@@ -831,9 +831,9 @@ select:focus {
   margin-top: 8px;
 }
 .btn-submit:hover {
-  opacity: 0.93;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 28px rgba(35, 53, 194, 0.42);
+  opacity: 0.95;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(35, 53, 194, 0.5);
 }
 .btn-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
 
