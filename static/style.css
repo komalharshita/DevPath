@@ -1574,7 +1574,7 @@ select:focus {
   .hero-stats { gap: 16px; }
 
   .form-card { padding: 28px 22px 24px; }
-  .form-row { grid-template-columns: 1fr; gap: 0; }
+  .form-row { grid-template-columns: 1fr; gap: 16px; }
   .form-group label {display: block; margin-bottom: 8px; }
 
   .results-grid { grid-template-columns: 1fr; }
