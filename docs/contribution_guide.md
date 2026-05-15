@@ -28,7 +28,7 @@ personal copy under your account.
 Then clone your fork:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/devpath.git
+git clone https://github.com/komalharshita/devpath.git
 cd devpath
 ```
 
@@ -36,7 +36,7 @@ Add the original repository as an upstream remote so you can pull future
 changes:
 
 ```bash
-git remote add upstream https://github.com/ORIGINAL_OWNER/devpath.git
+git remote add upstream https://github.com/komalharshita/devpath.git
 ```
 
 ---

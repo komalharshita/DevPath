@@ -26,16 +26,16 @@
 <br/>
 
 
-[![Open Issues](https://img.shields.io/github/issues/komalharshita/devpath?color=2335c2&style=flat-square&logo=github)](https://github.com/your-username/devpath/issues)
-[![Forks](https://img.shields.io/github/forks/komalharshita/devpath?color=7c3aed&style=flat-square&logo=github)](https://github.com/your-username/devpath/network/members)
-[![Stars](https://img.shields.io/github/stars/komalharshita/devpath?color=fbbf24&style=flat-square&logo=github)](https://github.com/your-username/devpath/stargazers)
-[![Contributors](https://img.shields.io/github/contributors/komalharshita/devpath?color=22c55e&style=flat-square&logo=github)](https://github.com/your-username/devpath/graphs/contributors)
+[![Open Issues](https://img.shields.io/github/issues/komalharshita/devpath?color=2335c2&style=flat-square&logo=github)](https://github.com/komalharshita/devpath/issues)
+[![Forks](https://img.shields.io/github/forks/komalharshita/devpath?color=7c3aed&style=flat-square&logo=github)](https://github.com/komalharshita/devpath/network/members)
+[![Stars](https://img.shields.io/github/stars/komalharshita/devpath?color=fbbf24&style=flat-square&logo=github)](https://github.com/komalharshita/devpath/stargazers)
+[![Contributors](https://img.shields.io/github/contributors/komalharshita/devpath?color=22c55e&style=flat-square&logo=github)](https://github.com/komalharshita/devpath/graphs/contributors)
 
 [Get Started](#quick-start) &nbsp;&bull;&nbsp;
 [How It Works](#how-it-works) &nbsp;&bull;&nbsp;
 [Contribute](#contributing) &nbsp;&bull;&nbsp;
 [Docs](docs/) &nbsp;&bull;&nbsp;
-[Issues](https://github.com/your-username/devpath/issues)
+[Issues](https://github.com/komalharshita/devpath/issues)
 
 <br/>
 
@@ -61,7 +61,7 @@ Clean Python, readable code, and 27 passing tests.
 ## Quick Start
 
 ```bash
-git clone https://github.com/your-username/devpath.git
+git clone https://github.com/komalharshita/devpath.git
 cd devpath
 python -m venv venv
 source venv/bin/activate          # Windows: venv\Scripts\activate
@@ -158,8 +158,8 @@ No backend changes needed. The engine picks it up on the next request.
 
 <div align="center">
 
-[![Issues](https://img.shields.io/github/issues/komalharshita/devpath?color=0f1560&style=flat-square)](https://github.com/your-username/devpath/issues)
-[![Good first issues](https://img.shields.io/github/issues/komalharshita/devpath/good%20first%20issue?color=22c55e&style=flat-square&label=good+first+issues)](https://github.com/your-username/devpath/issues?q=label%3A%22good+first+issue%22)
+[![Issues](https://img.shields.io/github/issues/komalharshita/devpath?color=0f1560&style=flat-square)](https://github.com/komalharshita/devpath/issues)
+[![Good first issues](https://img.shields.io/github/issues/komalharshita/devpath/good%20first%20issue?color=22c55e&style=flat-square&label=good+first+issues)](https://github.com/komalharshita/devpath/issues?q=label%3A%22good+first+issue%22)
 
 </div>
 
@@ -170,7 +170,7 @@ contribution, this is a good place to start.
 **Step-by-step process:**
 
 ```
-1. Browse issues          github.com/your-username/devpath/issues
+1. Browse issues          github.com/komalharshita/devpath/issues
 2. Comment to claim       Leave a comment before starting
 3. Fork the repo          Fork button on GitHub
 4. Create a branch        git checkout -b feat/your-change

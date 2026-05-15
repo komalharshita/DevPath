@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<!--
+  weather_dashboard.html
+  ======================
+  Project:    Weather Dashboard
+  Difficulty: Beginner
+  Skills:     HTML, CSS, JavaScript, Fetch API, OpenWeatherMap API
+  Time:       Low (a few hours)
+
+  What you will build:
+      A single-page weather app that fetches live weather data for any
+      city and displays the current temperature, conditions, humidity,
+      wind speed, and a weather icon. A toggle lets users switch between
+      Celsius and Fahrenheit without re-fetching the data.
+
+  How to run:
+      1. Get a free API key at https://openweathermap.org/api
+         (takes about 10 minutes to activate after sign-up)
+      2. Replace "YOUR_API_KEY_HERE" on line ~130 with your actual key
+      3. Open this file in any web browser — no server needed
+
+  Learning goals:
+      - Using the Fetch API to call an external REST API
+      - Parsing JSON responses and extracting nested values
+      - Updating the DOM dynamically with JavaScript
+      - Handling API errors and loading states
+      - Building a responsive layout with CSS Flexbox
+
+  OpenWeatherMap API reference:
+      Endpoint:  https://api.openweathermap.org/data/2.5/weather
+      Params:    q=<city>&appid=<key>&units=metric
+      Docs:      https://openweathermap.org/current
+
+  Sample API response shape:
+      {
+        "name": "London",
+        "main": {
+          "temp": 14.2,        <- Temperature in Celsius (units=metric)
+          "humidity": 78,      <- Humidity percentage
+          "feels_like": 13.1
+        },
+        "wind": { "speed": 5.2 },
+        "weather": [
+          {
+            "description": "light rain",
+            "icon": "10d"      <- Use with https://openweathermap.org/img/wn/<icon>@2x.png
+          }
+        ]
+      }
+
+  Roadmap:
+      Step 1:  Open the file in a browser — the layout and styles are ready
+      Step 2:  Add your API key to the API_KEY variable
+      Step 3:  Complete searchWeather() to build the API URL and call fetchWeather()
+      Step 4:  Complete fetchWeather() to make the Fetch call and handle errors
+      Step 5:  Complete displayWeather() to update the DOM with the response data
+      Step 6:  Complete toggleUnit() to convert the temperature without re-fetching
+      Step 7:  Complete getWindDirection() for a compass direction label
+      Step 8:  Add a search history list below the form
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather Dashboard</title>
+  <style>
+    /* ---- Reset and base ---- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a1f6e 0%, #2335c2 50%, #7c3aed 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    /* ---- Main card container ---- */
+    .card {
+      background: rgba(255, 255, 255, 0.97);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 520px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ---- Heading ---- */
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a1f6e;
+      margin-bottom: 4px;
+    }
+    .subtitle { font-size: 0.88rem; color: #6b7280; margin-bottom: 28px; }
+
+    /* ---- Search form ---- */
+    .search-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      color: #111827;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus { outline: none; border-color: #4f6ef7; }
+    button.search-btn {
+      padding: 12px 22px;
+      background: linear-gradient(90deg, #2335c2, #7c3aed);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+    button.search-btn:hover { opacity: 0.88; }
+    button.search-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ---- Error and loading messages ---- */
+    .message {
+      font-size: 0.85rem;
+      min-height: 20px;
+      margin-bottom: 20px;
+    }
+    .message.error { color: #dc2626; }
+    .message.info  { color: #6b7280; }
+
+    /* ---- Weather result panel (hidden until data loads) ---- */
+    #weather-result { display: none; }
+
+    /* ---- City and date header ---- */
+    .city-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .city-name {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #111827;
+    }
+    .city-date { font-size: 0.82rem; color: #9ca3af; margin-top: 4px; }
+
+    /* ---- Temperature display ---- */
+    .temp-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .weather-icon { width: 72px; height: 72px; }
+    .temp-value {
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: #1a1f6e;
+      line-height: 1;
+    }
+    .temp-unit {
+      font-size: 1.2rem;
+      color: #9ca3af;
+      align-self: flex-start;
+      margin-top: 10px;
+    }
+    .weather-desc {
+      font-size: 1rem;
+      color: #6b7280;
+      text-transform: capitalize;
+      margin-bottom: 20px;
+    }
+
+    /* ---- Toggle unit button ---- */
+    .toggle-btn {
+      background: #eef1ff;
+      color: #2335c2;
+      border: 1.5px solid #c7d2fe;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 24px;
+    }
+    .toggle-btn:hover { background: #e0e7ff; }
+
+    /* ---- Detail stat cards ---- */
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .detail-card {
+      background: #f9fafb;
+      border: 1px solid #f3f4f6;
+      border-radius: 12px;
+      padding: 16px 18px;
+    }
+    .detail-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 6px;
+    }
+    .detail-value {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #111827;
+    }
+    .detail-sub { font-size: 0.78rem; color: #9ca3af; margin-top: 2px; }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 480px) {
+      .card { padding: 26px 20px; }
+      .temp-value { font-size: 2.8rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+
+  <h1>Weather Dashboard</h1>
+  <p class="subtitle">Enter a city name to see the current weather.</p>
+
+  <!-- Search form -->
+  <div class="search-row">
+    <input
+      type="text"
+      id="city-input"
+      placeholder="e.g. London, Tokyo, New York"
+      autocomplete="off"
+    />
+    <button class="search-btn" id="search-btn" onclick="searchWeather()">
+      Search
+    </button>
+  </div>
+
+  <!-- Status message (error or loading text) -->
+  <p class="message" id="status-msg"></p>
+
+  <!-- Weather result (hidden until data is loaded) -->
+  <div id="weather-result">
+
+    <div class="city-header">
+      <div>
+        <div class="city-name" id="city-name"></div>
+        <div class="city-date" id="city-date"></div>
+      </div>
+    </div>
+
+    <div class="temp-row">
+      <img class="weather-icon" id="weather-icon" src="" alt="weather icon" />
+      <div>
+        <span class="temp-value" id="temp-value"></span>
+        <span class="temp-unit" id="temp-unit">C</span>
+      </div>
+    </div>
+
+    <p class="weather-desc" id="weather-desc"></p>
+
+    <button class="toggle-btn" id="toggle-btn" onclick="toggleUnit()">
+      Switch to Fahrenheit
+    </button>
+
+    <div class="details-grid">
+      <div class="detail-card">
+        <div class="detail-label">Feels Like</div>
+        <div class="detail-value" id="feels-like"></div>
+        <div class="detail-sub">Apparent temperature</div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-label">Humidity</div>
+        <div class="detail-value" id="humidity"></div>
+        <div class="detail-sub">Relative humidity</div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-label">Wind Speed</div>
+        <div class="detail-value" id="wind-speed"></div>
+        <div class="detail-sub" id="wind-direction"></div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-label">Conditions</div>
+        <div class="detail-value" id="conditions-main"></div>
+        <div class="detail-sub" id="conditions-desc"></div>
+      </div>
+    </div>
+
+  </div><!-- /weather-result -->
+
+</div><!-- /card -->
+
+<script>
+  // ---------------------------------------------------------------------------
+  // Configuration
+  // Replace "YOUR_API_KEY_HERE" with your free API key from openweathermap.org
+  // ---------------------------------------------------------------------------
+  var API_KEY = "YOUR_API_KEY_HERE";
+  var API_BASE = "https://api.openweathermap.org/data/2.5/weather";
+
+  // ---------------------------------------------------------------------------
+  // State — store raw Celsius values so unit toggle works without re-fetching
+  // ---------------------------------------------------------------------------
+  var currentTempC      = null;  // Temperature in Celsius
+  var currentFeelsLikeC = null;  // Feels-like temperature in Celsius
+  var currentUnit       = "C";   // "C" or "F"
+
+
+  // ---------------------------------------------------------------------------
+  // TODO Step 3: searchWeather()
+  // Called when the user clicks "Search" or presses Enter.
+  //
+  // Tasks:
+  //   1. Read the city name from #city-input and trim whitespace.
+  //   2. If the input is empty, show an error in #status-msg and return.
+  //   3. Disable the search button and show "Searching for <city>..." in #status-msg.
+  //   4. Build the API URL:
+  //        var url = API_BASE + "?q=" + city + "&appid=" + API_KEY + "&units=metric";
+  //   5. Call fetchWeather(url).
+  // ---------------------------------------------------------------------------
+  function searchWeather() {
+    // --- Write your code here ---
+
+  }
+
+
+  // ---------------------------------------------------------------------------
+  // TODO Step 4: fetchWeather(url)
+  // Fetch weather data from the API URL and handle the response.
+  //
+  // Tasks:
+  //   1. Use fetch(url) with .then() chains or async/await.
+  //   2. Parse the JSON response: response.json()
+  //   3. Check the response status code — the API returns a "cod" field:
+  //        if (data.cod !== 200) { showError(data.message); return; }
+  //   4. On success: call displayWeather(data).
+  //   5. On network error (.catch): call showError("Network error. Check your connection.").
+  //   6. Always re-enable the search button when done (success or error).
+  // ---------------------------------------------------------------------------
+  function fetchWeather(url) {
+    // --- Write your code here ---
+
+  }
+
+
+  // ---------------------------------------------------------------------------
+  // TODO Step 5: displayWeather(data)
+  // Populate the result panel with values from the API response.
+  //
+  // API response fields you need:
+  //   data.name                    -> City name
+  //   data.main.temp               -> Temperature (Celsius, units=metric)
+  //   data.main.feels_like         -> Feels-like temperature
+  //   data.main.humidity           -> Humidity percentage
+  //   data.wind.speed              -> Wind speed in m/s
+  //   data.wind.deg                -> Wind direction in degrees (for getWindDirection)
+  //   data.weather[0].description  -> Condition description (e.g. "light rain")
+  //   data.weather[0].main         -> Main condition (e.g. "Rain")
+  //   data.weather[0].icon         -> Icon code (e.g. "10d")
+  //
+  // Tasks:
+  //   1. Store data.main.temp in currentTempC and data.main.feels_like
+  //      in currentFeelsLikeC. Reset currentUnit to "C".
+  //   2. Set #city-name text to data.name.
+  //   3. Set #city-date text to today's date (new Date().toLocaleDateString()).
+  //   4. Set #temp-value text to Math.round(currentTempC).
+  //   5. Set #temp-unit text to "C".
+  //   6. Set #weather-icon src to:
+  //        "https://openweathermap.org/img/wn/" + data.weather[0].icon + "@2x.png"
+  //   7. Set #weather-desc text to data.weather[0].description.
+  //   8. Set #feels-like text to Math.round(data.main.feels_like) + " C".
+  //   9. Set #humidity text to data.main.humidity + "%".
+  //   10. Set #wind-speed text to data.wind.speed + " m/s".
+  //   11. Call getWindDirection(data.wind.deg) and set #wind-direction.
+  //   12. Set #conditions-main and #conditions-desc.
+  //   13. Set #toggle-btn text to "Switch to Fahrenheit".
+  //   14. Show #weather-result by setting its display to "block".
+  //   15. Clear #status-msg.
+  // ---------------------------------------------------------------------------
+  function displayWeather(data) {
+    // --- Write your code here ---
+
+  }
+
+
+  // ---------------------------------------------------------------------------
+  // TODO Step 6: toggleUnit()
+  // Switch the displayed temperature between Celsius and Fahrenheit.
+  // Do NOT make a new API call — convert the stored Celsius values.
+  //
+  // Conversion formulas:
+  //   Celsius to Fahrenheit: (C * 9/5) + 32
+  //   Fahrenheit to Celsius: (F - 32) * 5/9
+  //
+  // Tasks:
+  //   1. If currentTempC is null, return (no data loaded yet).
+  //   2. If currentUnit is "C":
+  //        - Convert currentTempC to Fahrenheit and display it.
+  //        - Update #temp-unit to "F".
+  //        - Update #feels-like with the converted feels-like value.
+  //        - Change #toggle-btn text to "Switch to Celsius".
+  //        - Set currentUnit to "F".
+  //   3. If currentUnit is "F":
+  //        - Display the original currentTempC value.
+  //        - Update labels back to "C".
+  //        - Change #toggle-btn text to "Switch to Fahrenheit".
+  //        - Set currentUnit to "C".
+  // ---------------------------------------------------------------------------
+  function toggleUnit() {
+    // --- Write your code here ---
+
+  }
+
+
+  // ---------------------------------------------------------------------------
+  // TODO Step 7: getWindDirection(degrees)
+  // Convert wind degrees (0-360) to a compass direction label.
+  //
+  // Conversion table:
+  //   337.5 - 22.5   ->  "North"
+  //   22.5  - 67.5   ->  "Northeast"
+  //   67.5  - 112.5  ->  "East"
+  //   112.5 - 157.5  ->  "Southeast"
+  //   157.5 - 202.5  ->  "South"
+  //   202.5 - 247.5  ->  "Southwest"
+  //   247.5 - 292.5  ->  "West"
+  //   292.5 - 337.5  ->  "Northwest"
+  //
+  // Returns a string like "Northeast" or "Southwest".
+  // ---------------------------------------------------------------------------
+  function getWindDirection(degrees) {
+    // --- Write your code here ---
+
+    return degrees + " deg";  // Replace this line with the real implementation
+  }
+
+
+  // ---------------------------------------------------------------------------
+  // Helper — already complete, no changes needed
+  // ---------------------------------------------------------------------------
+  function showError(message) {
+    var msg = document.getElementById("status-msg");
+    msg.textContent = message;
+    msg.className   = "message error";
+    document.getElementById("weather-result").style.display = "none";
+    document.getElementById("search-btn").disabled = false;
+  }
+
+  // Allow pressing Enter in the input field to trigger the search
+  document.getElementById("city-input").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") searchWeather();
+  });
+</script>
+</body>
+</html>

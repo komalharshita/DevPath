@@ -221,6 +221,11 @@
       </div>
       <div class="code-panel-actions">
         <a href="/project/{{ project.id }}/download" class="code-panel-download">Download file</a>
+        <button class="btn-copy-code" id="btn-copy-code" aria-label="Copy code to clipboard">
+          <svg class="copy-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <svg class="check-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="20 6 9 17 4 12"/></svg>
+          <span class="copy-btn-label">Copy Code</span>
+        </button>
         <button class="code-panel-close" id="code-panel-close">Close</button>
       </div>
     </div>
@@ -229,6 +234,12 @@
   </div>
   <!-- Dark overlay behind the code panel -->
   <div class="code-panel-overlay" id="code-panel-overlay"></div>
+
+  <!-- Copy success toast notification -->
+  <div class="copy-toast" id="copy-toast" role="status" aria-live="polite">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    Copied to clipboard!
+  </div>
 
   <!-- ============================================================
        Footer
@@ -248,7 +259,7 @@
 
   <!-- Pass project ID to the JavaScript without hardcoding -->
   <script>
-    var PROJECT_ID = {{ project.id }};
+    var PROJECT_ID = parseInt("{{ project.id }}", 10);
   </script>
   <script src="/static/script.js"></script>
 </body>

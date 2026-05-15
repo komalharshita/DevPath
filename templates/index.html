@@ -260,13 +260,11 @@
                   id="skills-input"
                   placeholder="Type a skill and press Enter..."
                   autocomplete="off"
-                  aria-required="true"
-                  aria-describedby="skills-hint skills-error"
                 />
               </div>
               <!-- Hidden field holds the final comma-separated value -->
               <input type="hidden" id="skills" name="skills" />
-              <span id="skills-hint" class="form-hint">Or click a popular skill below to add it</span>
+              <span class="form-hint">Or click a popular skill below to add it</span>
               <div class="form-error-msg" id="skills-error"></div>
             </div>
 
@@ -287,7 +285,7 @@
               <div class="form-group">
                 <label for="level">Experience Level</label>
                 <div class="select-wrap">
-                  <select id="level" name="level" aria-required="true" aria-describedby="level-error">
+                  <select id="level" name="level">
                     <option value="" disabled selected>Select level</option>
                     <option value="Beginner">Beginner</option>
                     <option value="Intermediate">Intermediate</option>
@@ -300,7 +298,7 @@
               <div class="form-group">
                 <label for="interest">Area of Interest</label>
                 <div class="select-wrap">
-                  <select id="interest" name="interest" aria-required="true" aria-describedby="interest-error">
+                  <select id="interest" name="interest">
                     <option value="" disabled selected>Select interest</option>
                     <option value="Web">Web Development</option>
                     <option value="Data">Data and Analytics</option>
@@ -317,7 +315,7 @@
             <div class="form-group">
               <label for="time">Time Availability</label>
               <div class="select-wrap">
-                <select id="time" name="time" aria-required="true" aria-describedby="time-error">
+                <select id="time" name="time">
                   <option value="" disabled selected>How much time can you commit?</option>
                   <option value="Low">Low — a few hours total</option>
                   <option value="Medium">Medium — across a weekend</option>

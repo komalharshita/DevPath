@@ -459,4 +459,69 @@ if (isDetailPage) {
     if (evt.key === "Escape") closeCodePanel();
   });
 
+  // ----------------------------------------------------------
+  // Copy Code button
+  // ----------------------------------------------------------
+  var btnCopyCode  = document.getElementById("btn-copy-code");
+  var copyToast    = document.getElementById("copy-toast");
+  var toastTimeout = null;
+
+  function showCopySuccess() {
+    if (!btnCopyCode) return;
+
+    // Swap icons on the button
+    var copyIcon  = btnCopyCode.querySelector(".copy-icon");
+    var checkIcon = btnCopyCode.querySelector(".check-icon");
+    var btnLabel  = btnCopyCode.querySelector(".copy-btn-label");
+
+    if (copyIcon)  copyIcon.style.display  = "none";
+    if (checkIcon) checkIcon.style.display = "inline";
+    if (btnLabel)  btnLabel.textContent    = "Copied!";
+    btnCopyCode.classList.add("copied");
+    btnCopyCode.disabled = true;
+
+    // Show toast
+    if (copyToast) {
+      copyToast.classList.add("show");
+    }
+
+    // Auto-reset after 2.5 s
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(function () {
+      if (copyIcon)  copyIcon.style.display  = "inline";
+      if (checkIcon) checkIcon.style.display = "none";
+      if (btnLabel)  btnLabel.textContent    = "Copy Code";
+      btnCopyCode.classList.remove("copied");
+      btnCopyCode.disabled = false;
+      if (copyToast) copyToast.classList.remove("show");
+    }, 2500);
+  }
+
+  if (btnCopyCode) {
+    btnCopyCode.addEventListener("click", function () {
+      var code = codeContentEl ? codeContentEl.textContent : "";
+      if (!code || code === "Loading..." || code === "Loading starter code...") return;
+
+      // Use Clipboard API with textarea fallback
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(showCopySuccess).catch(function () {
+          fallbackCopy(code);
+        });
+      } else {
+        fallbackCopy(code);
+      }
+    });
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand("copy"); showCopySuccess(); } catch (e) { /* silent fail */ }
+    document.body.removeChild(ta);
+  }
+
 } // end isDetailPage
