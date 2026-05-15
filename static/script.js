@@ -1,12 +1,49 @@
 // script.js — DevPath client-side logic
 //
 // Responsibilities:
+//   - Dark / Light mode toggle (persisted in localStorage)
 //   - Mobile navigation toggle
 //   - Skill chip manager (add/remove skills)
 //   - Form validation with per-field error messages
 //   - Recommendation API call and loading states
 //   - Result card rendering
 //   - Code viewer panel (detail page)
+
+// ============================================================
+// Dark / Light mode
+// ============================================================
+(function initTheme() {
+  var STORAGE_KEY = "devpath-theme";
+  var html = document.documentElement;
+
+  // Apply saved preference immediately (before paint) to avoid flash
+  var saved = localStorage.getItem(STORAGE_KEY);
+  var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  var theme = saved || (prefersDark ? "dark" : "light");
+  html.setAttribute("data-theme", theme);
+
+  function setTheme(t) {
+    html.setAttribute("data-theme", t);
+    localStorage.setItem(STORAGE_KEY, t);
+  }
+
+  function bindButton(btnId) {
+    var btn = document.getElementById(btnId);
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+      var current = html.getAttribute("data-theme");
+      setTheme(current === "dark" ? "light" : "dark");
+    });
+  }
+
+  // Bind after DOM is ready
+  document.addEventListener("DOMContentLoaded", function () {
+    bindButton("theme-toggle");
+    bindButton("theme-toggle-mobile");
+  });
+})();
+
+
 
 // ============================================================
 // Detect which page we are on

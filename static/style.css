@@ -1654,3 +1654,269 @@ select:focus {
   .container { padding: 0 20px; }
   .section-sub { margin-bottom: 40px; }
 }
+
+
+/* =============================================================
+   DARK MODE
+   Applied via [data-theme="dark"] on <html>
+   Smooth transitions on all colour-bearing properties.
+   ============================================================= */
+
+/* ---- Dark mode toggle button ------------------------------ */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-full);
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  background: transparent;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.85);
+  transition: background var(--t), border-color var(--t), color var(--t);
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+.theme-toggle svg { display: block; }
+.theme-toggle .icon-moon { display: block; }
+.theme-toggle .icon-sun  { display: none; }
+
+[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+[data-theme="dark"] .theme-toggle .icon-sun  { display: block; }
+
+/* ---- Smooth transition for theme switch ------------------- */
+body,
+.navbar,
+.form-card,
+.result-card,
+.feature-card,
+.step-card,
+.footer,
+.hero-visual-main,
+.hero-visual-card,
+.code-panel,
+.code-panel-header,
+.detail-sidebar,
+.tag,
+.skill-chip,
+.skill-chip-selected,
+.nav-mobile-menu,
+input, select, textarea {
+  transition:
+    background var(--t),
+    background-color var(--t),
+    color var(--t),
+    border-color var(--t),
+    box-shadow var(--t);
+}
+
+/* ---- Dark palette ----------------------------------------- */
+[data-theme="dark"] {
+  --text-heading: #f1f5f9;
+  --text-body:    #94a3b8;
+  --text-light:   #64748b;
+  --border:       #1e293b;
+  --white:        #0f172a;
+  --gray-50:      #0f172a;
+  --gray-100:     #1e293b;
+  --gray-200:     #334155;
+  --gray-300:     #475569;
+  --gray-400:     #64748b;
+  --gray-500:     #94a3b8;
+  --gray-600:     #cbd5e1;
+  --gray-700:     #e2e8f0;
+  --gray-900:     #f8fafc;
+}
+
+/* ---- Dark body & base ------------------------------------- */
+[data-theme="dark"] body {
+  background: #0f172a;
+  color: #94a3b8;
+}
+
+/* ---- Dark hero -------------------------------------------- */
+[data-theme="dark"] .hero {
+  background: linear-gradient(135deg, #0a0f2e 0%, #0d1540 60%, #100c35 100%);
+}
+[data-theme="dark"] .hero-bg-grid {
+  opacity: 0.3;
+}
+
+/* ---- Dark sections ---------------------------------------- */
+[data-theme="dark"] .how-it-works,
+[data-theme="dark"] .section-alt {
+  background: #0f172a;
+}
+[data-theme="dark"] .features,
+[data-theme="dark"] .find-project-section {
+  background: #090e1e;
+}
+
+/* ---- Dark cards ------------------------------------------- */
+[data-theme="dark"] .result-card {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+[data-theme="dark"] .result-card:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+[data-theme="dark"] .feature-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+[data-theme="dark"] .step-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+[data-theme="dark"] .step-connector { background: #334155; }
+
+/* ---- Dark form card --------------------------------------- */
+[data-theme="dark"] .form-card {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+[data-theme="dark"] .form-label { color: #cbd5e1; }
+[data-theme="dark"] .form-hint  { color: #64748b; }
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background: #0f172a;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+[data-theme="dark"] input:focus,
+[data-theme="dark"] select:focus {
+  border-color: var(--indigo-500);
+  box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.2);
+}
+[data-theme="dark"] input::placeholder { color: #475569; }
+[data-theme="dark"] select option { background: #1e293b; }
+
+/* ---- Dark skill chips ------------------------------------- */
+[data-theme="dark"] .skill-chip {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+[data-theme="dark"] .skill-chip:hover {
+  background: #334155;
+  border-color: var(--indigo-500);
+  color: #e2e8f0;
+}
+[data-theme="dark"] .skill-chip.selected {
+  background: rgba(79,110,247,0.18);
+  border-color: var(--indigo-500);
+  color: var(--indigo-500);
+}
+[data-theme="dark"] .skill-chip-selected {
+  background: rgba(79,110,247,0.18);
+  border-color: var(--indigo-500);
+  color: #a5b4fc;
+}
+[data-theme="dark"] .skill-chips-area {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+/* ---- Dark tags -------------------------------------------- */
+[data-theme="dark"] .tag {
+  background: #1e293b;
+  color: #94a3b8;
+}
+
+/* ---- Dark hero visual ------------------------------------- */
+[data-theme="dark"] .hero-visual-main {
+  background: #1e293b;
+  border-color: #334155;
+}
+[data-theme="dark"] .hero-visual-card {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+[data-theme="dark"] .hvc-sub { color: #64748b; }
+
+/* ---- Dark mobile nav -------------------------------------- */
+[data-theme="dark"] .nav-mobile-menu {
+  background: #0f172a;
+  border-color: #1e293b;
+}
+[data-theme="dark"] .nav-mobile-link {
+  color: #94a3b8;
+  border-color: #1e293b;
+}
+[data-theme="dark"] .nav-mobile-link:hover { color: #e2e8f0; }
+
+/* ---- Dark footer ------------------------------------------ */
+[data-theme="dark"] .footer {
+  background: #090e1e;
+  border-top-color: #1e293b;
+}
+[data-theme="dark"] .footer-divider { background: #1e293b; }
+[data-theme="dark"] .footer-heading { color: #e2e8f0; }
+[data-theme="dark"] .footer-link    { color: #64748b; }
+[data-theme="dark"] .footer-link:hover { color: #94a3b8; }
+[data-theme="dark"] .footer-copy    { color: #475569; }
+
+/* ---- Dark detail page ------------------------------------- */
+[data-theme="dark"] .detail-hero { background: linear-gradient(135deg, #0a0f2e, #0d1540); }
+[data-theme="dark"] .detail-sidebar {
+  background: #1e293b;
+  border-color: #334155;
+}
+[data-theme="dark"] .detail-section { border-color: #334155; }
+[data-theme="dark"] .roadmap-step   { border-color: #334155; }
+[data-theme="dark"] .roadmap-step-title { color: #e2e8f0; }
+[data-theme="dark"] .breadcrumb a   { color: #64748b; }
+[data-theme="dark"] .breadcrumb a:hover { color: #94a3b8; }
+
+/* ---- Dark code panel -------------------------------------- */
+[data-theme="dark"] .code-panel { background: #0d1117; }
+[data-theme="dark"] .code-panel-header {
+  background: #161b22;
+  border-color: #30363d;
+}
+
+/* ---- Dark autocomplete dropdown --------------------------- */
+[data-theme="dark"] .autocomplete-list {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+[data-theme="dark"] .autocomplete-item { color: #cbd5e1; }
+[data-theme="dark"] .autocomplete-item:hover,
+[data-theme="dark"] .autocomplete-item.active {
+  background: #334155;
+}
+
+/* ---- Dark results empty/error states ---------------------- */
+[data-theme="dark"] .results-empty p  { color: #64748b; }
+[data-theme="dark"] .form-error       { color: #f87171; }
+
+/* ---- Dark error page -------------------------------------- */
+[data-theme="dark"] .error-code { color: #1e293b; }
+
+/* Mobile toggle variant — sits inside mobile menu */
+.theme-toggle--mobile {
+  margin: 8px 20px 4px;
+  width: auto;
+  padding: 8px 16px;
+  border-radius: var(--r-xs);
+  gap: 8px;
+  justify-content: flex-start;
+  color: rgba(255,255,255,0.7);
+  border-color: rgba(255,255,255,0.15);
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+.theme-toggle--mobile::after {
+  content: "Toggle theme";
+  margin-left: 4px;
+}
