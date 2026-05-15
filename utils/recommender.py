@@ -7,11 +7,13 @@ from utils.data_loader import load_all_projects
 # Maximum number of recommendations returned to the user
 MAX_RESULTS = 3
 
-# Point weights for each matching criterion
-WEIGHT_SKILL   = 3   # Skill matches carry the most influence
-WEIGHT_LEVEL   = 2   # Experience level is the next strongest signal
-WEIGHT_INTEREST = 2  # Area of interest is equally important as level
-WEIGHT_TIME    = 1   # Time availability is a tiebreaker
+# Scoring weights used by the recommendation engine.
+# Higher weights mean that criterion has more influence
+# on the final recommendation score.
+WEIGHT_SKILL   = 3   # Skills are weighted highest because they best reflect project compatibility
+WEIGHT_LEVEL   = 2   # Matching experience level helps avoid projects that are too easy or too difficult
+WEIGHT_INTEREST = 2   # Interest alignment improves recommendation relevance
+WEIGHT_TIME    = 1    # Time availability acts as a smaller tie-breaker factor
 
 
 def parse_skills(skills_string):
@@ -38,7 +40,11 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
 
     # Compare user's skills against the project's required skills
     project_skills = [s.lower() for s in project.get("skills", [])]
-    matched_skills = sum(1 for skill in user_skills if skill in project_skills)
+    # Count how many user skills overlap with the
+    # skills required by the current project.
+    matched_skills = sum(1 for skill in user_skills if skill in project_skills) 
+    # Add weighted points based on the number of matching skills.
+    # More overlapping skills result in a higher recommendation score.
     score += matched_skills * WEIGHT_SKILL
 
     # Award points for each additional matching criterion
@@ -74,10 +80,13 @@ def get_recommendations(skills_string, level, interest, time_availability):
         score = score_single_project(
             project, user_skills, level, interest, time_availability
         )
+        # Ignore projects with a score of 0 since they
+        # have no meaningful overlap with the user's inputs.
         if score > 0:
             scored_projects.append({"project": project, "score": score})
 
-    # Sort so the highest-scoring project appears first
+    # Sort projects in descending order so the
+    # most relevant recommendations appear first.
     scored_projects.sort(key=lambda item: item["score"], reverse=True)
 
     # Return only the project dicts, not the score metadata
