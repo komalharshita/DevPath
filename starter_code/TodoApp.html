@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<!--
+  React Native Todo App Showcase
+  ==============================
+
+  Project:    Todo App 
+  Difficulty: Beginner
+  Skills:    React Native, Expo, JavaScript
+  time: low
+
+
+  This HTML page is used to SHOWCASE a React Native To-Do App
+  on a portfolio website.
+
+  Features shown:
+  - App preview image
+  - Project details
+  - Features
+  - Tech stack
+-->
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>React Native Todo App</title>
+
+  <style>
+
+    *{
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body{
+      background: #f3f4f6;
+      padding: 40px 20px;
+    }
+
+    .container{
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .card{
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .image-section{
+      background: #111827;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      padding: 30px;
+    }
+
+    .phone{
+      width: 260px;
+      height: 520px;
+
+      background: black;
+
+      border-radius: 35px;
+
+      padding: 15px;
+
+      position: relative;
+    }
+
+    .screen{
+      width: 100%;
+      height: 100%;
+
+      background: #f9fafb;
+
+      border-radius: 25px;
+
+      overflow: hidden;
+    }
+
+    .app-header{
+      background: #4f46e5;
+      color: white;
+
+      text-align: center;
+
+      padding: 20px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .task{
+      background: white;
+
+      margin: 15px;
+
+      padding: 15px;
+
+      border-radius: 10px;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .buttons{
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn{
+      width: 28px;
+      height: 28px;
+
+      border-radius: 6px;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      color: white;
+      font-size: 14px;
+    }
+
+    .green{
+      background: #10b981;
+    }
+
+    .red{
+      background: #ef4444;
+    }
+
+    /* -------------------------
+       Content Section
+    ------------------------- */
+
+    .content{
+      padding: 40px;
+    }
+
+    .tag{
+      background: #e0e7ff;
+      color: #4338ca;
+
+      display: inline-block;
+
+      padding: 8px 14px;
+
+      border-radius: 30px;
+
+      font-size: 14px;
+      font-weight: bold;
+
+      margin-bottom: 20px;
+    }
+
+    h1{
+      font-size: 40px;
+      margin-bottom: 15px;
+      color: #111827;
+    }
+
+    p{
+      color: #6b7280;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .features{
+      margin-bottom: 25px;
+    }
+
+    .features li{
+      margin-bottom: 10px;
+      color: #374151;
+    }
+
+    .tech{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+
+      margin-bottom: 30px;
+    }
+
+    .tech span{
+      background: #f3f4f6;
+
+      padding: 10px 16px;
+
+      border-radius: 8px;
+
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .buttons-row{
+      display: flex;
+      gap: 15px;
+    }
+
+    .project-btn{
+      padding: 14px 22px;
+
+      border-radius: 10px;
+
+      text-decoration: none;
+
+      font-weight: bold;
+    }
+
+    .github{
+      background: black;
+      color: white;
+    }
+
+    .live{
+      background: #4f46e5;
+      color: white;
+    }
+
+    @media(max-width: 850px){
+
+      .card{
+        grid-template-columns: 1fr;
+      }
+
+      .content{
+        padding: 30px 20px;
+      }
+
+      h1{
+        font-size: 32px;
+      }
+
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="card">
+
+    <!-- Left Side App Preview -->
+
+    <div class="image-section">
+
+      <div class="phone">
+
+        <div class="screen">
+
+          <div class="app-header">
+            Todo App
+          </div>
+
+          <div class="task">
+            <span>Complete React Native UI</span>
+
+            <div class="buttons">
+              <div class="btn green">✔</div>
+              <div class="btn red">✖</div>
+            </div>
+          </div>
+
+          <div class="task">
+            <span>Learn FlatList</span>
+
+            <div class="buttons">
+              <div class="btn green">✔</div>
+              <div class="btn red">✖</div>
+            </div>
+          </div>
+
+          <div class="task">
+            <span>Build Beginner Project</span>
+
+            <div class="buttons">
+              <div class="btn green">✔</div>
+              <div class="btn red">✖</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Right Side Content -->
+
+    <div class="content">
+
+      <div class="tag">
+        Beginner React Native Project
+      </div>
+
+      <h1>React Native Todo App</h1>
+
+      <p>
+        A beginner-friendly React Native application where users can
+        add tasks, mark them as completed, and delete tasks.
+        This project helps in understanding React Native components,
+        state management, FlatList, and styling.
+      </p>
+
+      <ul class="features">
+
+        <li>✔ Add Tasks</li>
+
+        <li>✔ Delete Tasks</li>
+
+        <li>✔ Mark Tasks Completed</li>
+
+        <li>✔ Responsive Mobile UI</li>
+
+        <li>✔ Beginner Friendly Structure</li>
+
+      </ul>
+
+      <div class="tech">
+
+        <span>React Native</span>
+
+        <span>Expo</span>
+
+        <span>JavaScript</span>
+
+        <span>FlatList</span>
+
+        <span>useState</span>
+
+      </div>
+
+      <div class="buttons-row">
+
+        <a href="#" class="project-btn github">
+          GitHub
+        </a>
+
+        <a href="#" class="project-btn live">
+          Live Preview
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

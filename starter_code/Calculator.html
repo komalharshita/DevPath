@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<!--
+  React Native Calculator App Showcase
+  ==============================
+
+  Project:    Calculator App 
+  Difficulty: Beginner
+  Skills:    React Native,JavaScript
+  time: low
+
+
+  This HTML page is used to SHOWCASE a React Native Calculator App
+  on a portfolio website.
+
+
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>React Native Calculator Project</title>
+
+  <style>
+
+    body{
+      background:#0f172a;
+      color:white;
+      font-family:Arial;
+      padding:40px;
+    }
+
+    .container{
+      max-width:900px;
+      margin:auto;
+    }
+
+    h1{
+      color:#7c3aed;
+      margin-bottom:10px;
+    }
+
+    p{
+      color:#cbd5e1;
+      line-height:1.7;
+    }
+
+    .code-box{
+      background:#111827;
+      padding:20px;
+      border-radius:15px;
+      overflow:auto;
+      margin-top:20px;
+      border:1px solid #374151;
+    }
+
+    pre{
+      color:#22c55e;
+      font-size:14px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>React Native Calculator App</h1>
+
+  <p>
+    This is a beginner React Native calculator project.
+    Users can perform addition, subtraction,
+    multiplication and division operations.
+    The app is built using React Native components
+    like View, Text, TouchableOpacity and useState hook.
+  </p>
+
+  <div class="code-box">
+
+<pre>
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity
+} from "react-native";
+
+export default function App() {
+
+  const [input, setInput] = useState("");
+
+  const pressHandler = (value) => {
+    setInput(input + value);
+  };
+
+  const clearHandler = () => {
+    setInput("");
+  };
+
+  const calculate = () => {
+    try {
+      setInput(eval(input).toString());
+    } catch {
+      setInput("Error");
+    }
+  };
+
+  return (
+    &lt;View&gt;
+      &lt;Text&gt;{input}&lt;/Text&gt;
+    &lt;/View&gt;
+  );
+}
+</pre>
+
+  </div>
+
+</div>
+
+</body>
+</html>
