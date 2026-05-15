@@ -669,6 +669,7 @@ label {
 
 /* Skill input wrap */
 .skill-input-wrap {
+  position: relative;
   border: 1.5px solid var(--border);
   border-radius: var(--r-sm);
   background: var(--gray-50);
@@ -688,6 +689,13 @@ label {
 }
 
 /* An added skill chip inside the wrap */
+.skill-chips-selected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
 .skill-chip-selected {
   display: inline-flex;
   align-items: center;
@@ -729,6 +737,62 @@ label {
 .skill-input-wrap input[type="text"]:focus {
   outline: none;
   box-shadow: none;
+}
+
+/*suggestions dropdown*/
+.skills-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--white);
+  border: 1.5px solid var(--indigo-200, #c7d2fe);
+  border-top: none;
+  border-radius: 0 0 var(--r-sm) var(--r-sm);
+  margin-top: -1px;
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+  box-shadow: 0 8px 24px rgba(79, 110, 247, 0.15);
+}
+
+.suggestion-item {
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  font-size: 0.9rem;
+  color: var(--gray-700);
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover,
+.suggestion-item--active {
+  background: var(--indigo-50);
+  color: var(--indigo-700);
+  font-weight: 500;
+}
+
+/* Scrollbar styling for suggestions dropdown */
+.skills-suggestions::-webkit-scrollbar {
+  width: 6px;
+}
+
+.skills-suggestions::-webkit-scrollbar-track {
+  background: var(--gray-50);
+}
+
+.skills-suggestions::-webkit-scrollbar-thumb {
+  background: var(--indigo-300);
+  border-radius: 3px;
+}
+
+.skills-suggestions::-webkit-scrollbar-thumb:hover {
+  background: var(--indigo-400);
 }
 
 /* Quick-select chips row */
@@ -1575,7 +1639,7 @@ select:focus {
 
   .form-card { padding: 28px 22px 24px; }
   .form-row { grid-template-columns: 1fr; gap: 16px; }
-  .form-group label {display: block; margin-bottom: 8px; }
+  .form-group label { display: block; margin-bottom: 8px; }
 
   .results-grid { grid-template-columns: 1fr; }
 
