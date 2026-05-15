@@ -356,7 +356,7 @@ if (isIndexPage) {
   }
 
   // ----------------------------------------------------------
-  // Filter projects based on search input
+  // Filter projects based on search input (title, description, AND skills)
   // ----------------------------------------------------------
   var searchInput = null;
   var currentProjects = [];
@@ -370,10 +370,29 @@ if (isIndexPage) {
       var cards = resultsGrid.querySelectorAll(".project-card");
       
       cards.forEach(function (card) {
+        // Get title and description
         var title = card.querySelector(".project-card-title")?.textContent.toLowerCase() || "";
         var desc = card.querySelector(".project-card-desc")?.textContent.toLowerCase() || "";
         
-        if (searchTerm === "" || title.includes(searchTerm) || desc.includes(searchTerm)) {
+        // Get all skill/tag text from project-tag elements
+        var tags = card.querySelectorAll(".project-tag");
+        var tagTexts = "";
+        tags.forEach(function(tag) {
+          tagTexts += tag.textContent.toLowerCase() + " ";
+        });
+        
+        // Also specifically look for skill tags (project-tag--skill class)
+        var skillTags = card.querySelectorAll(".project-tag--skill");
+        var skillTexts = "";
+        skillTags.forEach(function(skill) {
+          skillTexts += skill.textContent.toLowerCase() + " ";
+        });
+        
+        // Combine all searchable text
+        var searchableText = title + " " + desc + " " + tagTexts + " " + skillTexts;
+        
+        // Check if search term matches ANY content
+        if (searchTerm === "" || searchableText.includes(searchTerm)) {
           card.style.display = "";
         } else {
           card.style.display = "none";
@@ -386,7 +405,16 @@ if (isIndexPage) {
     var wrap = document.getElementById("results-search-wrap");
     if (wrap) {
       wrap.style.display = show ? "block" : "none";
-      if (show && searchInput) searchInput.value = "";
+      if (show && searchInput) {
+        searchInput.value = "";
+        // Reset any hidden cards when showing search
+        if (resultsGrid) {
+          var cards = resultsGrid.querySelectorAll(".project-card");
+          cards.forEach(function(card) {
+            card.style.display = "";
+          });
+        }
+      }
     }
   }
 
@@ -458,70 +486,5 @@ if (isDetailPage) {
   document.addEventListener("keydown", function (evt) {
     if (evt.key === "Escape") closeCodePanel();
   });
-
-  // ----------------------------------------------------------
-  // Copy Code button
-  // ----------------------------------------------------------
-  var btnCopyCode  = document.getElementById("btn-copy-code");
-  var copyToast    = document.getElementById("copy-toast");
-  var toastTimeout = null;
-
-  function showCopySuccess() {
-    if (!btnCopyCode) return;
-
-    // Swap icons on the button
-    var copyIcon  = btnCopyCode.querySelector(".copy-icon");
-    var checkIcon = btnCopyCode.querySelector(".check-icon");
-    var btnLabel  = btnCopyCode.querySelector(".copy-btn-label");
-
-    if (copyIcon)  copyIcon.style.display  = "none";
-    if (checkIcon) checkIcon.style.display = "inline";
-    if (btnLabel)  btnLabel.textContent    = "Copied!";
-    btnCopyCode.classList.add("copied");
-    btnCopyCode.disabled = true;
-
-    // Show toast
-    if (copyToast) {
-      copyToast.classList.add("show");
-    }
-
-    // Auto-reset after 2.5 s
-    clearTimeout(toastTimeout);
-    toastTimeout = setTimeout(function () {
-      if (copyIcon)  copyIcon.style.display  = "inline";
-      if (checkIcon) checkIcon.style.display = "none";
-      if (btnLabel)  btnLabel.textContent    = "Copy Code";
-      btnCopyCode.classList.remove("copied");
-      btnCopyCode.disabled = false;
-      if (copyToast) copyToast.classList.remove("show");
-    }, 2500);
-  }
-
-  if (btnCopyCode) {
-    btnCopyCode.addEventListener("click", function () {
-      var code = codeContentEl ? codeContentEl.textContent : "";
-      if (!code || code === "Loading..." || code === "Loading starter code...") return;
-
-      // Use Clipboard API with textarea fallback
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(code).then(showCopySuccess).catch(function () {
-          fallbackCopy(code);
-        });
-      } else {
-        fallbackCopy(code);
-      }
-    });
-  }
-
-  function fallbackCopy(text) {
-    var ta = document.createElement("textarea");
-    ta.value = text;
-    ta.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0";
-    document.body.appendChild(ta);
-    ta.focus();
-    ta.select();
-    try { document.execCommand("copy"); showCopySuccess(); } catch (e) { /* silent fail */ }
-    document.body.removeChild(ta);
-  }
 
 } // end isDetailPage
