@@ -90,6 +90,193 @@ a { color: var(--indigo-500); text-decoration: none; }
 a:hover { text-decoration: underline; }
 ul, ol { list-style: none; }
 
+/* ---- Skip Navigation Link --------------------------------- */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 24px;
+  background: var(--indigo-700);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  border-radius: 0 0 var(--r-sm) var(--r-sm);
+  z-index: 9999;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+.skip-link:focus {
+  top: 0;
+  outline: 3px solid var(--yellow-400);
+  outline-offset: 2px;
+}
+
+/* ---- Global Focus-Visible Ring ----------------------------- */
+/*
+ * We suppress the default browser outline on all elements globally
+ * and re-apply a polished custom ring only when navigating via
+ * keyboard (`:focus-visible`). This keeps the UI clean for mouse
+ * users while fully satisfying WCAG 2.1 SC 2.4.7 (Focus Visible).
+ */
+*:focus { outline: none; }
+
+*:focus-visible {
+  outline: 2.5px solid var(--indigo-500);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Dark-background contexts — use a lighter, high-contrast ring */
+.navbar *:focus-visible,
+.hero *:focus-visible,
+.detail-hero *:focus-visible,
+.cta-section *:focus-visible,
+.footer *:focus-visible,
+.code-panel *:focus-visible {
+  outline-color: var(--yellow-400);
+}
+
+/* ---- Per-component Focus Overrides ------------------------ */
+/* These extend the ring for elements that need rounded outlines */
+
+.nav-logo:focus-visible,
+.nav-link:focus-visible,
+.nav-btn-outline:focus-visible,
+.nav-mobile-link:focus-visible {
+  border-radius: var(--r-full);
+  outline: 2.5px solid var(--yellow-400);
+  outline-offset: 3px;
+}
+
+.btn-hero-primary:focus-visible,
+.btn-hero-ghost:focus-visible {
+  outline: 2.5px solid var(--yellow-400);
+  outline-offset: 3px;
+  border-radius: var(--r-full);
+}
+
+.skill-chip:focus-visible {
+  outline: 2.5px solid var(--indigo-500);
+  outline-offset: 2px;
+  border-radius: var(--r-full);
+}
+
+.skill-chip-remove:focus-visible {
+  outline: 2.5px solid var(--indigo-500);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+.feature-card-link:focus-visible {
+  outline: 2.5px solid var(--indigo-600);
+  outline-offset: 2px;
+  border-radius: var(--r-full);
+}
+
+.btn-submit:focus-visible {
+  outline: 2.5px solid var(--indigo-500);
+  outline-offset: 3px;
+  border-radius: var(--r-sm);
+  box-shadow: 0 0 0 5px rgba(79, 110, 247, 0.2), 0 4px 20px rgba(35, 53, 194, 0.35);
+}
+
+.btn-try-again:focus-visible {
+  outline: 2.5px solid var(--indigo-500);
+  outline-offset: 2px;
+  border-radius: var(--r-full);
+}
+
+.btn-details:focus-visible {
+  outline: 2.5px solid var(--indigo-500);
+  outline-offset: 2px;
+  border-radius: var(--r-xs);
+  background: var(--indigo-600);
+  color: var(--white);
+}
+
+.btn-cta:focus-visible {
+  outline: 2.5px solid var(--yellow-400);
+  outline-offset: 3px;
+  border-radius: var(--r-full);
+}
+
+.btn-download:focus-visible,
+.btn-view-code:focus-visible {
+  outline: 2.5px solid var(--yellow-400);
+  outline-offset: 3px;
+  border-radius: var(--r-xs);
+}
+
+.btn-view-code-sm:focus-visible {
+  outline: 2.5px solid var(--indigo-500);
+  outline-offset: 2px;
+  border-radius: var(--r-xs);
+  background: var(--indigo-600);
+  color: var(--white);
+}
+
+.btn-download-sm:focus-visible {
+  outline: 2.5px solid var(--yellow-400);
+  outline-offset: 2px;
+  border-radius: var(--r-xs);
+}
+
+.resource-link:focus-visible {
+  outline: 2.5px solid var(--indigo-500);
+  outline-offset: 2px;
+  border-radius: var(--r-xs);
+  background: var(--indigo-100);
+}
+
+.code-panel-download:focus-visible {
+  outline: 2.5px solid var(--yellow-400);
+  outline-offset: 2px;
+  border-radius: var(--r-full);
+}
+
+.code-panel-close:focus-visible {
+  outline: 2.5px solid var(--yellow-400);
+  outline-offset: 2px;
+  border-radius: var(--r-xs);
+  background: rgba(255,255,255,0.18);
+}
+
+.btn-copy-code:focus-visible {
+  outline: 2.5px solid var(--indigo-500);
+  outline-offset: 2px;
+  border-radius: var(--r-xs);
+}
+
+.nav-mobile-toggle:focus-visible {
+  outline: 2.5px solid var(--yellow-400);
+  outline-offset: 3px;
+  border-radius: var(--r-xs);
+}
+
+select:focus-visible {
+  outline: 2.5px solid var(--indigo-500);
+  outline-offset: 0;
+  border-color: var(--indigo-500);
+  box-shadow: 0 0 0 4px rgba(79, 110, 247, 0.15);
+}
+
+.breadcrumb a:focus-visible {
+  outline: 2.5px solid var(--yellow-400);
+  outline-offset: 2px;
+  border-radius: 3px;
+  color: var(--white);
+}
+
+.footer-links-list a:focus-visible,
+.footer-bottom-links a:focus-visible {
+  outline: 2.5px solid var(--yellow-400);
+  outline-offset: 2px;
+  border-radius: 3px;
+  color: var(--white);
+}
+
 /* ---- Shared utilities -------------------------------------- */
 .container {
   max-width: 1140px;

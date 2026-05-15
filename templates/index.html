@@ -9,6 +9,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 </head>
 <body>
+  <!-- Skip to main content for keyboard users -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
 
   <!-- ============================================================
        Navigation
@@ -23,12 +26,15 @@
         <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="nav-btn-outline">GitHub</a>
       </div>
       <!-- Mobile hamburger toggle -->
-      <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation">
-        <span></span><span></span><span></span>
+      <button class="nav-mobile-toggle" id="nav-mobile-toggle"
+              aria-label="Toggle navigation menu"
+              aria-expanded="false"
+              aria-controls="nav-mobile-menu">
+        <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
       </button>
     </div>
     <!-- Mobile menu -->
-    <div class="nav-mobile-menu" id="nav-mobile-menu">
+    <div class="nav-mobile-menu" id="nav-mobile-menu" role="navigation" aria-label="Mobile navigation">
       <a href="#how-it-works" class="nav-mobile-link">How It Works</a>
       <a href="#features" class="nav-mobile-link">Features</a>
       <a href="#find-project" class="nav-mobile-link">Find Project</a>
@@ -39,6 +45,7 @@
   <!-- ============================================================
        Hero Section
        ============================================================ -->
+  <main id="main-content">
   <section class="hero" id="home">
     <div class="hero-bg-grid"></div>
 
@@ -248,7 +255,7 @@
 
       <div class="form-card-outer">
         <div class="form-card" id="form-section">
-          <form id="recommend-form" novalidate>
+          <form id="recommend-form" novalidate aria-label="Find your project form">
 
             <!-- Skills input with chip selector -->
             <div class="form-group">
@@ -260,12 +267,14 @@
                   id="skills-input"
                   placeholder="Type a skill and press Enter..."
                   autocomplete="off"
+                  aria-label="Type a skill and press Enter to add it"
+                  aria-describedby="skills-hint skills-error"
                 />
               </div>
               <!-- Hidden field holds the final comma-separated value -->
               <input type="hidden" id="skills" name="skills" />
-              <span class="form-hint">Or click a popular skill below to add it</span>
-              <div class="form-error-msg" id="skills-error"></div>
+              <span class="form-hint" id="skills-hint">Or click a popular skill below to add it</span>
+              <div class="form-error-msg" id="skills-error" role="alert" aria-live="polite"></div>
             </div>
 
             <!-- Quick-select skill chips -->
@@ -285,20 +294,20 @@
               <div class="form-group">
                 <label for="level">Experience Level</label>
                 <div class="select-wrap">
-                  <select id="level" name="level">
+                  <select id="level" name="level" aria-describedby="level-error" aria-required="true">
                     <option value="" disabled selected>Select level</option>
                     <option value="Beginner">Beginner</option>
                     <option value="Intermediate">Intermediate</option>
                     <option value="Advanced">Advanced</option>
                   </select>
                 </div>
-                <div class="form-error-msg" id="level-error"></div>
+                <div class="form-error-msg" id="level-error" role="alert" aria-live="polite"></div>
               </div>
 
               <div class="form-group">
                 <label for="interest">Area of Interest</label>
                 <div class="select-wrap">
-                  <select id="interest" name="interest">
+                  <select id="interest" name="interest" aria-describedby="interest-error" aria-required="true">
                     <option value="" disabled selected>Select interest</option>
                     <option value="Web">Web Development</option>
                     <option value="Data">Data and Analytics</option>
@@ -307,7 +316,7 @@
                     <option value="Games">Games</option>
                   </select>
                 </div>
-                <div class="form-error-msg" id="interest-error"></div>
+                <div class="form-error-msg" id="interest-error" role="alert" aria-live="polite"></div>
               </div>
             </div>
 
@@ -315,23 +324,23 @@
             <div class="form-group">
               <label for="time">Time Availability</label>
               <div class="select-wrap">
-                <select id="time" name="time">
+                <select id="time" name="time" aria-describedby="time-error" aria-required="true">
                   <option value="" disabled selected>How much time can you commit?</option>
                   <option value="Low">Low — a few hours total</option>
                   <option value="Medium">Medium — across a weekend</option>
                   <option value="High">High — a week or more</option>
                 </select>
               </div>
-              <div class="form-error-msg" id="time-error"></div>
+              <div class="form-error-msg" id="time-error" role="alert" aria-live="polite"></div>
             </div>
 
             <!-- General error (shown above the button) -->
-            <p class="form-error-general" id="form-error-general"></p>
+            <p class="form-error-general" id="form-error-general" role="alert" aria-live="assertive"></p>
 
             <!-- Submit button -->
-            <button type="submit" class="btn-submit" id="submit-btn">
+            <button type="submit" class="btn-submit" id="submit-btn" aria-describedby="form-error-general">
               <span id="btn-label">Generate My Projects</span>
-              <span id="btn-loading" style="display:none;">Finding matches...</span>
+              <span id="btn-loading" style="display:none;" aria-live="polite">Finding matches...</span>
             </button>
 
           </form>
@@ -343,7 +352,9 @@
   <!-- ============================================================
        Results Section
        ============================================================ -->
-  <section class="results-section" id="results-section" style="display:none;">
+  </main>
+
+  <section class="results-section" id="results-section" style="display:none;" aria-label="Recommended projects" aria-live="polite">
     <div class="container">
       <div class="section-eyebrow">Your Matches</div>
       <h2 class="section-title">Recommended Projects</h2>
@@ -365,7 +376,7 @@
           </div>
           <h3>No Projects Found</h3>
           <p id="empty-message">Try adjusting your skills or selecting a different interest area.</p>
-          <button class="btn-try-again" onclick="document.getElementById('find-project').scrollIntoView({behavior:'smooth'})">Try Different Inputs</button>
+          <button class="btn-try-again" id="btn-try-again">Try Different Inputs</button>
         </div>
       </div>
 
