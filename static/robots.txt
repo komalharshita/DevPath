@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /project/*/download
+Disallow: /project/*/code
+Disallow: /api/
+
+Sitemap: https://mydevpath-github.vercel.app/sitemap.xml
