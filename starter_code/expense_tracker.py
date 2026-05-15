@@ -1,6 +1,3 @@
-"""
-expense_tracker.py
-==================
 Project:    Personal Expense Tracker
 Difficulty: Beginner
 Skills:     Python, CSV module, datetime module

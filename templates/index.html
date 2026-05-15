@@ -269,7 +269,11 @@
                   autocomplete="off"
                   aria-label="Type a skill and press Enter to add it"
                   aria-describedby="skills-hint skills-error"
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-controls="skills-suggestions"
                 />
+                <div id="skills-suggestions" class="skills-suggestions"></div>
               </div>
               <!-- Hidden field holds the final comma-separated value -->
               <input type="hidden" id="skills" name="skills" />
@@ -448,6 +452,7 @@
     </div>
   </footer>
 
+  <script src="/static/data/skills.js"></script>
   <script src="/static/script.js"></script>
 </body>
 </html>

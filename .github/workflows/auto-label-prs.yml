@@ -1,0 +1,76 @@
+name: Auto Label Pull Requests
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  auto-label-prs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Apply PR labels
+        uses: actions/github-script@v7
+
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const branch = pr.head.ref;
+
+            let labels = ['gssoc-2026'];
+
+            // Difficulty labels
+            if (branch.startsWith('level1/')) {
+              labels.push('level:beginner');
+            }
+
+            if (branch.startsWith('level2/')) {
+              labels.push('level:intermediate');
+            }
+
+            if (branch.startsWith('level3/')) {
+              labels.push('level:advanced');
+            }
+
+            if (branch.startsWith('level4/')) {
+              labels.push('level:critical');
+            }
+
+            // Type labels
+            if (branch.includes('feat/')) {
+              labels.push('type:feature');
+            }
+
+            if (branch.includes('fix/')) {
+              labels.push('type:bug');
+            }
+
+            if (branch.includes('docs/')) {
+              labels.push('type:docs');
+            }
+
+            if (branch.includes('refactor/')) {
+              labels.push('type:refactor');
+            }
+
+            if (branch.includes('test/')) {
+              labels.push('type:testing');
+            }
+
+            if (branch.includes('style/')) {
+              labels.push('type:design');
+            }
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              labels
+            });
