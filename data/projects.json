@@ -247,6 +247,71 @@
       "OWASP password guidelines: https://owasp.org"
     ],
     "starter_code": "starter_code/password_checker.py"
+  },
+  {
+    "id":9,
+    "title": "Movie Recommendation System",
+    "skills": ["Python"],
+    "level": "Intermediate",
+    "interest": "Automation",
+    "time": "High",
+    "description": "A recommendation system that suggests movies to users based on ratings and similarity scores. An intermediate project for learning recommendation algorithms, data preprocessing, and basic machine learning concepts.",
+    "features": [
+      "Recommend movies based on user preferences",
+      "Find similar movies using similarity metrics",
+      "Load and process movie datasets",
+      "Display top recommended movies"
+    ],
+    "tech_stack": ["Python", "pandas", "scikit-learn", "NumPy"],
+    "roadmap": [
+      "Step 1: Download and inspect a movie ratings dataset",
+      "Step 2: Load the dataset using pandas",
+      "Step 3: Clean and preprocess missing data",
+      "Step 4: Create a user-movie ratings matrix",
+      "Step 5: Calculate similarity scores between movies",
+      "Step 6: Build the recommendation function",
+      "Step 7: Display top movie recommendations to the user",
+      "Step 8: Test the recommendation system with sample inputs"
+    ],
+    "resources": [
+      "pandas documentation: https://pandas.pydata.org/docs",
+      "scikit-learn user guide: https://scikit-learn.org/stable/user_guide.html",
+      "MovieLens dataset: https://grouplens.org/datasets/movielens"
+    ],
+    "starter_code": "starter_code/movie_recommender.py"
+  }, 
+  {
+    "id": 10,
+    "title": "Sentiment Analysis Web App",
+    "skills": ["Python", "HTML", "CSS"],
+    "level": "Intermediate",
+    "interest": "Automation",
+    "time": "High",
+    "description": "A web application that predicts whether user entered text has positive, negative, or neutral sentiment. Great for learning NLP basics and model integration.",
+    "features": [
+      "Analyze sentiment from user input text",
+      "Display sentiment prediction results",
+      "Preprocess text using NLP techniques",
+      "Deploy the model with a simple web interface"
+    ],
+    "tech_stack": ["Python", "Flask", "scikit-learn", "HTML", "CSS"],
+    "roadmap": [
+      "Step 1: Collect or download a sentiment dataset",
+      "Step 2: Preprocess text data by cleaning and tokenizing",
+      "Step 3: Convert text into numerical features",
+      "Step 4: Train a sentiment classification model",
+      "Step 5: Evaluate the model accuracy",
+      "Step 6: Build a Flask app for user interaction",
+      "Step 7: Connect the trained model to the web app",
+      "Step 8: Test the application with sample text inputs"
+    ],
+    "resources": [
+      "Flask documentation: https://flask.palletsprojects.com",
+      "scikit-learn text tutorial: https://scikit-learn.org/stable/",
+      "NLTK documentation: https://www.nltk.org"
+    ],
+    "starter_code": "starter_code/sentiment_app.py"
   }
 ]
+
 
