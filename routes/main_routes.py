@@ -25,7 +25,8 @@ def recommend():
     Accept a JSON body with user inputs and return matching project recommendations.
 
     Expected JSON fields:
-        skills   (str) - comma-separated list of skills
+//     skills   (str) - comma-separated list of skills
+skills   (list or str) - skill names; use a list if a name has commas
         level    (str) - Beginner | Intermediate | Advanced
         interest (str) - Web | Data | Education | Automation | Games
         time     (str) - Low | Medium | High
@@ -35,7 +36,10 @@ def recommend():
     if not payload:
         return jsonify({"error": "Request body must be valid JSON."}), 400
 
-    skills            = payload.get("skills", "").strip()
+        # skills: list preferred; string still supported for older clients
+    skills            = payload.get("skills", [])
+    if isinstance(skills, str):
+        skills = skills.strip()
     level             = payload.get("level", "").strip()
     interest          = payload.get("interest", "").strip()
     time_availability = payload.get("time", "").strip()
