@@ -40,6 +40,54 @@ var isDetailPage = typeof PROJECT_ID !== "undefined";
 })();
 
 
+// Navbar shadow + back-to-top + section highlight in nav
+(function initPageScroll() {
+  var navbar = document.getElementById("navbar");
+  var backToTop = document.getElementById("back-to-top");
+  var navAnchors = document.querySelectorAll('.nav-link[href^="#"]');
+  var sections = [];
+
+  navAnchors.forEach(function (link) {
+    var id = link.getAttribute("href").slice(1);
+    var section = document.getElementById(id);
+    if (section) sections.push({ id: id, el: section, link: link });
+  });
+
+  function onScroll() {
+    var y = window.scrollY || document.documentElement.scrollTop;
+
+    if (navbar) {
+      navbar.classList.toggle("navbar--scrolled", y > 24);
+    }
+
+    if (backToTop) {
+      var showTop = y > 480;
+      backToTop.classList.toggle("is-visible", showTop);
+      backToTop.hidden = !showTop;
+    }
+
+    if (sections.length) {
+      var current = sections[0].id;
+      sections.forEach(function (item) {
+        if (y >= item.el.offsetTop - 100) current = item.id;
+      });
+      sections.forEach(function (item) {
+        item.link.classList.toggle("nav-link--active", item.id === current);
+      });
+    }
+  }
+
+  if (backToTop) {
+    backToTop.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+})();
+
+
 // ============================================================
 // INDEX PAGE
 // ============================================================
@@ -55,6 +103,15 @@ if (isIndexPage) {
   var resultsLoadingEl = document.getElementById("results-loading");
   var resultsEmptyEl = document.getElementById("results-empty");
   var emptyMessageEl = document.getElementById("empty-message");
+  var resultsToolbar = document.getElementById("results-toolbar");
+  var resultsFilterInput = document.getElementById("results-filter");
+  var resultsCountEl = document.getElementById("results-count");
+  var formResetBtn = document.getElementById("form-reset-btn");
+  var levelSelect = document.getElementById("level");
+  var interestSelect = document.getElementById("interest");
+  var timeSelect = document.getElementById("time");
+
+  var lastResults = [];
   var skillsHidden = document.getElementById("skills");
   var skillsTextInput = document.getElementById("skills-input");
   var chipsSelectedEl = document.getElementById("skill-chips-selected");
@@ -352,19 +409,57 @@ if (isIndexPage) {
 
   updateQuickPickState();
 
+  [levelSelect, interestSelect, timeSelect].forEach(function (selectEl) {
+    if (!selectEl) return;
+    selectEl.addEventListener("change", function () {
+      clearFieldError(selectEl.id + "-error");
+    });
+  });
+
+  if (formResetBtn) {
+    formResetBtn.addEventListener("click", resetForm);
+  }
+
+  if (resultsFilterInput) {
+    resultsFilterInput.addEventListener("input", function () {
+      filterResultCards(resultsFilterInput.value);
+    });
+  }
+
 
   // ----------------------------------------------------------
   // Form validation
   // ----------------------------------------------------------
 
+  var fieldMap = {
+    "skills-error": { input: skillsTextInput, wrap: skillWrap },
+    "level-error": { input: levelSelect },
+    "interest-error": { input: interestSelect },
+    "time-error": { input: timeSelect }
+  };
+
   function showFieldError(fieldId, message) {
     var el = document.getElementById(fieldId);
     if (el) el.textContent = message;
+
+    var field = fieldMap[fieldId];
+    if (field && field.input) {
+      field.input.setAttribute("aria-invalid", "true");
+      if (field.wrap) field.wrap.classList.add("is-invalid");
+      else field.input.classList.add("is-invalid");
+    }
   }
 
   function clearFieldError(fieldId) {
     var el = document.getElementById(fieldId);
     if (el) el.textContent = "";
+
+    var field = fieldMap[fieldId];
+    if (field && field.input) {
+      field.input.removeAttribute("aria-invalid");
+      if (field.wrap) field.wrap.classList.remove("is-invalid");
+      else field.input.classList.remove("is-invalid");
+    }
   }
 
   function clearAllErrors() {
@@ -421,7 +516,6 @@ if (isIndexPage) {
       interest: document.getElementById("interest").value,
       time: document.getElementById("time").value
     };
-
     fetch("/api/recommend", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -453,11 +547,11 @@ if (isIndexPage) {
     btnLoading.style.display = isLoading ? "inline" : "none";
 
     if (isLoading) {
-      // Show the results section with only the loading indicator visible
       resultsSection.style.display = "block";
       resultsLoadingEl.style.display = "block";
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "none";
+      if (resultsToolbar) resultsToolbar.style.display = "none";
       resultsSection.scrollIntoView({ behavior: "smooth" });
     } else {
       resultsLoadingEl.style.display = "none";
@@ -470,14 +564,36 @@ if (isIndexPage) {
   // Render result cards
   // ----------------------------------------------------------
 
+  function resetForm() {
+    selectedSkills = [];
+    renderSelectedChips();
+    syncSkillsHiddenInput();
+    updateQuickPickState();
+    skillsTextInput.value = "";
+    hideSuggestions();
+    levelSelect.selectedIndex = 0;
+    interestSelect.selectedIndex = 0;
+    timeSelect.selectedIndex = 0;
+    clearAllErrors();
+    resultsSection.style.display = "none";
+    lastResults = [];
+    if (resultsFilterInput) resultsFilterInput.value = "";
+    if (resultsToolbar) resultsToolbar.style.display = "none";
+    document.getElementById("find-project").scrollIntoView({ behavior: "smooth" });
+  }
+
   function renderResults(projects, message) {
     resultsSection.style.display = "block";
     resultsLoadingEl.style.display = "none";
     resultsGrid.innerHTML = "";
+    lastResults = projects || [];
+
+    if (resultsFilterInput) resultsFilterInput.value = "";
 
     if (!projects || projects.length === 0) {
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "block";
+      if (resultsToolbar) resultsToolbar.style.display = "none";
       if (message && emptyMessageEl) emptyMessageEl.textContent = message;
       resultsSection.scrollIntoView({ behavior: "smooth" });
       return;
@@ -485,24 +601,66 @@ if (isIndexPage) {
 
     resultsEmptyEl.style.display = "none";
     resultsGrid.style.display = "grid";
+    if (resultsToolbar) resultsToolbar.style.display = "flex";
 
-    projects.forEach(function (project) {
-      resultsGrid.appendChild(buildProjectCard(project));
+    projects.forEach(function (project, index) {
+      resultsGrid.appendChild(buildProjectCard(project, index));
     });
 
+    updateResultsCount();
     resultsSection.scrollIntoView({ behavior: "smooth" });
   }
 
-  function buildProjectCard(project) {
-    var card = document.createElement("div");
-    card.className = "project-card";
+  function filterResultCards(query) {
+    var q = (query || "").trim().toLowerCase();
+    var cards = resultsGrid.querySelectorAll(".project-card");
+    var visible = 0;
 
-    // Title
+    cards.forEach(function (card) {
+      var haystack = card.getAttribute("data-search") || "";
+      var show = !q || haystack.indexOf(q) !== -1;
+      card.classList.toggle("is-hidden", !show);
+      if (show) visible++;
+    });
+
+    if (resultsCountEl) {
+      if (q) {
+        resultsCountEl.textContent = visible + " of " + cards.length + " shown";
+      } else {
+        updateResultsCount();
+      }
+    }
+  }
+
+  function updateResultsCount() {
+    if (!resultsCountEl || !lastResults.length) {
+      if (resultsCountEl) resultsCountEl.textContent = "";
+      return;
+    }
+    resultsCountEl.textContent = lastResults.length + " match" + (lastResults.length === 1 ? "" : "es");
+  }
+
+  function buildProjectCard(project, index) {
+    var card = document.createElement("div");
+    card.className = "project-card is-revealed";
+    card.style.animationDelay = (index * 0.08) + "s";
+
+    var searchBits = [project.title, project.description, project.level, project.time]
+      .concat(project.skills || []);
+    card.setAttribute("data-search", searchBits.join(" ").toLowerCase());
+
+    var rankLabels = ["Best match", "Runner-up", "Also worth a look"];
+    if (typeof index === "number" && index < 3) {
+      var rank = document.createElement("span");
+      rank.className = "project-card-rank" + (index === 0 ? " project-card-rank--top" : "");
+      rank.textContent = rankLabels[index];
+      card.appendChild(rank);
+    }
+
     var title = document.createElement("h3");
     title.className = "project-card-title";
     title.textContent = project.title;
 
-    // Description (truncated for visual consistency)
     var desc = document.createElement("p");
     desc.className = "project-card-desc";
     desc.textContent = truncate(project.description, 120);
