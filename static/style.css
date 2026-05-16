@@ -258,7 +258,10 @@ ul, ol { list-style: none; }
 }
 
 /* Copy column */
-.hero-copy { max-width: 580px; }
+.hero-copy { 
+  max-width: 580px;
+  order: 1;
+}
 
 .hero-badge {
   display: inline-flex;
@@ -374,6 +377,7 @@ ul, ol { list-style: none; }
   display: flex;
   flex-direction: column;
   gap: 12px;
+  order: 2;
 }
 
 /* Floating info cards */

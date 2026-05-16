@@ -180,6 +180,7 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
 - Use 2-space indentation
 - Every `<section>` must have a comment header explaining its purpose
 - All images must have an `alt` attribute
+- Any new `<img>` tags should include `loading="lazy"` unless the image is critical above-the-fold content
 - Use semantic elements: `<nav>`, `<section>`, `<footer>`, `<article>`
 - Keep inline styles out of templates — use CSS classes instead
 
