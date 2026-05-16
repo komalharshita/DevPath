@@ -28,27 +28,27 @@ SKILL_ALIASES = {
 }
 
 
-def parse_skills(skills_string):
+def parse_skills(skills_input):
     """
-    Convert a raw comma-separated skills string into
-    a normalized lowercase list.
-
-    Example:
-    "JS, HTML5, CSS3" -> ["javascript", "html", "css"]
+    Convert skills input into a normalized lowercase list.
+    Accepts a list (preferred) or a comma-separated string.
     """
+    if isinstance(skills_input, list):
+        raw_skills = [
+            str(s).strip().lower()
+            for s in skills_input
+            if str(s).strip()
+        ]
+    elif isinstance(skills_input, str):
+        raw_skills = [
+            s.strip().lower()
+            for s in skills_input.split(",")
+            if s.strip()
+        ]
+    else:
+        return []
 
-    raw_skills = [
-        s.strip().lower()
-        for s in skills_string.split(",")
-        if s.strip()
-    ]
-
-    normalized_skills = [
-        SKILL_ALIASES.get(skill, skill)
-        for skill in raw_skills
-    ]
-
-    return normalized_skills
+    return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
 
 
 def score_single_project(
@@ -129,7 +129,12 @@ def validate_recommendation_inputs(skills, level, interest, time_availability):
     """
     errors = []
 
-    if not skills or not skills.strip():
+    skills_ok = False
+    if isinstance(skills, list):
+        skills_ok = any(str(s).strip() for s in skills)
+    elif isinstance(skills, str):
+        skills_ok = bool(skills.strip())
+    if not skills_ok:
         errors.append("Please enter at least one skill.")
 
     if not level or not level.strip():
