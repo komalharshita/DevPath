@@ -253,7 +253,7 @@
     "title": "Movie Recommendation System",
     "skills": ["Python"],
     "level": "Intermediate",
-    "interest": "Automation",
+    "interest": "Data",
     "time": "High",
     "description": "A recommendation system that suggests movies to users based on ratings and similarity scores. An intermediate project for learning recommendation algorithms, data preprocessing, and basic machine learning concepts.",
     "features": [
@@ -285,7 +285,7 @@
     "title": "Sentiment Analysis Web App",
     "skills": ["Python", "HTML", "CSS"],
     "level": "Intermediate",
-    "interest": "Automation",
+    "interest": "Data",
     "time": "High",
     "description": "A web application that predicts whether user entered text has positive, negative, or neutral sentiment. Great for learning NLP basics and model integration.",
     "features": [
