@@ -347,7 +347,8 @@ if (isIndexPage) {
 
   function syncSkillsHiddenInput() {
     // Keep the hidden <input> in sync for form serialisation
-    skillsHidden.value = selectedSkills.join(", ");
+    //skillsHidden.value = selectedSkills.join(", ");
+    skillsHidden.value = JSON.stringify(selectedSkills);
   }
 
   updateQuickPickState();
@@ -376,7 +377,8 @@ if (isIndexPage) {
   function validateForm() {
     var valid = true;
 
-    if (selectedSkills.length === 0 && !skillsHidden.value.trim()) {
+    //if (selectedSkills.length === 0 && !skillsHidden.value.trim())
+    if (selectedSkills.length === 0) {
       showFieldError("skills-error", "Please add at least one skill.");
       valid = false;
     }
@@ -416,7 +418,8 @@ if (isIndexPage) {
     setLoadingState(true);
 
     var payload = {
-      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
+     //skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
+      skills: selectedSkills,
       level: document.getElementById("level").value,
       interest: document.getElementById("interest").value,
       time: document.getElementById("time").value
