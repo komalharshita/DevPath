@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="DevPath recommends real coding projects based on your skills, level, and interests â€” with full roadmaps and starter code." />
-  <title>DevPath â€” Find Projects Based On Your Skills</title>
+  <meta name="description" content="DevPath recommends real coding projects based on your skills, level, and interests — with full roadmaps and starter code." />
+  <title>DevPath — Find Projects Based On Your Skills</title>
   <link rel="stylesheet" href="/static/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 </head>
@@ -200,7 +200,7 @@
     <div class="container">
       <div class="section-eyebrow">What You Get</div>
       <h2 class="section-title">Everything You Need to Start Building</h2>
-      <p class="section-sub">Every recommendation comes with practical resources â€” not just a project name.</p>
+      <p class="section-sub">Every recommendation comes with practical resources — not just a project name.</p>
 
       <div class="features-grid">
 
@@ -209,7 +209,7 @@
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           </div>
           <h3>Personalized Matches</h3>
-          <p>Projects are scored against your exact skills, level, and interest â€” not pulled from a generic list.</p>
+          <p>Projects are scored against your exact skills, level, and interest — not pulled from a generic list.</p>
           <a href="#find-project" class="feature-card-link">Try it now</a>
         </div>
 
@@ -232,6 +232,24 @@
         </div>
 
       </div>
+    </div>
+  </section>
+
+  <section class="library-section" id="recent-section" hidden>
+    <div class="container">
+      <div class="section-eyebrow">Pick up where you left off</div>
+      <h2 class="section-title">Recently Viewed</h2>
+      <p class="section-sub">Projects you opened lately — stored only in this browser.</p>
+      <ul class="library-list" id="recent-list"></ul>
+    </div>
+  </section>
+
+  <section class="library-section library-section--alt" id="saved-section" hidden>
+    <div class="container">
+      <div class="section-eyebrow">Your shortlist</div>
+      <h2 class="section-title">Saved Projects</h2>
+      <p class="section-sub">Bookmark projects to compare or come back to later.</p>
+      <ul class="library-list" id="saved-list"></ul>
     </div>
   </section>
 
@@ -321,9 +339,9 @@
               <div class="select-wrap">
                 <select id="time" name="time" aria-describedby="time-error" aria-required="true">
                   <option value="" disabled selected>How much time can you commit?</option>
-                  <option value="Low">Low â€” a few hours total</option>
-                  <option value="Medium">Medium â€” across a weekend</option>
-                  <option value="High">High â€” a week or more</option>
+                  <option value="Low">Low — a few hours total</option>
+                  <option value="Medium">Medium — across a weekend</option>
+                  <option value="High">High — a week or more</option>
                 </select>
               </div>
               <div class="form-error-msg" id="time-error"></div>
@@ -386,6 +404,7 @@
           autocomplete="off"
         />
         <span class="results-count" id="results-count" aria-live="polite"></span>
+        <button type="button" class="btn-export-results" id="export-results-btn">Copy list</button>
       </div>
 
       <div class="results-grid" id="results-grid"></div>
@@ -460,6 +479,7 @@
   </button>
 
   <script src="/static/data/skills.js"></script>
+  <script src="/static/storage.js"></script>
   <script src="/static/script.js"></script>
 </body>
 </html>

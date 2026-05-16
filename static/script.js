@@ -112,6 +112,12 @@ if (isIndexPage) {
   var timeSelect = document.getElementById("time");
 
   var lastResults = [];
+  var lastPayload = null;
+  var exportResultsBtn = document.getElementById("export-results-btn");
+  var savedSection = document.getElementById("saved-section");
+  var recentSection = document.getElementById("recent-section");
+  var savedListEl = document.getElementById("saved-list");
+  var recentListEl = document.getElementById("recent-list");
   var skillsHidden = document.getElementById("skills");
   var skillsTextInput = document.getElementById("skills-input");
   var chipsSelectedEl = document.getElementById("skill-chips-selected");
@@ -426,6 +432,195 @@ if (isIndexPage) {
     });
   }
 
+  if (exportResultsBtn) {
+    exportResultsBtn.addEventListener("click", exportResultsList);
+  }
+
+  renderLibraryPanels();
+
+
+  // ----------------------------------------------------------
+  // Saved / recent panels (localStorage)
+  // ----------------------------------------------------------
+
+  function renderLibraryPanels() {
+    if (typeof DevPathStore === "undefined") return;
+
+    renderLibraryList(
+      savedListEl,
+      savedSection,
+      DevPathStore.getSaved(),
+      true
+    );
+    renderLibraryList(
+      recentListEl,
+      recentSection,
+      DevPathStore.getRecent(),
+      false
+    );
+  }
+
+  function renderLibraryList(listEl, sectionEl, items, allowRemove) {
+    if (!listEl || !sectionEl) return;
+
+    listEl.innerHTML = "";
+
+    if (!items.length) {
+      sectionEl.hidden = true;
+      return;
+    }
+
+    sectionEl.hidden = false;
+
+    items.forEach(function (item) {
+      var li = document.createElement("li");
+      li.className = "library-item";
+
+      var main = document.createElement("div");
+      main.className = "library-item-main";
+
+      var link = document.createElement("a");
+      link.className = "library-item-title";
+      link.href = "/project/" + item.id;
+      link.textContent = item.title;
+
+      var meta = document.createElement("span");
+      meta.className = "library-item-meta";
+      meta.textContent = item.level ? item.level + " · Project #" + item.id : "Project #" + item.id;
+
+      main.appendChild(link);
+      main.appendChild(meta);
+
+      var actions = document.createElement("div");
+      actions.className = "library-item-actions";
+
+      if (allowRemove) {
+        var removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.className = "btn-library-remove";
+        removeBtn.textContent = "Remove";
+        removeBtn.addEventListener("click", function () {
+          DevPathStore.removeSaved(item.id);
+          renderLibraryPanels();
+        });
+        actions.appendChild(removeBtn);
+      }
+
+      li.appendChild(main);
+      li.appendChild(actions);
+      listEl.appendChild(li);
+    });
+  }
+
+  function updateSaveButtons() {
+    document.querySelectorAll(".btn-save-card").forEach(function (btn) {
+      var id = btn.getAttribute("data-project-id");
+      var saved = DevPathStore.isSaved(id);
+      btn.classList.toggle("is-saved", saved);
+      btn.setAttribute("aria-pressed", saved ? "true" : "false");
+      btn.setAttribute("aria-label", saved ? "Remove from saved" : "Save project");
+    });
+  }
+
+  function createSaveButton(project) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn-save-card";
+    btn.setAttribute("data-project-id", project.id);
+    btn.setAttribute("aria-pressed", DevPathStore.isSaved(project.id) ? "true" : "false");
+    btn.setAttribute("aria-label", DevPathStore.isSaved(project.id) ? "Remove from saved" : "Save project");
+    if (DevPathStore.isSaved(project.id)) btn.classList.add("is-saved");
+
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>';
+
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      DevPathStore.toggleSaved(project.id, project.title, project.level);
+      updateSaveButtons();
+      renderLibraryPanels();
+    });
+
+    return btn;
+  }
+
+  function buildMatchBreakdown(project) {
+    if (!project.match) return null;
+
+    var match = project.match;
+    var box = document.createElement("div");
+    box.className = "match-breakdown";
+
+    var intro = document.createElement("p");
+    intro.innerHTML = "<strong>Why this matched</strong>";
+    box.appendChild(intro);
+
+    var list = document.createElement("ul");
+    list.className = "match-breakdown-list";
+
+    if (match.matched_skills && match.matched_skills.length) {
+      match.matched_skills.forEach(function (skill) {
+        var li = document.createElement("li");
+        li.textContent = "Skill: " + skill;
+        list.appendChild(li);
+      });
+    }
+
+    [
+      { ok: match.level_match, label: "Level fits your experience" },
+      { ok: match.interest_match, label: "Matches your interest area" },
+      { ok: match.time_match, label: "Fits your time budget" }
+    ].forEach(function (row) {
+      var li = document.createElement("li");
+      li.textContent = row.label;
+      if (!row.ok) li.classList.add("is-miss");
+      list.appendChild(li);
+    });
+
+    if (match.missing_skills && match.missing_skills.length) {
+      var gap = document.createElement("p");
+      gap.style.marginTop = "8px";
+      gap.textContent = "You'll also use: " + match.missing_skills.join(", ");
+      box.appendChild(list);
+      box.appendChild(gap);
+    } else {
+      box.appendChild(list);
+    }
+
+    if (match.score) {
+      var scoreEl = document.createElement("span");
+      scoreEl.className = "match-score";
+      scoreEl.textContent = "Match score: " + match.score;
+      box.appendChild(scoreEl);
+    }
+
+    return box;
+  }
+
+  function exportResultsList() {
+    if (!lastResults.length) return;
+
+    var lines = ["DevPath — project recommendations", ""];
+    lastResults.forEach(function (project, i) {
+      lines.push((i + 1) + ". " + project.title);
+      lines.push("   " + (project.level || "") + " · " + (project.interest || "") + " · " + (project.time || "") + " time");
+      lines.push("   " + window.location.origin + "/project/" + project.id);
+      lines.push("");
+    });
+
+    var text = lines.join("\n").trim();
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        if (exportResultsBtn) {
+          var old = exportResultsBtn.textContent;
+          exportResultsBtn.textContent = "Copied!";
+          setTimeout(function () { exportResultsBtn.textContent = old; }, 2000);
+        }
+      });
+    }
+  }
+
 
   // ----------------------------------------------------------
   // Form validation
@@ -516,6 +711,8 @@ if (isIndexPage) {
       interest: document.getElementById("interest").value,
       time: document.getElementById("time").value
     };
+    lastPayload = payload;
+
     fetch("/api/recommend", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -608,6 +805,7 @@ if (isIndexPage) {
     });
 
     updateResultsCount();
+    if (typeof DevPathStore !== "undefined") updateSaveButtons();
     resultsSection.scrollIntoView({ behavior: "smooth" });
   }
 
@@ -657,13 +855,23 @@ if (isIndexPage) {
       card.appendChild(rank);
     }
 
+    var header = document.createElement("div");
+    header.className = "project-card-header";
+
     var title = document.createElement("h3");
     title.className = "project-card-title";
     title.textContent = project.title;
+    header.appendChild(title);
+
+    if (typeof DevPathStore !== "undefined") {
+      header.appendChild(createSaveButton(project));
+    }
 
     var desc = document.createElement("p");
     desc.className = "project-card-desc";
     desc.textContent = truncate(project.description, 120);
+
+    var matchBox = buildMatchBreakdown(project);
 
     // Tags row
     var tagsRow = document.createElement("div");
@@ -692,8 +900,9 @@ if (isIndexPage) {
 
     footer.appendChild(link);
 
-    card.appendChild(title);
+    card.appendChild(header);
     card.appendChild(desc);
+    if (matchBox) card.appendChild(matchBox);
     card.appendChild(tagsRow);
     card.appendChild(footer);
 
@@ -719,6 +928,47 @@ if (isIndexPage) {
 // DETAIL PAGE
 // ============================================================
 if (isDetailPage) {
+
+  if (typeof DevPathStore !== "undefined" && PROJECT_META) {
+    DevPathStore.addRecent(PROJECT_ID, PROJECT_META.title, PROJECT_META.level);
+  }
+
+  var btnSaveProject = document.getElementById("btn-save-project");
+  var btnSaveLabel = document.getElementById("btn-save-label");
+  var btnShareLink = document.getElementById("btn-share-link");
+
+  function refreshDetailSaveButton() {
+    if (!btnSaveProject || typeof DevPathStore === "undefined") return;
+    var saved = DevPathStore.isSaved(PROJECT_ID);
+    btnSaveProject.classList.toggle("is-saved", saved);
+    btnSaveProject.setAttribute("aria-pressed", saved ? "true" : "false");
+    if (btnSaveLabel) btnSaveLabel.textContent = saved ? "Saved" : "Save project";
+  }
+
+  if (btnSaveProject && typeof DevPathStore !== "undefined") {
+    refreshDetailSaveButton();
+    btnSaveProject.addEventListener("click", function () {
+      DevPathStore.toggleSaved(PROJECT_ID, PROJECT_META.title, PROJECT_META.level);
+      refreshDetailSaveButton();
+    });
+  }
+
+  var btnShareLabel = document.getElementById("btn-share-label");
+
+  if (btnShareLink) {
+    btnShareLink.addEventListener("click", function () {
+      var url = window.location.href;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function () {
+          if (btnShareLabel) {
+            var old = btnShareLabel.textContent;
+            btnShareLabel.textContent = "Link copied";
+            setTimeout(function () { btnShareLabel.textContent = old; }, 2000);
+          }
+        });
+      }
+    });
+  }
 
   var codePanel = document.getElementById("code-panel");
   var codePanelOverlay = document.getElementById("code-panel-overlay");

@@ -58,6 +58,14 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
             View Code
           </button>
+          <button type="button" class="btn-save-project" id="btn-save-project" aria-pressed="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            <span id="btn-save-label">Save project</span>
+          </button>
+          <button type="button" class="btn-share-link" id="btn-share-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            <span id="btn-share-label">Copy link</span>
+          </button>
         </div>
       </div>
     </div>
@@ -260,7 +268,12 @@
   <!-- Pass project ID to the JavaScript without hardcoding -->
   <script>
     var PROJECT_ID = parseInt("{{ project.id }}", 10);
+    var PROJECT_META = {
+      title: {{ project.title | tojson }},
+      level: {{ project.level | tojson }}
+    };
   </script>
+  <script src="/static/storage.js"></script>
   <script src="/static/script.js"></script>
 </body>
 </html>

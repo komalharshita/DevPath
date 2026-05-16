@@ -19,6 +19,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from utils.data_loader import load_all_projects, find_project_by_id, clear_cache
 from utils.recommender import (
     get_recommendations,
+    get_recommendations_with_match,
+    explain_project_match,
     validate_recommendation_inputs,
     parse_skills,
     score_single_project,
@@ -219,6 +221,41 @@ def test_recommend_api_valid():
     data = response.get_json()
     assert "projects" in data
     assert len(data["projects"]) > 0
+
+
+def test_explain_project_match_fields():
+    """Match breakdown should list skills and criteria flags."""
+    projects = load_all_projects()
+    project = projects[0]
+    user_skills = parse_skills("Python")
+    breakdown = explain_project_match(
+        project, user_skills, "Beginner", "Data", "Low"
+    )
+    assert "score" in breakdown
+    assert "matched_skills" in breakdown
+    assert "missing_skills" in breakdown
+    assert isinstance(breakdown["level_match"], bool)
+
+
+def test_get_recommendations_with_match():
+    results = get_recommendations_with_match(
+        "Python", "Beginner", "Data", "Low"
+    )
+    assert len(results) > 0
+    assert "match" in results[0]
+    assert results[0]["match"]["score"] > 0
+
+
+def test_recommend_api_includes_match():
+    client = get_client()
+    response = client.post("/api/recommend", json={
+        "skills": "Python",
+        "level": "Beginner",
+        "interest": "Data",
+        "time": "Low"
+    })
+    data = response.get_json()
+    assert "match" in data["projects"][0]
 
 
 def test_recommend_api_missing_field():

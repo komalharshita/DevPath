@@ -89,6 +89,39 @@ def score_single_project(
     return score
 
 
+def explain_project_match(project, user_skills, level, interest, time_availability):
+    """
+  Build a breakdown of why a project matched the user's inputs.
+  Used by the API so the UI can show transparent scoring.
+    """
+    matched_skills = [
+        skill for skill in project.get("skills", [])
+        if skill.lower() in user_skills
+    ]
+
+    level_match = project.get("level", "").lower() == level.lower()
+    interest_match = project.get("interest", "").lower() == interest.lower()
+    time_match = project.get("time", "").lower() == time_availability.lower()
+
+    score = score_single_project(
+        project, user_skills, level, interest, time_availability
+    )
+
+    missing_skills = [
+        skill for skill in project.get("skills", [])
+        if skill.lower() not in user_skills
+    ]
+
+    return {
+        "score": score,
+        "matched_skills": matched_skills,
+        "missing_skills": missing_skills,
+        "level_match": level_match,
+        "interest_match": interest_match,
+        "time_match": time_match,
+    }
+
+
 def get_recommendations(skills_string, level, interest, time_availability):
     """
     Return the top N recommended projects for the given user inputs.
@@ -119,6 +152,29 @@ def get_recommendations(skills_string, level, interest, time_availability):
     scored_projects.sort(key=lambda item: item["score"], reverse=True)
 
     # Return only the project dicts, not the score metadata
+    return [item["project"] for item in scored_projects[:MAX_RESULTS]]
+
+
+def get_recommendations_with_match(skills_string, level, interest, time_availability):
+    """
+    Like get_recommendations, but each project includes a ``match`` breakdown.
+    """
+    user_skills = parse_skills(skills_string)
+    all_projects = load_all_projects()
+    scored_projects = []
+
+    for project in all_projects:
+        score = score_single_project(
+            project, user_skills, level, interest, time_availability
+        )
+        if score > 0:
+            entry = dict(project)
+            entry["match"] = explain_project_match(
+                project, user_skills, level, interest, time_availability
+            )
+            scored_projects.append({"project": entry, "score": score})
+
+    scored_projects.sort(key=lambda item: item["score"], reverse=True)
     return [item["project"] for item in scored_projects[:MAX_RESULTS]]
 
 
