@@ -89,6 +89,10 @@ def test_parse_skills_single_entry():
     """parse_skills should handle a single skill with no commas."""
     assert parse_skills("JavaScript") == ["javascript"]
 
+def test_parse_skills_comma_inside_skill():
+    """List input must not split skill names that contain commas."""
+    result = parse_skills(["HTML, CSS", "JavaScript"])
+    assert result == ["html, css", "javascript"]
 
 def test_score_single_project_full_match():
     """A project that matches all four criteria should receive the maximum score."""
@@ -169,6 +173,9 @@ def test_validate_missing_skills():
     errors = validate_recommendation_inputs("", "Beginner", "Web", "Low")
     assert len(errors) > 0
 
+def test_validate_missing_skills_empty_list():
+    errors = validate_recommendation_inputs([], "Beginner", "Web", "Low")
+    assert len(errors) > 0
 
 def test_validate_missing_level():
     errors = validate_recommendation_inputs("Python", "", "Web", "Low")
@@ -220,6 +227,9 @@ def test_recommend_api_valid():
     assert "projects" in data
     assert len(data["projects"]) > 0
 
+def test_validate_missing_skills_empty_list():
+    errors = validate_recommendation_inputs([], "Beginner", "Web", "Low")
+    assert len(errors) > 0
 
 def test_recommend_api_missing_field():
     """The API should return 400 when a required field is missing."""
