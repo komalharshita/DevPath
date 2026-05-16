@@ -140,10 +140,11 @@ def test_get_recommendations_max_three():
 
 
 def test_get_recommendations_no_match_returns_empty():
-    """A very unlikely skill/interest combo should return an empty list."""
-    results = get_recommendations("Rust", "Advanced", "Games", "High")
-    # Rust and Games are not in the dataset so this should be empty or minimal
-    assert isinstance(results, list)
+    # Testing a skill that has zero project matches in the system
+    # Even with high interest/time, it should return an empty list
+    results = get_recommendations("Swift", "Advanced", "Web", "High")
+    
+    assert results == [], f"Expected empty list, but got {len(results)} projects."
 
 
 def test_get_recommendations_result_format():

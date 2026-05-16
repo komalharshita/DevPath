@@ -477,8 +477,17 @@ if (isIndexPage) {
 
     if (!projects || projects.length === 0) {
       resultsGrid.style.display = "none";
-      resultsEmptyEl.style.display = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
+      
+      // Explicitly ensure the container tracking empty states is displayed
+      if (resultsEmptyEl) resultsEmptyEl.style.display = "block"; 
+      
+      // Build a dynamic, interactive empty state warning explaining unmatched skills
+      if (emptyMessageEl) {
+        emptyMessageEl.innerHTML = `
+          ${message || "No projects match your current inputs."}<br><br>
+          <strong>Try adding popular alternative skills</strong> like Python, JavaScript, HTML, or CSS to see more matching repositories!
+        `;
+      }
       resultsSection.scrollIntoView({ behavior: "smooth" });
       return;
     }
