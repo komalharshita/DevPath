@@ -23,7 +23,7 @@ from utils.recommender import (
     parse_skills,
     score_single_project,
 )
-from app import app
+from app import app, internal_server_error
 
 
 # ============================================================
@@ -263,6 +263,16 @@ def test_project_detail_not_found():
     client = get_client()
     response = client.get("/project/99999")
     assert response.status_code == 404
+
+
+def test_internal_server_error_page():
+    """The 500 handler should render the friendly internal error template."""
+    with app.app_context():
+        rendered_page, status_code = internal_server_error(Exception("Test error"))
+
+    assert status_code == 500
+    assert "Internal Server Error" in rendered_page
+    assert "Back to Home" in rendered_page
 
 
 def test_view_code_found():

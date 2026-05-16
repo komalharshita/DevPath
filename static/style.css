@@ -257,8 +257,8 @@ ul, ol { list-style: none; }
   width: 100%;
 }
 
-/* Copy column */
-.hero-copy { max-width: 580px; }
+/* Copy column (order keeps layout when decorative blocks follow in DOM) */
+.hero-copy { max-width: 580px; order: 1; }
 
 .hero-badge {
   display: inline-flex;
@@ -374,6 +374,7 @@ ul, ol { list-style: none; }
   display: flex;
   flex-direction: column;
   gap: 12px;
+  order: 2;
 }
 
 /* Floating info cards */
@@ -1653,4 +1654,29 @@ select:focus {
 
   .container { padding: 0 20px; }
   .section-sub { margin-bottom: 40px; }
+}
+
+
+
+.tooltip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #6366f1;
+  color: white;
+  font-size: 11px;
+  cursor: help;
+  font-weight: 700;
+}
+
+.form-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.5;
 }
