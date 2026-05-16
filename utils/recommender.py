@@ -90,37 +90,28 @@ def score_single_project(
 
 
 def get_recommendations(skills_string, level, interest, time_availability):
-    """
-    Return the top N recommended projects for the given user inputs.
-
-    Steps:
-      1. Parse the raw skills input into a list.
-      2. Score every project in the dataset.
-      3. Drop projects with a score of zero (no overlap at all).
-      4. Sort by score descending.
-      5. Return the top MAX_RESULTS projects.
-    """
     user_skills = parse_skills(skills_string)
     all_projects = load_all_projects()
-
-    scored_projects = []
-
+    scored = []
+ 
     for project in all_projects:
-        score = score_single_project(
-            project, user_skills, level, interest, time_availability
-        )
-        # Ignore projects with a score of 0 since they
-        # have no meaningful overlap with the user's inputs.
+        # 1. Standardize project skills to lowercase for a case-insensitive match
+        project_skills = [s.lower() for s in project.get("skills", [])]
+        
+        # 2. Check if at least one of the user's skills overlaps with the project skills
+        has_skill_match = any(s in project_skills for s in user_skills)
+        
+        # 3. Guard clause: Never recommend a project with zero skill overlap
+        if not has_skill_match:
+            continue  
+ 
+        # Only score if there is a valid skill match
+        score = score_single_project(project, user_skills, level, interest, time_availability)
         if score > 0:
-            scored_projects.append({"project": project, "score": score})
-
-    # Sort projects in descending order so the
-    # most relevant recommendations appear first.
-    scored_projects.sort(key=lambda item: item["score"], reverse=True)
-
-    # Return only the project dicts, not the score metadata
-    return [item["project"] for item in scored_projects[:MAX_RESULTS]]
-
+            scored.append({"project": project, "score": score})
+ 
+    scored.sort(key=lambda x: x["score"], reverse=True)
+    return [item["project"] for item in scored[:MAX_RESULTS]]
 
 def validate_recommendation_inputs(skills, level, interest, time_availability):
     """
