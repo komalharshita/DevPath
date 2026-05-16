@@ -396,6 +396,28 @@ if (isIndexPage) {
     return valid;
   }
 
+  // Restore the previous search when returning from a project page.
+  if(sessionStorage.getItem("returnToRecommendations") === "true") {
+    document.getElementById("time").value = sessionStorage.getItem("time");
+    document.getElementById("interest").value = sessionStorage.getItem("interest");
+    document.getElementById("level").value = sessionStorage.getItem("level");
+    
+    selectedSkills = JSON.parse(sessionStorage.getItem("skills"));
+
+    renderSelectedChips();
+    syncSkillsHiddenInput();
+    updateQuickPickState();
+
+    setTimeout(function () {
+      submitBtn.click();
+    }, 100);
+
+    sessionStorage.removeItem("returnToRecommendations");
+    sessionStorage.removeItem("skills");
+    sessionStorage.removeItem("level");
+    sessionStorage.removeItem("interest");
+    sessionStorage.removeItem("time");
+  }
 
   // ----------------------------------------------------------
   // Form submission and API call
@@ -421,6 +443,12 @@ if (isIndexPage) {
       interest: document.getElementById("interest").value,
       time: document.getElementById("time").value
     };
+
+    // Save the current form inputs before loading recommendations.
+    sessionStorage.setItem("skills", JSON.stringify(selectedSkills));
+    sessionStorage.setItem("level", payload.level);
+    sessionStorage.setItem("interest", payload.interest);
+    sessionStorage.setItem("time", payload.time);
 
     fetch("/api/recommend", {
       method: "POST",
@@ -687,5 +715,16 @@ if (isDetailPage) {
     try { document.execCommand("copy"); showCopySuccess(); } catch (e) { /* silent fail */ }
     document.body.removeChild(ta);
   }
+  
+  // Detect navigation back to the homepage from the detail page.
+  var btnNavigate = document.querySelectorAll("a");
+
+  btnNavigate.forEach(function(link) {
+    if (link.pathname === "/") {
+      link.addEventListener("click", function(event) {
+        sessionStorage.setItem("returnToRecommendations","true");
+      });
+    }
+  });
 
 } // end isDetailPage
