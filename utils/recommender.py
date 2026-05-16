@@ -106,6 +106,12 @@ def get_recommendations(skills_string, level, interest, time_availability):
     scored_projects = []
 
     for project in all_projects:
+        # Require at least one skill match for a project to be recommended
+        project_skills = [s.lower() for s in project.get("skills", [])]
+        has_skill_match = any(s in project_skills for s in user_skills)
+        if not has_skill_match:
+            continue  # Never recommend a project with zero skill overlap
+
         score = score_single_project(
             project, user_skills, level, interest, time_availability
         )

@@ -4,6 +4,8 @@
 *.log
 *.pyc
 *.swp
+.venv/
+__pycache__/
 .buildlog/
 .history
 

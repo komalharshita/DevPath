@@ -55,6 +55,8 @@ if (isIndexPage) {
   var resultsLoadingEl = document.getElementById("results-loading");
   var resultsEmptyEl = document.getElementById("results-empty");
   var emptyMessageEl = document.getElementById("empty-message");
+  var suggestedSkillsContainer = document.getElementById("suggested-skills-container");
+  var suggestedSkillsList = document.getElementById("suggested-skills-list");
   var skillsHidden = document.getElementById("skills");
   var skillsTextInput = document.getElementById("skills-input");
   var chipsSelectedEl = document.getElementById("skill-chips-selected");
@@ -479,9 +481,30 @@ if (isIndexPage) {
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "block";
       if (message && emptyMessageEl) emptyMessageEl.textContent = message;
+
+      // Suggest skills that have projects in the dataset
+      var suggestions = ["Python", "JavaScript", "HTML", "CSS"];
+      if (suggestedSkillsList && suggestedSkillsContainer) {
+        suggestedSkillsList.innerHTML = "";
+        suggestions.forEach(function (skill) {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "skill-chip";
+          btn.textContent = skill;
+          btn.addEventListener("click", function () {
+            addSkill(skill);
+            form.dispatchEvent(new Event("submit"));
+          });
+          suggestedSkillsList.appendChild(btn);
+        });
+        suggestedSkillsContainer.style.display = "block";
+      }
+
       resultsSection.scrollIntoView({ behavior: "smooth" });
       return;
     }
+
+    if (suggestedSkillsContainer) suggestedSkillsContainer.style.display = "none";
 
     resultsEmptyEl.style.display = "none";
     resultsGrid.style.display = "grid";
