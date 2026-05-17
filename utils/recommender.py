@@ -7,22 +7,55 @@ from utils.data_loader import load_all_projects
 # Maximum number of recommendations returned to the user
 MAX_RESULTS = 3
 
-# Point weights for each matching criterion
-WEIGHT_SKILL   = 3   # Skill matches carry the most influence
-WEIGHT_LEVEL   = 2   # Experience level is the next strongest signal
-WEIGHT_INTEREST = 2  # Area of interest is equally important as level
-WEIGHT_TIME    = 1   # Time availability is a tiebreaker
+# Scoring weights used by the recommendation engine.
+# Higher weights mean that criterion has more influence
+# on the final recommendation score.
+SCORING_WEIGHTS = {
+    "skill":    3,
+    "level":    2,
+    "interest": 2,
+    "time":     1,
+}
+
+
+# Common aliases and abbreviations for skills
+# This improves recommendation accuracy by normalizing user input
+SKILL_ALIASES = {
+    "js": "javascript",
+    "py": "python",
+    "html5": "html",
+    "css3": "css",
+    "c++": "cpp",
+    "web dev": "javascript"
+}
 
 
 def parse_skills(skills_string):
     """
-    Convert a raw comma-separated skills string into a clean lowercase list.
-    Example: "Python, HTML, CSS" -> ["python", "html", "css"]
+    Convert a raw comma-separated skills string into
+    a normalized lowercase list.
+
+    Example:
+    "JS, HTML5, CSS3" -> ["javascript", "html", "css"]
     """
-    return [s.strip().lower() for s in skills_string.split(",") if s.strip()]
+
+    raw_skills = [
+        s.strip().lower()
+        for s in skills_string.split(",")
+        if s.strip()
+    ]
+
+    normalized_skills = [
+        SKILL_ALIASES.get(skill, skill)
+        for skill in raw_skills
+    ]
+
+    return normalized_skills
 
 
-def score_single_project(project, user_skills, level, interest, time_availability):
+def score_single_project(
+        project, user_skills,
+        level, interest, time_availability):
     """
     Calculate a numeric relevance score for one project.
 
@@ -38,18 +71,22 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
 
     # Compare user's skills against the project's required skills
     project_skills = [s.lower() for s in project.get("skills", [])]
+    # Count how many user skills overlap with the
+    # skills required by the current project.
     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
-    score += matched_skills * WEIGHT_SKILL
+    # Add weighted points based on the number of matching skills.
+    # More overlapping skills result in a higher recommendation score.
+    score += matched_skills * SCORING_WEIGHTS["skill"]
 
     # Award points for each additional matching criterion
     if project.get("level", "").lower() == level.lower():
-        score += WEIGHT_LEVEL
+        score += SCORING_WEIGHTS["level"]
 
     if project.get("interest", "").lower() == interest.lower():
-        score += WEIGHT_INTEREST
+        score += SCORING_WEIGHTS["interest"]
 
     if project.get("time", "").lower() == time_availability.lower():
-        score += WEIGHT_TIME
+        score += SCORING_WEIGHTS["time"]
 
     return score
 
@@ -74,10 +111,13 @@ def get_recommendations(skills_string, level, interest, time_availability):
         score = score_single_project(
             project, user_skills, level, interest, time_availability
         )
+        # Ignore projects with a score of 0 since they
+        # have no meaningful overlap with the user's inputs.
         if score > 0:
             scored_projects.append({"project": project, "score": score})
 
-    # Sort so the highest-scoring project appears first
+    # Sort projects in descending order so the
+    # most relevant recommendations appear first.
     scored_projects.sort(key=lambda item: item["score"], reverse=True)
 
     # Return only the project dicts, not the score metadata

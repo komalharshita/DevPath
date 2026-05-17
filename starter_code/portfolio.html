@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<!--
+  portfolio.html
+  ==============
+  Project:    Personal Portfolio Website
+  Difficulty: Beginner
+  Skills:     HTML, CSS, JavaScript
+  Time:       Low (a few hours)
+
+  What you will build:
+      A clean, professional personal portfolio website with five sections:
+      navigation, hero, projects grid, skills list, and a contact form.
+      The site is fully responsive and uses only HTML, CSS, and
+      vanilla JavaScript — no frameworks, no build tools, no installs.
+
+  How to run:
+      Open this file directly in any web browser.
+      No server or install step needed.
+
+  Learning goals:
+      - Writing semantic HTML5 structure
+      - Using CSS Flexbox and CSS Grid for layout
+      - Making a site responsive with media queries
+      - Animating elements on scroll using IntersectionObserver
+      - Validating a contact form with vanilla JavaScript
+      - Organising CSS with custom properties (variables)
+
+  Roadmap:
+      Step 1:  Open the file in a browser — the structure and styles load
+      Step 2:  Replace all placeholder text with your real information
+      Step 3:  Complete the smooth-scroll navigation in initNavigation()
+      Step 4:  Add your real projects to the projects grid (HTML section)
+      Step 5:  Complete the skill bar animation in animateSkillBars()
+      Step 6:  Complete the scroll reveal animation in initScrollReveal()
+      Step 7:  Complete the contact form validation in validateForm()
+      Step 8:  Make the mobile hamburger menu open and close in toggleMenu()
+      Step 9:  Test every section on a 375px mobile screen using DevTools
+      Step 10: Deploy to GitHub Pages (Settings > Pages > Deploy from main)
+
+  Deployment (GitHub Pages):
+      1. Push this file to a GitHub repository as index.html
+      2. Go to repository Settings > Pages
+      3. Set source to "Deploy from a branch" and select main / root
+      4. Your site will be live at https://your-username.github.io/repo-name
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Portfolio of [Your Name] — [Your Title]" />
+  <title>[Your Name] — Portfolio</title>
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* ==============================================================
+       CSS CUSTOM PROPERTIES
+       Change these to reskin the entire site instantly.
+       ============================================================== */
+    :root {
+      --color-primary:    #2335c2;
+      --color-primary-dk: #1a1f6e;
+      --color-accent:     #7c3aed;
+      --color-accent-lt:  #a78bfa;
+      --color-yellow:     #fbbf24;
+      --color-text:       #111827;
+      --color-text-mid:   #374151;
+      --color-text-light: #6b7280;
+      --color-border:     #e5e7eb;
+      --color-bg:         #ffffff;
+      --color-bg-soft:    #f9fafb;
+      --color-bg-hero:    #f0f2ff;
+
+      --font-display: "Sora", sans-serif;
+      --font-body:    "Inter", sans-serif;
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --radius-full: 9999px;
+
+      --shadow-sm: 0 2px 8px rgba(35, 53, 194, 0.08);
+      --shadow-md: 0 6px 24px rgba(35, 53, 194, 0.13);
+      --shadow-lg: 0 12px 40px rgba(35, 53, 194, 0.18);
+
+      --transition: 0.2s ease;
+    }
+
+    /* ==============================================================
+       RESET
+       ============================================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html                   { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      color: var(--color-text);
+      background: var(--color-bg);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    img  { display: block; max-width: 100%; }
+    a    { color: var(--color-primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    ul   { list-style: none; }
+
+    /* ==============================================================
+       SHARED UTILITIES
+       ============================================================== */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      background: var(--color-bg-hero);
+      border-radius: var(--radius-full);
+      padding: 4px 14px;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      color: var(--color-text);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .section-sub {
+      font-size: 1rem;
+      color: var(--color-text-light);
+      max-width: 520px;
+      margin-bottom: 52px;
+    }
+
+    /* Scroll-reveal: elements start invisible and slide up into view */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ==============================================================
+       NAVIGATION
+       ============================================================== */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 28px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--color-primary-dk);
+      letter-spacing: -0.03em;
+    }
+    /* TODO Step 2: Replace [YN] with your actual initials */
+    .nav-logo span { color: var(--color-accent); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .nav-link {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--color-text-mid);
+      transition: color var(--transition);
+    }
+    .nav-link:hover { color: var(--color-primary); text-decoration: none; }
+    .nav-link.active { color: var(--color-primary); font-weight: 600; }
+
+    .nav-cta {
+      padding: 9px 20px;
+      background: var(--color-primary);
+      color: #fff;
+      border-radius: var(--radius-full);
+      font-size: 0.86rem;
+      font-weight: 600;
+      transition: opacity var(--transition);
+    }
+    .nav-cta:hover { opacity: 0.88; text-decoration: none; }
+
+    /* Hamburger icon (mobile only) */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 22px; height: 2px;
+      background: var(--color-text);
+      border-radius: 2px;
+      transition: transform var(--transition), opacity var(--transition);
+    }
+    /* Hamburger open state — handled by JS */
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Mobile nav drawer */
+    .nav-mobile {
+      display: none;
+      flex-direction: column;
+      padding: 12px 28px 20px;
+      border-top: 1px solid var(--color-border);
+      background: var(--color-bg);
+    }
+    .nav-mobile.open { display: flex; }
+    .nav-mobile a {
+      padding: 11px 0;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--color-text-mid);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .nav-mobile a:last-child { border-bottom: none; }
+
+    /* ==============================================================
+       HERO SECTION
+       ============================================================== */
+    .hero {
+      padding: 130px 28px 90px;
+      background: var(--color-bg-hero);
+      border-bottom: 1px solid var(--color-border);
+      min-height: 88vh;
+      display: flex;
+      align-items: center;
+    }
+
+    .hero-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 64px;
+      align-items: center;
+      width: 100%;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      background: rgba(35, 53, 194, 0.07);
+      border: 1px solid rgba(35, 53, 194, 0.15);
+      border-radius: var(--radius-full);
+      padding: 5px 14px;
+      margin-bottom: 22px;
+    }
+    .hero-tag-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #22c55e;
+    }
+
+    .hero-heading {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      color: var(--color-text);
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .hero-heading .accent { color: var(--color-primary); }
+
+    .hero-sub {
+      font-size: 1.06rem;
+      color: var(--color-text-light);
+      line-height: 1.78;
+      max-width: 500px;
+      margin-bottom: 36px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      padding: 14px 28px;
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-full);
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(35, 53, 194, 0.3);
+      transition: opacity var(--transition), transform var(--transition);
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary:hover {
+      opacity: 0.9; transform: translateY(-2px); text-decoration: none;
+    }
+
+    .btn-ghost {
+      padding: 14px 28px;
+      background: transparent;
+      color: var(--color-primary);
+      border: 1.5px solid var(--color-primary);
+      border-radius: var(--radius-full);
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background var(--transition);
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-ghost:hover { background: var(--color-bg-hero); text-decoration: none; }
+
+    /* Avatar placeholder on the right side of the hero */
+    .hero-avatar-wrap {
+      display: flex;
+      justify-content: center;
+    }
+    .hero-avatar {
+      width: 280px; height: 280px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 5rem;
+      font-weight: 800;
+      color: rgba(255,255,255,0.9);
+      box-shadow: var(--shadow-lg);
+      flex-shrink: 0;
+      /* TODO Step 2: Replace this with an <img> tag pointing to your real photo.
+         Example: <img src="photo.jpg" alt="Your Name" class="hero-avatar" />
+         Then remove the background-color and text content. */
+    }
+
+    /* ==============================================================
+       PROJECTS SECTION
+       ============================================================== */
+    .projects-section {
+      padding: 96px 0;
+      background: var(--color-bg);
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 26px;
+    }
+
+    .project-card {
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--color-bg);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow var(--transition), transform var(--transition),
+                  border-color var(--transition);
+    }
+    .project-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-5px);
+      border-color: rgba(35, 53, 194, 0.25);
+    }
+
+    /* Coloured banner at the top of each card */
+    .project-banner {
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.9);
+      letter-spacing: -0.02em;
+    }
+    /* TODO Step 4: Replace these generic colours with real project screenshots.
+       Use <img src="screenshot.png" alt="..." class="project-banner-img" loading="lazy" />
+       and set height: 180px on .project-card img */
+    .banner-blue   { background: linear-gradient(135deg, #2335c2, #4f6ef7); }
+    .banner-purple { background: linear-gradient(135deg, #7c3aed, #a78bfa); }
+    .banner-teal   { background: linear-gradient(135deg, #0891b2, #06b6d4); }
+
+    .project-body { padding: 24px; flex: 1; display: flex; flex-direction: column; }
+
+    .project-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 8px;
+    }
+
+    .project-desc {
+      font-size: 0.88rem;
+      color: var(--color-text-light);
+      line-height: 1.68;
+      flex: 1;
+      margin-bottom: 18px;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 18px;
+    }
+    .tag {
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 3px 11px;
+      border-radius: var(--radius-full);
+      background: var(--color-bg-hero);
+      color: var(--color-primary);
+    }
+
+    .project-links { display: flex; gap: 10px; }
+    .project-link {
+      flex: 1;
+      padding: 9px 14px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      text-align: center;
+      border-radius: var(--radius-sm);
+      transition: background var(--transition), color var(--transition);
+    }
+    .project-link--primary {
+      background: var(--color-primary);
+      color: #fff;
+    }
+    .project-link--primary:hover { opacity: 0.88; text-decoration: none; color: #fff; }
+    .project-link--ghost {
+      border: 1.5px solid var(--color-border);
+      color: var(--color-text-mid);
+    }
+    .project-link--ghost:hover { border-color: var(--color-primary); color: var(--color-primary); text-decoration: none; }
+
+    /* ==============================================================
+       SKILLS SECTION
+       ============================================================== */
+    .skills-section {
+      padding: 96px 0;
+      background: var(--color-bg-soft);
+      border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+    }
+
+    .skills-group-title {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-text-light);
+      margin-bottom: 20px;
+    }
+
+    .skill-item { margin-bottom: 18px; }
+
+    .skill-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 6px;
+    }
+    .skill-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+    .skill-pct {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--color-text-light);
+    }
+
+    .skill-track {
+      height: 7px;
+      background: var(--color-border);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+    /* Width starts at 0 and is animated to data-pct by JS */
+    .skill-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+      border-radius: var(--radius-full);
+      transition: width 1s ease;
+    }
+
+    /* ==============================================================
+       CONTACT SECTION
+       ============================================================== */
+    .contact-section {
+      padding: 96px 0;
+      background: var(--color-bg);
+    }
+
+    .contact-inner {
+      max-width: 620px;
+    }
+
+    .form-group {
+      margin-bottom: 22px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--color-text-mid);
+      margin-bottom: 7px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: 0.93rem;
+      color: var(--color-text);
+      background: var(--color-bg-soft);
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(35, 53, 194, 0.1);
+      background: #fff;
+    }
+    .form-control.error-field { border-color: #dc2626; }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 130px;
+    }
+
+    .form-error {
+      font-size: 0.8rem;
+      color: #dc2626;
+      margin-top: 5px;
+      min-height: 18px;
+      font-weight: 500;
+    }
+
+    .form-success {
+      padding: 14px 18px;
+      background: #dcfce7;
+      border: 1px solid #86efac;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      color: #166534;
+      font-weight: 500;
+      display: none;
+      margin-bottom: 16px;
+    }
+
+    /* ==============================================================
+       FOOTER
+       ============================================================== */
+    .footer {
+      background: var(--color-primary-dk);
+      padding: 44px 28px;
+      text-align: center;
+    }
+    .footer-name {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+    .footer-tagline {
+      font-size: 0.86rem;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 24px;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      font-size: 0.86rem;
+      color: rgba(255,255,255,0.55);
+      transition: color var(--transition);
+    }
+    .footer-links a:hover { color: #fff; text-decoration: none; }
+    .footer-copy {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.25);
+      margin-top: 24px;
+    }
+
+    /* ==============================================================
+       RESPONSIVE
+       ============================================================== */
+    @media (max-width: 900px) {
+      .hero-inner    { grid-template-columns: 1fr; }
+      .hero-avatar-wrap { order: -1; }
+      .hero-avatar   { width: 180px; height: 180px; font-size: 3rem; }
+      .skills-grid   { grid-template-columns: 1fr; gap: 32px; }
+    }
+
+    @media (max-width: 640px) {
+      .nav-links     { display: none; }
+      .nav-hamburger { display: flex; }
+      .hero          { padding: 110px 20px 72px; }
+      .hero-heading  { font-size: 2rem; }
+      .container     { padding: 0 20px; }
+      .projects-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       NAVIGATION
+       ============================================================ -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <!-- TODO Step 2: Replace [YN] with your initials and [Your Name] below -->
+      <a href="#home" class="nav-logo">[<span>YN</span>]</a>
+
+      <ul class="nav-links">
+        <li><a href="#home"     class="nav-link active">Home</a></li>
+        <li><a href="#projects" class="nav-link">Projects</a></li>
+        <li><a href="#skills"   class="nav-link">Skills</a></li>
+        <li><a href="#contact"  class="nav-link">Contact</a></li>
+        <li><a href="#contact"  class="nav-cta">Hire Me</a></li>
+      </ul>
+
+      <button
+        class="nav-hamburger"
+        id="hamburger"
+        aria-label="Toggle navigation"
+        aria-expanded="false"
+      >
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <!-- Mobile navigation drawer -->
+    <div class="nav-mobile" id="nav-mobile">
+      <a href="#home"     onclick="closeMenu()">Home</a>
+      <a href="#projects" onclick="closeMenu()">Projects</a>
+      <a href="#skills"   onclick="closeMenu()">Skills</a>
+      <a href="#contact"  onclick="closeMenu()">Contact</a>
+    </div>
+  </nav>
+
+
+  <!-- ============================================================
+       HERO SECTION
+       ============================================================ -->
+  <section class="hero" id="home">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <!-- TODO Step 2: Update the tag text to reflect your current status -->
+        <div class="hero-tag">
+          <span class="hero-tag-dot"></span>
+          Available for opportunities
+        </div>
+
+        <!-- TODO Step 2: Replace with your real name and title -->
+        <h1 class="hero-heading">
+          Hi, I am<br>
+          <span class="accent">[Your Name]</span>
+        </h1>
+
+        <!-- TODO Step 2: Write 2-3 sentences about yourself -->
+        <p class="hero-sub">
+          A [Beginner / Junior / Intermediate] developer passionate about
+          building useful things with code. I specialise in [Python / Web
+          Development / Data] and I am looking to contribute to real
+          projects while growing my skills.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#projects" class="btn-primary">View My Projects</a>
+          <a href="#contact"  class="btn-ghost">Get In Touch</a>
+        </div>
+      </div>
+
+      <!-- TODO Step 2: Replace the initials with your photo -->
+      <div class="hero-avatar-wrap">
+        <div class="hero-avatar" aria-label="Profile photo placeholder">
+          <!-- Replace this entire div with:
+               <img src="your-photo.jpg" alt="[Your Name]" class="hero-avatar" />
+          -->
+          YN
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       PROJECTS SECTION
+       ============================================================ -->
+  <section class="projects-section" id="projects">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-label">Portfolio</div>
+        <h2 class="section-title">Things I Have Built</h2>
+        <p class="section-sub">
+          A selection of projects that show my skills and how I approach problems.
+          <!-- TODO Step 4: Update this text -->
+        </p>
+      </div>
+
+      <div class="projects-grid">
+
+        <!-- ---- Project Card 1 ---- -->
+        <!-- TODO Step 4: Replace with your real project details -->
+        <article class="project-card reveal">
+          <div class="project-banner banner-blue">
+            <!-- Replace this with a screenshot: <img src="screenshot.png" alt="Project name" loading="lazy"> -->
+            Project One
+          </div>
+          <div class="project-body">
+            <h3 class="project-title">Project Title One</h3>
+            <p class="project-desc">
+              A short description of what this project does, the problem it
+              solves, and what you learned while building it.
+            </p>
+            <div class="project-tags">
+              <span class="tag">Python</span>
+              <span class="tag">Flask</span>
+              <span class="tag">JSON</span>
+            </div>
+            <div class="project-links">
+              <!-- TODO Step 4: Replace # with your real GitHub and live URLs -->
+              <a href="#" class="project-link project-link--primary" target="_blank" rel="noopener noreferrer">Live Demo</a>
+              <a href="#" class="project-link project-link--ghost"   target="_blank" rel="noopener noreferrer">GitHub</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- ---- Project Card 2 ---- -->
+        <article class="project-card reveal">
+          <div class="project-banner banner-purple">Project Two</div>
+          <div class="project-body">
+            <h3 class="project-title">Project Title Two</h3>
+            <p class="project-desc">
+              A short description of what this project does, the problem it
+              solves, and what you learned while building it.
+            </p>
+            <div class="project-tags">
+              <span class="tag">HTML</span>
+              <span class="tag">CSS</span>
+              <span class="tag">JavaScript</span>
+            </div>
+            <div class="project-links">
+              <a href="#" class="project-link project-link--primary" target="_blank" rel="noopener noreferrer">Live Demo</a>
+              <a href="#" class="project-link project-link--ghost"   target="_blank" rel="noopener noreferrer">GitHub</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- ---- Project Card 3 ---- -->
+        <article class="project-card reveal">
+          <div class="project-banner banner-teal">Project Three</div>
+          <div class="project-body">
+            <h3 class="project-title">Project Title Three</h3>
+            <p class="project-desc">
+              A short description of what this project does, the problem it
+              solves, and what you learned while building it.
+            </p>
+            <div class="project-tags">
+              <span class="tag">Python</span>
+              <span class="tag">pandas</span>
+              <span class="tag">CSV</span>
+            </div>
+            <div class="project-links">
+              <a href="#" class="project-link project-link--primary" target="_blank" rel="noopener noreferrer">Live Demo</a>
+              <a href="#" class="project-link project-link--ghost"   target="_blank" rel="noopener noreferrer">GitHub</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SKILLS SECTION
+       ============================================================ -->
+  <section class="skills-section" id="skills">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-label">Skills</div>
+        <h2 class="section-title">What I Work With</h2>
+        <p class="section-sub">
+          Technologies I have used in projects and am actively growing.
+        </p>
+      </div>
+
+      <div class="skills-grid reveal">
+
+        <!-- Left column: technical skills with animated bars -->
+        <div>
+          <p class="skills-group-title">Technical</p>
+
+          <!--
+            data-pct sets the target width for the animated bar.
+            TODO Step 2: Update skill names and percentages to match your real abilities.
+            Be honest — interviewers will ask about anything on your portfolio.
+          -->
+          <div class="skill-item">
+            <div class="skill-header">
+              <span class="skill-name">Python</span>
+              <span class="skill-pct">70%</span>
+            </div>
+            <div class="skill-track">
+              <div class="skill-bar" data-pct="70"></div>
+            </div>
+          </div>
+
+          <div class="skill-item">
+            <div class="skill-header">
+              <span class="skill-name">HTML &amp; CSS</span>
+              <span class="skill-pct">80%</span>
+            </div>
+            <div class="skill-track">
+              <div class="skill-bar" data-pct="80"></div>
+            </div>
+          </div>
+
+          <div class="skill-item">
+            <div class="skill-header">
+              <span class="skill-name">JavaScript</span>
+              <span class="skill-pct">60%</span>
+            </div>
+            <div class="skill-track">
+              <div class="skill-bar" data-pct="60"></div>
+            </div>
+          </div>
+
+          <div class="skill-item">
+            <div class="skill-header">
+              <span class="skill-name">Flask</span>
+              <span class="skill-pct">55%</span>
+            </div>
+            <div class="skill-track">
+              <div class="skill-bar" data-pct="55"></div>
+            </div>
+          </div>
+
+          <div class="skill-item">
+            <div class="skill-header">
+              <span class="skill-name">SQL</span>
+              <span class="skill-pct">50%</span>
+            </div>
+            <div class="skill-track">
+              <div class="skill-bar" data-pct="50"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column: other skills as a tag cloud -->
+        <div>
+          <p class="skills-group-title">Tools &amp; Other</p>
+          <!-- TODO Step 2: Add or remove tags to match your real toolkit -->
+          <div class="project-tags" style="gap:10px;">
+            <span class="tag" style="font-size:0.82rem;padding:6px 14px;">Git &amp; GitHub</span>
+            <span class="tag" style="font-size:0.82rem;padding:6px 14px;">VS Code</span>
+            <span class="tag" style="font-size:0.82rem;padding:6px 14px;">Command Line</span>
+            <span class="tag" style="font-size:0.82rem;padding:6px 14px;">REST APIs</span>
+            <span class="tag" style="font-size:0.82rem;padding:6px 14px;">JSON</span>
+            <span class="tag" style="font-size:0.82rem;padding:6px 14px;">Responsive Design</span>
+            <span class="tag" style="font-size:0.82rem;padding:6px 14px;">pandas</span>
+            <span class="tag" style="font-size:0.82rem;padding:6px 14px;">pytest</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       CONTACT SECTION
+       ============================================================ -->
+  <section class="contact-section" id="contact">
+    <div class="container">
+      <div class="contact-inner">
+        <div class="reveal">
+          <div class="section-label">Contact</div>
+          <h2 class="section-title">Get In Touch</h2>
+          <p class="section-sub">
+            Have a project idea, a question, or just want to connect?
+            Fill in the form and I will get back to you as soon as I can.
+          </p>
+        </div>
+
+        <!-- Success message (shown after valid submission) -->
+        <div class="form-success" id="form-success">
+          Your message has been sent. I will be in touch soon.
+        </div>
+
+        <form id="contact-form" class="reveal" novalidate>
+
+          <div class="form-group">
+            <label for="name">Your Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              class="form-control"
+              placeholder="Alice Smith"
+              autocomplete="name"
+            />
+            <div class="form-error" id="name-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-control"
+              placeholder="alice@example.com"
+              autocomplete="email"
+            />
+            <div class="form-error" id="email-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <input
+              type="text"
+              id="subject"
+              name="subject"
+              class="form-control"
+              placeholder="Project collaboration / Question / Other"
+            />
+            <div class="form-error" id="subject-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea
+              id="message"
+              name="message"
+              class="form-control"
+              placeholder="Tell me what you have in mind..."
+            ></textarea>
+            <div class="form-error" id="message-error"></div>
+          </div>
+
+          <button type="submit" class="btn-primary" id="submit-btn">
+            Send Message
+          </button>
+
+        </form>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="footer">
+    <!-- TODO Step 2: Replace [Your Name] and [Your Title] -->
+    <div class="footer-name">[Your Name]</div>
+    <p class="footer-tagline">[Your Title] — Building things that matter</p>
+
+    <div class="footer-links">
+      <!-- TODO Step 2: Replace # with your real profile URLs -->
+      <a href="#" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="#" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a href="#" target="_blank" rel="noopener noreferrer">Twitter</a>
+      <a href="mailto:you@example.com">Email</a>
+    </div>
+
+    <p class="footer-copy">
+      Built with HTML, CSS, and JavaScript. No frameworks.
+    </p>
+  </footer>
+
+
+  <!-- ============================================================
+       JAVASCRIPT
+       ============================================================ -->
+  <script>
+    // ==========================================================
+    // TODO Step 3: initNavigation()
+    // Highlight the correct nav link as the user scrolls between sections.
+    //
+    // Tasks:
+    //   1. Collect all nav links: document.querySelectorAll(".nav-link")
+    //   2. Collect all sections with an id: document.querySelectorAll("section[id]")
+    //   3. Add a "scroll" event listener to window.
+    //   4. On each scroll event, find which section is currently in the
+    //      viewport by comparing window.scrollY to section.offsetTop.
+    //      The active section is the one whose top is just above the middle
+    //      of the viewport:
+    //        section.offsetTop - window.innerHeight / 2 <= window.scrollY
+    //   5. Remove "active" class from all nav links.
+    //   6. Add "active" class to the link whose href matches #<section.id>.
+    // ==========================================================
+    function initNavigation() {
+      // --- Write your code here ---
+
+    }
+
+
+    // ==========================================================
+    // TODO Step 8: toggleMenu() and closeMenu()
+    // Open and close the mobile navigation drawer.
+    //
+    // toggleMenu() tasks:
+    //   1. Toggle the "open" class on #hamburger.
+    //   2. Toggle the "open" class on #nav-mobile.
+    //   3. Update aria-expanded on the hamburger button:
+    //        var isOpen = hamburger.classList.contains("open");
+    //        hamburger.setAttribute("aria-expanded", isOpen);
+    //
+    // closeMenu() tasks:
+    //   1. Remove "open" from #hamburger.
+    //   2. Remove "open" from #nav-mobile.
+    //   3. Set aria-expanded to "false".
+    //
+    // Wire toggleMenu() to the hamburger button's onclick below.
+    // closeMenu() is already called by each mobile nav link (see HTML).
+    // ==========================================================
+    function toggleMenu() {
+      // --- Write your code here ---
+
+    }
+
+    function closeMenu() {
+      // --- Write your code here ---
+
+    }
+
+    // Wire the hamburger button — already connected, no change needed here
+    document.getElementById("hamburger").addEventListener("click", toggleMenu);
+
+
+    // ==========================================================
+    // TODO Step 5: animateSkillBars()
+    // Animate the skill bar widths from 0% to their data-pct value.
+    //
+    // Tasks:
+    //   1. Select all elements with class "skill-bar":
+    //        document.querySelectorAll(".skill-bar")
+    //   2. Loop through each bar.
+    //   3. Read the target percentage: bar.getAttribute("data-pct")
+    //   4. Set bar.style.width = pct + "%"
+    //      The CSS transition: width 1s ease handles the animation automatically.
+    //
+    // This function is called by initScrollReveal() when the skills section
+    // enters the viewport — so the animation only fires when the user can see it.
+    // ==========================================================
+    function animateSkillBars() {
+      // --- Write your code here ---
+
+    }
+
+
+    // ==========================================================
+    // TODO Step 6: initScrollReveal()
+    // Use IntersectionObserver to reveal elements as they scroll into view.
+    //
+    // Tasks:
+    //   1. Select all elements with class "reveal".
+    //   2. Create an IntersectionObserver:
+    //        var observer = new IntersectionObserver(function(entries) {
+    //            entries.forEach(function(entry) {
+    //                if (entry.isIntersecting) {
+    //                    entry.target.classList.add("visible");
+    //                    // If this is the skills section, animate bars
+    //                    if (entry.target.closest("#skills")) {
+    //                        animateSkillBars();
+    //                    }
+    //                    observer.unobserve(entry.target); // Fire once only
+    //                }
+    //            });
+    //        }, { threshold: 0.15 }); // Fire when 15% of element is visible
+    //   3. Call observer.observe(el) on each reveal element.
+    // ==========================================================
+    function initScrollReveal() {
+      // --- Write your code here ---
+
+    }
+
+
+    // ==========================================================
+    // TODO Step 7: validateForm()
+    // Validate the contact form before "submitting" it.
+    //
+    // Validation rules:
+    //   name    — required, at least 2 characters
+    //   email   — required, must contain "@" and "."
+    //   subject — required, at least 3 characters
+    //   message — required, at least 10 characters
+    //
+    // Tasks:
+    //   1. Read the value from each field using document.getElementById().value.trim()
+    //   2. For each field, check the rule above.
+    //   3. If a rule fails:
+    //        - Show the error message in the field's #<name>-error div.
+    //        - Add the "error-field" CSS class to the input.
+    //        - Set a flag: var isValid = false
+    //   4. If a rule passes:
+    //        - Clear the error div.
+    //        - Remove "error-field" from the input.
+    //   5. If all rules pass (isValid is true):
+    //        - Hide the form: document.getElementById("contact-form").style.display = "none"
+    //        - Show the success message: document.getElementById("form-success").style.display = "block"
+    //        - Note: in a real project you would send the data to a backend here.
+    //          For now, just showing the success message is enough.
+    //   6. Return isValid.
+    // ==========================================================
+    function validateForm() {
+      var isValid = true;
+
+      // --- Write your validation code here ---
+
+      return isValid;
+    }
+
+
+    // ==========================================================
+    // Form submit handler — already wired, no changes needed
+    // ==========================================================
+    document.getElementById("contact-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      validateForm();
+    });
+
+
+    // ==========================================================
+    // Initialise everything on page load
+    // ==========================================================
+    document.addEventListener("DOMContentLoaded", function() {
+      initNavigation();
+      initScrollReveal();
+    });
+  </script>
+
+</body>
+</html>
