@@ -7,6 +7,7 @@
 //   - Recommendation API call and loading states
 //   - Result card rendering
 //   - Code viewer panel (detail page)
+//   - Interactive roadmap progress tracking & persistence (Fully Configured)
 
 // ============================================================
 // Detect which page we are on
@@ -61,7 +62,13 @@ if (isIndexPage) {
   var resultsEmptyEl = document.getElementById("results-empty");
   var emptyMessageEl = document.getElementById("empty-message");
   var skillsHidden = document.getElementById("skills");
+  
+  // Safely grab the active text field among duplicate template input elements
   var skillsTextInput = document.getElementById("skills-input");
+  if (skillsTextInput && skillsTextInput.tagName !== "INPUT") {
+      skillsTextInput = document.querySelector(".skill-input-wrap input[type='text']");
+  }
+  
   var chipsSelectedEl = document.getElementById("skill-chips-selected");
   var quickPickChips = document.querySelectorAll(".skill-chip");
 
@@ -133,7 +140,9 @@ if (isIndexPage) {
   }
 
   function syncSuggestionsA11yState() {
-    skillsTextInput.setAttribute("aria-expanded", visibleSuggestions.length > 0 ? "true" : "false");
+    if (skillsTextInput) {
+      skillsTextInput.setAttribute("aria-expanded", visibleSuggestions.length > 0 ? "true" : "false");
+    }
   }
 
   function renderActiveSuggestion() {
@@ -157,9 +166,11 @@ if (isIndexPage) {
 
   function selectSuggestion(skill) {
     addSkill(skill);
-    skillsTextInput.value = "";
-    hideSuggestions();
-    skillsTextInput.focus();
+    if (skillsTextInput) {
+      skillsTextInput.value = "";
+      hideSuggestions();
+      skillsTextInput.focus();
+    }
   }
 
   function displaySuggestions(items) {
@@ -179,7 +190,7 @@ if (isIndexPage) {
       item.setAttribute("id", "skills-suggestion-" + index);
       item.setAttribute("aria-selected", "false");
 
-      // Prevent the input blur handler from closing the menu before click runs.
+      // Prevent input blur handler from closing menu before click runs
       item.addEventListener("mousedown", function (evt) {
         evt.preventDefault();
       });
@@ -207,66 +218,66 @@ if (isIndexPage) {
     });
   }
 
-  // Add skill on Enter key in the text input
-  skillsTextInput.addEventListener("keydown", function (evt) {
-    if (evt.key === "ArrowDown" || evt.key === "ArrowUp") {
-      if (visibleSuggestions.length === 0) {
-        displaySuggestions(getFilteredSkills(skillsTextInput.value));
-      }
-      if (visibleSuggestions.length === 0) return;
-      evt.preventDefault();
-      if (evt.key === "ArrowDown") {
-        activeSuggestionIndex = (activeSuggestionIndex + 1) % visibleSuggestions.length;
-      } else {
-        activeSuggestionIndex = activeSuggestionIndex <= 0
-          ? visibleSuggestions.length - 1
-          : activeSuggestionIndex - 1;
-      }
-      renderActiveSuggestion();
-      return;
-    }
-
-    if (evt.key === "Escape") {
-      hideSuggestions();
-      return;
-    }
-
-    if (evt.key === "Enter") {
-      evt.preventDefault();
-      if (activeSuggestionIndex >= 0 && visibleSuggestions[activeSuggestionIndex]) {
-        selectSuggestion(visibleSuggestions[activeSuggestionIndex]);
+  // Bind keyboard interactions safely if text node exists
+  if (skillsTextInput) {
+    skillsTextInput.addEventListener("keydown", function (evt) {
+      if (evt.key === "ArrowDown" || evt.key === "ArrowUp") {
+        if (visibleSuggestions.length === 0) {
+          displaySuggestions(getFilteredSkills(skillsTextInput.value));
+        }
+        if (visibleSuggestions.length === 0) return;
+        evt.preventDefault();
+        if (evt.key === "ArrowDown") {
+          activeSuggestionIndex = (activeSuggestionIndex + 1) % visibleSuggestions.length;
+        } else {
+          activeSuggestionIndex = activeSuggestionIndex <= 0
+            ? visibleSuggestions.length - 1
+            : activeSuggestionIndex - 1;
+        }
+        renderActiveSuggestion();
         return;
       }
-      if (skillsTextInput.value.trim()) {
-        addSkill(skillsTextInput.value);
-        skillsTextInput.value = "";
+
+      if (evt.key === "Escape") {
+        hideSuggestions();
+        return;
       }
-      hideSuggestions();
-    }
-  });
 
-  // Show suggestions on input
-  skillsTextInput.addEventListener("input", function (evt) {
-    var typedValue = evt.target.value.trim();
-    if (typedValue.length === 0) {
-      hideSuggestions();
-      return;
-    }
-    displaySuggestions(getFilteredSkills(typedValue));
-  });
+      if (evt.key === "Enter") {
+        evt.preventDefault();
+        if (activeSuggestionIndex >= 0 && visibleSuggestions[activeSuggestionIndex]) {
+          selectSuggestion(visibleSuggestions[activeSuggestionIndex]);
+          return;
+        }
+        if (skillsTextInput.value.trim()) {
+          addSkill(skillsTextInput.value);
+          skillsTextInput.value = "";
+        }
+        hideSuggestions();
+      }
+    });
 
-  skillsTextInput.addEventListener("focus", function () {
-    if (skillsTextInput.value.trim()) {
-      displaySuggestions(getFilteredSkills(skillsTextInput.value));
-    }
-  });
+    skillsTextInput.addEventListener("input", function (evt) {
+      var typedValue = evt.target.value.trim();
+      if (typedValue.length === 0) {
+        hideSuggestions();
+        return;
+      }
+      displaySuggestions(getFilteredSkills(typedValue));
+    });
 
-  // Hide suggestions when input loses focus
-  skillsTextInput.addEventListener("blur", function () {
-    setTimeout(function () { hideSuggestions(); }, 150);
-  });
+    skillsTextInput.addEventListener("focus", function () {
+      if (skillsTextInput.value.trim()) {
+        displaySuggestions(getFilteredSkills(skillsTextInput.value));
+      }
+    });
 
-  if (skillWrap) {
+    skillsTextInput.addEventListener("blur", function () {
+      setTimeout(function () { hideSuggestions(); }, 150);
+    });
+  }
+
+  if (skillWrap && skillsTextInput) {
     skillWrap.addEventListener("click", function () {
       skillsTextInput.focus();
     });
@@ -277,7 +288,7 @@ if (isIndexPage) {
     chip.addEventListener("click", function () {
       addSkill(chip.getAttribute("data-skill"));
       hideSuggestions();
-      skillsTextInput.value = "";
+      if (skillsTextInput) skillsTextInput.value = "";
     });
   });
 
@@ -288,24 +299,18 @@ if (isIndexPage) {
   });
 
   function addSkill(rawSkill) {
-    // Clean up any extra spaces and match to canonical skill name
     var skill = getCanonicalSkill(rawSkill);
-    // Nothing to add if string is empty after trimming
     if (!skill) return;
-
-    // Block duplicate entries (case-insensitive)
     if (isSkillSelected(skill)) return;
 
     selectedSkills.push(skill);
     renderSelectedChips();
     syncSkillsHiddenInput();
     updateQuickPickState();
-    // Once a skill is added, remove the "please add a skill" error if it was showing
     clearFieldError("skills-error");
   }
 
   function removeSkill(skill) {
-    // Rebuild the array without the skill that was just removed
     selectedSkills = selectedSkills.filter(function (selectedSkill) {
       return normalizeSkill(selectedSkill) !== normalizeSkill(skill);
     });
@@ -315,21 +320,19 @@ if (isIndexPage) {
   }
 
   function renderSelectedChips() {
-    // Wipe out old chips first so we don't end up with duplicates in the UI
+    if (!chipsSelectedEl) return;
     chipsSelectedEl.innerHTML = "";
     selectedSkills.forEach(function (skill) {
       var chipEl = document.createElement("span");
       chipEl.className = "skill-chip-selected";
       chipEl.textContent = skill;
 
-      // Remove button for each chip
       var removeBtn = document.createElement("button");
       removeBtn.type = "button";
       removeBtn.className = "skill-chip-remove";
       removeBtn.innerHTML = "&times;";
       removeBtn.setAttribute("aria-label", "Remove " + skill);
       removeBtn.addEventListener("click", function (e) {
-        // Stop click from bubbling up to the chip wrap's click listener
         e.stopPropagation();
         removeSkill(skill);
       });
@@ -340,9 +343,9 @@ if (isIndexPage) {
   }
 
   function syncSkillsHiddenInput() {
-    // Keep the hidden <input> in sync for form serialisation
-    // The API expects a comma-separated string, so join the array that way
-    skillsHidden.value = selectedSkills.join(", ");
+    if (skillsHidden) {
+      skillsHidden.value = selectedSkills.join(", ");
+    }
   }
 
   updateQuickPickState();
@@ -351,7 +354,6 @@ if (isIndexPage) {
   // ----------------------------------------------------------
   // Form validation
   // ----------------------------------------------------------
-
   function showFieldError(fieldId, message) {
     var el = document.getElementById(fieldId);
     if (el) el.textContent = message;
@@ -370,9 +372,9 @@ if (isIndexPage) {
 
   function validateForm() {
     var valid = true;
+    var rawText = skillsTextInput ? skillsTextInput.value.trim() : "";
 
-    // Check both the array and the hidden input since skills can come from either source
-    if (selectedSkills.length === 0 && !skillsHidden.value.trim()) {
+    if (selectedSkills.length === 0 && (!skillsHidden || !skillsHidden.value.trim()) && !rawText) {
       showFieldError("skills-error", "Please add at least one skill.");
       valid = false;
     }
@@ -396,12 +398,11 @@ if (isIndexPage) {
   // ----------------------------------------------------------
   // Form submission and API call
   // ----------------------------------------------------------
-
   form.addEventListener("submit", function (evt) {
     evt.preventDefault();
     clearAllErrors();
 
-    if (skillsTextInput.value.trim()) {
+    if (skillsTextInput && skillsTextInput.value.trim()) {
       addSkill(skillsTextInput.value);
       skillsTextInput.value = "";
       hideSuggestions();
@@ -412,8 +413,7 @@ if (isIndexPage) {
     setLoadingState(true);
 
     var payload = {
-      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills:   skillsHidden.value.trim() || skillsTextInput.value.trim(),
+      skills:   (skillsHidden && skillsHidden.value.trim()) || (skillsTextInput ? skillsTextInput.value.trim() : ""),
       level:    document.getElementById("level").value,
       interest: document.getElementById("interest").value,
       time:     document.getElementById("time").value
@@ -443,18 +443,15 @@ if (isIndexPage) {
   });
 
   function setLoadingState(isLoading) {
-    // Disable the button so the user can't accidentally submit twice
     submitBtn.disabled = isLoading;
     btnLabel.style.display = isLoading ? "none" : "inline";
     btnLoading.style.display = isLoading ? "inline" : "none";
 
     if (isLoading) {
-      // Show the results section with only the loading indicator visible
       resultsSection.style.display = "block";
       resultsLoadingEl.style.display = "block";
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "none";
-      // Scroll down so the user can see the spinner without manually scrolling
       resultsSection.scrollIntoView({ behavior: "smooth" });
     } else {
       resultsLoadingEl.style.display = "none";
@@ -466,11 +463,9 @@ if (isIndexPage) {
   // ----------------------------------------------------------
   // Render result cards
   // ----------------------------------------------------------
-
   function renderResults(projects, message) {
     resultsSection.style.display = "block";
     resultsLoadingEl.style.display = "none";
-    // Clear out any cards from a previous search before showing new ones
     resultsGrid.innerHTML = "";
 
     if (!projects || projects.length === 0) {
@@ -495,35 +490,25 @@ if (isIndexPage) {
     var card = document.createElement("div");
     card.className = "project-card";
 
-    // Title
     var title = document.createElement("h3");
     title.className = "project-card-title";
     title.textContent = project.title;
 
-    // Description (truncated for visual consistency)
     var desc = document.createElement("p");
     desc.className = "project-card-desc";
-    // Cut description to 120 chars so all cards stay the same height
     desc.textContent = truncate(project.description, 120);
 
-    // Tags row
     var tagsRow = document.createElement("div");
     tagsRow.className = "project-card-tags";
 
-    // Show the first two skills as tags
     (project.skills || []).slice(0, 2).forEach(function (skill) {
       tagsRow.appendChild(createTag(skill, "skill"));
     });
 
-    // Level tag (colour-coded via CSS class)
-    // Lowercase so it matches the CSS class names like "level beginner", "level advanced"
     var levelClass = "level " + (project.level || "").toLowerCase();
     tagsRow.appendChild(createTag(project.level, levelClass));
-
-    // Time tag
     tagsRow.appendChild(createTag("Time: " + project.time, "time"));
 
-    // Footer with view-details link
     var footer = document.createElement("div");
     footer.className = "project-card-footer";
 
@@ -533,7 +518,6 @@ if (isIndexPage) {
     link.href = "/project/" + project.id;
 
     footer.appendChild(link);
-
     card.appendChild(title);
     card.appendChild(desc);
     card.appendChild(tagsRow);
@@ -542,20 +526,48 @@ if (isIndexPage) {
     return card;
   }
 
+  // Visual component for tags
   function createTag(text, type) {
     var span = document.createElement("span");
-    // The type becomes a BEM modifier so CSS can style each tag differently
     span.className = "project-tag project-tag--" + type;
     span.textContent = text;
     return span;
   }
 
   function truncate(text, maxLength) {
-    // Safety check — just return empty string if text is missing
     if (!text) return "";
-    // Only add "..." if the text is actually longer than the limit
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
   }
+
+  // ----------------------------------------------------------
+  // RESUME LEARNING INJECTION (Dashboard Widget UI)
+  // ----------------------------------------------------------
+  (function initResumeDashboard() {
+    var progress = getProgress();
+    
+    if (progress.lastAccessedStep && progress.currentProjectId) {
+      var mainFormWrapper = document.getElementById("recommend-form");
+      if (!mainFormWrapper) return;
+      
+      var resumeCard = document.createElement("div");
+      resumeCard.id = "resume-learning-card";
+      resumeCard.style.cssText = "background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1px solid #bbf7d0; padding: 24px; border-radius: 12px; margin-bottom: 32px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); text-align: left;";
+      
+      resumeCard.innerHTML = 
+        '<div style="display: flex; flex-direction: column; md-flex-direction: row; justify-content: space-between; align-items: flex-start; gap: 16px;">' +
+          '<div style="flex: 1;">' +
+            '<span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: #86efac; color: #166534; padding: 4px 12px; border-radius: 9999px;">Continue Learning</span>' +
+            '<h3 style="font-size: 20px; font-weight: 700; color: #14532d; margin-top: 12px; margin-bottom: 4px; font-family: Sora, sans-serif;">' + progress.lastAccessedStep.title + '</h3>' +
+            '<p style="font-size: 14px; color: #166534; font-family: Inter, sans-serif;">Pick up exactly where you left off on your custom project roadmap.</p>' +
+          '</div>' +
+          '<div style="align-self: flex-start; margin-top: 4px;">' +
+            '<a href="/project/' + progress.currentProjectId + '" class="btn-hero-primary" style="display: inline-block; padding: 12px 24px; font-size: 14px; text-decoration: none; font-weight: 600; border-radius: 8px; background: #15803d; color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">Jump Back In →</a>' +
+          '</div>' +
+        '</div>';
+        
+      mainFormWrapper.parentNode.insertBefore(resumeCard, mainFormWrapper);
+    }
+  })();
 
 } // end isIndexPage
 
@@ -573,18 +585,13 @@ if (isDetailPage) {
   var btnViewCodeSm = document.getElementById("btn-view-code-sm");
   var btnClosePanel = document.getElementById("code-panel-close");
 
-  // Cache flag so code is only fetched once per page load
   var codeFetched = false;
 
   function openCodePanel() {
-    // Panel element might not exist on every detail page, so check first
     if (!codePanel) return;
     codePanel.classList.add("active");
     if (codePanelOverlay) codePanelOverlay.classList.add("active");
-    // Lock background scroll so the page doesn't scroll behind the panel
     document.body.style.overflow = "hidden";
-
-    // Only fetch the code on the first open, no need to re-fetch every time
     if (!codeFetched) fetchStarterCode();
   }
 
@@ -592,12 +599,10 @@ if (isDetailPage) {
     if (!codePanel) return;
     codePanel.classList.remove("active");
     if (codePanelOverlay) codePanelOverlay.classList.remove("active");
-    // Restore normal scrolling once the panel is closed
     document.body.style.overflow = "";
   }
 
   function fetchStarterCode() {
-    // Show a loading message while we wait for the API response
     if (codeContentEl) codeContentEl.textContent = "Loading starter code...";
 
     fetch("/project/" + PROJECT_ID + "/code")
@@ -609,7 +614,6 @@ if (isDetailPage) {
         }
         if (codePanelFilename) codePanelFilename.textContent = data.filename;
         if (codeContentEl) codeContentEl.textContent = data.code;
-        // Mark as fetched so we don't hit the API again on the next open
         codeFetched = true;
       })
       .catch(function () {
@@ -619,16 +623,11 @@ if (isDetailPage) {
       });
   }
 
-  // Attach open/close handlers
   if (btnViewCode) btnViewCode.addEventListener("click", openCodePanel);
   if (btnViewCodeSm) btnViewCodeSm.addEventListener("click", openCodePanel);
   if (btnClosePanel) btnClosePanel.addEventListener("click", closeCodePanel);
+  if (codePanelOverlay) codePanelOverlay.addEventListener("click", closeCodePanel);
 
-  if (codePanelOverlay) {
-    codePanelOverlay.addEventListener("click", closeCodePanel);
-  }
-
-  // Let keyboard users close the panel with Escape — important for accessibility
   document.addEventListener("keydown", function (evt) {
     if (evt.key === "Escape") closeCodePanel();
   });
@@ -643,7 +642,6 @@ if (isDetailPage) {
   function showCopySuccess() {
     if (!btnCopyCode) return;
 
-    // Swap icons on the button
     var copyIcon  = btnCopyCode.querySelector(".copy-icon");
     var checkIcon = btnCopyCode.querySelector(".check-icon");
     var btnLabel  = btnCopyCode.querySelector(".copy-btn-label");
@@ -652,16 +650,10 @@ if (isDetailPage) {
     if (checkIcon) checkIcon.style.display = "inline";
     if (btnLabel)  btnLabel.textContent    = "Copied!";
     btnCopyCode.classList.add("copied");
-    // Disable button so user can't spam click it while toast is showing
     btnCopyCode.disabled = true;
 
-    // Show toast
-    if (copyToast) {
-      copyToast.classList.add("show");
-    }
+    if (copyToast) copyToast.classList.add("show");
 
-    // Auto-reset after 2.5 s
-    // Clear any previous timeout first so timers don't stack up
     clearTimeout(toastTimeout);
     toastTimeout = setTimeout(function () {
       if (copyIcon)  copyIcon.style.display  = "inline";
@@ -676,10 +668,8 @@ if (isDetailPage) {
   if (btnCopyCode) {
     btnCopyCode.addEventListener("click", function () {
       var code = codeContentEl ? codeContentEl.textContent : "";
-      // Don't copy if the code hasn't loaded yet — just ignore the click
       if (!code || code === "Loading..." || code === "Loading starter code...") return;
 
-      // Use Clipboard API with textarea fallback
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(code).then(showCopySuccess).catch(function () {
           fallbackCopy(code);
@@ -691,17 +681,138 @@ if (isDetailPage) {
   }
 
   function fallbackCopy(text) {
-    // Some older browsers don't support navigator.clipboard, so we use a hidden textarea instead
     var ta = document.createElement("textarea");
     ta.value = text;
-    // Push it off-screen so it's not visible but can still be selected
     ta.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0";
     document.body.appendChild(ta);
     ta.focus();
     ta.select();
-    // execCommand is old and deprecated but works as a last resort — fail silently if it doesn't
-    try { document.execCommand("copy"); showCopySuccess(); } catch (e) { /* silent fail */ }
+    try { document.execCommand("copy"); showCopySuccess(); } catch (e) {}
     document.body.removeChild(ta);
   }
 
-} // end isDetailPage
+  // ----------------------------------------------------------
+  // ROADMAP PROGRESS TRACKING INJECTION
+  // ----------------------------------------------------------
+  (function renderProjectProgressControls() {
+    // Perfectly aligns with your project.html list structures
+    var stepItems = document.querySelectorAll(".roadmap-step");
+    if (stepItems.length === 0) return;
+
+    var progress = getProgress();
+    var currentProjectData = progress.projects[PROJECT_ID] || { steps: {} };
+
+    // Inject the loading progress percentage card above Step 1
+    var containerParent = stepItems[0].parentNode;
+    var progressMetricWrapper = document.createElement("div");
+    progressMetricWrapper.style.cssText = "background: #f8fafc; padding: 20px; border-radius: 10px; margin-bottom: 28px; border: 1px solid #e2e8f0; text-align: left;";
+    progressMetricWrapper.innerHTML = 
+        '<div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; font-weight: 600; color: #334155; font-family: Sora, sans-serif;">' +
+            '<span>Project Path Completion</span>' +
+            '<span id="project-progress-text">0% Completed (0 steps done)</span>' +
+        '</div>' +
+        '<div style="background: #e2e8f0; border-radius: 9999px; height: 10px; width: 100%; overflow: hidden;">' +
+            '<div id="project-progress-bar" style="background: #10b981; height: 100%; width: 0%; transition: width 0.4s ease;"></div>' +
+        '</div>';
+    
+    containerParent.insertBefore(progressMetricWrapper, stepItems[0]);
+
+    // Attach tracking select menus to your template elements dynamically
+    stepItems.forEach(function(item, index) {
+        var stepId = "step_" + index;
+        
+        // Correctly read the clean inner text from .roadmap-step-text wrapper
+        var stepTitleEl = item.querySelector(".roadmap-step-text") || { textContent: "Step " + (index + 1) };
+        var stepTitle = stepTitleEl.textContent.trim();
+        var savedStatus = currentProjectData.steps[stepId] || "Not Started";
+
+        var selectWrapper = document.createElement("div");
+        selectWrapper.style.cssText = "margin-top: 12px; display: block; text-align: left;";
+        selectWrapper.innerHTML = 
+            '<select class="status-select-input" style="padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; border: 1px solid #cbd5e1; background: #ffffff; color: #334155; cursor: pointer; font-family: Inter, sans-serif;" ' +
+                    'onchange="window.updateStepStatus(\'' + PROJECT_ID + '\', \'' + stepId + '\', \'' + stepTitle + '\', this.value, ' + stepItems.length + ')">' +
+                '<option value="Not Started"' + (savedStatus === "Not Started" ? " selected" : "") + '>Not Started</option>' +
+                '<option value="In Progress"' + (savedStatus === "In Progress" ? " selected" : "") + '>In Progress</option>' +
+                '<option value="Completed"' + (savedStatus === "Completed" ? " selected" : "") + '>Completed</option>' +
+            '</select>';
+
+        // Append selector into the roadmap content layout container node
+        var contentBlock = item.querySelector(".roadmap-content");
+        if (contentBlock) {
+            contentBlock.appendChild(selectWrapper);
+        } else {
+            item.appendChild(selectWrapper);
+        }
+    });
+
+    // Fire state calculations immediately
+    updateProgressBarUI(PROJECT_ID);
+  })();
+
+} // end isDetailPage  
+
+
+// ============================================================
+// GLOBAL PROGRESS MANAGEMENT STORAGE HOOKS (Shared Engine)
+// ============================================================
+var STORAGE_KEY = 'DevPath_Progress';
+
+function getProgress() {
+    try {
+        var data = localStorage.getItem(STORAGE_KEY);
+        return data ? JSON.parse(data) : { currentProjectId: null, lastAccessedStep: null, projects: {} };
+    } catch (e) {
+        return { currentProjectId: null, lastAccessedStep: null, projects: {} };
+    }
+}
+
+function saveProgress(progressData) {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(progressData));
+    } catch (e) {
+        console.error("Storage write error:", e);
+    }
+}
+
+window.updateStepStatus = function(projectId, stepId, stepTitle, status, totalSteps) {
+    var progress = getProgress();
+
+    if (!progress.projects[projectId]) {
+        progress.projects[projectId] = { completedCount: 0, totalCount: totalSteps, steps: {} };
+    }
+
+    progress.projects[projectId].steps[stepId] = status;
+
+    if (status === 'In Progress' || status === 'Completed') {
+        progress.currentProjectId = projectId;
+        progress.lastAccessedStep = { id: stepId, title: stepTitle, projectId: projectId };
+    }
+
+    var steps = progress.projects[projectId].steps;
+    var completedCount = 0;
+    for (var key in steps) {
+        if (steps.hasOwnProperty(key) && steps[key] === 'Completed') {
+            completedCount++;
+        }
+    }
+    
+    progress.projects[projectId].completedCount = completedCount;
+    progress.projects[projectId].totalCount = totalSteps;
+
+    saveProgress(progress);
+    updateProgressBarUI(projectId);
+};
+
+function updateProgressBarUI(projectId) {
+    var progress = getProgress();
+    var projectData = progress.projects[projectId];
+    
+    var progressBar = document.getElementById('project-progress-bar');
+    var progressText = document.getElementById('project-progress-text');
+    
+    if (projectData && projectData.totalCount > 0) {
+        var percent = Math.round((projectData.completedCount / projectData.totalCount) * 100) || 0;
+        if (progressBar) progressBar.style.width = percent + '%';
+        if (progressText) progressText.textContent = percent + '% Completed (' + projectData.completedCount + '/' + projectData.totalCount + ' steps)';
+    }
+}
