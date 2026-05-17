@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Page title uses the project title injected by Flask's Jinja2 template engine -->
   <title>{{ project.title }} — DevPath</title>
-  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="./static/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 </head>
 <body class="detail-page">
@@ -248,7 +248,7 @@
 
   <!-- Pass project ID to the JavaScript without hardcoding -->
   <script>
-    var PROJECT_ID = {{ project.id }};
+    var PROJECT_ID = "{{ project.id }}";
   </script>
   <script src="/static/script.js"></script>
 </body>
