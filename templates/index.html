@@ -24,7 +24,7 @@
         <a href="#how-it-works" class="nav-link">How It Works</a>
         <a href="#features" class="nav-link">Features</a>
         <a href="#find-project" class="nav-link">Find Project</a>
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="nav-btn-outline">GitHub</a>
+        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-btn-outline">GitHub</a>
       </div>
       <!-- Mobile hamburger toggle -->
       <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation">
@@ -36,7 +36,7 @@
       <a href="#how-it-works" class="nav-mobile-link">How It Works</a>
       <a href="#features" class="nav-mobile-link">Features</a>
       <a href="#find-project" class="nav-mobile-link">Find Project</a>
-      <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="nav-mobile-link">GitHub</a>
+      <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-mobile-link">GitHub</a>
     </div>
   </nav>
 
@@ -63,23 +63,6 @@
           roadmaps and ready-to-run starter code.
         </p>
 
-        <!-- Inline stat strip -->
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <span class="hero-stat-num">7+</span>
-            <span class="hero-stat-label">Projects</span>
-          </div>
-          <div class="hero-stat-divider"></div>
-          <div class="hero-stat">
-            <span class="hero-stat-num">3</span>
-            <span class="hero-stat-label">Skill Levels</span>
-          </div>
-          <div class="hero-stat-divider"></div>
-          <div class="hero-stat">
-            <span class="hero-stat-num">5</span>
-            <span class="hero-stat-label">Interest Areas</span>
-          </div>
-        </div>
 
         <div class="hero-cta-row">
           <a href="#find-project" class="btn-hero-primary">Start Finding Projects</a>
@@ -144,6 +127,48 @@
     <div class="hero-bg-grid"></div>
     <div class="hero-blob hero-blob-1"></div>
     <div class="hero-blob hero-blob-2"></div>
+  </section>
+
+  <!-- ============================================================
+       Statistics Cards (Dynamic)
+       ============================================================ -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <!-- Total Projects -->
+        <div class="stat-card">
+          <div class="stat-icon stat-icon--indigo">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ stats.total_projects }}</span>
+            <span class="stat-label">Real Projects</span>
+          </div>
+        </div>
+
+        <!-- Unique Skills -->
+        <div class="stat-card">
+          <div class="stat-icon stat-icon--yellow">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ stats.unique_skills }}</span>
+            <span class="stat-label">Unique Skills</span>
+          </div>
+        </div>
+
+        <!-- Beginner Friendly -->
+        <div class="stat-card">
+          <div class="stat-icon stat-icon--green">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ stats.beginner_friendly }}</span>
+            <span class="stat-label">Beginner Friendly</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- ============================================================
@@ -497,6 +522,32 @@
   </section>
 
   <!-- ============================================================
+       Our Story / About Us
+       ============================================================ -->
+  <section class="features-section" id="our-story">
+    <div class="container">
+      <div class="section-eyebrow">About Us</div>
+      <h2 class="section-title">Our Story</h2>
+      <p class="section-sub">DevPath was built to help learners move from scattered tutorials to projects with a clear path, practical code, and meaningful momentum.</p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3>Why it exists</h3>
+          <p>Too many project ideas stop at the title. DevPath focuses on the next steps that make starting and finishing feel manageable.</p>
+        </div>
+        <div class="feature-card">
+          <h3>How it helps</h3>
+          <p>Each recommendation includes a roadmap and starter code so users can spend time building instead of searching for structure.</p>
+        </div>
+        <div class="feature-card">
+          <h3>What it leads to</h3>
+          <p>A smoother path from curiosity to a finished project, with fewer dead ends and more confidence along the way.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
        Footer
        ============================================================ -->
   <footer class="footer">
@@ -521,18 +572,18 @@
         <h4 class="footer-col-title">Resources</h4>
         <ul class="footer-links-list">
           <li><a href="/project/1">Sample Project</a></li>
-          <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-          <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">Contributing Guide</a></li>
-          <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">Report an Issue</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing Guide</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath/issues" target="_blank" rel="noopener noreferrer">Report an Issue</a></li>
         </ul>
       </div>
 
       <div class="footer-col">
-        <h4 class="footer-col-title">About</h4>
+        <h4 class="footer-col-title">About Us</h4>
         <ul class="footer-links-list">
-          <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">Our Story</a></li>
-          <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">Open Source</a></li>
-          <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">License</a></li>
+          <li><a href="#our-story">Our Story</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">Open Source</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">License</a></li>
         </ul>
       </div>
     </div>
@@ -540,8 +591,8 @@
     <div class="footer-bottom">
       <p>DevPath is open source. Licensed under the MIT License.</p>
       <div class="footer-bottom-links">
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer">Terms of Use</a>
+        <a href="#our-story">About Us</a>
+        <a href="https://github.com/komalharshita/DevPath/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Project License</a>
       </div>
     </div>
   </footer>
