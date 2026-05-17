@@ -13,6 +13,12 @@ body.dark-mode {
   --bg-color: #0f0f1a;
   --text-color: #ffffff;
   --card-bg: #1e1e2e;
+     --text-heading: #f9fafb;
+  --text-body:#d1d5db;
+  --border: #2e2e42;
+--gray-50:#1a1a2e;
+  --gray-100:#22223a;
+  --white: #1e1e2e;
 }
 
 
@@ -77,7 +83,10 @@ body.dark-mode {
   --text-body:    var(--gray-600);
   --text-light:   var(--gray-400);
   --border:       var(--gray-200);
-
+/*  Theme defaults (light mode)  */
+  --bg-color:   #ffffff;
+  --text-color: #111827;
+  --card-bg:    #ffffff;
   /* Shadows */
   --shadow-xs: 0 1px 2px rgba(15, 21, 96, 0.05);
   --shadow-sm: 0 2px 8px rgba(15, 21, 96, 0.08);
@@ -111,8 +120,6 @@ body {
   background: var(--white);
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
-  
-   background-color: var(--bg-color);
   transition: background-color 0.3s, color 0.3s;
 }
 img { display: block; max-width: 100%; }
