@@ -39,7 +39,6 @@ jobs:
       - name: Run flake8
         run: |
           flake8 . \
-            --exit-zero \
             --max-line-length=120 \
             --ignore=E402,E221
 
