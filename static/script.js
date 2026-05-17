@@ -12,7 +12,7 @@
 // Detect which page we are on
 // ============================================================
 // !! trick turns the DOM result into a simple true/false
-var isIndexPage  = !!document.getElementById("recommend-form");
+var isIndexPage = !!document.getElementById("recommend-form");
 // PROJECT_ID is set by the server only on detail pages, so if it's missing we're elsewhere
 var isDetailPage = typeof PROJECT_ID !== "undefined";
 
@@ -85,7 +85,7 @@ if (isIndexPage) {
       "C#", "Ruby", "PHP", "Go", "Swift", "TypeScript", "Angular", "Vue.js",
       "Spring", "Flutter", "TensorFlow", "PyTorch", "Data Science",
       "Machine Learning", "Artificial Intelligence", "DevOps", "Cybersecurity",
-      "Blockchain", "UI/UX Design", "Game Development", "CI/CD", "REST API", "GraphQL", 
+      "Blockchain", "UI/UX Design", "Game Development", "CI/CD", "REST API", "GraphQL",
       "Rust", "Kotlin"
     ];
   }
@@ -413,10 +413,10 @@ if (isIndexPage) {
 
     var payload = {
       // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills:   skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level:    document.getElementById("level").value,
+      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
+      level: document.getElementById("level").value,
       interest: document.getElementById("interest").value,
-      time:     document.getElementById("time").value
+      time: document.getElementById("time").value
     };
 
     fetch("/api/recommend", {
@@ -636,21 +636,21 @@ if (isDetailPage) {
   // ----------------------------------------------------------
   // Copy Code button
   // ----------------------------------------------------------
-  var btnCopyCode  = document.getElementById("btn-copy-code");
-  var copyToast    = document.getElementById("copy-toast");
+  var btnCopyCode = document.getElementById("btn-copy-code");
+  var copyToast = document.getElementById("copy-toast");
   var toastTimeout = null;
 
   function showCopySuccess() {
     if (!btnCopyCode) return;
 
     // Swap icons on the button
-    var copyIcon  = btnCopyCode.querySelector(".copy-icon");
+    var copyIcon = btnCopyCode.querySelector(".copy-icon");
     var checkIcon = btnCopyCode.querySelector(".check-icon");
-    var btnLabel  = btnCopyCode.querySelector(".copy-btn-label");
+    var btnLabel = btnCopyCode.querySelector(".copy-btn-label");
 
-    if (copyIcon)  copyIcon.style.display  = "none";
+    if (copyIcon) copyIcon.style.display = "none";
     if (checkIcon) checkIcon.style.display = "inline";
-    if (btnLabel)  btnLabel.textContent    = "Copied!";
+    if (btnLabel) btnLabel.textContent = "Copied!";
     btnCopyCode.classList.add("copied");
     // Disable button so user can't spam click it while toast is showing
     btnCopyCode.disabled = true;
@@ -664,9 +664,9 @@ if (isDetailPage) {
     // Clear any previous timeout first so timers don't stack up
     clearTimeout(toastTimeout);
     toastTimeout = setTimeout(function () {
-      if (copyIcon)  copyIcon.style.display  = "inline";
+      if (copyIcon) copyIcon.style.display = "inline";
       if (checkIcon) checkIcon.style.display = "none";
-      if (btnLabel)  btnLabel.textContent    = "Copy Code";
+      if (btnLabel) btnLabel.textContent = "Copy Code";
       btnCopyCode.classList.remove("copied");
       btnCopyCode.disabled = false;
       if (copyToast) copyToast.classList.remove("show");
@@ -705,3 +705,33 @@ if (isDetailPage) {
   }
 
 } // end isDetailPage
+
+//dark mode toggle (runs on all pages)
+const themeToggle =
+  document.getElementById("theme-toggle");
+
+const savedTheme =
+  localStorage.getItem("theme");
+
+if (savedTheme === "dark") {
+  document.body.classList.add("dark-mode");
+  themeToggle.innerHTML = "Light";
+}
+
+themeToggle.addEventListener("click", () => {
+
+  document.body.classList.toggle("dark-mode");
+
+  if (document.body.classList.contains("dark-mode")) {
+
+    localStorage.setItem("theme", "dark");
+
+    themeToggle.innerHTML = "Light";
+
+  } else {
+
+    localStorage.setItem("theme", "light");
+
+    themeToggle.innerHTML = "Dark";
+  }
+});
