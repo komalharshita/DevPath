@@ -675,65 +675,108 @@ ul, ol { list-style: none; }
   margin-top: 16px;
 }
 
-/* Feature cards with distinct colour backgrounds (Eduvo style) */
 .feature-card {
-  background: var(--surface-muted);
-  border: 1px solid var(--border-muted-soft);
-  border-radius: var(--r-lg);
-  padding: 38px 32px;
+  background: rgba(16, 22, 58, 0.26);
+  border: 1px solid rgba(255,255,255,0.095);
+  border-radius: var(--r-sm);
+  padding: 18px;
   position: relative;
   overflow: hidden;
-  transition: transform var(--t), box-shadow var(--t);
+  transition: transform var(--t), box-shadow var(--t), border-color var(--t), background var(--t);
 }
-.feature-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+.feature-card:hover {
+  background: rgba(16, 22, 58, 0.32);
+  border-color: rgba(126, 231, 255, 0.18);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(18, 24, 64, 0.18);
+}
 
 .feature-card--pink,
-.feature-card--yellow,
-.feature-card--purple { background: var(--surface-muted); }
-
-.feature-card-icon {
-  width: 52px; height: 52px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid var(--border-muted-soft);
-  border-radius: var(--r-sm);
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: 22px;
-  box-shadow: var(--shadow-xs);
+.feature-card--yellow { background: rgba(16, 22, 58, 0.26); }
+.feature-card--purple {
+  background: rgba(16, 22, 58, 0.34);
+  border-color: rgba(126, 231, 255, 0.22);
 }
-.feature-card--pink   .feature-card-icon { color: var(--pink-500); }
-.feature-card--yellow .feature-card-icon { color: var(--orange-500); }
-.feature-card--purple .feature-card-icon { color: var(--purple-600); }
+
+.feature-terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  margin: -4px -4px 20px;
+  padding: 8px 12px;
+  background: rgba(6, 12, 32, 0.24);
+  border: 1px solid rgba(255,255,255,0.075);
+  border-radius: var(--r-xs);
+}
+.ft-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  opacity: 0.72;
+}
+.ft-dot--red { background: #fca5a5; }
+.ft-dot--amber { background: #fcd34d; }
+.ft-dot--green { background: #86efac; }
+.ft-command {
+  margin-left: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: rgba(218, 241, 255, 0.78);
+  letter-spacing: 0.01em;
+}
+.feature-meta,
+.feature-status {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: rgba(252, 211, 77, 0.74);
+  margin-bottom: 10px;
+}
+.feature-status {
+  color: rgba(134, 239, 172, 0.78);
+  margin: 0 0 18px;
+}
 
 .feature-card h3 {
-  font-family: var(--font-display);
-  font-size: 1.08rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.9);
-  margin-bottom: 12px;
+  font-family: var(--font-body);
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.86);
+  margin-bottom: 8px;
 }
 .feature-card p {
-  font-size: 0.91rem;
-  color: rgba(255,255,255,0.64);
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.62);
   line-height: 1.7;
-  margin-bottom: 22px;
+  margin-bottom: 18px;
 }
 
 .feature-card-link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.84rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.82);
-  border: 1.5px solid var(--border-muted);
-  background: rgba(255,255,255,0.06);
-  padding: 7px 16px;
-  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: rgba(218, 241, 255, 0.82);
+  border: 1px solid rgba(126, 231, 255, 0.16);
+  background: rgba(126, 231, 255, 0.055);
+  padding: 7px 12px;
+  border-radius: var(--r-xs);
   transition: background var(--t), border-color var(--t);
 }
+.feature-card-link::before {
+  content: "$";
+  color: rgba(134, 239, 172, 0.68);
+}
 .feature-card-link:hover {
-  background: rgba(255,255,255,0.1);
-  border-color: rgba(255,255,255,0.18);
+  background: rgba(126, 231, 255, 0.09);
+  border-color: rgba(126, 231, 255, 0.28);
   text-decoration: none;
 }
 
