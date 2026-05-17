@@ -23,7 +23,7 @@ from utils.recommender import (
     parse_skills,
     score_single_project,
 )
-from app import app
+from app import app, internal_server_error
 
 
 # ============================================================
@@ -255,6 +255,16 @@ def test_project_detail_not_found():
     assert response.status_code == 404
 
 
+def test_internal_server_error_page():
+    """The 500 handler should render the friendly internal error template."""
+    with app.app_context():
+        rendered_page, status_code = internal_server_error(Exception("Test error"))
+
+    assert status_code == 500
+    assert "Internal Server Error" in rendered_page
+    assert "Back to Home" in rendered_page
+
+
 def test_view_code_found():
     client = get_client()
     response = client.get("/project/1/code")
@@ -274,7 +284,7 @@ def test_download_code_found():
 from utils.recommender import SCORING_WEIGHTS
 
 def test_scoring_weights_has_all_keys():
-    """SCORING_WEIGHTS must contain exactly the four expected keys."""
+    """Verify SCORING_WEIGHTS contains exactly the four expected keys."""
     expected_keys = {"skill", "level", "interest", "time"}
     assert set(SCORING_WEIGHTS.keys()) == expected_keys
 
