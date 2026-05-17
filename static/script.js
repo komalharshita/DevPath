@@ -300,6 +300,7 @@ if (isIndexPage) {
     renderSelectedChips();
     syncSkillsHiddenInput();
     updateQuickPickState();
+    saveToLocalStorage();
     // Once a skill is added, remove the "please add a skill" error if it was showing
     clearFieldError("skills-error");
   }
@@ -312,6 +313,7 @@ if (isIndexPage) {
     renderSelectedChips();
     syncSkillsHiddenInput();
     updateQuickPickState();
+    saveToLocalStorage();
   }
 
   function renderSelectedChips() {
@@ -392,11 +394,46 @@ if (isIndexPage) {
     return valid;
   }
 
+//save the data and retrive it from local storage
+
+  var isRestoring = false;
+
+  function saveToLocalStorage() {
+    if (isRestoring) return; // don't overwrite while restoring
+    localStorage.setItem("rc_skills", JSON.stringify(selectedSkills));
+    localStorage.setItem("rc_level", document.getElementById("level").value);
+    localStorage.setItem("rc_interest", document.getElementById("interest").value);
+    localStorage.setItem("rc_time", document.getElementById("time").value);
+  }
+
+  function restoreFromLocalStorage() {
+    isRestoring = true; // pause saving
+
+    var savedSkills = JSON.parse(localStorage.getItem("rc_skills") || "[]");
+    savedSkills.forEach(function(skill) { addSkill(skill); });
+
+    var level = localStorage.getItem("rc_level");
+    var interest = localStorage.getItem("rc_interest");
+    var time = localStorage.getItem("rc_time");
+
+    if (level) document.getElementById("level").value = level;
+    if (interest) document.getElementById("interest").value = interest;
+    if (time) document.getElementById("time").value = time;
+
+    isRestoring = false; // resume saving
+    saveToLocalStorage(); 
+  }
+
+  restoreFromLocalStorage();
+
+  ["level", "interest", "time"].forEach(function(id) {
+    document.getElementById(id).addEventListener("change", saveToLocalStorage);
+  });
+
 
   // ----------------------------------------------------------
   // Form submission and API call
   // ----------------------------------------------------------
-
   form.addEventListener("submit", function (evt) {
     evt.preventDefault();
     clearAllErrors();
@@ -461,6 +498,28 @@ if (isIndexPage) {
       resultsGrid.style.display = "grid";
     }
   }
+
+  //Reset button
+  document.getElementById('reset-btn').addEventListener('click',()=>{
+    skillsTextInput.value="";
+    document.getElementById("level").value="";
+    document.getElementById("interest").value="";
+    document.getElementById("time").value="";
+    selectedSkills = [];
+    renderSelectedChips();
+    syncSkillsHiddenInput();
+    updateQuickPickState();
+
+    // Clear errors and results
+    clearAllErrors();
+    hideSuggestions();
+    resultsSection.style.display = "none";
+
+    localStorage.removeItem("rc_skills");
+    localStorage.removeItem("rc_level");
+    localStorage.removeItem("rc_interest");
+    localStorage.removeItem("rc_time");
+  })
 
 
   // ----------------------------------------------------------

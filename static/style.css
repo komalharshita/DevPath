@@ -651,7 +651,7 @@ ul, ol { list-style: none; }
 }
 
 /* Form groups */
-.form-group { margin-bottom: 24px; }
+.form-group { margin: 24px 0; }
 
 .form-row {
   display: grid;
@@ -676,6 +676,7 @@ label {
   background: var(--gray-50);
   min-height: 48px;
   padding: 6px 10px;
+  margin-top: 12px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -901,7 +902,27 @@ select:focus {
   box-shadow: 0 6px 28px rgba(35, 53, 194, 0.42);
 }
 .btn-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
-
+/* Reset button styling for the skills form */
+  .reset-btn{
+    float: right;
+    background: transparent;
+    border: 1px solid #d1d5db; /* light gray */
+    color: #111827; /* dark text */
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color .12s ease, border-color .12s ease;
+  }
+  .reset-btn:hover{
+    background: #f3f4f6; /* slightly darker on hover */
+    border-color: #9ca3af;
+  }
+  .reset-btn:focus{
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+  }
 /* ---- Results Section -------------------------------------- */
 .results-section {
   padding: 80px 0 108px;
