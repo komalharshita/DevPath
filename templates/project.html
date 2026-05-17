@@ -248,7 +248,7 @@
 
   <!-- Pass project ID to the JavaScript without hardcoding -->
   <script>
-    var PROJECT_ID = "{{ project.id }}";
+   var PROJECT_ID = parseInt("{{ project.id }}", 10);
   </script>
   <script src="/static/script.js"></script>
 </body>
