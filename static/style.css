@@ -6,6 +6,33 @@
    ============================================================= */
 
 /* ---- Variables -------------------------------------------- */
+/* ── Theme Variables ── */
+
+
+body.dark-mode {
+  --bg-color: #0f0f1a;
+  --text-color: #ffffff;
+  --card-bg: #1e1e2e;
+}
+
+
+
+/* Toggle Button */
+.theme-toggle {
+  background: none;
+  border: 2px solid var(--text-color);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  cursor: pointer;
+  font-size: 18px;
+  margin-left: 10px;
+  transition: 0.3s;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+}
 :root {
   /* Core palette */
   --indigo-900: #0f1560;
@@ -84,6 +111,9 @@ body {
   background: var(--white);
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  
+   background-color: var(--bg-color);
+  transition: background-color 0.3s, color 0.3s;
 }
 img { display: block; max-width: 100%; }
 a { color: var(--indigo-500); text-decoration: none; }

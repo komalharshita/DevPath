@@ -687,5 +687,25 @@ if (isDetailPage) {
     try { document.execCommand("copy"); showCopySuccess(); } catch (e) { /* silent fail */ }
     document.body.removeChild(ta);
   }
+  // =====================================================
+// Dark / Light Mode Toggle
+
+var themeToggle = document.getElementById('theme-toggle');
+var themeIcon = document.getElementById('theme-icon');
+
+if (themeToggle) {
+ 
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+    themeIcon.textContent = '☀️';
+  }
+
+  themeToggle.addEventListener('click', function () {
+    document.body.classList.toggle('dark-mode');
+    var isDark = document.body.classList.contains('dark-mode');
+    themeIcon.textContent = isDark ? '☀️' : '🌙';
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  });
+}
 
 } // end isDetailPage
