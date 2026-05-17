@@ -716,25 +716,27 @@ if (isDetailPage) {
 
   // =====================================================
 // Dark / Light Mode Toggle
+(function initThemeToggle() {
+  var themeToggle = document.getElementById('theme-toggle');
+  var themeIcon   = document.getElementById('theme-icon');
 
-var themeToggle = document.getElementById('theme-toggle');
-var themeIcon = document.getElementById('theme-icon');
+  if (!themeToggle) return;
 
-if (themeToggle) {
- 
+  // Apply saved preference on load
   if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark-mode');
     themeIcon.textContent = '☀️';
   }
-
-  themeToggle.addEventListener('click', function () {
+themeToggle.addEventListener('click', function () {
     document.body.classList.toggle('dark-mode');
     var isDark = document.body.classList.contains('dark-mode');
     themeIcon.textContent = isDark ? '☀️' : '🌙';
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
   });
-}
-} // end isDetailPage
+})();
+
+
+}  // end isDetailPage
 
 
 /* ---- Scroll-to-top button ---- */
