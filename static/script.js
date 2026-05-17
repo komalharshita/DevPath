@@ -245,6 +245,24 @@ if (isIndexPage) {
     }
   });
 
+  // Add/toggle skill on quick-pick chip click
+  quickPickChips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      var skill = chip.getAttribute("data-skill");
+      var isAlreadySelected = selectedSkills.some(function (s) {
+        return s.toLowerCase() === skill.toLowerCase();
+      });
+
+      if (isAlreadySelected) {
+        removeSkill(skill);
+      } else {
+        addSkill(skill);
+      }
+      hideSuggestions();
+      skillsTextInput.value = "";
+    });
+  });
+
   // Show suggestions on input
   skillsTextInput.addEventListener("input", function (evt) {
     var typedValue = evt.target.value.trim();
@@ -272,14 +290,6 @@ if (isIndexPage) {
     });
   }
 
-  // Add skill on quick-pick chip click
-  quickPickChips.forEach(function (chip) {
-    chip.addEventListener("click", function () {
-      addSkill(chip.getAttribute("data-skill"));
-      hideSuggestions();
-      skillsTextInput.value = "";
-    });
-  });
 
   document.addEventListener("click", function (evt) {
     if (skillWrap && !skillWrap.contains(evt.target)) {
@@ -762,5 +772,34 @@ if (isDetailPage) {
     try { document.execCommand("copy"); showCopySuccess(); } catch (e) { /* silent fail */ }
     document.body.removeChild(ta);
   }
-
 } // end isDetailPage
+
+
+/* ---- Scroll-to-top button ---- */
+
+/* Show the button only when the user has scrolled more than 300px */
+var SCROLL_THRESHOLD = 300;
+
+/* Get the button element; guard against pages that do not have it */
+var scrollTopBtn = document.getElementById('scroll-top-btn');
+
+/* Add or remove the .visible class based on scroll position */
+function handleScroll() {
+    if (!scrollTopBtn) return;
+    if (window.pageYOffset > SCROLL_THRESHOLD) {
+        scrollTopBtn.classList.add('visible');
+    } else {
+        scrollTopBtn.classList.remove('visible');
+    }
+}
+
+/* Smooth-scroll to the very top of the page */
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* Only wire up listeners if the button exists on this page */
+if (scrollTopBtn) {
+    window.addEventListener('scroll', handleScroll);
+    scrollTopBtn.addEventListener('click', scrollToTop);
+}
