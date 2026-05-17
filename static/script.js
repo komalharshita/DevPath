@@ -12,10 +12,9 @@
 // Detect which page we are on
 // ============================================================
 // !! trick turns the DOM result into a simple true/false
-var isIndexPage  = !!document.getElementById("recommend-form");
+var isIndexPage = !!document.getElementById("recommend-form");
 // PROJECT_ID is set by the server only on detail pages, so if it's missing we're elsewhere
 var isDetailPage = typeof PROJECT_ID !== "undefined";
-
 
 // ============================================================
 // Mobile navigation toggle (runs on all pages)
@@ -44,12 +43,10 @@ var isDetailPage = typeof PROJECT_ID !== "undefined";
   });
 })();
 
-
 // ============================================================
 // INDEX PAGE
 // ============================================================
 if (isIndexPage) {
-
   // DOM references
   var form = document.getElementById("recommend-form");
   var submitBtn = document.getElementById("submit-btn");
@@ -68,25 +65,64 @@ if (isIndexPage) {
   // Tracks currently selected skills to prevent duplicates
   var selectedSkills = [];
 
-
   // ----------------------------------------------------------
   // Skill chip manager
   // ----------------------------------------------------------
 
   // Skills list for autocomplete (from skills.js)
   var availableSkills = [];
-  if (typeof skills !== "undefined" && Array.isArray(skills) && skills.length > 0) {
-    availableSkills = skills.map(function (s) { return s.label; });
+  if (
+    typeof skills !== "undefined" &&
+    Array.isArray(skills) &&
+    skills.length > 0
+  ) {
+    availableSkills = skills.map(function (s) {
+      return s.label;
+    });
   } else {
     // Fallback if skills.js doesn't load
     availableSkills = [
-      "Python", "JavaScript", "Java", "C++", "HTML", "CSS", "React", "Node.js",
-      "Django", "Flask", "SQL", "MongoDB", "AWS", "Docker", "Kubernetes", "Git",
-      "C#", "Ruby", "PHP", "Go", "Swift", "TypeScript", "Angular", "Vue.js",
-      "Spring", "Flutter", "TensorFlow", "PyTorch", "Data Science",
-      "Machine Learning", "Artificial Intelligence", "DevOps", "Cybersecurity",
-      "Blockchain", "UI/UX Design", "Game Development", "CI/CD", "REST API", "GraphQL", 
-      "Rust", "Kotlin"
+      "Python",
+      "JavaScript",
+      "Java",
+      "C++",
+      "HTML",
+      "CSS",
+      "React",
+      "Node.js",
+      "Django",
+      "Flask",
+      "SQL",
+      "MongoDB",
+      "AWS",
+      "Docker",
+      "Kubernetes",
+      "Git",
+      "C#",
+      "Ruby",
+      "PHP",
+      "Go",
+      "Swift",
+      "TypeScript",
+      "Angular",
+      "Vue.js",
+      "Spring",
+      "Flutter",
+      "TensorFlow",
+      "PyTorch",
+      "Data Science",
+      "Machine Learning",
+      "Artificial Intelligence",
+      "DevOps",
+      "Cybersecurity",
+      "Blockchain",
+      "UI/UX Design",
+      "Game Development",
+      "CI/CD",
+      "REST API",
+      "GraphQL",
+      "Rust",
+      "Kotlin",
     ];
   }
 
@@ -96,10 +132,13 @@ if (isIndexPage) {
   var activeSuggestionIndex = -1;
 
   availableSkills = availableSkills.filter(function (skill, index, list) {
-    return typeof skill === "string" && skill.trim() &&
+    return (
+      typeof skill === "string" &&
+      skill.trim() &&
       list.findIndex(function (item) {
         return item.toLowerCase() === skill.toLowerCase();
-      }) === index;
+      }) === index
+    );
   });
 
   if (suggestionsDiv) {
@@ -127,22 +166,32 @@ if (isIndexPage) {
 
   function getFilteredSkills(query) {
     var normalizedQuery = normalizeSkill(query);
-    return availableSkills.filter(function (skill) {
-      return normalizeSkill(skill).includes(normalizedQuery) && !isSkillSelected(skill);
-    }).slice(0, 8);
+    return availableSkills
+      .filter(function (skill) {
+        return (
+          normalizeSkill(skill).includes(normalizedQuery) &&
+          !isSkillSelected(skill)
+        );
+      })
+      .slice(0, 8);
   }
 
   function syncSuggestionsA11yState() {
-    skillsTextInput.setAttribute("aria-expanded", visibleSuggestions.length > 0 ? "true" : "false");
+    skillsTextInput.setAttribute(
+      "aria-expanded",
+      visibleSuggestions.length > 0 ? "true" : "false",
+    );
   }
 
   function renderActiveSuggestion() {
     if (!suggestionsDiv) return;
-    suggestionsDiv.querySelectorAll(".suggestion-item").forEach(function (item, index) {
-      var isActive = index === activeSuggestionIndex;
-      item.classList.toggle("suggestion-item--active", isActive);
-      item.setAttribute("aria-selected", isActive ? "true" : "false");
-    });
+    suggestionsDiv
+      .querySelectorAll(".suggestion-item")
+      .forEach(function (item, index) {
+        var isActive = index === activeSuggestionIndex;
+        item.classList.toggle("suggestion-item--active", isActive);
+        item.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
   }
 
   function hideSuggestions() {
@@ -216,11 +265,13 @@ if (isIndexPage) {
       if (visibleSuggestions.length === 0) return;
       evt.preventDefault();
       if (evt.key === "ArrowDown") {
-        activeSuggestionIndex = (activeSuggestionIndex + 1) % visibleSuggestions.length;
+        activeSuggestionIndex =
+          (activeSuggestionIndex + 1) % visibleSuggestions.length;
       } else {
-        activeSuggestionIndex = activeSuggestionIndex <= 0
-          ? visibleSuggestions.length - 1
-          : activeSuggestionIndex - 1;
+        activeSuggestionIndex =
+          activeSuggestionIndex <= 0
+            ? visibleSuggestions.length - 1
+            : activeSuggestionIndex - 1;
       }
       renderActiveSuggestion();
       return;
@@ -233,7 +284,10 @@ if (isIndexPage) {
 
     if (evt.key === "Enter") {
       evt.preventDefault();
-      if (activeSuggestionIndex >= 0 && visibleSuggestions[activeSuggestionIndex]) {
+      if (
+        activeSuggestionIndex >= 0 &&
+        visibleSuggestions[activeSuggestionIndex]
+      ) {
         selectSuggestion(visibleSuggestions[activeSuggestionIndex]);
         return;
       }
@@ -263,7 +317,9 @@ if (isIndexPage) {
 
   // Hide suggestions when input loses focus
   skillsTextInput.addEventListener("blur", function () {
-    setTimeout(function () { hideSuggestions(); }, 150);
+    setTimeout(function () {
+      hideSuggestions();
+    }, 150);
   });
 
   if (skillWrap) {
@@ -272,10 +328,15 @@ if (isIndexPage) {
     });
   }
 
-  // Add skill on quick-pick chip click
+  // Add/remove skill using a toggle button
   quickPickChips.forEach(function (chip) {
     chip.addEventListener("click", function () {
-      addSkill(chip.getAttribute("data-skill"));
+      var skill = chip.getAttribute("data-skill");
+      if (isSkillSelected(skill)) {
+        removeSkill(skill);
+      } else {
+        addSkill(skill);
+      }
       hideSuggestions();
       skillsTextInput.value = "";
     });
@@ -347,7 +408,6 @@ if (isIndexPage) {
 
   updateQuickPickState();
 
-
   // ----------------------------------------------------------
   // Form validation
   // ----------------------------------------------------------
@@ -363,7 +423,9 @@ if (isIndexPage) {
   }
 
   function clearAllErrors() {
-    ["skills-error", "level-error", "interest-error", "time-error"].forEach(clearFieldError);
+    ["skills-error", "level-error", "interest-error", "time-error"].forEach(
+      clearFieldError,
+    );
     var generalErr = document.getElementById("form-error-general");
     if (generalErr) generalErr.textContent = "";
   }
@@ -392,7 +454,6 @@ if (isIndexPage) {
     return valid;
   }
 
-
   // ----------------------------------------------------------
   // Form submission and API call
   // ----------------------------------------------------------
@@ -413,18 +474,20 @@ if (isIndexPage) {
 
     var payload = {
       // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills:   skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level:    document.getElementById("level").value,
+      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
+      level: document.getElementById("level").value,
       interest: document.getElementById("interest").value,
-      time:     document.getElementById("time").value
+      time: document.getElementById("time").value,
     };
 
     fetch("/api/recommend", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     })
-      .then(function (res) { return res.json(); })
+      .then(function (res) {
+        return res.json();
+      })
       .then(function (data) {
         setLoadingState(false);
         if (data.error) {
@@ -437,7 +500,8 @@ if (isIndexPage) {
       .catch(function (err) {
         setLoadingState(false);
         var generalErr = document.getElementById("form-error-general");
-        if (generalErr) generalErr.textContent = "Something went wrong. Please try again.";
+        if (generalErr)
+          generalErr.textContent = "Something went wrong. Please try again.";
         console.error("API request failed:", err);
       });
   });
@@ -461,7 +525,6 @@ if (isIndexPage) {
       resultsGrid.style.display = "grid";
     }
   }
-
 
   // ----------------------------------------------------------
   // Render result cards
@@ -556,15 +619,12 @@ if (isIndexPage) {
     // Only add "..." if the text is actually longer than the limit
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
   }
-
 } // end isIndexPage
-
 
 // ============================================================
 // DETAIL PAGE
 // ============================================================
 if (isDetailPage) {
-
   var codePanel = document.getElementById("code-panel");
   var codePanelOverlay = document.getElementById("code-panel-overlay");
   var codeContentEl = document.getElementById("code-content");
@@ -601,7 +661,9 @@ if (isDetailPage) {
     if (codeContentEl) codeContentEl.textContent = "Loading starter code...";
 
     fetch("/project/" + PROJECT_ID + "/code")
-      .then(function (res) { return res.json(); })
+      .then(function (res) {
+        return res.json();
+      })
       .then(function (data) {
         if (data.error) {
           if (codeContentEl) codeContentEl.textContent = "Error: " + data.error;
@@ -614,7 +676,8 @@ if (isDetailPage) {
       })
       .catch(function () {
         if (codeContentEl) {
-          codeContentEl.textContent = "Could not load starter code. Try downloading it instead.";
+          codeContentEl.textContent =
+            "Could not load starter code. Try downloading it instead.";
         }
       });
   }
@@ -636,21 +699,21 @@ if (isDetailPage) {
   // ----------------------------------------------------------
   // Copy Code button
   // ----------------------------------------------------------
-  var btnCopyCode  = document.getElementById("btn-copy-code");
-  var copyToast    = document.getElementById("copy-toast");
+  var btnCopyCode = document.getElementById("btn-copy-code");
+  var copyToast = document.getElementById("copy-toast");
   var toastTimeout = null;
 
   function showCopySuccess() {
     if (!btnCopyCode) return;
 
     // Swap icons on the button
-    var copyIcon  = btnCopyCode.querySelector(".copy-icon");
+    var copyIcon = btnCopyCode.querySelector(".copy-icon");
     var checkIcon = btnCopyCode.querySelector(".check-icon");
-    var btnLabel  = btnCopyCode.querySelector(".copy-btn-label");
+    var btnLabel = btnCopyCode.querySelector(".copy-btn-label");
 
-    if (copyIcon)  copyIcon.style.display  = "none";
+    if (copyIcon) copyIcon.style.display = "none";
     if (checkIcon) checkIcon.style.display = "inline";
-    if (btnLabel)  btnLabel.textContent    = "Copied!";
+    if (btnLabel) btnLabel.textContent = "Copied!";
     btnCopyCode.classList.add("copied");
     // Disable button so user can't spam click it while toast is showing
     btnCopyCode.disabled = true;
@@ -664,9 +727,9 @@ if (isDetailPage) {
     // Clear any previous timeout first so timers don't stack up
     clearTimeout(toastTimeout);
     toastTimeout = setTimeout(function () {
-      if (copyIcon)  copyIcon.style.display  = "inline";
+      if (copyIcon) copyIcon.style.display = "inline";
       if (checkIcon) checkIcon.style.display = "none";
-      if (btnLabel)  btnLabel.textContent    = "Copy Code";
+      if (btnLabel) btnLabel.textContent = "Copy Code";
       btnCopyCode.classList.remove("copied");
       btnCopyCode.disabled = false;
       if (copyToast) copyToast.classList.remove("show");
@@ -677,13 +740,17 @@ if (isDetailPage) {
     btnCopyCode.addEventListener("click", function () {
       var code = codeContentEl ? codeContentEl.textContent : "";
       // Don't copy if the code hasn't loaded yet — just ignore the click
-      if (!code || code === "Loading..." || code === "Loading starter code...") return;
+      if (!code || code === "Loading..." || code === "Loading starter code...")
+        return;
 
       // Use Clipboard API with textarea fallback
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(code).then(showCopySuccess).catch(function () {
-          fallbackCopy(code);
-        });
+        navigator.clipboard
+          .writeText(code)
+          .then(showCopySuccess)
+          .catch(function () {
+            fallbackCopy(code);
+          });
       } else {
         fallbackCopy(code);
       }
@@ -700,8 +767,12 @@ if (isDetailPage) {
     ta.focus();
     ta.select();
     // execCommand is old and deprecated but works as a last resort — fail silently if it doesn't
-    try { document.execCommand("copy"); showCopySuccess(); } catch (e) { /* silent fail */ }
+    try {
+      document.execCommand("copy");
+      showCopySuccess();
+    } catch (e) {
+      /* silent fail */
+    }
     document.body.removeChild(ta);
   }
-
 } // end isDetailPage
