@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 </head>
 <body class="detail-page">
+  {% set repo_url = "https://github.com/komalharshita/DevPath" %}
 
   <!-- ============================================================
        Navigation
@@ -18,7 +19,7 @@
       <a href="/" class="nav-logo">DevPath</a>
       <div class="nav-links">
         <a href="/" class="nav-link">Back to Search</a>
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="nav-link nav-link-gh">GitHub</a>
+        <a href="{{ repo_url }}" target="_blank" rel="noopener noreferrer" class="nav-link nav-link-gh">GitHub</a>
       </div>
     </div>
   </nav>
@@ -252,7 +253,7 @@
       </div>
       <div class="footer-links">
         <a href="/">Back to Search</a>
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="{{ repo_url }}" target="_blank" rel="noopener noreferrer">GitHub</a>
       </div>
     </div>
   </footer>
