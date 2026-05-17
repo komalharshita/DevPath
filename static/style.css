@@ -1108,10 +1108,25 @@ select:focus {
   gap: 16px;
   transition: box-shadow var(--t), transform var(--t), border-color var(--t);
 }
+.project-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 30px 28px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition:
+    box-shadow 0.35s ease,
+    transform 0.35s ease,
+    border-color 0.35s ease;
+}
+
 .project-card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-5px);
-  border-color: rgba(79, 110, 247, 0.3);
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(79, 110, 247, 0.45);
 }
 
 .project-card-title {
