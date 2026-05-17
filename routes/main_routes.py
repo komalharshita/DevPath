@@ -3,6 +3,8 @@
 # Each route is kept thin: it validates input, calls a utility function,
 # and returns a response. No business logic lives here.
 
+import os
+
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
@@ -44,8 +46,7 @@ def recommend():
     # Validate before running the recommendation engine
     errors = validate_recommendation_inputs(skills, level, interest, time_availability)
     if errors:
-        # Return only the first error to keep the UI message clean
-        return jsonify({"error": errors[0]}), 400
+        return jsonify({"errors": errors}), 400
 
     results = get_recommendations(skills, level, interest, time_availability)
 
@@ -95,6 +96,5 @@ def download_code(project_id):
     if not full_path:
         abort(404)
 
-    import os
     filename = os.path.basename(full_path)
     return send_from_directory(get_starter_code_dir(), filename, as_attachment=True)
