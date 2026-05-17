@@ -271,6 +271,14 @@ def test_download_code_found():
     assert response.status_code == 200
 
 
+from utils.recommender import SCORING_WEIGHTS
+
+def test_scoring_weights_has_all_keys():
+    """SCORING_WEIGHTS must contain exactly the four expected keys."""
+    expected_keys = {"skill", "level", "interest", "time"}
+    assert set(SCORING_WEIGHTS.keys()) == expected_keys
+
+
 # ============================================================
 # Run tests directly (no pytest required)
 # ============================================================
