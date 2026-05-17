@@ -744,3 +744,27 @@ if (scrollTopBtn) {
     window.addEventListener('scroll', handleScroll);
     scrollTopBtn.addEventListener('click', scrollToTop);
 }
+
+
+const themeToggle = document.getElementById("theme-toggle");
+
+if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+
+        const currentTheme =
+            document.body.classList.contains("dark-mode")
+                ? "dark"
+                : "light";
+
+        localStorage.setItem("theme", currentTheme);
+    });
+
+    window.addEventListener("load", () => {
+        const savedTheme = localStorage.getItem("theme");
+
+        if (savedTheme === "dark") {
+            document.body.classList.add("dark-mode");
+        }
+    });
+}
