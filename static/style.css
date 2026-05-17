@@ -402,12 +402,12 @@ ul, ol { list-style: none; }
   align-items: center;
   gap: 14px;
   background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: var(--r-md);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  padding: 16px 20px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  padding: 14px 16px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.05);
 }
 .hvc-icon {
   width: 40px; height: 40px;
@@ -535,7 +535,7 @@ ul, ol { list-style: none; }
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0;
+  gap: 20px;
   margin-top: 16px;
 }
 
@@ -543,16 +543,16 @@ ul, ol { list-style: none; }
   flex: 1;
   max-width: 300px;
   background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.05);
   border-radius: var(--r-sm);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  padding: 32px 24px;
+  padding: 28px 22px;
   text-align: left;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
   transition: box-shadow var(--t), transform var(--t);
 }
-.step-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); transform: translateY(-2px); }
+.step-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.08); transform: translateY(-1px); }
 
 .step-num {
   font-family: var(--font-display);
@@ -593,7 +593,7 @@ ul, ol { list-style: none; }
 .features-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 28px;
   text-align: left;
   margin-top: 16px;
 }
@@ -671,12 +671,12 @@ ul, ol { list-style: none; }
 
 .form-card {
   background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.05);
   border-radius: var(--r-lg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  padding: 40px 40px 36px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+  padding: 36px 36px 32px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   text-align: left;
 }
 
@@ -999,7 +999,7 @@ select:focus {
 .results-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 26px;
+  gap: 30px;
   text-align: left;
   margin-top: 16px;
 }
@@ -1007,21 +1007,21 @@ select:focus {
 /* Project card */
 .project-card {
   background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.05);
   border-radius: var(--r-md);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  padding: 28px 26px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  padding: 26px 24px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.04);
   display: flex;
   flex-direction: column;
   gap: 16px;
   transition: box-shadow var(--t), transform var(--t), border-color var(--t);
 }
 .project-card:hover {
-  box-shadow: 0 6px 24px rgba(0,0,0,0.15);
-  transform: translateY(-4px);
-  border-color: rgba(255,255,255,0.15);
+  box-shadow: 0 3px 14px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.1);
 }
 
 .project-card-title {
@@ -1302,12 +1302,12 @@ select:focus {
 
 .detail-section {
   background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.05);
   border-radius: var(--r-md);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  padding: 32px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  padding: 30px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.04);
   margin-bottom: 24px;
 }
 .detail-section-header {
@@ -1421,12 +1421,12 @@ select:focus {
 .detail-sidebar { display: flex; flex-direction: column; gap: 20px; position: sticky; top: 84px; }
 .sidebar-card {
   background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.05);
   border-radius: var(--r-md);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  padding: 22px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  padding: 20px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
 }
 .sidebar-card--code {
   background: rgba(79, 110, 247, 0.08);
