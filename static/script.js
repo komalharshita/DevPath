@@ -11,7 +11,9 @@
 // ============================================================
 // Detect which page we are on
 // ============================================================
-var isIndexPage = !!document.getElementById("recommend-form");
+// !! trick turns the DOM result into a simple true/false
+var isIndexPage  = !!document.getElementById("recommend-form");
+// PROJECT_ID is set by the server only on detail pages, so if it's missing we're elsewhere
 var isDetailPage = typeof PROJECT_ID !== "undefined";
 
 
@@ -22,13 +24,17 @@ var isDetailPage = typeof PROJECT_ID !== "undefined";
   var toggle = document.getElementById("nav-mobile-toggle");
   var menu = document.getElementById("nav-mobile-menu");
 
+  // Nothing to do if the nav isn't on this page, just bail out
   if (!toggle || !menu) return;
 
   toggle.addEventListener("click", function () {
+    // classList.toggle returns true if class was added, false if removed
     var isOpen = menu.classList.toggle("open");
     toggle.classList.toggle("open", isOpen);
     // Keep aria-expanded in sync so screen readers announce state changes
     toggle.setAttribute("aria-expanded", String(isOpen));
+    // Keep aria-expanded in sync so screen readers know if menu is open or closed
+    toggle.setAttribute("aria-expanded", isOpen);
   });
 
   // Close menu when any mobile link is clicked
@@ -92,7 +98,8 @@ if (isIndexPage) {
       "C#", "Ruby", "PHP", "Go", "Swift", "TypeScript", "Angular", "Vue.js",
       "Spring", "Flutter", "TensorFlow", "PyTorch", "Data Science",
       "Machine Learning", "Artificial Intelligence", "DevOps", "Cybersecurity",
-      "Blockchain", "UI/UX Design", "Game Development", "CI/CD", "REST API", "GraphQL"
+      "Blockchain", "UI/UX Design", "Game Development", "CI/CD", "REST API", "GraphQL", 
+      "Rust", "Kotlin"
     ];
   }
 
@@ -128,13 +135,11 @@ if (isIndexPage) {
     var matchedSkill = availableSkills.find(function (skill) {
       return normalizeSkill(skill) === normalizedSkill;
     });
-
     return matchedSkill || rawSkill.trim();
   }
 
   function getFilteredSkills(query) {
     var normalizedQuery = normalizeSkill(query);
-
     return availableSkills.filter(function (skill) {
       return normalizeSkill(skill).includes(normalizedQuery) && !isSkillSelected(skill);
     }).slice(0, 8);
@@ -146,7 +151,6 @@ if (isIndexPage) {
 
   function renderActiveSuggestion() {
     if (!suggestionsDiv) return;
-
     suggestionsDiv.querySelectorAll(".suggestion-item").forEach(function (item, index) {
       var isActive = index === activeSuggestionIndex;
       item.classList.toggle("suggestion-item--active", isActive);
@@ -157,12 +161,10 @@ if (isIndexPage) {
   function hideSuggestions() {
     visibleSuggestions = [];
     activeSuggestionIndex = -1;
-
     if (suggestionsDiv) {
       suggestionsDiv.style.display = "none";
       suggestionsDiv.innerHTML = "";
     }
-
     syncSuggestionsA11yState();
   }
 
@@ -175,15 +177,12 @@ if (isIndexPage) {
 
   function displaySuggestions(items) {
     if (!suggestionsDiv) return;
-
     visibleSuggestions = items;
     activeSuggestionIndex = -1;
-
     if (items.length === 0) {
       hideSuggestions();
       return;
     }
-
     suggestionsDiv.innerHTML = "";
     items.forEach(function (skill, index) {
       var item = document.createElement("div");
@@ -209,7 +208,6 @@ if (isIndexPage) {
 
       suggestionsDiv.appendChild(item);
     });
-
     suggestionsDiv.style.display = "block";
     syncSuggestionsA11yState();
   }
@@ -228,9 +226,7 @@ if (isIndexPage) {
       if (visibleSuggestions.length === 0) {
         displaySuggestions(getFilteredSkills(skillsTextInput.value));
       }
-
       if (visibleSuggestions.length === 0) return;
-
       evt.preventDefault();
       if (evt.key === "ArrowDown") {
         activeSuggestionIndex = (activeSuggestionIndex + 1) % visibleSuggestions.length;
@@ -239,7 +235,6 @@ if (isIndexPage) {
           ? visibleSuggestions.length - 1
           : activeSuggestionIndex - 1;
       }
-
       renderActiveSuggestion();
       return;
     }
@@ -251,31 +246,44 @@ if (isIndexPage) {
 
     if (evt.key === "Enter") {
       evt.preventDefault();
-
       if (activeSuggestionIndex >= 0 && visibleSuggestions[activeSuggestionIndex]) {
         selectSuggestion(visibleSuggestions[activeSuggestionIndex]);
         return;
       }
-
       if (skillsTextInput.value.trim()) {
         addSkill(skillsTextInput.value);
         skillsTextInput.value = "";
       }
-
       hideSuggestions();
     }
   });
 
   // Add skill on quick-pick chip click; also support Space/Enter for keyboard users
+  // Add/toggle skill on quick-pick chip click
+  quickPickChips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      var skill = chip.getAttribute("data-skill");
+      var isAlreadySelected = selectedSkills.some(function (s) {
+        return s.toLowerCase() === skill.toLowerCase();
+      });
+
+      if (isAlreadySelected) {
+        removeSkill(skill);
+      } else {
+        addSkill(skill);
+      }
+      hideSuggestions();
+      skillsTextInput.value = "";
+    });
+  });
+
   // Show suggestions on input
   skillsTextInput.addEventListener("input", function (evt) {
     var typedValue = evt.target.value.trim();
-
     if (typedValue.length === 0) {
       hideSuggestions();
       return;
     }
-
     displaySuggestions(getFilteredSkills(typedValue));
   });
 
@@ -321,7 +329,9 @@ if (isIndexPage) {
   });
 
   function addSkill(rawSkill) {
+    // Clean up any extra spaces and match to canonical skill name
     var skill = getCanonicalSkill(rawSkill);
+    // Nothing to add if string is empty after trimming
     if (!skill) return;
 
     // Block duplicate entries (case-insensitive)
@@ -331,20 +341,22 @@ if (isIndexPage) {
     renderSelectedChips();
     syncSkillsHiddenInput();
     updateQuickPickState();
+    // Once a skill is added, remove the "please add a skill" error if it was showing
     clearFieldError("skills-error");
   }
 
   function removeSkill(skill) {
+    // Rebuild the array without the skill that was just removed
     selectedSkills = selectedSkills.filter(function (selectedSkill) {
       return normalizeSkill(selectedSkill) !== normalizeSkill(skill);
     });
-
     renderSelectedChips();
     syncSkillsHiddenInput();
     updateQuickPickState();
   }
 
   function renderSelectedChips() {
+    // Wipe out old chips first so we don't end up with duplicates in the UI
     chipsSelectedEl.innerHTML = "";
     selectedSkills.forEach(function (skill) {
       var chipEl = document.createElement("span");
@@ -358,6 +370,7 @@ if (isIndexPage) {
       removeBtn.innerHTML = "&times;";
       removeBtn.setAttribute("aria-label", "Remove " + skill);
       removeBtn.addEventListener("click", function (e) {
+        // Stop click from bubbling up to the chip wrap's click listener
         e.stopPropagation();
         removeSkill(skill);
       });
@@ -369,6 +382,7 @@ if (isIndexPage) {
 
   function syncSkillsHiddenInput() {
     // Keep the hidden <input> in sync for form serialisation
+    // The API expects a comma-separated string, so join the array that way
     skillsHidden.value = selectedSkills.join(", ");
   }
 
@@ -398,6 +412,7 @@ if (isIndexPage) {
   function validateForm() {
     var valid = true;
 
+    // Check both the array and the hidden input since skills can come from either source
     if (selectedSkills.length === 0 && !skillsHidden.value.trim()) {
       showFieldError("skills-error", "Please add at least one skill.");
       valid = false;
@@ -438,10 +453,11 @@ if (isIndexPage) {
     setLoadingState(true);
 
     var payload = {
-      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level: document.getElementById("level").value,
+      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
+      skills:   skillsHidden.value.trim() || skillsTextInput.value.trim(),
+      level:    document.getElementById("level").value,
       interest: document.getElementById("interest").value,
-      time: document.getElementById("time").value
+      time:     document.getElementById("time").value
     };
 
     fetch("/api/recommend", {
@@ -452,13 +468,11 @@ if (isIndexPage) {
       .then(function (res) { return res.json(); })
       .then(function (data) {
         setLoadingState(false);
-
         if (data.error) {
           var generalErr = document.getElementById("form-error-general");
           if (generalErr) generalErr.textContent = data.error;
           return;
         }
-
         renderResults(data.projects || [], data.message);
       })
       .catch(function (err) {
@@ -470,6 +484,7 @@ if (isIndexPage) {
   });
 
   function setLoadingState(isLoading) {
+    // Disable the button so the user can't accidentally submit twice
     submitBtn.disabled = isLoading;
     btnLabel.style.display = isLoading ? "none" : "inline";
     btnLoading.style.display = isLoading ? "inline" : "none";
@@ -480,6 +495,7 @@ if (isIndexPage) {
       resultsLoadingEl.style.display = "block";
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "none";
+      // Scroll down so the user can see the spinner without manually scrolling
       resultsSection.scrollIntoView({ behavior: "smooth" });
     } else {
       resultsLoadingEl.style.display = "none";
@@ -495,6 +511,7 @@ if (isIndexPage) {
   function renderResults(projects, message) {
     resultsSection.style.display = "block";
     resultsLoadingEl.style.display = "none";
+    // Clear out any cards from a previous search before showing new ones
     resultsGrid.innerHTML = "";
 
     if (!projects || projects.length === 0) {
@@ -527,6 +544,7 @@ if (isIndexPage) {
     // Description (truncated for visual consistency)
     var desc = document.createElement("p");
     desc.className = "project-card-desc";
+    // Cut description to 120 chars so all cards stay the same height
     desc.textContent = truncate(project.description, 120);
 
     // Tags row
@@ -539,6 +557,7 @@ if (isIndexPage) {
     });
 
     // Level tag (colour-coded via CSS class)
+    // Lowercase so it matches the CSS class names like "level beginner", "level advanced"
     var levelClass = "level " + (project.level || "").toLowerCase();
     tagsRow.appendChild(createTag(project.level, levelClass));
 
@@ -566,13 +585,16 @@ if (isIndexPage) {
 
   function createTag(text, type) {
     var span = document.createElement("span");
+    // The type becomes a BEM modifier so CSS can style each tag differently
     span.className = "project-tag project-tag--" + type;
     span.textContent = text;
     return span;
   }
 
   function truncate(text, maxLength) {
+    // Safety check — just return empty string if text is missing
     if (!text) return "";
+    // Only add "..." if the text is actually longer than the limit
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
   }
 
@@ -611,9 +633,29 @@ if (isDetailPage) {
 
   // Tracks which element triggered the panel so focus can return on close
   var panelTrigger = null;
+  function openCodePanel() {
+    // Panel element might not exist on every detail page, so check first
+    if (!codePanel) return;
+    codePanel.classList.add("active");
+    if (codePanelOverlay) codePanelOverlay.classList.add("active");
+    // Lock background scroll so the page doesn't scroll behind the panel
+    document.body.style.overflow = "hidden";
+
+    // Only fetch the code on the first open, no need to re-fetch every time
+    if (!codeFetched) fetchStarterCode();
+  }
+
+  function closeCodePanel() {
+    if (!codePanel) return;
+    codePanel.classList.remove("active");
+    if (codePanelOverlay) codePanelOverlay.classList.remove("active");
+    // Restore normal scrolling once the panel is closed
+    document.body.style.overflow = "";
+  }
 
   // Fetch the starter code from the server (only once per page load)
   function fetchStarterCode() {
+    // Show a loading message while we wait for the API response
     if (codeContentEl) codeContentEl.textContent = "Loading starter code...";
 
     fetch("/project/" + PROJECT_ID + "/code")
@@ -625,6 +667,7 @@ if (isDetailPage) {
         }
         if (codePanelFilename) codePanelFilename.textContent = data.filename;
         if (codeContentEl) codeContentEl.textContent = data.code;
+        // Mark as fetched so we don't hit the API again on the next open
         codeFetched = true;
       })
       .catch(function () {
@@ -686,6 +729,7 @@ if (isDetailPage) {
   }
 
   // Focus trap: while the panel is open, Tab/Shift+Tab must stay inside it
+  // Let keyboard users close the panel with Escape — important for accessibility
   document.addEventListener("keydown", function (evt) {
     if (!codePanel || !codePanel.classList.contains("active")) return;
 
@@ -745,6 +789,7 @@ if (isDetailPage) {
     if (checkIcon) checkIcon.style.display = "inline";
     if (btnLabel)  btnLabel.textContent    = "Copied!";
     btnCopyCode.classList.add("copied");
+    // Disable button so user can't spam click it while toast is showing
     btnCopyCode.disabled = true;
 
     // Show toast
@@ -753,6 +798,7 @@ if (isDetailPage) {
     }
 
     // Auto-reset after 2.5 s
+    // Clear any previous timeout first so timers don't stack up
     clearTimeout(toastTimeout);
     toastTimeout = setTimeout(function () {
       if (copyIcon)  copyIcon.style.display  = "inline";
@@ -767,6 +813,7 @@ if (isDetailPage) {
   if (btnCopyCode) {
     btnCopyCode.addEventListener("click", function () {
       var code = codeContentEl ? codeContentEl.textContent : "";
+      // Don't copy if the code hasn't loaded yet — just ignore the click
       if (!code || code === "Loading..." || code === "Loading starter code...") return;
 
       // Use Clipboard API with textarea fallback
@@ -781,14 +828,46 @@ if (isDetailPage) {
   }
 
   function fallbackCopy(text) {
+    // Some older browsers don't support navigator.clipboard, so we use a hidden textarea instead
     var ta = document.createElement("textarea");
     ta.value = text;
+    // Push it off-screen so it's not visible but can still be selected
     ta.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0";
     document.body.appendChild(ta);
     ta.focus();
     ta.select();
+    // execCommand is old and deprecated but works as a last resort — fail silently if it doesn't
     try { document.execCommand("copy"); showCopySuccess(); } catch (e) { /* silent fail */ }
     document.body.removeChild(ta);
   }
-
 } // end isDetailPage
+
+
+/* ---- Scroll-to-top button ---- */
+
+/* Show the button only when the user has scrolled more than 300px */
+var SCROLL_THRESHOLD = 300;
+
+/* Get the button element; guard against pages that do not have it */
+var scrollTopBtn = document.getElementById('scroll-top-btn');
+
+/* Add or remove the .visible class based on scroll position */
+function handleScroll() {
+    if (!scrollTopBtn) return;
+    if (window.pageYOffset > SCROLL_THRESHOLD) {
+        scrollTopBtn.classList.add('visible');
+    } else {
+        scrollTopBtn.classList.remove('visible');
+    }
+}
+
+/* Smooth-scroll to the very top of the page */
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* Only wire up listeners if the button exists on this page */
+if (scrollTopBtn) {
+    window.addEventListener('scroll', handleScroll);
+    scrollTopBtn.addEventListener('click', scrollToTop);
+}
