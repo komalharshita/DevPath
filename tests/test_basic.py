@@ -281,6 +281,25 @@ def test_download_code_found():
     assert response.status_code == 200
 
 
+def test_project_links_security():
+    """External links in project details must have rel='noopener noreferrer'."""
+    client = get_client()
+    response = client.get("/project/1")
+    html = response.get_data(as_text=True)
+
+    # Check for external resource links specifically
+    # Example format: <a href="..." target="_blank" rel="noopener noreferrer" class="resource-link">
+    assert 'target="_blank"' in html
+    assert 'rel="noopener noreferrer"' in html
+
+    # Verify that every target="_blank" link also has the security rel attribute
+    import re
+    # Find all anchor tags with target="_blank"
+    blank_links = re.findall(r'<a[^>]+target="_blank"[^>]*>', html)
+    for link in blank_links:
+        assert 'rel="noopener noreferrer"' in link, f"Missing security attribute in link: {link}"
+
+
 # ============================================================
 # Run tests directly (no pytest required)
 # ============================================================

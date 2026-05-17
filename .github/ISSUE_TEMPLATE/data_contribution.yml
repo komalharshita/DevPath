@@ -111,6 +111,9 @@ body:
     id: resources
     attributes:
       label: Learning resources (one per line, format "Label: https://url")
+      description: |
+        External links will be rendered with `target="_blank"`.
+        Please ensure all URLs are secure and trustworthy.
       placeholder: |
         Python json module: https://docs.python.org/3/library/json.html
         Python file I/O: https://docs.python.org/3/tutorial/inputoutput.html

@@ -206,6 +206,7 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
 - `starter_code` must point to an actual file inside `starter_code/`
 - The `roadmap` array should have between 5 and 10 entries
 - Do not use markdown formatting inside JSON string values
+- **Security:** External URLs in `resources` will be rendered with `target="_blank"`. Ensure all links are trustworthy and point to reputable sources.
 
 ---
 
