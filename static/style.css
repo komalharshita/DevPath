@@ -20,6 +20,13 @@
   --purple-600: #7c3aed;
   --purple-100: #f3f0ff;
 
+  /* Hero and surface softening */
+  --hero-indigo-deep: #131a4b;
+  --hero-indigo-mid: #1e2860;
+  --hero-violet-muted: #4b426d;
+  --surface-soft: #f6f7fb;
+  --surface-soft-alt: #f1f3f9;
+
   --yellow-400: #fbbf24;
   --yellow-300: #fcd34d;
   --yellow-100: #fef9e7;
@@ -229,18 +236,29 @@ ul, ol { list-style: none; }
 .hero {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(140deg, var(--indigo-900) 0%, var(--indigo-800) 40%, var(--purple-700) 100%);
+  background: linear-gradient(155deg, var(--hero-indigo-deep) 0%, var(--hero-indigo-mid) 52%, var(--hero-violet-muted) 100%);
   padding: 130px 32px 90px;
   min-height: 92vh;
   display: flex;
   align-items: center;
 }
 
+.hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 130px;
+  background: linear-gradient(180deg, rgba(18, 24, 66, 0) 0%, rgba(241, 243, 249, 0.92) 78%, var(--surface-soft) 100%);
+  pointer-events: none;
+}
+
 /* Subtle dot-grid overlay */
 .hero-bg-grid {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(255,255,255,0.045) 1px, transparent 1px);
   background-size: 28px 28px;
   pointer-events: none;
 }
@@ -441,26 +459,29 @@ ul, ol { list-style: none; }
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
-  filter: blur(90px);
-  opacity: 0.25;
+  filter: blur(110px);
+  opacity: 0.16;
 }
 .hero-blob-1 {
   width: 560px; height: 560px;
-  background: var(--purple-600);
+  background: #5a4f81;
   top: -180px; right: -180px;
 }
 .hero-blob-2 {
   width: 360px; height: 360px;
-  background: var(--indigo-500);
+  background: #4b5f96;
   bottom: -80px; left: -100px;
 }
 
 /* ---- Skill Strip ------------------------------------------ */
 .skill-strip {
-  background: var(--gray-50);
-  border-top: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--surface-soft-alt) 0%, var(--surface-soft) 62%, #f8f9fc 100%);
+  border-top: none;
   border-bottom: 1px solid var(--border);
   padding: 18px 32px;
+  margin-top: -22px;
+  position: relative;
+  z-index: 3;
 }
 .skill-strip-inner {
   max-width: 1140px;
@@ -500,7 +521,7 @@ ul, ol { list-style: none; }
 /* ---- How It Works ----------------------------------------- */
 .how-section {
   padding: 96px 0;
-  background: var(--white);
+  background: var(--surface-soft);
   text-align: center;
 }
 
