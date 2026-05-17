@@ -1,5 +1,5 @@
 var skills = [
-    // Core Languages
+    // Languages
     {id: "python", label: "Python"},
     {id: "javascript", label: "JavaScript"},
     {id: "java", label: "Java"},
@@ -13,8 +13,6 @@ var skills = [
     {id: "html", label: "HTML"},
     {id: "css", label: "CSS"},
     {id: "sql", label: "SQL"},
-    
-    // Languages (Extended)
     {id: "kotlin", label: "Kotlin"},
     {id: "rust", label: "Rust"},
     {id: "scala", label: "Scala"},
