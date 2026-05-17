@@ -6,7 +6,7 @@
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
-from utils.data_loader import find_project_by_id
+from utils.data_loader import find_project_by_id, get_project_stats
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
 
 # Create the Blueprint that app.py will register
@@ -15,8 +15,9 @@ main = Blueprint("main", __name__)
 
 @main.route("/")
 def index():
-    """Render the homepage with the skill input form."""
-    return render_template("index.html")
+    """Render the homepage with the skill input form and dynamic stats."""
+    stats = get_project_stats()
+    return render_template("index.html", stats=stats)
 
 
 @main.route("/api/recommend", methods=["POST"])
