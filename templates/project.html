@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Page title uses the project title injected by Flask's Jinja2 template engine -->
   <title>{{ project.title }} — DevPath</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/static/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 </head>
@@ -21,7 +22,7 @@
       <a href="/" class="nav-logo">DevPath</a>
       <div class="nav-links">
         <a href="/" class="nav-link">Back to Search</a>
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="nav-link nav-link-gh">GitHub</a>
+        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-link nav-link-gh">GitHub</a>
       </div>
     </div>
   </nav>
@@ -41,14 +42,16 @@
 
       <div class="detail-hero-content">
         <div class="detail-hero-left">
-          <!-- Difficulty and interest tags -->
-          <div class="detail-tags">
-            <span class="detail-tag detail-tag--level">{{ project.level }}</span>
-            <span class="detail-tag detail-tag--interest">{{ project.interest }}</span>
-            <span class="detail-tag detail-tag--time">{{ project.time }} effort</span>
-          </div>
-
           <h1 class="detail-title">{{ project.title }}</h1>
+          <!-- Difficulty, interest, and skill badges -->
+          <div class="badge-group">
+            <span class="badge badge--{{ project.level | lower }}">{{ project.level }}</span>
+            <span class="badge badge--{{ project.interest | lower }}">{{ project.interest }}</span>
+            {% for skill in project.skills %}
+            <span class="badge badge--{{ skill | lower }}">{{ skill }}</span>
+            {% endfor %}
+            <span class="badge badge--time">{{ project.time }} effort</span>
+          </div>
           <p class="detail-description">{{ project.description }}</p>
         </div>
 
@@ -253,14 +256,19 @@
     <div class="footer-inner">
       <div class="footer-brand">
         <span class="footer-logo">DevPath</span>
-        <p>Open source. Built for learners, by learners.</p>
+        <p style="color: #D1D5DB;">
+          Open source. Built for learners, by learners.
+        </p>
       </div>
       <div class="footer-links">
         <a href="/">Back to Search</a>
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">GitHub</a>
       </div>
     </div>
   </footer>
+
+ <!-- Scroll-to-top button -->
+  <button id="scroll-top-btn" aria-label="Back to top" title="Back to top">↑</button>  
 
   <!-- Pass project ID to the JavaScript without hardcoding -->
   <script>
