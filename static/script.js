@@ -200,6 +200,27 @@ if (isIndexPage) {
   }
 
   function updateQuickPickState() {
+    /* Toggle extra skill suggestions */
+var toggleBtn = document.getElementById("toggleSkillsBtn");
+var skillsExpanded = false;
+
+if (toggleBtn) {
+  toggleBtn.addEventListener("click", function () {
+    var hiddenSkills = document.querySelectorAll(".extra-skill");
+
+    for (var i = 0; i < hiddenSkills.length; i++) {
+      hiddenSkills[i].style.display = skillsExpanded
+        ? "none"
+        : "inline-flex";
+    }
+
+    skillsExpanded = !skillsExpanded;
+
+    toggleBtn.textContent = skillsExpanded
+      ? "Show Less"
+      : "Show More";
+  });
+}
     quickPickChips.forEach(function (chip) {
       var isActive = isSkillSelected(chip.getAttribute("data-skill") || "");
       chip.classList.toggle("active", isActive);
