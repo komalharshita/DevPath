@@ -1830,6 +1830,28 @@ select:focus {
   .container { padding: 0 20px; }
   .section-sub { margin-bottom: 40px; }
 }
+/* ---- Suggested Skills in Empty State ---------------------- */
+.suggested-skills-container {
+  margin: 24px 0;
+  padding: 20px;
+  background: var(--indigo-50);
+  border-radius: var(--r-md);
+  border: 1px dashed var(--indigo-200);
+}
+
+.suggestion-text {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--indigo-700);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.skill-chips-row--center {
+  justify-content: center;
+  gap: 10px;
+}
 
 .github-input-reveal input {
     border: 1px solid var(--border);

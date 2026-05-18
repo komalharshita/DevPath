@@ -142,8 +142,8 @@ def test_get_recommendations_max_three():
 def test_get_recommendations_no_match_returns_empty():
     """A very unlikely skill/interest combo should return an empty list."""
     results = get_recommendations("Rust", "Advanced", "Games", "High")
-    # Rust and Games are not in the dataset so this should be empty or minimal
-    assert isinstance(results, list)
+    # Rust is not in the dataset, so zero skill overlap means zero results
+    assert results == []
 
 
 def test_get_recommendations_result_format():

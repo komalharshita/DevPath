@@ -64,8 +64,9 @@ def recommend():
         return jsonify({
             "projects": [],
             "message": (
-                "No projects matched your inputs. "
-                "Try different skills or broaden your interest area."
+                "No projects matched your exact skills. "
+                "Try adding broader skills like Python, JavaScript, HTML, or CSS "
+                "to see more recommendations."
             )
         }), 200
 
