@@ -58,19 +58,21 @@ if (isIndexPage) {
 
   // DOM references
   // grabbing all the elements we'll need so we're not calling getElementById over and over again throughout the code
-  var form              = document.getElementById("recommend-form");
-  var submitBtn         = document.getElementById("submit-btn");
-  var btnLabel          = document.getElementById("btn-label"); // "get recommendations" text 
-  var btnLoading        = document.getElementById("btn-loading"); // spinner icon inside the button 
-  var resultsSection    = document.getElementById("results-section"); 
-  var resultsGrid       = document.getElementById("results-grid"); 
-  var resultsLoadingEl  = document.getElementById("results-loading"); // "Loading..." text in the results 
-  var resultsEmptyEl    = document.getElementById("results-empty"); 
-  var emptyMessageEl    = document.getElementById("empty-message"); 
-  var skillsHidden      = document.getElementById("skills"); // the hidden input that holds skills list
-  var skillsTextInput   = document.getElementById("skills-input"); //visible text box in which user types skills
-  var chipsSelectedEl   = document.getElementById("skill-chips-selected"); //selected skills tags container
-  var quickPickChips    = document.querySelectorAll(".skill-chip"); // predefined skills user can click
+  var form                     = document.getElementById("recommend-form");
+  var submitBtn                = document.getElementById("submit-btn");
+  var btnLabel                 = document.getElementById("btn-label"); // "get recommendations" text 
+  var btnLoading               = document.getElementById("btn-loading"); // spinner icon inside the button 
+  var resultsSection           = document.getElementById("results-section"); 
+  var resultsGrid              = document.getElementById("results-grid"); 
+  var resultsLoadingEl         = document.getElementById("results-loading"); // "Loading..." text in the results 
+  var resultsEmptyEl           = document.getElementById("results-empty"); 
+  var emptyMessageEl           = document.getElementById("empty-message"); 
+  var suggestedSkillsContainer = document.getElementById("suggested-skills-container");
+  var suggestedSkillsList      = document.getElementById("suggested-skills-list");
+  var skillsHidden             = document.getElementById("skills"); // the hidden input that holds skills list
+  var skillsTextInput          = document.getElementById("skills-input"); //visible text box in which user types skills
+  var chipsSelectedEl          = document.getElementById("skill-chips-selected"); //selected skills tags container
+  var quickPickChips           = document.querySelectorAll(".skill-chip"); // predefined skills user can click
 
   // Tracks currently selected skills to prevent duplicates
   var selectedSkills = [];
@@ -514,9 +516,30 @@ if (isIndexPage) {
       resultsGrid.style.display      = "none";
       resultsEmptyEl.style.display   = "block";
       if (message && emptyMessageEl) emptyMessageEl.textContent = message; //if api sent back a message (e.g. "no projects found matching your criteria"), show that 
+
+      // Suggest skills that have projects in the dataset
+      var suggestions = ["Python", "JavaScript", "HTML", "CSS"];
+      if (suggestedSkillsList && suggestedSkillsContainer) {
+        suggestedSkillsList.innerHTML = "";
+        suggestions.forEach(function (skill) {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "skill-chip";
+          btn.textContent = skill;
+          btn.addEventListener("click", function () {
+            addSkill(skill);
+            form.dispatchEvent(new Event("submit"));
+          });
+          suggestedSkillsList.appendChild(btn);
+        });
+        suggestedSkillsContainer.style.display = "block";
+      }
+
       resultsSection.scrollIntoView({ behavior: "smooth" });
       return;
     }
+
+    if (suggestedSkillsContainer) suggestedSkillsContainer.style.display = "none";
 
     resultsEmptyEl.style.display = "none";
     resultsGrid.style.display = "grid";

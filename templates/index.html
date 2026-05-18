@@ -506,9 +506,11 @@
           </div>
           <h3>No Projects Found</h3>
           <p id="empty-message">Try adjusting your skills or selecting a different interest area.</p>
-          <button class="btn-try-again"
-            onclick="document.getElementById('find-project').scrollIntoView({behavior:'smooth'})">Try Different
-            Inputs</button>
+          <div id="suggested-skills-container" class="suggested-skills-container" style="display:none;">
+            <p class="suggestion-text">Suggested skills to try:</p>
+            <div id="suggested-skills-list" class="skill-chips-row skill-chips-row--center"></div>
+          </div>
+          <button class="btn-try-again" onclick="document.getElementById('find-project').scrollIntoView({behavior:'smooth'})">Try Different Inputs</button>
         </div>
       </div>
 
