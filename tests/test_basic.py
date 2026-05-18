@@ -279,6 +279,22 @@ def test_download_code_found():
     client = get_client()
     response = client.get("/project/1/download")
     assert response.status_code == 200
+    
+def test_health_check(client):
+    response = client.get("/health")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "status" in data
+    assert "version" in data
+    assert data["status"] == "ok"
+
+
+from utils.recommender import SCORING_WEIGHTS
+
+def test_scoring_weights_has_all_keys():
+    """Verify SCORING_WEIGHTS contains exactly the four expected keys."""
+    expected_keys = {"skill", "level", "interest", "time"}
+    assert set(SCORING_WEIGHTS.keys()) == expected_keys
 
 def test_health_check(client):
     client = get_client()
