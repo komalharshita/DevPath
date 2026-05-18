@@ -98,8 +98,8 @@ def download_code(project_id):
     filename = os.path.basename(full_path)
     return send_from_directory(get_starter_code_dir(), filename, as_attachment=True)
 
-    @main.route("/robots.txt")
+
+@main.route("/robots.txt")
 def robots():
-    """Serve the robots.txt file to control search engine crawling."""
     from flask import current_app
     return send_from_directory(current_app.static_folder, "robots.txt")
