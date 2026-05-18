@@ -296,6 +296,16 @@ def test_scoring_weights_has_all_keys():
     expected_keys = {"skill", "level", "interest", "time"}
     assert set(SCORING_WEIGHTS.keys()) == expected_keys
 
+def test_project_links_have_noopener():
+    client = app.test_client()
+
+    response = client.get("/project/1")
+
+    assert response.status_code == 200
+    assert b'target="_blank"' in response.data
+    assert b'rel="noopener noreferrer"' in response.data
+
+
 
 # ============================================================
 # Run tests directly (no pytest required)
