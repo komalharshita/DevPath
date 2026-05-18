@@ -287,22 +287,29 @@ if (isIndexPage) {
     }
   });
 
-  function addSkill(rawSkill) {
-    // Clean up any extra spaces and match to canonical skill name
+ function addSkill(rawSkill) {
     var skill = getCanonicalSkill(rawSkill);
-    // Nothing to add if string is empty after trimming
     if (!skill) return;
 
-    // Block duplicate entries (case-insensitive)
+    // Validate against available skills list
+    var isValid = availableSkills.some(function(s) {
+        return s.toLowerCase() === skill.toLowerCase();
+    });
+
+    if (!isValid) {
+        showFieldError("skills-error",
+        '"' + skill + '" is not a recognized skill. Please select from the available list.');
+        return;
+    }
+
     if (isSkillSelected(skill)) return;
 
     selectedSkills.push(skill);
     renderSelectedChips();
     syncSkillsHiddenInput();
     updateQuickPickState();
-    // Once a skill is added, remove the "please add a skill" error if it was showing
     clearFieldError("skills-error");
-  }
+}
 
   function removeSkill(skill) {
     // Rebuild the array without the skill that was just removed
