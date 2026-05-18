@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Real-Time Chat</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; }
+    body { max-width: 640px; margin: 2rem auto; padding: 0 1rem; }
+    #log { border: 1px solid #ccc; height: 320px; overflow-y: auto; padding: 0.5rem; margin: 1rem 0; background: #fafafa; }
+    .msg { margin: 0.25rem 0; }
+    .msg--system { color: #666; font-style: italic; }
+    form { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .row { display: flex; gap: 0.5rem; width: 100%; }
+    input[type="text"] { flex: 1; padding: 0.5rem; min-width: 0; }
+    button { padding: 0.5rem 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Real-Time Chat</h1>
+  <p>Open this page in another tab to see messages sync across clients.</p>
+  <div id="log" aria-live="polite"></div>
+  <form id="chat-form">
+    <div class="row">
+      <input type="text" id="username" placeholder="Your name" maxlength="32" value="Guest" autocomplete="username" />
+    </div>
+    <div class="row">
+      <input type="text" id="message" placeholder="Type a message…" autocomplete="off" />
+      <button type="submit">Send</button>
+    </div>
+  </form>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>
+  <script>
+    (function () {
+      var log = document.getElementById("log");
+      function appendLine(text, isSystem) {
+        var div = document.createElement("div");
+        div.className = "msg" + (isSystem ? " msg--system" : "");
+        div.textContent = text;
+        log.appendChild(div);
+        log.scrollTop = log.scrollHeight;
+      }
+
+      var socket = io();
+      socket.on("connect", function () {
+        appendLine("Connected to server.", true);
+      });
+      socket.on("disconnect", function () {
+        appendLine("Disconnected.", true);
+      });
+      socket.on("system", function (data) {
+        appendLine(data.msg || "", true);
+      });
+      socket.on("chat_message", function (data) {
+        var u = data.user || "?";
+        var t = data.text || "";
+        appendLine(u + ": " + t, false);
+      });
+
+      document.getElementById("chat-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var msgInput = document.getElementById("message");
+        var userInput = document.getElementById("username");
+        var text = (msgInput.value || "").trim();
+        var user = (userInput.value || "").trim() || "Guest";
+        if (!text) return;
+        socket.emit("chat_message", { user: user, text: text });
+        msgInput.value = "";
+        msgInput.focus();
+      });
+    })();
+  </script>
+</body>
+</html>
