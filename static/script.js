@@ -31,6 +31,8 @@ var isDetailPage = typeof PROJECT_ID !== "undefined";
     // classList.toggle returns true if class was added, false if removed
     var isOpen = menu.classList.toggle("open");
     toggle.classList.toggle("open", isOpen);
+    // Keep aria-expanded in sync so screen readers announce state changes
+    toggle.setAttribute("aria-expanded", String(isOpen));
     // Keep aria-expanded in sync so screen readers know if menu is open or closed
     toggle.setAttribute("aria-expanded", isOpen);
   });
@@ -40,7 +42,18 @@ var isDetailPage = typeof PROJECT_ID !== "undefined";
     link.addEventListener("click", function () {
       menu.classList.remove("open");
       toggle.classList.remove("open");
+      toggle.setAttribute("aria-expanded", "false");
     });
+  });
+
+  // Also close the menu when Escape is pressed
+  document.addEventListener("keydown", function (evt) {
+    if (evt.key === "Escape" && menu.classList.contains("open")) {
+      menu.classList.remove("open");
+      toggle.classList.remove("open");
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.focus();
+    }
   });
 })();
 
@@ -245,6 +258,7 @@ if (isIndexPage) {
     }
   });
 
+  // Add skill on quick-pick chip click; also support Space/Enter for keyboard users
   // Add/toggle skill on quick-pick chip click
   quickPickChips.forEach(function (chip) {
     chip.addEventListener("click", function () {
@@ -290,6 +304,23 @@ if (isIndexPage) {
     });
   }
 
+  // Add skill on quick-pick chip click
+  quickPickChips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      addSkill(chip.getAttribute("data-skill"));
+      hideSuggestions();
+      skillsTextInput.value = "";
+    });
+    // Keyboard users expect buttons to respond to Enter and Space by default
+    // (they already do because these are <button> elements, but make sure)
+    chip.addEventListener("keydown", function (evt) {
+      if (evt.key === "Enter" || evt.key === " ") {
+        evt.preventDefault();
+        addSkill(chip.getAttribute("data-skill"));
+        chip.classList.add("active");
+      }
+    });
+  });
 
   document.addEventListener("click", function (evt) {
     if (skillWrap && !skillWrap.contains(evt.target)) {
@@ -567,6 +598,20 @@ if (isIndexPage) {
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
   }
 
+  // Wire up the "Try Different Inputs" button (onclick removed from HTML)
+  var btnTryAgain = document.getElementById("btn-try-again");
+  if (btnTryAgain) {
+    btnTryAgain.addEventListener("click", function () {
+      var target = document.getElementById("find-project");
+      if (target) target.scrollIntoView({ behavior: "smooth" });
+      // Move focus to the skills input so keyboard users land in the form
+      setTimeout(function () {
+        var skillsInput = document.getElementById("skills-input");
+        if (skillsInput) skillsInput.focus();
+      }, 400);
+    });
+  }
+
 } // end isIndexPage
 
 
@@ -586,6 +631,8 @@ if (isDetailPage) {
   // Cache flag so code is only fetched once per page load
   var codeFetched = false;
 
+  // Tracks which element triggered the panel so focus can return on close
+  var panelTrigger = null;
   function openCodePanel() {
     // Panel element might not exist on every detail page, so check first
     if (!codePanel) return;
@@ -606,6 +653,7 @@ if (isDetailPage) {
     document.body.style.overflow = "";
   }
 
+  // Fetch the starter code from the server (only once per page load)
   function fetchStarterCode() {
     // Show a loading message while we wait for the API response
     if (codeContentEl) codeContentEl.textContent = "Loading starter code...";
@@ -629,19 +677,98 @@ if (isDetailPage) {
       });
   }
 
+  // Collect all focusable elements inside the panel for the focus trap
+  function getFocusableInPanel() {
+    return Array.from(
+      codePanel.querySelectorAll(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+    ).filter(function (el) { return !el.hidden && el.offsetParent !== null; });
+  }
   // Attach open/close handlers
   if (btnViewCode) btnViewCode.addEventListener("click", openCodePanel);
   if (btnViewCodeSm) btnViewCodeSm.addEventListener("click", openCodePanel);
   if (btnClosePanel) btnClosePanel.addEventListener("click", closeCodePanel);
 
+  function openCodePanel(triggerEl) {
+    if (!codePanel) return;
+    panelTrigger = triggerEl || document.activeElement;
+    codePanel.classList.add("active");
+    if (codePanelOverlay) codePanelOverlay.classList.add("active");
+    document.body.style.overflow = "hidden";
+
+    // Update aria-expanded on both trigger buttons
+    if (btnViewCode)   btnViewCode.setAttribute("aria-expanded", "true");
+    if (btnViewCodeSm) btnViewCodeSm.setAttribute("aria-expanded", "true");
+
+    if (!codeFetched) fetchStarterCode();
+
+    // Move focus to the close button so keyboard users are immediately inside
+    // the panel's focus trap
+    setTimeout(function () {
+      var focusable = getFocusableInPanel();
+      if (focusable.length) focusable[0].focus();
+    }, 60);
+  }
+
+  function closeCodePanel() {
+    if (!codePanel) return;
+    codePanel.classList.remove("active");
+    if (codePanelOverlay) codePanelOverlay.classList.remove("active");
+    document.body.style.overflow = "";
+
+    // Update aria-expanded on both trigger buttons
+    if (btnViewCode)   btnViewCode.setAttribute("aria-expanded", "false");
+    if (btnViewCodeSm) btnViewCodeSm.setAttribute("aria-expanded", "false");
+
+    // Return focus to whichever button opened the panel
+    if (panelTrigger && typeof panelTrigger.focus === "function") {
+      panelTrigger.focus();
+    }
+    panelTrigger = null;
+  }
+
+  // Focus trap: while the panel is open, Tab/Shift+Tab must stay inside it
+  // Let keyboard users close the panel with Escape — important for accessibility
+  document.addEventListener("keydown", function (evt) {
+    if (!codePanel || !codePanel.classList.contains("active")) return;
+
+    if (evt.key === "Escape") {
+      closeCodePanel();
+      return;
+    }
+
+    if (evt.key !== "Tab") return;
+
+    var focusable = getFocusableInPanel();
+    if (!focusable.length) { evt.preventDefault(); return; }
+
+    var first = focusable[0];
+    var last  = focusable[focusable.length - 1];
+
+    if (evt.shiftKey) {
+      // Shift+Tab: if focus is on the first element, wrap to last
+      if (document.activeElement === first) {
+        evt.preventDefault();
+        last.focus();
+      }
+    } else {
+      // Tab: if focus is on the last element, wrap to first
+      if (document.activeElement === last) {
+        evt.preventDefault();
+        first.focus();
+      }
+    }
+  });
+
+  // Attach open/close handlers — pass the trigger element so focus returns correctly
+  if (btnViewCode)   btnViewCode.addEventListener("click", function () { openCodePanel(btnViewCode); });
+  if (btnViewCodeSm) btnViewCodeSm.addEventListener("click", function () { openCodePanel(btnViewCodeSm); });
+  if (btnClosePanel) btnClosePanel.addEventListener("click", closeCodePanel);
+
   if (codePanelOverlay) {
     codePanelOverlay.addEventListener("click", closeCodePanel);
   }
-
-  // Let keyboard users close the panel with Escape — important for accessibility
-  document.addEventListener("keydown", function (evt) {
-    if (evt.key === "Escape") closeCodePanel();
-  });
 
   // ----------------------------------------------------------
   // Copy Code button

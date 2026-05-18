@@ -10,11 +10,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 </head>
 <body class="detail-page">
+  <!-- Skip to main content for keyboard users -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
 
   <!-- ============================================================
        Navigation
        ============================================================ -->
-  <nav class="navbar">
+  <nav class="navbar" aria-label="Primary navigation">
     <div class="nav-inner">
       <a href="/" class="nav-logo">DevPath</a>
       <div class="nav-links">
@@ -27,10 +30,11 @@
   <!-- ============================================================
        Project Hero Banner
        ============================================================ -->
+  <main id="main-content">
   <div class="detail-hero">
     <div class="container">
       <!-- Breadcrumb trail -->
-      <nav class="breadcrumb" aria-label="breadcrumb">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="/">Home</a>
         <span class="breadcrumb-sep">&#8250;</span>
         <span>{{ project.title }}</span>
@@ -53,11 +57,11 @@
 
         <!-- Quick-action buttons in the hero -->
         <div class="detail-hero-actions">
-          <a href="/project/{{ project.id }}/download" class="btn-download">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <a href="/project/{{ project.id }}/download" class="btn-download" aria-label="Download starter code for {{ project.title }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Download Starter Code
           </a>
-          <button class="btn-view-code" id="btn-view-code">
+          <button class="btn-view-code" id="btn-view-code" aria-expanded="false" aria-controls="code-panel">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
             View Code
           </button>
@@ -203,8 +207,8 @@
             </h3>
             <p class="sidebar-card-desc">A working template to kick off this project without starting from scratch.</p>
             <div class="sidebar-code-actions">
-              <button class="btn-view-code-sm" id="btn-view-code-sm">View Code</button>
-              <a href="/project/{{ project.id }}/download" class="btn-download-sm">Download</a>
+              <button class="btn-view-code-sm" id="btn-view-code-sm" aria-expanded="false" aria-controls="code-panel">View Code</button>
+              <a href="/project/{{ project.id }}/download" class="btn-download-sm" aria-label="Download starter code for {{ project.title }}">Download</a>
             </div>
           </div>
 
@@ -212,24 +216,25 @@
       </div>
     </div>
   </div>
+  </main>
 
   <!-- ============================================================
        Starter Code Viewer Panel (slides in from bottom)
        ============================================================ -->
-  <div class="code-panel" id="code-panel">
+  <div class="code-panel" id="code-panel" role="dialog" aria-modal="true" aria-label="Starter code viewer">
     <div class="code-panel-header">
       <div class="code-panel-title">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
         <span id="code-panel-filename">starter_code</span>
       </div>
       <div class="code-panel-actions">
-        <a href="/project/{{ project.id }}/download" class="code-panel-download">Download file</a>
+        <a href="/project/{{ project.id }}/download" class="code-panel-download" aria-label="Download starter code file">Download file</a>
         <button class="btn-copy-code" id="btn-copy-code" aria-label="Copy code to clipboard">
-          <svg class="copy-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          <svg class="check-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="20 6 9 17 4 12"/></svg>
+          <svg class="copy-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <svg class="check-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
           <span class="copy-btn-label">Copy Code</span>
         </button>
-        <button class="code-panel-close" id="code-panel-close">Close</button>
+        <button class="code-panel-close" id="code-panel-close" aria-label="Close code panel">Close</button>
       </div>
     </div>
     <!-- Code is injected here by script.js -->
