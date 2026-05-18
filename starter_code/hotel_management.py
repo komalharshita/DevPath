@@ -29,6 +29,9 @@ Roadmap:
     Step 4: Create the cancellation and guest detail lookup logic.
     Step 5: Wrap all logic in a persistent main menu loop.
 """
+# ---------------------------------------------------------------------------
+# Core Logic & Initialization
+# ---------------------------------------------------------------------------
 
 def initialize_rooms():
     """
@@ -56,6 +59,10 @@ def initialize_rooms():
 
 # Instantiate the global room database
 rooms = initialize_rooms()
+
+# ---------------------------------------------------------------------------
+# Room Management Functions
+# ---------------------------------------------------------------------------
 
 def show_available_rooms():
     """Filters and displays only the rooms currently marked as 'Available'."""
@@ -145,6 +152,10 @@ def cancel_booking():
     else:
         print(f">> Room {room_no} is not currently booked.")
 
+# ---------------------------------------------------------------------------
+# Search & Reporting Functions
+# ---------------------------------------------------------------------------        
+
 def search_by_type():
     """Allows filtering of the entire inventory by specific room categories."""
     print("\nCategories: Deluxe, Super Deluxe, Suite, Presidential Suite")
@@ -178,6 +189,10 @@ def view_guest_details():
         print(f"Total Billing: ₹{guest['Total Price']} (₹{rooms[room_no][1]} x {guest['Days']})")
     else:
         print(">> No active booking found for this room.")
+
+# ---------------------------------------------------------------------------
+# Main Entry Point
+# ---------------------------------------------------------------------------
 
 def main_menu():
     """The central control hub for the Management System."""
