@@ -255,6 +255,14 @@ def test_project_detail_not_found():
     assert response.status_code == 404
 
 
+def test_project_detail_json_ld_present():
+    """Project detail page must include JSON-LD structured data."""
+    client = get_client()
+    response = client.get("/project/1")
+    assert response.status_code == 200
+    assert b"application/ld+json" in response.data
+
+
 def test_internal_server_error_page():
     """The 500 handler should render the friendly internal error template."""
     with app.app_context():
@@ -280,7 +288,8 @@ def test_download_code_found():
     response = client.get("/project/1/download")
     assert response.status_code == 200
     
-def test_health_check(client):
+def test_health_check():
+    client = get_client()
     response = client.get("/health")
     assert response.status_code == 200
     data = response.get_json()
