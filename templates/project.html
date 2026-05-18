@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Page title uses the project title injected by Flask's Jinja2 template engine -->
   <title>{{ project.title }} — DevPath</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/static/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 </head>
@@ -37,14 +38,16 @@
 
       <div class="detail-hero-content">
         <div class="detail-hero-left">
-          <!-- Difficulty and interest tags -->
-          <div class="detail-tags">
-            <span class="detail-tag detail-tag--level">{{ project.level }}</span>
-            <span class="detail-tag detail-tag--interest">{{ project.interest }}</span>
-            <span class="detail-tag detail-tag--time">{{ project.time }} effort</span>
-          </div>
-
           <h1 class="detail-title">{{ project.title }}</h1>
+          <!-- Difficulty, interest, and skill badges -->
+          <div class="badge-group">
+            <span class="badge badge--{{ project.level | lower }}">{{ project.level }}</span>
+            <span class="badge badge--{{ project.interest | lower }}">{{ project.interest }}</span>
+            {% for skill in project.skills %}
+            <span class="badge badge--{{ skill | lower }}">{{ skill }}</span>
+            {% endfor %}
+            <span class="badge badge--time">{{ project.time }} effort</span>
+          </div>
           <p class="detail-description">{{ project.description }}</p>
         </div>
 

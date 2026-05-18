@@ -261,6 +261,7 @@ If you add a new feature, add at least one corresponding test in `tests/test_bas
 - Your branch is up to date with the upstream `main` branch
 - Your code follows the style rules above
 - You have removed all debug `print()` statements and commented-out code
+- Update `CHANGELOG.md` for any user-facing or documentation-related changes
 
 ### Steps
 

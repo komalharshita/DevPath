@@ -168,6 +168,48 @@ ul, ol { list-style: none; }
   line-height: 1.75;
 }
 
+/* ---- Badges ------------------------------------------------ */
+.badge-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  margin-bottom: 24px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: var(--gray-100);
+  color: var(--gray-600);
+}
+
+.badge--beginner {
+  background: var(--green-100);
+  color: var(--green-500);
+}
+
+.badge--web {
+  background: var(--indigo-100);
+  color: var(--indigo-600);
+}
+
+.badge--python {
+  background: var(--yellow-100);
+  color: var(--orange-500);
+}
+
+.badge--data {
+  background: var(--purple-100);
+  color: var(--purple-600);
+}
+
 /* ---- Navigation ------------------------------------------- */
 .navbar {
   position: fixed;
@@ -1642,12 +1684,17 @@ select:focus {
   width: 36px;
 }
 .roadmap-dot {
-  width: 14px; height: 14px;
+  width: 16px; height: 16px;
   border-radius: 50%;
-  background: var(--indigo-600);
-  border: 3px solid var(--indigo-100);
+  background: var(--white);
+  border: 2px solid var(--indigo-600);
   position: relative; z-index: 1;
   margin-top: 4px;
+}
+.roadmap-step:first-child .roadmap-dot{
+  background: var(--indigo-600) ;
+  border-color:var(--indigo-100);
+  box-shadow:0 0 0 3px var(--indigo-100);
 }
 .roadmap-line {
   flex: 1;
