@@ -218,5 +218,35 @@
       "Real Python data analysis: https://realpython.com/pandas-dataframe"
     ],
     "starter_code": "starter_code/data_report.py"
+  },
+  {
+    "id": 8,
+    "title": "Password Strength Checker",
+    "skills": ["Python"],
+    "level": "Beginner",
+    "interest": "Cybersecurity",
+    "time": "Low",
+    "description": "A tool that checks password strength based on length, symbols, uppercase letters, and numbers. Helps beginners understand input validation and security basics.",
+    "features": [
+      "Check password complexity",
+      "Display strength rating",
+      "Suggest stronger password improvements",
+      "Prevent weak password patterns"
+    ],
+    "tech_stack": ["Python", "Regex"],
+    "roadmap": [
+      "Step 1: Create the password input system",
+      "Step 2: Check password length",
+      "Step 3: Detect uppercase and lowercase letters",
+      "Step 4: Detect numbers and symbols",
+      "Step 5: Create a scoring system",
+      "Step 6: Display password strength feedback"
+    ],
+    "resources": [
+      "Python regex docs: https://docs.python.org/3/library/re.html",
+      "OWASP password guidelines: https://owasp.org"
+    ],
+    "starter_code": "starter_code/password_checker.py"
   }
 ]
+
