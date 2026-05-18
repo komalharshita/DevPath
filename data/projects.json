@@ -221,6 +221,69 @@
   },
   {
     "id": 8,
+
+    "title": "Library Management System",
+    "skills": ["Java"],
+    "level": "Beginner",
+    "interest": "Backend",
+    "time": "Medium",
+    "description": "A Java application that helps manage books, students, and borrowing records in a library. This project teaches object-oriented programming concepts, file handling, and menu-driven application design.",
+    "features": [
+      "Add and remove books",
+      "Issue and return books",
+      "Store student records",
+      "Search books by title or author"
+    ],
+    "tech_stack": ["Java", "OOP", "File Handling"],
+    "roadmap": [
+      "Step 1: Create Book and Student classes",
+      "Step 2: Design the menu-driven interface",
+      "Step 3: Implement add and remove book features",
+      "Step 4: Add issue and return book functionality",
+      "Step 5: Store records using file handling",
+      "Step 6: Implement search functionality",
+      "Step 7: Test the system with sample records"
+    ],
+    "resources": [
+      "Java official docs: https://docs.oracle.com/javase/tutorial",
+      "OOP concepts in Java: https://www.geeksforgeeks.org/object-oriented-programming-oops-concept-in-java",
+      "Java file handling: https://www.w3schools.com/java/java_files.asp"
+    ],
+    "starter_code": "starter_code/library_management.java"
+  },
+  {
+    "id": 9,
+    "title": "Real-Time Chat Application",
+    "skills": ["JavaScript", "Node.js"],
+    "level": "Intermediate",
+    "interest": "Web",
+    "time": "High",
+    "description": "A real-time chat application that allows multiple users to send and receive instant messages using WebSockets. This project introduces backend communication, event handling, and real-time systems.",
+    "features": [
+      "Multiple user chat support",
+      "Real-time messaging",
+      "User join and leave notifications",
+      "Simple responsive chat interface"
+    ],
+    "tech_stack": ["Node.js", "Express.js", "Socket.IO", "HTML", "CSS"],
+    "roadmap": [
+      "Step 1: Initialize the Node.js project",
+      "Step 2: Install Express and Socket.IO",
+      "Step 3: Create the server using Express",
+      "Step 4: Build the frontend chat interface",
+      "Step 5: Implement real-time messaging with Socket.IO",
+      "Step 6: Add user connection notifications",
+      "Step 7: Test the application with multiple users"
+    ],
+    "resources": [
+      "Node.js docs: https://nodejs.org/en/docs",
+      "Socket.IO guide: https://socket.io/docs/v4",
+      "Express.js documentation: https://expressjs.com"
+    ],
+    "starter_code": "starter_code/realtime_chat_app.js"
+  },
+  {
+    "id": 10,
     "title": "Password Strength Checker",
     "skills": ["Python"],
     "level": "Beginner",
@@ -249,4 +312,3 @@
     "starter_code": "starter_code/password_checker.py"
   }
 ]
-
