@@ -37,3 +37,7 @@ if __name__ == "__main__":
     # debug=True is only for local development.
     # Never run with debug=True in a production deployment.
     app.run(debug=True)
+
+@app.route('/health')
+def health_check():
+    return {'status': 'ok'}, 200
