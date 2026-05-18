@@ -280,7 +280,10 @@ def test_download_code_found():
     response = client.get("/project/1/download")
     assert response.status_code == 200
 
-
+def test_health_check(client):
+    client = get_client()
+    response = client.get('/health')
+    assert response.status_code == 200
 # ============================================================
 # Run tests directly (no pytest required)
 # ============================================================
