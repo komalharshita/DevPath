@@ -751,7 +751,30 @@ if (isDetailPage) {
     try { document.execCommand("copy"); showCopySuccess(); } catch (e) { /* silent fail */ }
     document.body.removeChild(ta);
   }
-} // end isDetailPage
+
+  // =====================================================
+// Dark / Light Mode Toggle
+(function initThemeToggle() {
+  var themeToggle = document.getElementById('theme-toggle');
+  var themeIcon   = document.getElementById('theme-icon');
+
+  if (!themeToggle) return;
+
+  // Apply saved preference on load
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+    themeIcon.textContent = '☀️';
+  }
+themeToggle.addEventListener('click', function () {
+    document.body.classList.toggle('dark-mode');
+    var isDark = document.body.classList.contains('dark-mode');
+    themeIcon.textContent = isDark ? '☀️' : '🌙';
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  });
+})();
+
+
+}  // end isDetailPage
 
 if (
     openModalBtn &&

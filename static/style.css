@@ -6,6 +6,39 @@
    ============================================================= */
 
 /* ---- Variables -------------------------------------------- */
+/* ── Theme Variables ── */
+
+
+body.dark-mode {
+  --bg-color: #0f0f1a;
+  --text-color: #ffffff;
+  --card-bg: #1e1e2e;
+     --text-heading: #f9fafb;
+  --text-body:#d1d5db;
+  --border: #2e2e42;
+--gray-50:#1a1a2e;
+  --gray-100:#22223a;
+  --white: #1e1e2e;
+}
+
+
+
+/* Toggle Button */
+.theme-toggle {
+  background: none;
+  border: 2px solid var(--text-color);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  cursor: pointer;
+  font-size: 18px;
+  margin-left: 10px;
+  transition: 0.3s;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+}
 :root {
   /* Core palette */
   --indigo-900: #0f1560;
@@ -50,7 +83,10 @@
   --text-body:    var(--gray-600);
   --text-light:   var(--gray-400);
   --border:       var(--gray-200);
-
+/*  Theme defaults (light mode)  */
+  --bg-color:   #ffffff;
+  --text-color: #111827;
+  --card-bg:    #ffffff;
   /* Shadows */
   --shadow-xs: 0 1px 2px rgba(15, 21, 96, 0.05);
   --shadow-sm: 0 2px 8px rgba(15, 21, 96, 0.08);
@@ -84,6 +120,7 @@ body {
   background: var(--white);
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s, color 0.3s;
 }
 img { display: block; max-width: 100%; }
 a { color: var(--indigo-500); text-decoration: none; }
