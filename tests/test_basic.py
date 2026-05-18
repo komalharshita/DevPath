@@ -23,6 +23,7 @@ from utils.recommender import (
     parse_skills,
     score_single_project,
 )
+from utils.link_helper import parse_external_link
 from app import app, internal_server_error
 
 
@@ -72,6 +73,35 @@ def test_find_project_by_id_missing():
 # ============================================================
 # Recommender utility tests
 # ============================================================
+
+def test_parse_external_link():
+    """parse_external_link should correctly identify and split links and labels."""
+    assert parse_external_link("Python docs: https://docs.python.org") == {
+        "label": "Python docs",
+        "url": "https://docs.python.org",
+        "is_link": True
+    }
+    assert parse_external_link("Real Python - https://realpython.com") == {
+        "label": "Real Python",
+        "url": "https://realpython.com",
+        "is_link": True
+    }
+    assert parse_external_link("https://docs.python.org") == {
+        "label": "https://docs.python.org",
+        "url": "https://docs.python.org",
+        "is_link": True
+    }
+    assert parse_external_link("Some non-link text description") == {
+        "label": "Some non-link text description",
+        "url": None,
+        "is_link": False
+    }
+    assert parse_external_link("") == {
+        "label": "",
+        "url": None,
+        "is_link": False
+    }
+
 
 def test_parse_skills_basic():
     """parse_skills should split on commas and lowercase each entry."""

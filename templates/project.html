@@ -136,15 +136,14 @@
             <ul class="resource-list">
               {% for resource in project.resources %}
               <li class="resource-item">
-                <!-- Parse the "Label: URL" format stored in the data -->
-                {% set parts = resource.split(": http") %}
-                {% if parts|length > 1 %}
-                  <a href="http{{ parts[1] }}" target="_blank" rel="noopener noreferrer" class="resource-link">
-                    <span>{{ parts[0] }}</span>
+                {% set link_info = resource | parse_resource %}
+                {% if link_info.is_link %}
+                  <a href="{{ link_info.url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
+                    <span>{{ link_info.label }}</span>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                   </a>
                 {% else %}
-                  <span class="resource-plain">{{ resource }}</span>
+                  <span class="resource-plain">{{ link_info.label }}</span>
                 {% endif %}
               </li>
               {% endfor %}
