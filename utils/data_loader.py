@@ -24,6 +24,30 @@ def find_project_by_id(project_id):
             return project
     return None
 
+def get_project_stats():
+    """
+    Calculate and return statistics about the projects.
+    Returns: { total_projects, unique_skills, beginner_friendly }
+    """
+    projects = load_all_projects()
+    total_projects = len(projects)
+
+    # Collect all unique skills
+    all_skills = set()
+    for p in projects:
+        for s in p.get("skills", []):
+            all_skills.add(s)
+    unique_skills = len(all_skills)
+
+    # Count beginner projects
+    beginner_friendly = len([p for p in projects if p.get("level") == "Beginner"])
+
+    return {
+        "total_projects": total_projects,
+        "unique_skills": unique_skills,
+        "beginner_friendly": beginner_friendly
+    }
+
 # Cache for loaded projects
 _projects_cache = None
 
