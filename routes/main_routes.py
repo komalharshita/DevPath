@@ -4,15 +4,69 @@
 # and returns a response. No business logic lives here.
 
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort
-
+import time
 from utils.recommender import get_recommendations, validate_recommendation_inputs
 from utils.data_loader import find_project_by_id, get_project_stats
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
 import os
 
+from utils.redis_client import get_redis_client
+from utils.kafka_producer import get_kafka_producer
+
 # Create the Blueprint that app.py will register
 main = Blueprint("main", __name__)
 
+
+@main.route('/api/suggestions', methods=['GET'])
+def get_suggestions():
+    user_id = request.args.get('userId')
+    if not user_id:
+        return jsonify({'error': 'Missing userId parameter'}), 400
+
+    try:
+        r = get_redis_client()
+        redis_key = f"user:history:{user_id}"
+
+        # Pull top 20 interactive IDs by descending score sorting logic
+        raw_history = r.zrevrange(redis_key, 0, 19)
+
+        response = jsonify({'success': True, 'suggestions': raw_history})
+        if hasattr(request, 'rate_limit_headers'):
+            response.headers.update(request.rate_limit_headers)
+        return response
+
+    except Exception as e:
+        return jsonify({'error': 'Internal Caching Failure', 'details': str(e)}), 500
+
+@main.route('/api/suggestions', methods=['POST'])
+def log_interaction():
+    data = request.get_json() or {}
+    user_id = data.get('userId')
+    project_id = data.get('projectId')
+    interaction_type = data.get('interactionType', 'view')
+
+    if not user_id or not project_id:
+        return jsonify({'error': 'Missing required payload'}), 400
+
+    try:
+        producer = get_kafka_producer()
+        payload = {
+            'userId': user_id,
+            'projectId': project_id,
+            'interactionType': interaction_type,
+            'timestamp': int(time.time() * 1000)
+        }
+
+        # Unblocking asynchronous push operation offloaded to broker topology
+        producer.send('user-activity', key=user_id, value=payload)
+
+        response = jsonify({'success': True, 'message': 'Interaction logged.'})
+        if hasattr(request, 'rate_limit_headers'):
+            response.headers.update(request.rate_limit_headers)
+        return response
+
+    except Exception as e:
+        return jsonify({'error': 'Kafka Event Logging Pipeline Failure', 'details': str(e)}), 500
 
 @main.route("/")
 def index():
