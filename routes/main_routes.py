@@ -7,7 +7,12 @@ from flask import Blueprint, render_template, request, jsonify, send_from_direct
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
 from utils.data_loader import find_project_by_id
-from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
+from utils.file_server import (
+    read_starter_code,
+    resolve_starter_file,
+    get_starter_code_dir,
+    starter_download_relpath,
+)
 
 # Create the Blueprint that app.py will register
 main = Blueprint("main", __name__)
@@ -94,6 +99,9 @@ def download_code(project_id):
     if not full_path:
         abort(404)
 
-    import os
-    filename = os.path.basename(full_path)
-    return send_from_directory(get_starter_code_dir(), filename, as_attachment=True)
+    download_name = starter_download_relpath(full_path)
+    return send_from_directory(
+        get_starter_code_dir(),
+        download_name,
+        as_attachment=True,
+    )

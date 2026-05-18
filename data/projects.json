@@ -218,5 +218,83 @@
       "Real Python data analysis: https://realpython.com/pandas-dataframe"
     ],
     "starter_code": "starter_code/data_report.py"
+  },
+  {
+    "id": 8,
+    "title": "Real-Time Chat Application",
+    "skills": ["Python", "JavaScript", "HTML", "CSS"],
+    "level": "Advanced",
+    "interest": "Web",
+    "time": "High",
+    "description": "Build a browser-based chat that pushes messages instantly to every connected client using Flask-SocketIO and the Socket.IO protocol (WebSockets with HTTP long-polling fallback). You will design event names, optional rooms, and a minimal UI while learning concurrency limits and production deployment considerations.",
+    "features": [
+      "Flask-SocketIO server with connect, disconnect, and chat events",
+      "Browser client using the Socket.IO JS library (emit and on)",
+      "Broadcast messages to all connected users (or scoped rooms)",
+      "Simple nickname or session identity shown with each message",
+      "Optional: typing indicator or join/leave system messages",
+      "Optional: persist recent messages to SQLite or Redis",
+      "Basic rate limiting or message length validation on the server",
+      "Run locally with eventlet/gevent worker for WebSocket support"
+    ],
+    "tech_stack": ["Python", "Flask", "Flask-SocketIO", "Socket.IO", "WebSockets", "HTML", "JavaScript", "CSS", "eventlet"],
+    "roadmap": [
+      "Step 1: Study how Socket.IO differs from raw WebSockets and why fallbacks exist",
+      "Step 2: Create a virtual environment and install Flask, Flask-SocketIO, and an async worker (eventlet)",
+      "Step 3: Scaffold Flask app with a route that serves a chat HTML template",
+      "Step 4: Instantiate SocketIO on the Flask app and switch the entrypoint to socketio.run",
+      "Step 5: Implement connect/disconnect handlers and log or broadcast presence",
+      "Step 6: Add a chat_message handler that validates payload and emits to all clients",
+      "Step 7: Wire the front end: io(), form submit emits events, listeners append to the message log",
+      "Step 8: Add usernames (query param, prompt, or small form) and include them in each payload",
+      "Step 9: Test with multiple browser tabs; handle edge cases (empty message, disconnect mid-send)",
+      "Step 10: Document how you would deploy behind a reverse proxy with sticky sessions or Redis message queue"
+    ],
+    "resources": [
+      "Flask-SocketIO documentation: https://flask-socketio.readthedocs.io",
+      "Socket.IO protocol overview: https://socket.io/docs/v4",
+      "Flask WebSockets background: https://flask.palletsprojects.com/en/stable/deploying/asgi",
+      "MDN WebSockets guide: https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API"
+    ],
+    "starter_code": "starter_code/realtime_chat/app.py"
+  },
+  {
+    "id": 9,
+    "title": "REST API with JWT Authentication",
+    "skills": ["Python"],
+    "level": "Advanced",
+    "interest": "Web",
+    "time": "High",
+    "description": "Design a stateless REST API where clients authenticate with JSON Web Tokens signed by the server. Users register with passwords hashed using bcrypt; login returns a short-lived JWT used on subsequent requests. You will implement registration, login, token verification middleware, and at least one protected resource while following common security practices.",
+    "features": [
+      "POST /register with bcrypt password hashing before storage",
+      "POST /login returning JWT access token and token type",
+      "GET /profile (or similar) protected by Bearer JWT in Authorization header",
+      "Configurable secret key and token expiry via environment variables",
+      "Consistent JSON error responses with correct HTTP status codes",
+      "Optional: refresh tokens or token blocklist for logout semantics",
+      "Optional: SQLite persistence replacing in-memory user store",
+      "Input validation for username length, password strength, and duplicate users"
+    ],
+    "tech_stack": ["Python", "Flask", "PyJWT", "bcrypt", "JSON", "HTTP", "Postman (for testing)"],
+    "roadmap": [
+      "Step 1: Review JWT structure (header, payload, signature) and why secrets must stay server-side",
+      "Step 2: Install Flask, PyJWT, and bcrypt; set SECRET_KEY from an environment variable",
+      "Step 3: Define a minimal user model and in-memory or SQLite storage layer",
+      "Step 4: Implement registration: validate input, bcrypt.hashpw with a generated salt, store hash only",
+      "Step 5: Implement login: fetch user, bcrypt.checkpw, reject wrong credentials with 401",
+      "Step 6: On successful login, encode JWT with sub (user id or name) and exp claim",
+      "Step 7: Write a decorator or helper that extracts Bearer token, decodes JWT, and loads the user",
+      "Step 8: Protect one or more routes; return 401 for missing/invalid/expired tokens",
+      "Step 9: Test full flow with curl or Postman (register, login, authorized and unauthorized calls)",
+      "Step 10: Harden for production: HTTPS, key rotation plan, rate limiting, and never log tokens"
+    ],
+    "resources": [
+      "PyJWT usage: https://pyjwt.readthedocs.io",
+      "bcrypt Python bindings: https://github.com/pyca/bcrypt",
+      "JWT introduction: https://jwt.io/introduction",
+      "Flask application patterns: https://flask.palletsprojects.com/en/stable/patterns/"
+    ],
+    "starter_code": "starter_code/jwt_auth_api.py"
   }
 ]

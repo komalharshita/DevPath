@@ -1,0 +1,4 @@
+# Install for jwt_auth_api.py (run from repo root or starter_code/)
+flask>=3.0.0
+pyjwt>=2.8.0
+bcrypt>=4.1.0
