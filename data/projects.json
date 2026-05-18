@@ -247,6 +247,134 @@
       "OWASP password guidelines: https://owasp.org"
     ],
     "starter_code": "starter_code/password_checker.py"
+  },
+  {
+    "id": 9,
+    "title": "File Organiser Script",
+    "skills": ["Python"],
+    "level": "Beginner",
+    "interest": "Automation",
+    "time": "Low",
+    "description": "A Python script that scans a folder and automatically sorts files into subfolders by type — images, documents, videos, music, and more. A practical introduction to file system automation using only the standard library.",
+    "features": [
+      "Scan a target directory and list all files",
+      "Move files into typed subfolders (Images, Documents, Videos, etc.)",
+      "Create destination subfolders automatically if they do not exist",
+      "Handle filename conflicts without overwriting existing files",
+      "Print a summary report of how many files were moved per category"
+    ],
+    "tech_stack": ["Python", "os module", "shutil module"],
+    "roadmap": [
+      "Step 1: Set up the script and define the extension-to-folder mapping",
+      "Step 2: Write list_files() to return only files from a given directory",
+      "Step 3: Write get_destination_folder() to look up the folder for an extension",
+      "Step 4: Write resolve_conflict() to generate a unique filename if one already exists",
+      "Step 5: Write move_file() to create the subfolder and move one file safely",
+      "Step 6: Write organise_folder() to process every file and build a summary",
+      "Step 7: Test on a folder with mixed file types and verify the output"
+    ],
+    "resources": [
+      "Python os module: https://docs.python.org/3/library/os.html",
+      "Python shutil module: https://docs.python.org/3/library/shutil.html",
+      "Real Python file handling: https://realpython.com/working-with-files-in-python"
+    ],
+    "starter_code": "starter_code/file_organiser.py"
+  },
+  {
+    "id": 10,
+    "title": "Email Sender Bot",
+    "skills": ["Python"],
+    "level": "Intermediate",
+    "interest": "Automation",
+    "time": "Medium",
+    "description": "A Python script that reads a recipient list from a CSV file and sends each person a personalised email through Gmail's SMTP server. Credentials are stored in environment variables so passwords never appear in source code. Every send attempt is logged to a report file.",
+    "features": [
+      "Read sender credentials securely from environment variables",
+      "Load recipient list from a CSV file",
+      "Compose a personalised email body per recipient using a template",
+      "Send emails via Gmail SMTP with SSL",
+      "Log sent and failed attempts to a report CSV"
+    ],
+    "tech_stack": ["Python", "smtplib", "email module", "csv module", "os module"],
+    "roadmap": [
+      "Step 1: Set up Gmail App Password and export credentials as env vars",
+      "Step 2: Write get_credentials() to read and validate environment variables",
+      "Step 3: Write load_recipients() to parse the CSV into a list of dicts",
+      "Step 4: Write compose_message() to build a MIMEText email object",
+      "Step 5: Write send_email() to open an SMTP_SSL connection and deliver the message",
+      "Step 6: Write log_result() to append each outcome to the report CSV",
+      "Step 7: Write send_bulk() to loop through all recipients and log results",
+      "Step 8: Test with two or three recipients before sending to a larger list"
+    ],
+    "resources": [
+      "Python smtplib docs: https://docs.python.org/3/library/smtplib.html",
+      "Python email.mime module: https://docs.python.org/3/library/email.mime.html",
+      "Gmail App Passwords guide: https://support.google.com/accounts/answer/185833"
+    ],
+    "starter_code": "starter_code/email_bot.py"
+  },
+  {
+    "id": 11,
+    "title": "Number Guessing Game",
+    "skills": ["Python"],
+    "level": "Beginner",
+    "interest": "Games",
+    "time": "Low",
+    "description": "A classic command-line game where the computer picks a secret number and the player tries to guess it within a limited number of attempts. After each guess the player receives a 'too high' or 'too low' hint. A score is shown at the end based on efficiency.",
+    "features": [
+      "Computer generates a random secret number in a configurable range",
+      "Player receives 'too high' or 'too low' feedback after each guess",
+      "Limited number of attempts per round",
+      "Score calculated based on how quickly the player guessed correctly",
+      "Play-again prompt after each round"
+    ],
+    "tech_stack": ["Python", "random module"],
+    "roadmap": [
+      "Step 1: Read the constants and function skeletons in the starter file",
+      "Step 2: Complete generate_secret() to return a random integer in range",
+      "Step 3: Complete get_valid_guess() to prompt and validate player input",
+      "Step 4: Complete check_guess() to return 'correct', 'too_high', or 'too_low'",
+      "Step 5: Complete calculate_score() based on attempts used vs maximum allowed",
+      "Step 6: Complete play_game() to wire all helpers into one full round",
+      "Step 7: Test all paths: win on first guess, win on last attempt, run out of guesses"
+    ],
+    "resources": [
+      "Python random module: https://docs.python.org/3/library/random.html",
+      "Python while loops: https://realpython.com/python-while-loop",
+      "W3Schools Python basics: https://www.w3schools.com/python"
+    ],
+    "starter_code": "starter_code/number_guess.py"
+  },
+  {
+    "id": 12,
+    "title": "Tic-Tac-Toe CLI",
+    "skills": ["Python"],
+    "level": "Beginner",
+    "interest": "Games",
+    "time": "Medium",
+    "description": "A two-player Tic-Tac-Toe game that runs in the terminal. Players take turns entering a cell number to place their mark. The board is printed after every move and the game automatically detects wins across all rows, columns, and diagonals, as well as draws.",
+    "features": [
+      "Display a 3x3 board after each move",
+      "Accept player moves by cell number (1-9) with input validation",
+      "Detect win conditions across all rows, columns, and diagonals",
+      "Detect a draw when the board is full with no winner",
+      "Play-again prompt without restarting the script"
+    ],
+    "tech_stack": ["Python"],
+    "roadmap": [
+      "Step 1: Read the board layout and WIN_PATTERNS constant in the starter file",
+      "Step 2: Complete display_board() to print the 3x3 grid",
+      "Step 3: Complete get_player_move() to prompt and validate a cell choice",
+      "Step 4: Complete check_winner() to detect all eight win patterns",
+      "Step 5: Complete check_draw() to detect a full board with no winner",
+      "Step 6: Complete play_game() to run the full alternating-turn game loop",
+      "Step 7: Test every win direction (row, column, both diagonals) and the draw condition"
+    ],
+    "resources": [
+      "Python lists: https://docs.python.org/3/tutorial/datastructures.html",
+      "Python string formatting: https://realpython.com/python-string-formatting",
+      "W3Schools Python basics: https://www.w3schools.com/python"
+    ],
+    "starter_code": "starter_code/tictactoe.py"
   }
 ]
-
