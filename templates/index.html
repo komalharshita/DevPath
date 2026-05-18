@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="DevPath recommends real coding projects based on your skills, level, and interests — with full roadmaps and starter code." />
+  <meta name="description"
+    content="DevPath recommends real coding projects based on your skills, level, and interests — with full roadmaps and starter code." />
   <title>DevPath — Find Projects Based On Your Skills</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/static/style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet" />
 </head>
+
 <body>
   <!-- ============================================================
        Navigation
@@ -19,7 +25,7 @@
         <a href="#how-it-works" class="nav-link">How It Works</a>
         <a href="#features" class="nav-link">Features</a>
         <a href="#find-project" class="nav-link">Find Project</a>
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="nav-btn-outline">GitHub</a>
+        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-btn-outline">GitHub</a>
       </div>
       <!-- Mobile hamburger toggle -->
       <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation">
@@ -31,7 +37,7 @@
       <a href="#how-it-works" class="nav-mobile-link">How It Works</a>
       <a href="#features" class="nav-mobile-link">Features</a>
       <a href="#find-project" class="nav-mobile-link">Find Project</a>
-      <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="nav-mobile-link">GitHub</a>
+      <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-mobile-link">GitHub</a>
     </div>
   </nav>
 
@@ -39,8 +45,6 @@
        Hero Section
        ============================================================ -->
   <section class="hero" id="home">
-    <div class="hero-bg-grid"></div>
-
     <div class="hero-inner">
       <!-- Left: copy -->
       <div class="hero-copy">
@@ -60,23 +64,6 @@
           roadmaps and ready-to-run starter code.
         </p>
 
-        <!-- Inline stat strip -->
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <span class="hero-stat-num">7+</span>
-            <span class="hero-stat-label">Projects</span>
-          </div>
-          <div class="hero-stat-divider"></div>
-          <div class="hero-stat">
-            <span class="hero-stat-num">3</span>
-            <span class="hero-stat-label">Skill Levels</span>
-          </div>
-          <div class="hero-stat-divider"></div>
-          <div class="hero-stat">
-            <span class="hero-stat-num">5</span>
-            <span class="hero-stat-label">Interest Areas</span>
-          </div>
-        </div>
 
         <div class="hero-cta-row">
           <a href="#find-project" class="btn-hero-primary">Start Finding Projects</a>
@@ -84,11 +71,15 @@
         </div>
       </div>
 
-      <!-- Right: abstract visual panel -->
+      <!-- Hero visual loads after main content for performance -->
       <div class="hero-visual">
         <div class="hero-visual-card hero-visual-card--top">
           <div class="hvc-icon hvc-icon--blue">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6" />
+              <polyline points="8 6 2 12 8 18" />
+            </svg>
           </div>
           <div class="hvc-text">
             <span class="hvc-title">Starter Code Ready</span>
@@ -104,10 +95,12 @@
             <span class="hvm-filename">expense_tracker.py</span>
           </div>
           <div class="hvm-code">
-            <span class="hvm-line"><span class="hvm-kw">def</span> <span class="hvm-fn">add_expense</span>(category, amount):</span>
+            <span class="hvm-line"><span class="hvm-kw">def</span> <span class="hvm-fn">add_expense</span>(category,
+              amount):</span>
             <span class="hvm-line hvm-indent"><span class="hvm-cm"># Save entry to CSV</span></span>
             <span class="hvm-line hvm-indent">date <span class="hvm-op">=</span> datetime.now()</span>
-            <span class="hvm-line hvm-indent"><span class="hvm-kw">with</span> open(DATA_FILE) <span class="hvm-kw">as</span> f:</span>
+            <span class="hvm-line hvm-indent"><span class="hvm-kw">with</span> open(DATA_FILE) <span
+                class="hvm-kw">as</span> f:</span>
             <span class="hvm-line hvm-indent2">writer.writerow([date, ...])</span>
             <span class="hvm-line">&nbsp;</span>
             <span class="hvm-line"><span class="hvm-kw">def</span> <span class="hvm-fn">monthly_summary</span>():</span>
@@ -118,7 +111,10 @@
 
         <div class="hero-visual-card hero-visual-card--bottom">
           <div class="hvc-icon hvc-icon--green">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
           </div>
           <div class="hvc-text">
             <span class="hvc-title">7-Step Roadmap</span>
@@ -128,36 +124,109 @@
       </div>
     </div>
 
-    <!-- Decorative background blobs -->
+    <!-- Hero visual loads after main content for performance -->
+    <div class="hero-bg-grid"></div>
     <div class="hero-blob hero-blob-1"></div>
     <div class="hero-blob hero-blob-2"></div>
   </section>
 
   <!-- ============================================================
-       Language / Skill Strip (visual trust element)
+       Statistics Cards (Dynamic)
        ============================================================ -->
-  <div class="skill-strip">
-    <div class="skill-strip-inner">
-      <span class="skill-strip-label">Supports skills including:</span>
-      <div class="skill-strip-items">
-        <span class="ss-item">Python</span>
-        <span class="ss-sep"></span>
-        <span class="ss-item">JavaScript</span>
-        <span class="ss-sep"></span>
-        <span class="ss-item">HTML / CSS</span>
-        <span class="ss-sep"></span>
-        <span class="ss-item">Flask</span>
-        <span class="ss-sep"></span>
-        <span class="ss-item">SQL</span>
-        <span class="ss-sep"></span>
-        <span class="ss-item">React</span>
-        <span class="ss-sep"></span>
-        <span class="ss-item">Node.js</span>
-        <span class="ss-sep"></span>
-        <span class="ss-item">pandas</span>
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <!-- Total Projects -->
+        <div class="stat-card">
+          <div class="stat-icon stat-icon--indigo">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ stats.total_projects }}</span>
+            <span class="stat-label">Real Projects</span>
+          </div>
+        </div>
+
+        <!-- Unique Skills -->
+        <div class="stat-card">
+          <div class="stat-icon stat-icon--yellow">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ stats.unique_skills }}</span>
+            <span class="stat-label">Unique Skills</span>
+          </div>
+        </div>
+
+        <!-- Beginner Friendly -->
+        <div class="stat-card">
+          <div class="stat-icon stat-icon--green">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ stats.beginner_friendly }}</span>
+            <span class="stat-label">Beginner Friendly</span>
+          </div>
+        </div>
       </div>
     </div>
+  </section>
+
+  <!-- ============================================================
+       Language / Skill Strip (visual trust element)
+       ============================================================ -->
+
+<div class="skill-strip">
+  <div class="skill-strip-inner">
+    <span class="skill-strip-label">Supports skills including:</span>
+    <div class="skill-strip-items">
+      <span class="ss-item">Python</span>
+      <span class="ss-sep"></span>
+
+      <span class="ss-item">JavaScript</span>
+      <span class="ss-sep"></span>
+
+      <span class="ss-item">HTML / CSS</span>
+      <span class="ss-sep"></span>
+
+      <span class="ss-item">Flask</span>
+      <span class="ss-sep"></span>
+
+      <span class="ss-item">SQL</span>
+      <span class="ss-sep"></span>
+
+      <span class="ss-item">React</span>
+      <span class="ss-sep"></span>
+
+      <span class="ss-item">Node.js</span>
+      <span class="ss-sep"></span>
+
+      <span class="ss-item">pandas</span>
+      <span class="ss-sep"></span>
+
+      <span class="ss-item">C++</span>
+      <span class="ss-sep"></span>
+
+      <span class="ss-item">Java</span>
+      <span class="ss-sep"></span>
+
+      <span class="ss-item">TypeScript</span>
+      <span class="ss-sep"></span>
+
+      <span class="ss-item">Go</span>
+      <span class="ss-sep"></span>
+
+      <span class="ss-item">Rust</span>
+      <span class="ss-sep"></span>
+
+      <span class="ss-item">C#</span>
+      <span class="ss-sep"></span>
+
+      <span class="ss-item">Kotlin</span>
+    </div>
   </div>
+</div>
+
 
   <!-- ============================================================
        How It Works
@@ -175,7 +244,10 @@
           <p>Type your programming skills or click quick-select chips. Add as many as you like.</p>
         </div>
         <div class="step-connector">
-          <svg width="32" height="16" viewBox="0 0 32 16"><path d="M0 8 H28 M22 2 L30 8 L22 14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="32" height="16" viewBox="0 0 32 16">
+            <path d="M0 8 H28 M22 2 L30 8 L22 14" stroke="currentColor" stroke-width="2" fill="none"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
         </div>
         <div class="step-card">
           <div class="step-num">02</div>
@@ -183,7 +255,10 @@
           <p>Select your experience level, area of interest, and how much time you can commit.</p>
         </div>
         <div class="step-connector">
-          <svg width="32" height="16" viewBox="0 0 32 16"><path d="M0 8 H28 M22 2 L30 8 L22 14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="32" height="16" viewBox="0 0 32 16">
+            <path d="M0 8 H28 M22 2 L30 8 L22 14" stroke="currentColor" stroke-width="2" fill="none"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
         </div>
         <div class="step-card">
           <div class="step-num">03</div>
@@ -207,7 +282,13 @@
 
         <div class="feature-card feature-card--pink">
           <div class="feature-card-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
           </div>
           <h3>Personalized Matches</h3>
           <p>Projects are scored against your exact skills, level, and interest — not pulled from a generic list.</p>
@@ -216,7 +297,10 @@
 
         <div class="feature-card feature-card--yellow">
           <div class="feature-card-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
           </div>
           <h3>Step-by-Step Roadmaps</h3>
           <p>Each project includes a numbered roadmap so you always know what to build next, without guessing.</p>
@@ -225,10 +309,15 @@
 
         <div class="feature-card feature-card--purple">
           <div class="feature-card-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6" />
+              <polyline points="8 6 2 12 8 18" />
+            </svg>
           </div>
           <h3>Starter Code Included</h3>
-          <p>Download a working template for every project. Skip the blank-page problem and start building immediately.</p>
+          <p>Download a working template for every project. Skip the blank-page problem and start building immediately.
+          </p>
           <a href="#find-project" class="feature-card-link">Get starter code</a>
         </div>
 
@@ -248,12 +337,27 @@
       <div class="form-card-outer">
         <div class="form-card" id="form-section">
           <form id="recommend-form" novalidate>
-
-            <!-- Skills input with chip selector -->
             <div class="form-group">
-              <label for="skills-input">Your Skills</label>
+              <div class="form-label-row" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
+                <label for="skills-input">
+                  Your Skills
+                  <span class="tooltip"
+                    title="Add technologies, programming languages, or tools you know like Python, React, Git, SQL, etc.">
+                    ⓘ
+                  </span>
+                </label>
+                
+                <!-- Inline GitHub Trigger -->
+                <div class="github-inline-trigger" id="github-trigger-wrap" style="line-height: 1.2;">
+                  <button type="button" id="btn-show-github" class="resource-link" style="padding: 4px 8px; border-radius: var(--r-xs); font-size: 0.75rem; gap: 6px;">
+                    <svg style="width:14px; fill:currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    <span>Import from GitHub</span>
+                  </button>
+                </div>
+              </div>
               <div class="skill-input-wrap" id="skill-input-wrap">
                 <div class="skill-chips-selected" id="skill-chips-selected"></div>
+                <input type="text" id="skills-input" placeholder="Type a skill and press Enter..." autocomplete="off" />
                 <input
                   type="text"
                   id="skills-input"
@@ -267,7 +371,9 @@
               </div>
               <!-- Hidden field holds the final comma-separated value -->
               <input type="hidden" id="skills" name="skills" />
-              <span class="form-hint">Or click a popular skill below to add it</span>
+              <span class="form-hint">
+                Add one or more skills you are comfortable with. Example: Python, React, SQL, Git.
+              </span>
               <div class="form-error-msg" id="skills-error"></div>
             </div>
 
@@ -281,6 +387,14 @@
               <button type="button" class="skill-chip" data-skill="SQL">SQL</button>
               <button type="button" class="skill-chip" data-skill="React">React</button>
               <button type="button" class="skill-chip" data-skill="Node.js">Node.js</button>
+              <button type="button" class="skill-chip" data-skill="C++">C++</button>
+              <button type="button" class="skill-chip" data-skill="Java">Java</button>
+              <button type="button" class="skill-chip" data-skill="TypeScript">TypeScript</button>
+              <button type="button" class="skill-chip" data-skill="Go">Go</button>
+              <button type="button" class="skill-chip" data-skill="Rust">Rust</button>
+              <button type="button" class="skill-chip" data-skill="C#">C#</button>
+              <button type="button" class="skill-chip" data-skill="Kotlin">Kotlin</button>
+
             </div>
 
             <!-- Level + Interest in a row -->
@@ -299,7 +413,13 @@
               </div>
 
               <div class="form-group">
-                <label for="interest">Area of Interest</label>
+                <label for="interest">
+                  Area of Interest
+                  <span class="tooltip"
+                    title="Choose the type of projects you enjoy building or want to learn more about.">
+                    ⓘ
+                  </span>
+                </label>
                 <div class="select-wrap">
                   <select id="interest" name="interest">
                     <option value="" disabled selected>Select interest</option>
@@ -310,36 +430,50 @@
                     <option value="Games">Games</option>
                   </select>
                 </div>
-                <div class="form-error-msg" id="interest-error"></div>
-              </div>
+             
+
+              <span class="form-hint">
+                Pick the domain you want to explore such as Web Development, Automation, or Games.
+              </span>
+              <div class="form-error-msg" id="interest-error"></div>
             </div>
-
-            <!-- Time availability -->
-            <div class="form-group">
-              <label for="time">Time Availability</label>
-              <div class="select-wrap">
-                <select id="time" name="time">
-                  <option value="" disabled selected>How much time can you commit?</option>
-                  <option value="Low">Low — a few hours total</option>
-                  <option value="Medium">Medium — across a weekend</option>
-                  <option value="High">High — a week or more</option>
-                </select>
-              </div>
-              <div class="form-error-msg" id="time-error"></div>
-            </div>
-
-            <!-- General error (shown above the button) -->
-            <p class="form-error-general" id="form-error-general"></p>
-
-            <!-- Submit button -->
-            <button type="submit" class="btn-submit" id="submit-btn">
-              <span id="btn-label">Generate My Projects</span>
-              <span id="btn-loading" style="display:none;">Finding matches...</span>
-            </button>
-
-          </form>
         </div>
+
+        <!-- Time availability -->
+        <div class="form-group">
+          <label for="time">
+            Time Availability
+            <span class="tooltip"
+              title="Estimate how much time you can realistically dedicate to building the project.">
+              ⓘ
+            </span>
+          </label>
+          <div class="select-wrap">
+            <select id="time" name="time">
+              <option value="" disabled selected>How much time can you commit?</option>
+              <option value="Low">Low — a few hours total</option>
+              <option value="Medium">Medium — across a weekend</option>
+              <option value="High">High — a week or more</option>
+            </select>
+          </div>
+          <span class="form-hint">
+            Include coding, debugging, learning, and reviewing time in your estimate.
+          </span>
+          <div class="form-error-msg" id="time-error"></div>
+        </div>
+
+        <!-- General error (shown above the button) -->
+        <p class="form-error-general" id="form-error-general"></p>
+
+        <!-- Submit button -->
+        <button type="submit" class="btn-submit" id="submit-btn">
+          <span id="btn-label">Generate My Projects</span>
+          <span id="btn-loading" style="display:none;">Finding matches...</span>
+        </button>
+
+        </form>
       </div>
+    </div>
     </div>
   </section>
 
@@ -364,7 +498,11 @@
       <div id="results-empty" style="display:none;">
         <div class="empty-state">
           <div class="empty-icon">
-            <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
           </div>
           <h3>No Projects Found</h3>
           <p id="empty-message">Try adjusting your skills or selecting a different interest area.</p>
@@ -373,6 +511,9 @@
             <div id="suggested-skills-list" class="skill-chips-row skill-chips-row--center"></div>
           </div>
           <button class="btn-try-again" onclick="document.getElementById('find-project').scrollIntoView({behavior:'smooth'})">Try Different Inputs</button>
+          <button class="btn-try-again"
+            onclick="document.getElementById('find-project').scrollIntoView({behavior:'smooth'})">Try Different
+            Inputs</button>
         </div>
       </div>
 
@@ -390,6 +531,32 @@
         <h2>Start Building.<br><span class="cta-accent">A New Skill</span> Awaits.</h2>
         <p>Find a project that challenges you and grow with every line of code.</p>
         <a href="#find-project" class="btn-cta">Find My Project</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Our Story / About Us
+       ============================================================ -->
+  <section class="features-section" id="our-story">
+    <div class="container">
+      <div class="section-eyebrow">About Us</div>
+      <h2 class="section-title">Our Story</h2>
+      <p class="section-sub">DevPath was built to help learners move from scattered tutorials to projects with a clear path, practical code, and meaningful momentum.</p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3>Why it exists</h3>
+          <p>Too many project ideas stop at the title. DevPath focuses on the next steps that make starting and finishing feel manageable.</p>
+        </div>
+        <div class="feature-card">
+          <h3>How it helps</h3>
+          <p>Each recommendation includes a roadmap and starter code so users can spend time building instead of searching for structure.</p>
+        </div>
+        <div class="feature-card">
+          <h3>What it leads to</h3>
+          <p>A smoother path from curiosity to a finished project, with fewer dead ends and more confidence along the way.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -419,18 +586,18 @@
         <h4 class="footer-col-title">Resources</h4>
         <ul class="footer-links-list">
           <li><a href="/project/1">Sample Project</a></li>
-          <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-          <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">Contributing Guide</a></li>
-          <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">Report an Issue</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing Guide</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath/issues" target="_blank" rel="noopener noreferrer">Report an Issue</a></li>
         </ul>
       </div>
 
       <div class="footer-col">
-        <h4 class="footer-col-title">About</h4>
+        <h4 class="footer-col-title">About Us</h4>
         <ul class="footer-links-list">
-          <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">Our Story</a></li>
-          <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">Open Source</a></li>
-          <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">License</a></li>
+          <li><a href="#our-story">Our Story</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">Open Source</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">License</a></li>
         </ul>
       </div>
     </div>
@@ -438,13 +605,41 @@
     <div class="footer-bottom">
       <p>DevPath is open source. Licensed under the MIT License.</p>
       <div class="footer-bottom-links">
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer">Terms of Use</a>
+        <a href="#our-story">About Us</a>
+        <a href="https://github.com/komalharshita/DevPath/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Project License</a>
       </div>
     </div>
   </footer>
 
-  <script src="/static/data/skills.js"></script>
+  <!-- GitHub Modal Overlay -->
+  <div class="code-panel-overlay" id="github-modal-overlay" style="align-items: center; justify-content: center; opacity: 1;">
+    <div class="sidebar-card" style="width: 100%; max-width: 400px; margin: 20px; z-index: 400; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
+      
+      <div class="sidebar-card-title">
+        <svg style="width:18px; fill:var(--indigo-600)" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        Sync with GitHub
+      </div>
+      
+      <p class="sidebar-card-desc" style="margin-bottom: 20px;">Enter your username to import coding languages from your top repositories into the skills list.<br/> Note: We use stars to determine top repositories</p>
+      
+      <div class="form-group" style="margin-bottom: 20px;">
+        <div class="skill-input-wrap">
+          <span style="color:var(--gray-400); font-family:var(--font-mono); font-size:0.8rem; margin-left:8px;">@</span>
+          <input type="text" id="github-username" placeholder="username" style="border:none; outline:none; flex:1; padding:10px;">
+        </div>
+        <div class="form-error-msg" id="github-modal-error"></div>
+      </div>
+      
+      <div style="display: flex; gap: 12px;">
+        <button type="button" id="btn-fetch-github" class="btn-primary" style="flex: 2; padding: 10px; font-size: 0.85rem;">Fetch Skills</button>
+        <button type="button" id="btn-close-github" class="btn-view-code-sm" style="flex: 1; border-color: var(--border); color: var(--text-body);">Cancel</button>
+      </div>
+      
+    </div>
+  </div>
+
+    <script src="/static/data/skills.js"></script>
   <script src="/static/script.js"></script>
 </body>
+
 </html>
