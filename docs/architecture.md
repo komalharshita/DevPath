@@ -115,9 +115,11 @@ Functions:
 - `read_starter_code(project)` — returns `{"filename": ..., "code": ...}` or None
 - `get_starter_code_dir()` — returns the directory path for `send_from_directory`
 
-The `os.path.basename()` call in `resolve_starter_file` ensures that a
-malicious `starter_code` value in the JSON (such as `../../etc/passwd`) cannot
-cause a path traversal vulnerability.
+Paths in `projects.json` may include subfolders (for example
+`starter_code/realtime_chat/app.py`). `resolve_starter_file` strips an optional
+`starter_code/` prefix, rejects `..` segments, resolves the path under the real
+`starter_code` directory, and verifies containment with `os.path.commonpath`
+so a malicious value cannot read files outside that folder.
 
 ---
 
