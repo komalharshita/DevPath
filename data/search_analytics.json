@@ -3,6 +3,24 @@
     "q": "weather",
     "filters": {
       "q": "weather",
+      "sort_by": "views"
+    },
+    "result_count": 1,
+    "timestamp": "2026-05-18T14:18:41.549438"
+  },
+  {
+    "q": "weather",
+    "filters": {
+      "q": "weather",
+      "sort_by": "views"
+    },
+    "result_count": 1,
+    "timestamp": "2026-05-18T14:18:38.005235"
+  },
+  {
+    "q": "weather",
+    "filters": {
+      "q": "weather",
       "level": "Advanced",
       "interest": "Web",
       "time": "High",
