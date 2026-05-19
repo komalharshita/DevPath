@@ -102,6 +102,20 @@ if (isIndexPage) {
   var visibleSuggestions = [];
   var activeSuggestionIndex = -1;
 
+  function initSkillStripMarquee() {
+    var marquee = document.querySelector(".skill-strip-marquee");
+    var track = marquee && marquee.querySelector(".skill-strip-track");
+
+    if (!marquee || !track || track.querySelector(".skill-strip-items[data-marquee-clone='true']")) {
+      return;
+    }
+
+    var clone = track.querySelector(".skill-strip-items").cloneNode(true);
+    clone.setAttribute("aria-hidden", "true");
+    clone.setAttribute("data-marquee-clone", "true");
+    track.appendChild(clone);
+  }
+
   availableSkills = availableSkills.filter(function (skill, index, list) {
     return typeof skill === "string" && skill.trim() &&
       list.findIndex(function (item) {
@@ -112,6 +126,8 @@ if (isIndexPage) {
   if (suggestionsDiv) {
     suggestionsDiv.setAttribute("role", "listbox");
   }
+
+  initSkillStripMarquee();
 
   function normalizeSkill(skill) {
     return skill.trim().toLowerCase();

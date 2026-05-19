@@ -279,3 +279,35 @@
     "recommendations": 35
   }
 ]
+    "starter_code": "starter_code/password_checker.py"
+  },
+  {
+    "id": 9,
+    "title": "Feedback Survey Form",
+    "skills": ["HTML"],
+    "level": "Beginner",
+    "interest": "Web",
+    "time": "Low",
+    "description": "A simple student feedback form that collects user names, emails, and ratings. Teaches basic HTML form handling and layout design.",
+    "features": [
+      "Collect user name, email, and age with validation",
+      "Dropdown menu for experience selection",
+      "Text area for detailed user suggestions"
+    ],
+    "tech_stack": ["HTML"],
+    "roadmap": [
+      "Step 1: Create the HTML folder structure inside starter_code",
+      "Step 2: Build the input text fields and labels",
+      "Step 3: Add select options and textarea elements",
+      "Step 4: Align the form to the center for better layout",
+      "Step 5: Test the form using Live Server"
+    ],
+    "resources": [
+      "MDN HTML Forms: https://developer.mozilla.org/en-US/docs/Learn/Forms"
+    ],
+    "starter_code": "starter_code/survey_form/index.html"
+  }
+]
+
+
+
