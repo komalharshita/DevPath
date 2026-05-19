@@ -322,6 +322,25 @@ ul, ol { list-style: none; }
 
 .nav-mobile-link:last-child { border-bottom: none; }
 
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  background: var(--indigo-700);
+  color: var(--white);
+  padding: 10px 18px;
+  border-radius: 0 0 var(--r-sm) var(--r-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
+  z-index: 9999;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
 /* ---- Hero Section ----------------------------------------- */
 .hero {
   position: relative;
