@@ -17,4 +17,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- No fixes recorded yet
+- `/api/recommend` now returns all validation errors in a single response instead of only the first one, so users can correct every invalid field at once
