@@ -297,6 +297,7 @@ if (clearFiltersBtn) {
       if (skillsTextInput.value.trim()) {
         addSkill(skillsTextInput.value);
         skillsTextInput.value = "";
+        updateSkillsCount();
       }
       hideSuggestions();
     }
@@ -322,13 +323,20 @@ if (clearFiltersBtn) {
 
   // Show suggestions on input
   skillsTextInput.addEventListener("input", function (evt) {
+
+    // Character counter update
+    updateSkillsCount();
+
+    // Existing suggestions logic
     var typedValue = evt.target.value.trim();
-    if (typedValue.length === 0) {
-      hideSuggestions();
-      return;
-    }
-    displaySuggestions(getFilteredSkills(typedValue));
-  });
+
+  if (typedValue.length === 0) {
+    hideSuggestions();
+    return;
+  }
+
+  displaySuggestions(getFilteredSkills(typedValue));
+});
 
   skillsTextInput.addEventListener("focus", function () {
     if (skillsTextInput.value.trim()) {
@@ -367,6 +375,7 @@ if (clearFiltersBtn) {
     selectedSkills.push(skill);
     renderSelectedChips();
     syncSkillsHiddenInput();
+    updateSkillsCount();
     updateQuickPickState();
     // Once a skill is added, remove the "please add a skill" error if it was showing
     clearFieldError("skills-error");
@@ -380,6 +389,7 @@ if (clearFiltersBtn) {
     });
     renderSelectedChips();
     syncSkillsHiddenInput();
+    updateSkillsCount();
     updateQuickPickState();
   }
 
@@ -409,6 +419,16 @@ if (clearFiltersBtn) {
       chipEl.appendChild(removeBtn); // put x button inside the chip
       chipsSelectedEl.appendChild(chipEl); //add chip to page
     });
+  }
+
+  function updateSkillsCount() {
+    var skillsCount = document.getElementById("skillsCount");
+    if (!skillsCount) return;
+    var selectedSkillsLength = selectedSkills.reduce(function (total, skill) {
+      return total + (skill || "").length;
+    }, 0);
+    var totalCharacters = selectedSkillsLength + (skillsTextInput.value || "").length;
+    skillsCount.textContent = totalCharacters;
   }
 
   function syncSkillsHiddenInput() {
