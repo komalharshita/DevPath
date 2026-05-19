@@ -1306,13 +1306,35 @@ label {
   cursor: pointer;
   transition: background var(--t), border-color var(--t), color var(--t);
 }
+.extra-skill {
+  display: none;
+}
 
-.skill-chip:hover,
+.skill-chip:hover, 
 .skill-chip.active {
   background: var(--indigo-700);
   border-color: var(--indigo-700);
   color: var(--white);
+}/* Hide extra skill chips initially */
+
+
+/* Toggle button for extra skills */
+.toggle-skills-btn {
+  margin-top: 12px;
+  background: transparent;
+  border: none;
+  color: var(--indigo-600);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color var(--t);
 }
+
+.toggle-skills-btn:hover {
+  color: var(--indigo-800);
+}
+
 
 /* Select wrapper with custom chevron */
 .select-wrap {

@@ -255,7 +255,33 @@ if (clearFiltersBtn) {
     syncSuggestionsA11yState();
   }
 
+  // Skills expansion state (shared across multiple function calls)
+  var skillsExpanded = false;
+
+  // Initialize toggle button once (moved outside updateQuickPickState to prevent duplicate listeners)
+  (function initToggleButton() {
+    var toggleBtn = document.getElementById("toggleSkillsBtn");
+    if (toggleBtn) {
+      toggleBtn.addEventListener("click", function () {
+        var hiddenSkills = document.querySelectorAll(".extra-skill");
+
+        for (var i = 0; i < hiddenSkills.length; i++) {
+          hiddenSkills[i].style.display = skillsExpanded
+            ? "none"
+            : "inline-flex";
+        }
+
+        skillsExpanded = !skillsExpanded;
+
+        toggleBtn.textContent = skillsExpanded
+          ? "Show Less"
+          : "Show More";
+      });
+    }
+  })();
+
   function updateQuickPickState() {
+    // Update the quick-pick chip states based on selected skills
     quickPickChips.forEach(function (chip) {
       var isActive = isSkillSelected(chip.getAttribute("data-skill") || "");
       chip.classList.toggle("active", isActive);
