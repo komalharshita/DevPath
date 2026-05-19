@@ -32,6 +32,11 @@ def internal_server_error(error):
     """Render a friendly 500 page for unexpected server errors."""
     return render_template("500.html"), 500
 
+@app.errorhandler(405)
+def method_not_allowed(error):
+    """Render a friendly 405 page when the wrong HTTP method is used."""
+    return render_template("405.html"), 405
+
 
 if __name__ == "__main__":
     # debug=True is only for local development.

@@ -12,7 +12,7 @@
 // Detect which page we are on
 // ============================================================
 // !! trick turns the DOM result into a simple true/false
-var isIndexPage  = !!document.getElementById("recommend-form");
+var isIndexPage = !!document.getElementById("recommend-form");
 // PROJECT_ID is set by the server only on detail pages, so if it's missing we're elsewhere
 var isDetailPage = typeof PROJECT_ID !== "undefined";
 var modal = document.getElementById('github-modal-overlay');
@@ -74,6 +74,39 @@ if (isIndexPage) {
 
   // Tracks currently selected skills to prevent duplicates
   var selectedSkills = [];
+  // Clear Filters Button Functionality
+var clearFiltersBtn = document.getElementById("clear-filters-btn");
+if (clearFiltersBtn) {
+    clearFiltersBtn.addEventListener("click", function() {
+        var recommendForm = document.getElementById("recommend-form");
+        if (recommendForm) {
+            // 1. Reset standard form dropdowns and fields
+            recommendForm.reset();
+            
+            // 2. Clear out the internal JavaScript array tracker completely
+            selectedSkills = [];
+            
+            // 3. Clear the hidden inputs and visual chips using the file's own variables
+            if (skillsHidden) skillsHidden.value = "";
+            if (chipsSelectedEl) chipsSelectedEl.innerHTML = "";
+            if (skillsTextInput) {
+                skillsTextInput.value = "";
+                skillsTextInput.focus(); // Place cursor back on input
+            }
+            
+            // 4. Hide autocomplete suggestions if any are open
+            var suggestionsBox = document.getElementById("skills-suggestions");
+            if (suggestionsBox) suggestionsBox.innerHTML = "";
+
+            // 5. Reset quick-pick chip visual active states if they have any
+            if (quickPickChips) {
+                quickPickChips.forEach(function(chip) {
+                    chip.classList.remove("active", "selected");
+                });
+            }
+        }
+    });
+}
 
 
   // ----------------------------------------------------------
@@ -92,7 +125,7 @@ if (isIndexPage) {
       "C#", "Ruby", "PHP", "Go", "Swift", "TypeScript", "Angular", "Vue.js",
       "Spring", "Flutter", "TensorFlow", "PyTorch", "Data Science",
       "Machine Learning", "Artificial Intelligence", "DevOps", "Cybersecurity",
-      "Blockchain", "UI/UX Design", "Game Development", "CI/CD", "REST API", "GraphQL", 
+      "Blockchain", "UI/UX Design", "Game Development", "CI/CD", "REST API", "GraphQL",
       "Rust", "Kotlin"
     ];
   }
@@ -101,6 +134,20 @@ if (isIndexPage) {
   var skillWrap = document.getElementById("skill-input-wrap");
   var visibleSuggestions = [];
   var activeSuggestionIndex = -1;
+
+  function initSkillStripMarquee() {
+    var marquee = document.querySelector(".skill-strip-marquee");
+    var track = marquee && marquee.querySelector(".skill-strip-track");
+
+    if (!marquee || !track || track.querySelector(".skill-strip-items[data-marquee-clone='true']")) {
+      return;
+    }
+
+    var clone = track.querySelector(".skill-strip-items").cloneNode(true);
+    clone.setAttribute("aria-hidden", "true");
+    clone.setAttribute("data-marquee-clone", "true");
+    track.appendChild(clone);
+  }
 
   availableSkills = availableSkills.filter(function (skill, index, list) {
     return typeof skill === "string" && skill.trim() &&
@@ -112,6 +159,8 @@ if (isIndexPage) {
   if (suggestionsDiv) {
     suggestionsDiv.setAttribute("role", "listbox");
   }
+
+  initSkillStripMarquee();
 
   function normalizeSkill(skill) {
     return skill.trim().toLowerCase();
@@ -468,13 +517,50 @@ if (isIndexPage) {
 
     setLoadingState(true);
 
+    // Allow browser to paint spinner before request starts
+    requestAnimationFrame(function () {
+
+      var payload = {
+        skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
+        level: document.getElementById("level").value,
+        interest: document.getElementById("interest").value,
+        time: document.getElementById("time").value
+      };
+
+      fetch("/api/recommend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+        .then(function (res) {
+          return res.json();
+        })
+        .then(function (data) {
+
+          setLoadingState(false);
+
+          if (data.error) {
+            var generalErr = document.getElementById("form-error-general");
+
+            if (generalErr) {
+              generalErr.textContent = data.error;
+            }
+
+            return;
+          }
+
+          renderResults(data.projects || [], data.message);
+        })
+        .catch(function () {
+
+          setLoadingState(false);
     //combine form values into an object to send to server/api
     var payload = {
       // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills:   skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level:    document.getElementById("level").value,
+      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
+      level: document.getElementById("level").value,
       interest: document.getElementById("interest").value,
-      time:     document.getElementById("time").value
+      time: document.getElementById("time").value
     };
 
     //post the data to backend api as JSON, then handle the response
@@ -486,6 +572,15 @@ if (isIndexPage) {
       .then(function (res) { return res.json(); }) //parse the response as JSON
       .then(function (data) {
         setLoadingState(false);
+
+          var generalErr = document.getElementById("form-error-general");
+
+          if (generalErr) {
+            generalErr.textContent =
+              "Something went wrong. Please try again.";
+          }
+        });
+    });
         if (data.error) {
           var generalErr = document.getElementById("form-error-general");
           if (generalErr) generalErr.textContent = data.error;
@@ -506,6 +601,9 @@ if (isIndexPage) {
   function setLoadingState(isLoading) {
     // Disable the button so the user can't accidentally submit twice
     submitBtn.disabled = isLoading;
+    submitBtn.setAttribute("aria-busy", isLoading);
+    btnLabel.style.display = isLoading ? "none" : "inline";
+    btnLoading.style.display = isLoading ? "inline-flex" : "none";
     btnLabel.style.display = isLoading ? "none" : "inline";
     btnLoading.style.display = isLoading ? "inline" : "none";
 
@@ -536,6 +634,12 @@ if (isIndexPage) {
     // Clear out any cards from a previous search before showing new ones
     resultsGrid.innerHTML = "";
 
+    if (!projects || projects.length === 0) {
+      resultsGrid.style.display     = "none";
+      resultsEmptyEl.style.display  = "block";
+      resultsGrid.style.display = "none";
+      resultsEmptyEl.style.display = "block";
+      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
     if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
       resultsGrid.style.display      = "none";
       resultsEmptyEl.style.display   = "block";
@@ -680,7 +784,12 @@ if (isDetailPage) {
           return;
         }
         if (codePanelFilename) codePanelFilename.textContent = data.filename;
-        if (codeContentEl) codeContentEl.textContent = data.code;
+        if (codeContentEl) {
+          codeContentEl.textContent = "";
+          renderCodeWithLineNumbers(data.code).forEach(function (row) {
+            codeContentEl.appendChild(row);
+          });
+        }
         // Mark as fetched so we don't hit the API again on the next open
         codeFetched = true;
       })
@@ -719,11 +828,11 @@ if (isDetailPage) {
     // Swap icons on the button(copy and checkmark icons)
     var copyIcon  = btnCopyCode.querySelector(".copy-icon");
     var checkIcon = btnCopyCode.querySelector(".check-icon");
-    var btnLabel  = btnCopyCode.querySelector(".copy-btn-label");
+    var btnLabel = btnCopyCode.querySelector(".copy-btn-label");
 
-    if (copyIcon)  copyIcon.style.display  = "none";
+    if (copyIcon) copyIcon.style.display = "none";
     if (checkIcon) checkIcon.style.display = "inline";
-    if (btnLabel)  btnLabel.textContent    = "Copied!";
+    if (btnLabel) btnLabel.textContent = "Copied!";
     btnCopyCode.classList.add("copied");
     // Disable button so user can't spam click it while toast is showing
     btnCopyCode.disabled = true;
@@ -737,9 +846,9 @@ if (isDetailPage) {
     // Clear any previous timeout first so timers don't stack up
     clearTimeout(toastTimeout);
     toastTimeout = setTimeout(function () {
-      if (copyIcon)  copyIcon.style.display  = "inline";
+      if (copyIcon) copyIcon.style.display = "inline";
       if (checkIcon) checkIcon.style.display = "none";
-      if (btnLabel)  btnLabel.textContent    = "Copy Code";
+      if (btnLabel) btnLabel.textContent = "Copy Code";
       btnCopyCode.classList.remove("copied");
       btnCopyCode.disabled = false;
       if (copyToast) copyToast.classList.remove("show");
@@ -748,7 +857,11 @@ if (isDetailPage) {
 
   if (btnCopyCode) {
     btnCopyCode.addEventListener("click", function () {
-      var code = codeContentEl ? codeContentEl.textContent : "";
+      var code = codeContentEl
+        ? Array.from(codeContentEl.querySelectorAll(".line-content"))
+          .map(function (el) { return el.textContent; })
+          .join("\n")
+        : "";
       // Don't copy if the code hasn't loaded yet — just ignore the click
       if (!code || code === "Loading..." || code === "Loading starter code...") return;
 
@@ -850,17 +963,17 @@ var scrollTopBtn = document.getElementById('scroll-top-btn');
 
 /* Add or remove the .visible class based on scroll position */
 function handleScroll() {
-    if (!scrollTopBtn) return;
-    if (window.pageYOffset > SCROLL_THRESHOLD) {
-        scrollTopBtn.classList.add('visible');
-    } else {
-        scrollTopBtn.classList.remove('visible');
-    }
+  if (!scrollTopBtn) return;
+  if (window.pageYOffset > SCROLL_THRESHOLD) {
+    scrollTopBtn.classList.add('visible');
+  } else {
+    scrollTopBtn.classList.remove('visible');
+  }
 }
 
 /* Smooth-scroll to the very top of the page */
 function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 /* Only wire up listeners if the button exists on this page */
