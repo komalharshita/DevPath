@@ -1,12 +1,58 @@
 // script.js — DevPath client-side logic
 //
 // Responsibilities:
+//   - Dark mode toggle
 //   - Mobile navigation toggle
 //   - Skill chip manager (add/remove skills)
 //   - Form validation with per-field error messages
 //   - Recommendation API call and loading states
 //   - Result card rendering
 //   - Code viewer panel (detail page)
+
+// ============================================================
+// Dark Mode
+// ============================================================
+(function initTheme() {
+  var toggle = document.getElementById("theme-toggle");
+  var html = document.documentElement;
+  var sunIcon = toggle && toggle.querySelector(".theme-toggle-sun");
+  var moonIcon = toggle && toggle.querySelector(".theme-toggle-moon");
+
+  function getPreferredTheme() {
+    var saved = localStorage.getItem("theme");
+    if (saved) return saved;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+
+  function setTheme(theme) {
+    html.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+    if (toggle && sunIcon && moonIcon) {
+      if (theme === "dark") {
+        sunIcon.style.display = "none";
+        moonIcon.style.display = "inline";
+      } else {
+        sunIcon.style.display = "inline";
+        moonIcon.style.display = "none";
+      }
+    }
+  }
+
+  if (toggle) {
+    toggle.addEventListener("click", function () {
+      var current = html.getAttribute("data-theme") || "light";
+      setTheme(current === "dark" ? "light" : "dark");
+    });
+  }
+
+  setTheme(getPreferredTheme());
+
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function (e) {
+    if (!localStorage.getItem("theme")) {
+      setTheme(e.matches ? "dark" : "light");
+    }
+  });
+})();
 
 // ============================================================
 // Detect which page we are on
