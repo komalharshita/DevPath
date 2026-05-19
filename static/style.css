@@ -294,6 +294,24 @@ ul, ol { list-style: none; }
   transition: color var(--t);
 }
 
+.nav-link-login {
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 8px 16px;
+  border-radius: 10px;
+}
+
+.nav-link-signup {
+  background: linear-gradient(135deg, #7c3aed, #2563eb);
+  color: white !important;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.nav-link-signup:hover {
+  transform: translateY(-1px);
+}
+
 /* Animated underline for mobile links */
 .nav-mobile-link::after {
   content: '';
@@ -1968,4 +1986,92 @@ select:focus {
 
 #scroll-top-btn.visible {
     display: flex;
+}
+input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  transition: 0.2s ease;
+  background: var(--white);
+}
+
+input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+/*Google Login*/
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  width: 100%;
+  padding: 12px;
+
+  margin-top: 10px;
+
+  border: 1px solid #ddd;
+  border-radius: 10px;
+
+  text-decoration: none;
+  font-weight: 600;
+  color: #333;
+  background: #fff;
+
+  transition: 0.2s ease;
+}
+
+.google-btn:hover {
+  background: #f5f5f5;
+  transform: translateY(-1px);
+}
+/*Flash Messages*/
+.flash-container{
+  width: min(900px, 92%);
+  margin: 100px auto 20px auto;
+  position: relative;
+  z-index: 999;
+}
+
+.flash-message{
+  padding: 16px 20px;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.5;
+  animation: fadeSlide 0.3s ease;
+  transition: all 0.3s ease;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.flash-success{
+  background: rgba(34,197,94,0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34,197,94,0.35);
+}
+
+.flash-error{
+  background: rgba(239,68,68,0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239,68,68,0.35);
+}
+
+@keyframes fadeSlide{
+  from{
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to{
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

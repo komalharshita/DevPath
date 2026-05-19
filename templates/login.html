@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — DevPath</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">Dev<span class="nav-logo-accent">Path</span></a>
+      <div class="nav-links">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/signup" class="nav-link">Signup</a>
+      </div>
+    </div>
+  </nav>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+  <section class="form-section">
+    <div class="container">
+      <div class="section-eyebrow">Welcome Back</div>
+      <h2 class="section-title">
+        Login To Your Account
+      </h2>
+      <p class="section-sub">
+        Continue building projects and tracking your progress.
+      </p>
+      <div class="form-card-outer">
+        <div class="form-card">
+          <form method="POST">
+            <div class="form-group">
+              <label>Email</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input
+                type="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+            {% if error %}
+            <p class="form-error-general">
+              {{ error }}
+            </p>
+            {% endif %}
+            <button type="submit" class="btn-submit">
+              Login
+            </button>
+          </form>
+          <div style="text-align:center; margin: 18px 0; color:#aaa; font-weight:500;">
+              OR
+          </div>
+          <!-- Google Login Button -->
+            <a href="/login/google" class="google-btn">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg"
+                 alt="Google" 
+                 width="20" 
+                 height="20"
+            />
+                 Continue with Google
+            </a>
+          <p style="margin-top:20px;text-align:center;">
+            Don't have an account?
+            <a href="/signup">Create one</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
