@@ -466,8 +466,16 @@
           <div class="form-error-msg" id="time-error"></div>
         </div>
 
-        <!-- General error (shown above the button) -->
-        <p class="form-error-general" id="form-error-general"></p>
+            <!-- General error (shown above the button) -->
+            <div aria-live="polite" aria-atomic="true">
+              <p class="form-error-general" id="form-error-general"></p>
+              <div id="results-loading" style="display:none;">
+                <div class="loading-box">
+                  <div class="loading-dots"><span></span><span></span><span></span></div>
+                  <p>Finding the best projects for you...</p>
+                </div>
+              </div>
+            </div>
 
         <!-- Submit button -->
         <button type="submit" class="btn-submit" id="submit-btn">
@@ -491,10 +499,12 @@
       <p class="section-sub" id="results-subtitle">Based on your inputs, here are your top matches.</p>
 
       <!-- Loading state -->
-      <div id="results-loading" style="display:none;">
-        <div class="loading-box">
-          <div class="loading-dots"><span></span><span></span><span></span></div>
-          <p>Finding the best projects for you...</p>
+      <div aria-live="polite" aria-atomic="true">
+        <div id="results-loading" style="display:none;">
+          <div class="loading-box">
+            <div class="loading-dots"><span></span><span></span><span></span></div>
+            <p>Finding the best projects for you...</p>
+          </div>
         </div>
       </div>
 
