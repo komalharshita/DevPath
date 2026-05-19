@@ -362,7 +362,7 @@
               <div class="skill-input-wrap" id="skill-input-wrap">
                 <div class="skill-chips-selected" id="skill-chips-selected"></div>
                 <input type="text" id="skills-input" placeholder="Type a skill and press Enter..." autocomplete="off" />
-                <input
+                <input 
                   type="text"
                   id="skills-input"
                   placeholder="Type a skill and press Enter..."
@@ -370,8 +370,12 @@
                   aria-haspopup="listbox"
                   aria-expanded="false"
                   aria-controls="skills-suggestions"
-                />
+                    maxlength="500"
+                /> 
                 <div id="skills-suggestions" class="skills-suggestions"></div>
+                <div class="char-counter">
+  <span id="skillsCount">0</span>/500 characters
+</div>
               </div>
               <!-- Hidden field holds the final comma-separated value -->
               <input type="hidden" id="skills" name="skills" />

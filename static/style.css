@@ -1170,6 +1170,12 @@ select:focus {
   color: var(--gray-400);
   margin-top: 5px;
 }
+.char-counter {
+  text-align: right;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--gray-500);
+}
 .form-error-msg {
   font-size: 0.81rem;
   color: var(--red-500);
