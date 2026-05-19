@@ -4,9 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Page title uses the project title injected by Flask's Jinja2 template engine -->
-  <title>{{ project.title }} — DevPath</title>
+  
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
-
+  <title>{{ project.title }} — {{ project.level }}{% if project.skills %} {{ project.skills[0] }}{% endif %} Project | DevPath</title>
+  
   <meta property="og:title" content="{{ project.title }} — DevPath" />
   <meta property="og:description" content="{{ project.description[:155] }}" />
   <meta property="og:type" content="article" />

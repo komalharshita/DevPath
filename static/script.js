@@ -507,6 +507,75 @@ if (isIndexPage) {
         })
         .catch(function (err) {
           setLoadingState(false);
+    if (!validateForm()) return; //stop - anything missing/invalid
+
+    setLoadingState(true);
+
+    // Allow browser to paint spinner before request starts
+    requestAnimationFrame(function () {
+
+      var payload = {
+        skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
+        level: document.getElementById("level").value,
+        interest: document.getElementById("interest").value,
+        time: document.getElementById("time").value
+      };
+
+      fetch("/api/recommend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+        .then(function (res) {
+          return res.json();
+        })
+        .then(function (data) {
+
+          setLoadingState(false);
+
+          if (data.error) {
+            var generalErr = document.getElementById("form-error-general");
+
+            if (generalErr) {
+              generalErr.textContent = data.error;
+            }
+
+            return;
+          }
+
+          renderResults(data.projects || [], data.message);
+        })
+        .catch(function () {
+
+          setLoadingState(false);
+    //combine form values into an object to send to server/api
+    var payload = {
+      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
+      skills:   skillsHidden.value.trim() || skillsTextInput.value.trim(),
+      level:    document.getElementById("level").value,
+      interest: document.getElementById("interest").value,
+      time:     document.getElementById("time").value
+    };
+
+    //post the data to backend api as JSON, then handle the response
+    fetch("/api/recommend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify(payload) //convert object to json string
+    })
+      .then(function (res) { return res.json(); }) //parse the response as JSON
+      .then(function (data) {
+        setLoadingState(false);
+
+          var generalErr = document.getElementById("form-error-general");
+
+          if (generalErr) {
+            generalErr.textContent =
+              "Something went wrong. Please try again.";
+          }
+        });
+    });
+        if (data.error) {
           var generalErr = document.getElementById("form-error-general");
           if (generalErr) generalErr.textContent = "Something went wrong. Please try again.";
           console.error("API request failed:", err);
@@ -553,6 +622,9 @@ if (isIndexPage) {
   function setLoadingState(isLoading) {
     // Disable the button so the user can't accidentally submit twice
     submitBtn.disabled = isLoading;
+    submitBtn.setAttribute("aria-busy", isLoading);
+    btnLabel.style.display = isLoading ? "none" : "inline";
+    btnLoading.style.display = isLoading ? "inline-flex" : "none";
     btnLabel.style.display = isLoading ? "none" : "inline";
     btnLoading.style.display = isLoading ? "inline" : "none";
 
@@ -603,6 +675,12 @@ if (isIndexPage) {
       }
     }
 
+    if (!projects || projects.length === 0) {
+      resultsGrid.style.display     = "none";
+      resultsEmptyEl.style.display  = "block";
+      resultsGrid.style.display = "none";
+      resultsEmptyEl.style.display = "block";
+      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
     if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
       resultsGrid.style.display      = "none";
       resultsEmptyEl.style.display   = "block";

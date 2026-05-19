@@ -2095,6 +2095,79 @@ select:focus {
   }
 }
 
+
+.btn-submit:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+  transform: none;
+}
+ 
+
+.btn-loading-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+ 
+
+.loading-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+ 
+
+.loading-box {
+  animation: fadeInUp 0.35s ease;
+}
+
+.loading-dots span {
+  animation: pulse 1.2s infinite ease-in-out;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+ 
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+ 
+
+@keyframes pulse {
+  0%, 80%, 100% {
+    transform: scale(0.7);
+    opacity: 0.5;
+  }
+
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+ 
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 .tooltip {
   display: inline-flex;
   align-items: center;
@@ -2373,4 +2446,15 @@ select:focus {
 .project-tag--hours {
   background: #f0fdf4 !important;
   color: #16a34a !important;
+.noscript-warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
+  border-bottom: 2px solid #ffc107;
+  padding: 1rem 1.5rem;
+  margin-top: 64px;   /* pushes below the fixed 64px navbar */
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 500;
+  width: 100%;
 }
