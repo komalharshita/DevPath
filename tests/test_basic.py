@@ -300,9 +300,14 @@ def client():
     with app.test_client() as client:
         yield client
 
-def test_health_check(client):
-    response = client.get('/health')
+def test_health_check():
+    client = get_client()
+    response = client.get("/health")
     assert response.status_code == 200
+    data = response.get_json()
+    assert "status" in data
+    assert "version" in data
+    assert data["status"] == "ok"
 # ============================================================
 # Run tests directly (no pytest required)
 # ============================================================
