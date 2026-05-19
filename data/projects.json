@@ -277,9 +277,6 @@
     "prerequisite_skills": ["Basic Python Syntax", "String operations"],
     "views": 150,
     "recommendations": 35
-  }
-]
-    "starter_code": "starter_code/password_checker.py"
   },
   {
     "id": 9,
@@ -305,7 +302,11 @@
     "resources": [
       "MDN HTML Forms: https://developer.mozilla.org/en-US/docs/Learn/Forms"
     ],
-    "starter_code": "starter_code/survey_form/index.html"
+    "starter_code": "starter_code/survey_form/index.html",
+    "estimated_hours": 3,
+    "prerequisite_skills": ["HTML Basics"],
+    "views": 110,
+    "recommendations": 25
   }
 ]
 
