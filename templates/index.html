@@ -177,50 +177,54 @@
 <div class="skill-strip">
   <div class="skill-strip-inner">
     <span class="skill-strip-label">Supports skills including:</span>
-    <div class="skill-strip-items">
-      <span class="ss-item">Python</span>
-      <span class="ss-sep"></span>
+    <div class="skill-strip-marquee" aria-label="Supported skills">
+      <div class="skill-strip-track">
+        <div class="skill-strip-items">
+          <span class="ss-item">Python</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">JavaScript</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">JavaScript</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">HTML / CSS</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">HTML / CSS</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">Flask</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">Flask</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">SQL</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">SQL</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">React</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">React</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">Node.js</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">Node.js</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">pandas</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">pandas</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">C++</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">C++</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">Java</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">Java</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">TypeScript</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">TypeScript</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">Go</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">Go</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">Rust</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">Rust</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">C#</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">C#</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">Kotlin</span>
+          <span class="ss-item">Kotlin</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -324,16 +328,24 @@
       <div class="form-card-outer">
         <div class="form-card" id="form-section">
           <form id="recommend-form" novalidate>
-
-            <!-- Skills input with chip selector -->
             <div class="form-group">
-              <label for="skills-input">
-                Your Skills
-                <span class="tooltip"
-                  title="Add technologies, programming languages, or tools you know like Python, React, Git, SQL, etc.">
-                  ⓘ
-                </span>
-              </label>
+              <div class="form-label-row" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
+                <label for="skills-input">
+                  Your Skills
+                  <span class="tooltip"
+                    title="Add technologies, programming languages, or tools you know like Python, React, Git, SQL, etc.">
+                    ⓘ
+                  </span>
+                </label>
+                
+                <!-- Inline GitHub Trigger -->
+                <div class="github-inline-trigger" id="github-trigger-wrap" style="line-height: 1.2;">
+                  <button type="button" id="btn-show-github" class="resource-link" style="padding: 4px 8px; border-radius: var(--r-xs); font-size: 0.75rem; gap: 6px;">
+                    <svg style="width:14px; fill:currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    <span>Import from GitHub</span>
+                  </button>
+                </div>
+              </div>
               <div class="skill-input-wrap" id="skill-input-wrap">
                 <div class="skill-chips-selected" id="skill-chips-selected"></div>
                 <input type="text" id="skills-input" placeholder="Type a skill and press Enter..." autocomplete="off" />
@@ -585,7 +597,34 @@
     </div>
   </footer>
 
-  <script src="/static/data/skills.js"></script>
+  <!-- GitHub Modal Overlay -->
+  <div class="code-panel-overlay" id="github-modal-overlay" style="align-items: center; justify-content: center; opacity: 1;">
+    <div class="sidebar-card" style="width: 100%; max-width: 400px; margin: 20px; z-index: 400; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
+      
+      <div class="sidebar-card-title">
+        <svg style="width:18px; fill:var(--indigo-600)" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        Sync with GitHub
+      </div>
+      
+      <p class="sidebar-card-desc" style="margin-bottom: 20px;">Enter your username to import coding languages from your top repositories into the skills list.<br/> Note: We use stars to determine top repositories</p>
+      
+      <div class="form-group" style="margin-bottom: 20px;">
+        <div class="skill-input-wrap">
+          <span style="color:var(--gray-400); font-family:var(--font-mono); font-size:0.8rem; margin-left:8px;">@</span>
+          <input type="text" id="github-username" placeholder="username" style="border:none; outline:none; flex:1; padding:10px;">
+        </div>
+        <div class="form-error-msg" id="github-modal-error"></div>
+      </div>
+      
+      <div style="display: flex; gap: 12px;">
+        <button type="button" id="btn-fetch-github" class="btn-primary" style="flex: 2; padding: 10px; font-size: 0.85rem;">Fetch Skills</button>
+        <button type="button" id="btn-close-github" class="btn-view-code-sm" style="flex: 1; border-color: var(--border); color: var(--text-body);">Cancel</button>
+      </div>
+      
+    </div>
+  </div>
+
+    <script src="/static/data/skills.js"></script>
   <script src="/static/script.js"></script>
 </body>
 

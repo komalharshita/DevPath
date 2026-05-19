@@ -6,6 +6,15 @@
   <!-- Page title uses the project title injected by Flask's Jinja2 template engine -->
   <title>{{ project.title }} — DevPath</title>
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+
+  <meta property="og:title" content="{{ project.title }} — DevPath" />
+  <meta property="og:description" content="{{ project.description[:155] }}" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://mydevpath-github.vercel.app/project/{{ project.id }}" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="{{ project.title }} — DevPath" />
+  <meta name="twitter:description" content="{{ project.description[:155] }}" />
   <link rel="stylesheet" href="/static/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 </head>
