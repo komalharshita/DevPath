@@ -231,7 +231,10 @@ def test_recommend_api_missing_field():
         "time": "Low"
     })
     assert response.status_code in (400, 415)
-    assert "error" in response.get_json()
+    data = response.get_json()
+    assert "errors" in data
+    assert isinstance(data["errors"], list)
+    assert len(data["errors"]) > 0
 
 
 def test_recommend_api_empty_body():

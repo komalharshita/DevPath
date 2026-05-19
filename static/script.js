@@ -437,9 +437,10 @@ if (isIndexPage) {
       .then(function (res) { return res.json(); })
       .then(function (data) {
         setLoadingState(false);
-        if (data.error) {
+        if (data.errors && data.errors.length) {
+          // Show all validation errors joined so the user can fix every field at once
           var generalErr = document.getElementById("form-error-general");
-          if (generalErr) generalErr.textContent = data.error;
+          if (generalErr) generalErr.textContent = data.errors.join(" | ");
           return;
         }
         renderResults(data.projects || [], data.message);
