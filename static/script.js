@@ -882,3 +882,57 @@ if (themeToggle) {
         }
     });
 }
+// 1. Open Github Input Modal
+openModalBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    modal.classList.add('active');
+    githubInput.focus();
+});
+
+// 2. Close Github Input Modal
+const closeGithubModal = () => {
+    modal.classList.remove('active');
+    githubInput.value = '';
+    errorMsg.textContent = '';
+};
+
+closeModalBtn.addEventListener('click', closeGithubModal);
+
+// Close on clicking outside the card
+modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeGithubModal();
+});
+
+// 3. Fetch Skills Logic
+fetchBtn.addEventListener('click', async () => {
+    const username = githubInput.value.trim();
+    if (!username) return;
+
+    fetchBtn.disabled = true;
+    fetchBtn.textContent = 'Syncing...';
+
+    try {
+        const response = await fetch(`https://api.github.com/users/${username}/repos`);
+        if (!response.ok) throw new Error();
+        
+        const repos = await response.json();
+        const langs = [...new Set(repos.map(r => r.language).filter(Boolean))];
+
+        if (langs.length > 0) {
+            langs.forEach(lang => {
+                if (typeof addSkill === 'function') addSkill(lang);
+            });
+            closeGithubModal();
+            // Optional: Show your existing copy-toast with a custom message
+            // showToast("Skills imported successfully!"); 
+        } else {
+            errorMsg.textContent = "No public languages found.";
+        }
+    } catch (err) {
+        errorMsg.textContent = err;
+    } finally {
+        fetchBtn.disabled = false;
+        fetchBtn.textContent = 'Fetch Skills';
+    }
+});
+    
