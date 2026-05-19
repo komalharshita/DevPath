@@ -29,7 +29,15 @@
         <a href="#find-project" class="nav-link">Find Project</a>
         <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-btn-outline">GitHub</a>
       </div>
+      <button id="theme-toggle" class="theme-toggle">
+        🌙
+      </button>
       <!-- Mobile hamburger toggle -->
+      <button id="theme-toggle" class="theme-toggle">
+        
+      </button>
+      
+      
       <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation">
         <span></span><span></span><span></span>
       </button>
@@ -394,6 +402,7 @@
         <div class="form-card" id="form-section">
           <form id="recommend-form" novalidate>
             <div class="form-group">
+<<<<<<< Updated upstream
               <div class="form-label-row" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
                 <label for="skills-input">
                   Your Skills
@@ -402,6 +411,19 @@
                     ⓘ
                   </span>
                 </label>
+=======
+<<<<<<< HEAD
+              <label for="skills-input">
+                Your Skills
+                <span class="tooltip"
+                  title="Add technologies, programming languages, or tools you know like Python, React, Git, SQL, etc.">
+                  ⓘ
+                </span>
+              </label>
+=======
+              <div class="form-label-row" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
+                <label for="skills-input" style="margin-bottom: 0;">Your Skills</label>
+>>>>>>> Stashed changes
                 
                 <!-- Inline GitHub Trigger -->
                 <div class="github-inline-trigger" id="github-trigger-wrap" style="line-height: 1.2;">
@@ -411,6 +433,10 @@
                   </button>
                 </div>
               </div>
+<<<<<<< Updated upstream
+=======
+>>>>>>> 03b5373 (feat: Implemented - Autofill skills using github)
+>>>>>>> Stashed changes
               <div class="skill-input-wrap" id="skill-input-wrap">
                 <div class="skill-chips-selected" id="skill-chips-selected"></div>
                 
@@ -429,9 +455,14 @@
               </div>
               <!-- Hidden field holds the final comma-separated value -->
               <input type="hidden" id="skills" name="skills" />
+<<<<<<< HEAD
               <span class="form-hint">
                 Add one or more skills you are comfortable with. Example: Python, React, SQL, Git.
               </span>
+=======
+
+              <span class="form-hint" style="padding-left:6px;"> Or click a popular skill below to add it</span>
+>>>>>>> 03b5373 (feat: Implemented - Autofill skills using github)
               <div class="form-error-msg" id="skills-error"></div>
             </div>
 
