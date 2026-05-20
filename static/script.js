@@ -12,7 +12,7 @@
 // Detect which page we are on
 // ============================================================
 // !! trick turns the DOM result into a simple true/false
-var isIndexPage  = !!document.getElementById("recommend-form");
+var isIndexPage = !!document.getElementById("recommend-form");
 // PROJECT_ID is set by the server only on detail pages, so if it's missing we're elsewhere
 var isDetailPage = typeof PROJECT_ID !== "undefined";
 var modal = document.getElementById('github-modal-overlay');
@@ -74,6 +74,39 @@ if (isIndexPage) {
 
   // Tracks currently selected skills to prevent duplicates
   var selectedSkills = [];
+  // Clear Filters Button Functionality
+var clearFiltersBtn = document.getElementById("clear-filters-btn");
+if (clearFiltersBtn) {
+    clearFiltersBtn.addEventListener("click", function() {
+        var recommendForm = document.getElementById("recommend-form");
+        if (recommendForm) {
+            // 1. Reset standard form dropdowns and fields
+            recommendForm.reset();
+            
+            // 2. Clear out the internal JavaScript array tracker completely
+            selectedSkills = [];
+            
+            // 3. Clear the hidden inputs and visual chips using the file's own variables
+            if (skillsHidden) skillsHidden.value = "";
+            if (chipsSelectedEl) chipsSelectedEl.innerHTML = "";
+            if (skillsTextInput) {
+                skillsTextInput.value = "";
+                skillsTextInput.focus(); // Place cursor back on input
+            }
+            
+            // 4. Hide autocomplete suggestions if any are open
+            var suggestionsBox = document.getElementById("skills-suggestions");
+            if (suggestionsBox) suggestionsBox.innerHTML = "";
+
+            // 5. Reset quick-pick chip visual active states if they have any
+            if (quickPickChips) {
+                quickPickChips.forEach(function(chip) {
+                    chip.classList.remove("active", "selected");
+                });
+            }
+        }
+    });
+}
 
 
   // ----------------------------------------------------------
@@ -92,7 +125,7 @@ if (isIndexPage) {
       "C#", "Ruby", "PHP", "Go", "Swift", "TypeScript", "Angular", "Vue.js",
       "Spring", "Flutter", "TensorFlow", "PyTorch", "Data Science",
       "Machine Learning", "Artificial Intelligence", "DevOps", "Cybersecurity",
-      "Blockchain", "UI/UX Design", "Game Development", "CI/CD", "REST API", "GraphQL", 
+      "Blockchain", "UI/UX Design", "Game Development", "CI/CD", "REST API", "GraphQL",
       "Rust", "Kotlin"
     ];
   }
@@ -101,6 +134,20 @@ if (isIndexPage) {
   var skillWrap = document.getElementById("skill-input-wrap");
   var visibleSuggestions = [];
   var activeSuggestionIndex = -1;
+
+  function initSkillStripMarquee() {
+    var marquee = document.querySelector(".skill-strip-marquee");
+    var track = marquee && marquee.querySelector(".skill-strip-track");
+
+    if (!marquee || !track || track.querySelector(".skill-strip-items[data-marquee-clone='true']")) {
+      return;
+    }
+
+    var clone = track.querySelector(".skill-strip-items").cloneNode(true);
+    clone.setAttribute("aria-hidden", "true");
+    clone.setAttribute("data-marquee-clone", "true");
+    track.appendChild(clone);
+  }
 
   availableSkills = availableSkills.filter(function (skill, index, list) {
     return typeof skill === "string" && skill.trim() &&
@@ -112,6 +159,8 @@ if (isIndexPage) {
   if (suggestionsDiv) {
     suggestionsDiv.setAttribute("role", "listbox");
   }
+
+  initSkillStripMarquee();
 
   function normalizeSkill(skill) {
     return skill.trim().toLowerCase();
@@ -442,13 +491,50 @@ if (isIndexPage) {
 
     setLoadingState(true);
 
+    // Allow browser to paint spinner before request starts
+    requestAnimationFrame(function () {
+
+      var payload = {
+        skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
+        level: document.getElementById("level").value,
+        interest: document.getElementById("interest").value,
+        time: document.getElementById("time").value
+      };
+
+      fetch("/api/recommend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+        .then(function (res) {
+          return res.json();
+        })
+        .then(function (data) {
+
+          setLoadingState(false);
+
+          if (data.error) {
+            var generalErr = document.getElementById("form-error-general");
+
+            if (generalErr) {
+              generalErr.textContent = data.error;
+            }
+
+            return;
+          }
+
+          renderResults(data.projects || [], data.message);
+        })
+        .catch(function () {
+
+          setLoadingState(false);
     //combine form values into an object to send to server/api
     var payload = {
       // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills:   skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level:    document.getElementById("level").value,
+      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
+      level: document.getElementById("level").value,
       interest: document.getElementById("interest").value,
-      time:     document.getElementById("time").value
+      time: document.getElementById("time").value
     };
 
     //post the data to backend api as JSON, then handle the response
@@ -460,6 +546,15 @@ if (isIndexPage) {
       .then(function (res) { return res.json(); }) //parse the response as JSON
       .then(function (data) {
         setLoadingState(false);
+
+          var generalErr = document.getElementById("form-error-general");
+
+          if (generalErr) {
+            generalErr.textContent =
+              "Something went wrong. Please try again.";
+          }
+        });
+    });
         if (data.error) {
           var generalErr = document.getElementById("form-error-general");
           if (generalErr) generalErr.textContent = data.error;
@@ -480,6 +575,9 @@ if (isIndexPage) {
   function setLoadingState(isLoading) {
     // Disable the button so the user can't accidentally submit twice
     submitBtn.disabled = isLoading;
+    submitBtn.setAttribute("aria-busy", isLoading);
+    btnLabel.style.display = isLoading ? "none" : "inline";
+    btnLoading.style.display = isLoading ? "inline-flex" : "none";
     btnLabel.style.display = isLoading ? "none" : "inline";
     btnLoading.style.display = isLoading ? "inline" : "none";
 
@@ -512,6 +610,13 @@ if (isIndexPage) {
     // Store current projects for reference
     currentProjects = projects || [];
 
+    if (!projects || projects.length === 0) {
+      resultsGrid.style.display     = "none";
+      resultsEmptyEl.style.display  = "block";
+      resultsGrid.style.display = "none";
+      resultsEmptyEl.style.display = "block";
+      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
+    if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
     if (!projects || projects.length === 0) {
       resultsGrid.style.display      = "none";
       resultsEmptyEl.style.display   = "block";
@@ -724,7 +829,12 @@ if (isDetailPage) {
           return;
         }
         if (codePanelFilename) codePanelFilename.textContent = data.filename;
-        if (codeContentEl) codeContentEl.textContent = data.code;
+        if (codeContentEl) {
+          codeContentEl.textContent = "";
+          renderCodeWithLineNumbers(data.code).forEach(function (row) {
+            codeContentEl.appendChild(row);
+          });
+        }
         // Mark as fetched so we don't hit the API again on the next open
         codeFetched = true;
       })
@@ -749,4 +859,170 @@ if (isDetailPage) {
     if (evt.key === "Escape") closeCodePanel(); //esc key to close
   });
 
+  // ----------------------------------------------------------
+  // Copy Code button
+  // ----------------------------------------------------------
+  var btnCopyCode  = document.getElementById("btn-copy-code");
+  var copyToast    = document.getElementById("copy-toast"); //popup msg when copied 
+  var toastTimeout = null; 
+
+  //shows the "copied to clipboard" state on the button and the toast message, then resets after a short delay
+  function showCopySuccess() {
+    if (!btnCopyCode) return;
+
+    // Swap icons on the button(copy and checkmark icons)
+    var copyIcon  = btnCopyCode.querySelector(".copy-icon");
+    var checkIcon = btnCopyCode.querySelector(".check-icon");
+    var btnLabel = btnCopyCode.querySelector(".copy-btn-label");
+
+    if (copyIcon) copyIcon.style.display = "none";
+    if (checkIcon) checkIcon.style.display = "inline";
+    if (btnLabel) btnLabel.textContent = "Copied!";
+    btnCopyCode.classList.add("copied");
+    // Disable button so user can't spam click it while toast is showing
+    btnCopyCode.disabled = true;
+
+    // Show toast
+    if (copyToast) {
+      copyToast.classList.add("show");
+    }
+
+    // Auto-reset after 2.5 s
+    // Clear any previous timeout first so timers don't stack up
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(function () {
+      if (copyIcon) copyIcon.style.display = "inline";
+      if (checkIcon) checkIcon.style.display = "none";
+      if (btnLabel) btnLabel.textContent = "Copy Code";
+      btnCopyCode.classList.remove("copied");
+      btnCopyCode.disabled = false;
+      if (copyToast) copyToast.classList.remove("show");
+    }, 2500);
+  }
+
+  if (btnCopyCode) {
+    btnCopyCode.addEventListener("click", function () {
+      var code = codeContentEl
+        ? Array.from(codeContentEl.querySelectorAll(".line-content"))
+          .map(function (el) { return el.textContent; })
+          .join("\n")
+        : "";
+      // Don't copy if the code hasn't loaded yet — just ignore the click
+      if (!code || code === "Loading..." || code === "Loading starter code...") return;
+
+      // Use Clipboard API with textarea fallback
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(showCopySuccess).catch(function () {
+          fallbackCopy(code); // clipboard api failed, try the old way
+        });
+      } else {
+        fallbackCopy(code); // Clipboard API not supported, use fallback method
+      }
+    });
+  }
+
+  // Fallback method to copy text using a hidden textarea and execCommand (for older browsers)
+  function fallbackCopy(text) {
+    // Some older browsers don't support navigator.clipboard, so we use a hidden textarea instead
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    // Push it off-screen so it's not visible but can still be selected
+    ta.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    // execCommand is old and deprecated but works as a last resort — fail silently if it doesn't
+    try { document.execCommand("copy"); showCopySuccess(); } catch (e) { /* silent fail */ }
+    document.body.removeChild(ta);
+  }
 } // end isDetailPage
+
+if (
+    openModalBtn &&
+    closeModalBtn &&
+    modal &&
+    githubInput &&
+    fetchBtn &&
+    errorMsg
+) {
+// 1. Open Github Input Modal
+  openModalBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      modal.classList.add('active');
+      githubInput.focus();
+  });
+
+  // 2. Close Github Input Modal
+  const closeGithubModal = () => {
+      modal.classList.remove('active');
+      githubInput.value = '';
+      errorMsg.textContent = '';
+  };
+
+  closeModalBtn.addEventListener('click', closeGithubModal);
+
+  // Close on clicking outside the card
+  modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeGithubModal();
+  });
+
+  // 3. Fetch Skills Logic
+  fetchBtn.addEventListener('click', async () => {
+      const username = githubInput.value.trim();
+      if (!username) return;
+
+      fetchBtn.disabled = true;
+      fetchBtn.textContent = 'Syncing...';
+
+      try {
+          const response = await fetch(`https://api.github.com/users/${username}/repos`);
+          if (!response.ok) throw new Error();
+          
+          const repos = await response.json();
+          const langs = [...new Set(repos.map(r => r.language).filter(Boolean))];
+
+          if (langs.length > 0) {
+              langs.forEach(lang => {
+                  if (typeof addSkill === 'function') addSkill(lang);
+              });
+              closeGithubModal();
+          } else {
+              errorMsg.textContent = "No public languages found.";
+          }
+      } catch (err) {
+          errorMsg.textContent = err.message ?? "Failed to fetch skills";
+      } finally {
+          fetchBtn.disabled = false;
+          fetchBtn.textContent = 'Fetch Skills';
+      }
+  });
+}
+
+/* ---- Scroll-to-top button ---- */
+
+/* Show the button only when the user has scrolled more than 300px */
+var SCROLL_THRESHOLD = 300;
+
+/* Get the button element; guard against pages that do not have it */
+var scrollTopBtn = document.getElementById('scroll-top-btn');
+
+/* Add or remove the .visible class based on scroll position */
+function handleScroll() {
+  if (!scrollTopBtn) return;
+  if (window.pageYOffset > SCROLL_THRESHOLD) {
+    scrollTopBtn.classList.add('visible');
+  } else {
+    scrollTopBtn.classList.remove('visible');
+  }
+}
+
+/* Smooth-scroll to the very top of the page */
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* Only wire up listeners if the button exists on this page */
+if (scrollTopBtn) {
+    window.addEventListener('scroll', handleScroll);
+    scrollTopBtn.addEventListener('click', scrollToTop);
+}
