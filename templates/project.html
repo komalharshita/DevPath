@@ -7,16 +7,16 @@
   <!-- Page title uses the project title injected by Flask's Jinja2 template engine -->
   
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
-  <title>{{ project.title }} — {{ project.level }}{% if project.skills %} {{ project.skills[0] }}{% endif %} Project | DevPath</title>
+  <title>{{ project.title|e }} — {{ project.level|e }}{% if project.skills %} {{ project.skills[0]|e }}{% endif %} Project | DevPath</title>
   
-  <meta property="og:title" content="{{ project.title }} — DevPath" />
-  <meta property="og:description" content="{{ project.description[:155] }}" />
+  <meta property="og:title" content="{{ project.title[:100]|e }} — DevPath" />
+  <meta property="og:description" content="{{ project.description[:155]|e }}" />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://mydevpath-github.vercel.app/project/{{ project.id }}" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="{{ project.title }} — DevPath" />
-  <meta name="twitter:description" content="{{ project.description[:155] }}" />
+  <meta name="twitter:title" content="{{ project.title[:100]|e }} — DevPath" />
+  <meta name="twitter:description" content="{{ project.description[:155]|e }}" />
   <link rel="stylesheet" href="/static/style.css" />
   <link
     href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
@@ -44,25 +44,25 @@
   <div class="detail-hero">
     <div class="container">
       <!-- Breadcrumb trail -->
-      <nav class="breadcrumb" aria-label="breadcrumb">
+        <nav class="breadcrumb" aria-label="breadcrumb">
         <a href="/">Home</a>
         <span class="breadcrumb-sep">&#8250;</span>
-        <span>{{ project.title }}</span>
+        <span>{{ project.title|e }}</span>
       </nav>
 
       <div class="detail-hero-content">
         <div class="detail-hero-left">
-          <h1 class="detail-title">{{ project.title }}</h1>
+          <h1 class="detail-title">{{ project.title|e }}</h1>
           <!-- Difficulty, interest, and skill badges -->
           <div class="badge-group">
-            <span class="badge badge--{{ project.level | lower }}">{{ project.level }}</span>
-            <span class="badge badge--{{ project.interest | lower }}">{{ project.interest }}</span>
+            <span class="badge badge--{{ project.level | lower | replace(' ', '-') }}">{{ project.level|e }}</span>
+            <span class="badge badge--{{ project.interest | lower | replace(' ', '-') }}">{{ project.interest|e }}</span>
             {% for skill in project.skills %}
-            <span class="badge badge--{{ skill | lower }}">{{ skill }}</span>
+            <span class="badge badge--{{ skill | lower | replace(' ', '-') }}">{{ skill|e }}</span>
             {% endfor %}
-            <span class="badge badge--time">{{ project.time }} effort</span>
+            <span class="badge badge--time">{{ project.time|e }} effort</span>
           </div>
-          <p class="detail-description">{{ project.description }}</p>
+            <p class="detail-description">{{ project.description|e }}</p>
         </div>
 
         <!-- Quick-action buttons in the hero -->
@@ -121,7 +121,7 @@
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                 </span>
-                {{ feature }}
+                {{ feature|e }}
               </li>
               {% endfor %}
             </ul>
@@ -152,7 +152,7 @@
                   <!-- Step number badge derived from loop index -->
                   <span class="roadmap-step-num">Step {{ loop.index }}</span>
                   <!-- Strip the "Step N:" prefix if present in the data -->
-                  <p class="roadmap-step-text">{{ step | replace("Step " + loop.index|string + ": ", "") }}</p>
+                  <p class="roadmap-step-text">{{ (step | replace("Step " + loop.index|string + ": ", ""))|e }}</p>
                 </div>
               </li>
               {% endfor %}
@@ -179,7 +179,7 @@
                 {% set parts = resource.split(": http") %}
                 {% if parts|length > 1 %}
                 <a href="http{{ parts[1] }}" target="_blank" rel="noopener noreferrer" class="resource-link">
-                  <span>{{ parts[0] }}</span>
+                  <span>{{ parts[0]|e }}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                     stroke-linecap="round" stroke-linejoin="round">
                     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
@@ -188,7 +188,7 @@
                   </svg>
                 </a>
                 {% else %}
-                <span class="resource-plain">{{ resource }}</span>
+                <span class="resource-plain">{{ resource|e }}</span>
                 {% endif %}
               </li>
               {% endfor %}
@@ -213,7 +213,7 @@
             </h3>
             <div class="tech-tags">
               {% for tech in project.tech_stack %}
-              <span class="tech-tag">{{ tech }}</span>
+              <span class="tech-tag">{{ tech|e }}</span>
               {% endfor %}
             </div>
           </div>
@@ -337,8 +337,8 @@
   <button id="scroll-top-btn" aria-label="Back to top" title="Back to top">↑</button>
 
   <!-- Pass project ID to the JavaScript without hardcoding -->
-  <script>
-    var PROJECT_ID = parseInt("{{ project.id }}", 10);
+    <script>
+    var PROJECT_ID = {{ project.id|tojson }};
   </script>
   <script src="/static/script.js"></script>
 </body>
