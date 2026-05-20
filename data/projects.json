@@ -247,6 +247,383 @@
       "OWASP password guidelines: https://owasp.org"
     ],
     "starter_code": "starter_code/password_checker.py"
+  },
+  {
+    "id": 9,
+    "title": "CLI Task Automation Tool",
+    "skills": ["Go"],
+    "level": "Intermediate",
+    "interest": "Automation",
+    "time": "Medium",
+    "description": "A command-line tool built in Go that automates repetitive file and folder management tasks. Great for learning Go's standard library, file I/O, and CLI argument parsing.",
+    "features": [
+      "Organize files into folders by extension",
+      "Batch rename files using patterns",
+      "Delete empty folders automatically",
+      "Log all operations to a text file"
+    ],
+    "tech_stack": ["Go", "os package", "filepath package", "flag package"],
+    "roadmap": [
+      "Step 1: Set up Go module and main.go entry point",
+      "Step 2: Parse CLI arguments using the flag package",
+      "Step 3: Write a function to scan a directory",
+      "Step 4: Implement file grouping by extension",
+      "Step 5: Write the batch rename logic",
+      "Step 6: Add empty folder cleanup function",
+      "Step 7: Implement operation logging to a file",
+      "Step 8: Test with sample directories"
+    ],
+    "resources": [
+      "Go official docs: https://go.dev/doc",
+      "Go file I/O tutorial: https://gobyexample.com/reading-files",
+      "Go CLI args: https://gobyexample.com/command-line-flags"
+    ],
+    "starter_code": "starter_code/todo_cli.go"
+  },
+  {
+    "id": 10,
+    "title": "Student Quiz App",
+    "skills": ["Kotlin"],
+    "level": "Beginner",
+    "interest": "Education Tools",
+    "time": "Medium",
+    "description": "A console-based quiz application built in Kotlin that loads questions, tracks scores, and shows a final result. Perfect for learning Kotlin syntax, data classes, and control flow.",
+    "features": [
+      "Load questions from a JSON file",
+      "Multiple choice question format",
+      "Track score throughout the quiz",
+      "Show final score and correct answers"
+    ],
+    "tech_stack": ["Kotlin", "JSON parsing", "File I/O"],
+    "roadmap": [
+      "Step 1: Set up Kotlin project with main.kt",
+      "Step 2: Define a Question data class",
+      "Step 3: Load questions from a JSON file",
+      "Step 4: Display questions one by one in console",
+      "Step 5: Accept and validate user answers",
+      "Step 6: Track score with a counter variable",
+      "Step 7: Display final results with correct answers"
+    ],
+    "resources": [
+      "Kotlin official docs: https://kotlinlang.org/docs/home.html",
+      "Kotlin data classes: https://kotlinlang.org/docs/data-classes.html",
+      "Kotlin by example: https://play.kotlinlang.org/byExample"
+    ],
+    "starter_code": "starter_code/quiz_app.kt"
+  },
+  {
+    "id": 11,
+    "title": "Number Guessing Game",
+    "skills": ["Rust"],
+    "level": "Beginner",
+    "interest": "Games",
+    "time": "Low",
+    "description": "A classic number guessing game built in Rust. The program picks a random number and the user guesses until they get it right. Perfect for learning Rust ownership, input handling, and control flow.",
+    "features": [
+      "Generate a random number in a range",
+      "Accept user guesses from terminal",
+      "Give higher or lower hints",
+      "Track number of attempts taken"
+    ],
+    "tech_stack": ["Rust", "rand crate", "std::io"],
+    "roadmap": [
+      "Step 1: Set up Rust project with cargo new",
+      "Step 2: Add rand crate to Cargo.toml",
+      "Step 3: Generate a random number using rand",
+      "Step 4: Read user input from stdin",
+      "Step 5: Parse input string to integer",
+      "Step 6: Compare guess with target and give hints",
+      "Step 7: Loop until correct guess and show attempts"
+    ],
+    "resources": [
+      "Rust official book: https://doc.rust-lang.org/book",
+      "Rust by example: https://doc.rust-lang.org/rust-by-example",
+      "rand crate docs: https://docs.rs/rand/latest/rand"
+    ],
+    "starter_code": "starter_code/guessing_game.rs"
+  },
+  {
+    "id": 12,
+    "title": "Student Grade Calculator",
+    "skills": ["Java"],
+    "level": "Beginner",
+    "interest": "Education Tools",
+    "time": "Low",
+    "description": "A Java console app that takes student marks as input, calculates averages, and assigns letter grades. Great for learning Java basics like classes, loops, arrays, and methods.",
+    "features": [
+      "Input marks for multiple subjects",
+      "Calculate average score",
+      "Assign letter grade automatically",
+      "Display full result summary"
+    ],
+    "tech_stack": ["Java", "Scanner class", "Arrays"],
+    "roadmap": [
+      "Step 1: Create a Student class with name and marks fields",
+      "Step 2: Write a method to calculate average",
+      "Step 3: Write a method to assign letter grade",
+      "Step 4: Use Scanner to take input from user",
+      "Step 5: Store multiple subject marks in an array",
+      "Step 6: Display the final result summary"
+    ],
+    "resources": [
+      "Java official docs: https://docs.oracle.com/en/java",
+      "W3Schools Java: https://www.w3schools.com/java",
+      "Java Scanner tutorial: https://www.javatpoint.com/Scanner-class"
+    ],
+    "starter_code": "starter_code/grade_calculator.java"
+  },
+  {
+    "id": 13,
+    "title": "Personal Finance Dashboard",
+    "skills": ["TypeScript", "JavaScript", "HTML", "CSS"],
+    "level": "Intermediate",
+    "interest": "Web Development",
+    "time": "High",
+    "description": "A web-based personal finance tracker built with TypeScript. Users can add income and expenses, view summaries, and see charts. Teaches TypeScript types, interfaces, and DOM manipulation.",
+    "features": [
+      "Add income and expense entries",
+      "Categorize transactions",
+      "Display balance summary",
+      "Show spending breakdown chart"
+    ],
+    "tech_stack": ["TypeScript", "HTML", "CSS", "Chart.js"],
+    "roadmap": [
+      "Step 1: Set up TypeScript project with tsconfig.json",
+      "Step 2: Define Transaction interface with type, amount, category",
+      "Step 3: Write functions to add and delete transactions",
+      "Step 4: Calculate and display total balance",
+      "Step 5: Build the HTML form for adding entries",
+      "Step 6: Render transactions as a list in the DOM",
+      "Step 7: Add Chart.js pie chart for spending breakdown",
+      "Step 8: Add localStorage to persist data"
+    ],
+    "resources": [
+      "TypeScript docs: https://www.typescriptlang.org/docs",
+      "TypeScript handbook: https://www.typescriptlang.org/docs/handbook/intro.html",
+      "Chart.js docs: https://www.chartjs.org/docs/latest"
+    ],
+    "starter_code": "starter_code/finance_dashboard.ts"
+  },
+  {
+    "id": 14,
+    "title": "File Compression Tool",
+    "skills": ["C++"],
+    "level": "Intermediate",
+    "interest": "Automation",
+    "time": "High",
+    "description": "A command-line file compression tool built in C++ that implements basic run-length encoding. Great for learning C++ file streams, string manipulation, and algorithm implementation.",
+    "features": [
+      "Compress a text file using run-length encoding",
+      "Decompress back to original file",
+      "Show compression ratio achieved",
+      "Handle edge cases like empty files"
+    ],
+    "tech_stack": ["C++", "fstream", "string", "iostream"],
+    "roadmap": [
+      "Step 1: Set up C++ project with main.cpp",
+      "Step 2: Write a file reader using fstream",
+      "Step 3: Implement run-length encoding algorithm",
+      "Step 4: Write compressed output to a new file",
+      "Step 5: Implement the decompression function",
+      "Step 6: Calculate and display compression ratio",
+      "Step 7: Handle edge cases and test with sample files"
+    ],
+    "resources": [
+      "C++ file streams: https://cplusplus.com/doc/tutorial/files",
+      "C++ reference: https://en.cppreference.com",
+      "Run-length encoding explained: https://en.wikipedia.org/wiki/Run-length_encoding"
+    ],
+    "starter_code": "starter_code/file_compression.cpp"
+  }
+,{
+    "id": 15,
+    "title": "Personal Blog REST API",
+    "skills": ["Go"],
+    "level": "Beginner",
+    "interest": "Web Development",
+    "time": "Medium",
+    "description": "A simple REST API built in Go that handles blog posts. Users can create, read, update, and delete blog posts. Perfect for learning Go's net/http package, JSON encoding, and basic routing.",
+    "features": [
+      "Create and delete blog posts",
+      "List all posts or get a single post",
+      "Store posts in memory as a map",
+      "Return JSON responses for all endpoints"
+    ],
+    "tech_stack": ["Go", "net/http package", "encoding/json package"],
+    "roadmap": [
+      "Step 1: Set up Go module and create main.go",
+      "Step 2: Define a BlogPost struct with id, title, and content",
+      "Step 3: Create an in-memory map to store posts",
+      "Step 4: Write a handler for GET /posts to list all posts",
+      "Step 5: Write a handler for POST /posts to create a post",
+      "Step 6: Write a handler for DELETE /posts/{id}",
+      "Step 7: Return proper JSON responses with status codes",
+      "Step 8: Test all endpoints using curl or Postman"
+    ],
+    "resources": [
+      "Go net/http docs: https://pkg.go.dev/net/http",
+      "Go JSON encoding: https://gobyexample.com/json",
+      "Go official tour: https://go.dev/tour/welcome/1"
+    ],
+    "starter_code": "starter_code/blog_api.go"
+  },
+  {
+    "id": 16,
+    "title": "File Organizer Automation",
+    "skills": ["Kotlin"],
+    "level": "Intermediate",
+    "interest": "Automation",
+    "time": "Medium",
+    "description": "A Kotlin command-line tool that automatically organizes files in a folder by type, date, or size. Great for learning Kotlin file handling, extension functions, and collections.",
+    "features": [
+      "Scan a folder and list all files",
+      "Group files by extension into subfolders",
+      "Move files automatically to correct folders",
+      "Generate a summary report of what was moved"
+    ],
+    "tech_stack": ["Kotlin", "java.io.File", "kotlin.collections"],
+    "roadmap": [
+      "Step 1: Set up Kotlin project with main.kt",
+      "Step 2: Write a function to scan and list all files in a folder",
+      "Step 3: Group files by their extension using groupBy()",
+      "Step 4: Create subfolders for each file type",
+      "Step 5: Move files into correct subfolders",
+      "Step 6: Count moved files per category",
+      "Step 7: Print a summary report to the console"
+    ],
+    "resources": [
+      "Kotlin file I/O: https://kotlinlang.org/docs/java-interop.html",
+      "Kotlin collections: https://kotlinlang.org/docs/collections-overview.html",
+      "Kotlin standard library: https://kotlinlang.org/api/latest/jvm/stdlib"
+    ],
+    "starter_code": "starter_code/file_organizer.kt"
+  },
+  {
+    "id": 17,
+    "title": "CSV Data Analyzer",
+    "skills": ["Rust"],
+    "level": "Intermediate",
+    "interest": "Data and Analytics",
+    "time": "High",
+    "description": "A command-line tool in Rust that reads a CSV file and generates basic statistics like min, max, mean, and count per column. Great for learning Rust file I/O, error handling, and the csv crate.",
+    "features": [
+      "Read and parse a CSV file",
+      "Calculate min, max, and mean per numeric column",
+      "Count total rows and missing values",
+      "Display a formatted summary table in terminal"
+    ],
+    "tech_stack": ["Rust", "csv crate", "std::fs", "std::io"],
+    "roadmap": [
+      "Step 1: Set up Rust project with cargo new",
+      "Step 2: Add csv and serde crates to Cargo.toml",
+      "Step 3: Write a CSV reader using the csv crate",
+      "Step 4: Parse each row into a vector of strings",
+      "Step 5: Detect numeric columns and parse values",
+      "Step 6: Calculate min, max, and mean for each column",
+      "Step 7: Count missing or empty values per column",
+      "Step 8: Display results as a formatted table"
+    ],
+    "resources": [
+      "Rust csv crate: https://docs.rs/csv/latest/csv",
+      "Rust error handling: https://doc.rust-lang.org/book/ch09-00-error-handling.html",
+      "Rust by example: https://doc.rust-lang.org/rust-by-example"
+    ],
+    "starter_code": "starter_code/csv_analyzer.rs"
+  },
+  {
+    "id": 18,
+    "title": "Student Registration System",
+    "skills": ["Java"],
+    "level": "Intermediate",
+    "interest": "Web Development",
+    "time": "High",
+    "description": "A Java web application using Spring Boot that allows students to register, view, and delete their profiles. Great for learning Spring Boot basics, REST APIs, and Java annotations.",
+    "features": [
+      "Register a new student with name and email",
+      "List all registered students",
+      "Delete a student by ID",
+      "Validate input fields before saving"
+    ],
+    "tech_stack": ["Java", "Spring Boot", "REST API", "Maven"],
+    "roadmap": [
+      "Step 1: Create a Spring Boot project using Spring Initializr",
+      "Step 2: Define a Student class with id, name, and email fields",
+      "Step 3: Create a StudentController with REST endpoints",
+      "Step 4: Implement GET /students to list all students",
+      "Step 5: Implement POST /students to register a new student",
+      "Step 6: Implement DELETE /students/{id} to remove a student",
+      "Step 7: Add basic input validation using annotations",
+      "Step 8: Test endpoints using Postman"
+    ],
+    "resources": [
+      "Spring Boot docs: https://spring.io/projects/spring-boot",
+      "Spring Initializr: https://start.spring.io",
+      "Java REST API tutorial: https://www.baeldung.com/rest-with-spring-series"
+    ],
+    "starter_code": "starter_code/student_registration.java"
+  },
+  {
+    "id": 19,
+    "title": "Memory Card Game",
+    "skills": ["TypeScript"],
+    "level": "Beginner",
+    "interest": "Games",
+    "time": "Medium",
+    "description": "A browser-based memory card matching game built with TypeScript. Players flip cards to find matching pairs. Great for learning TypeScript basics, DOM manipulation, and game logic.",
+    "features": [
+      "Display a grid of face-down cards",
+      "Flip two cards on click and check for a match",
+      "Track number of attempts",
+      "Show a win message when all pairs are found"
+    ],
+    "tech_stack": ["TypeScript", "HTML", "CSS", "DOM API"],
+    "roadmap": [
+      "Step 1: Set up TypeScript project with tsconfig.json",
+      "Step 2: Define a Card interface with id, value, and isFlipped",
+      "Step 3: Create and shuffle the card array",
+      "Step 4: Render cards as a grid in the DOM",
+      "Step 5: Handle card click events and flip logic",
+      "Step 6: Compare two flipped cards for a match",
+      "Step 7: Track attempts counter and update display",
+      "Step 8: Detect win condition and show message"
+    ],
+    "resources": [
+      "TypeScript handbook: https://www.typescriptlang.org/docs/handbook/intro.html",
+      "TypeScript DOM manipulation: https://www.typescriptlang.org/docs/handbook/dom-manipulation.html",
+      "TypeScript playground: https://www.typescriptlang.org/play"
+    ],
+    "starter_code": "starter_code/memory_game.ts"
+  },
+  {
+    "id": 20,
+    "title": "Simple Calculator",
+    "skills": ["C++"],
+    "level": "Beginner",
+    "interest": "Games",
+    "time": "Low",
+    "description": "A console-based calculator in C++ that performs basic arithmetic operations. Perfect for absolute beginners learning C++ syntax, functions, switch statements, and user input handling.",
+    "features": [
+      "Add, subtract, multiply, and divide two numbers",
+      "Handle division by zero gracefully",
+      "Loop to allow multiple calculations",
+      "Display clear results with proper formatting"
+    ],
+    "tech_stack": ["C++", "iostream", "cmath"],
+    "roadmap": [
+      "Step 1: Create main.cpp and set up basic structure",
+      "Step 2: Write individual functions for each operation",
+      "Step 3: Display a menu for operation selection",
+      "Step 4: Accept two numbers as user input",
+      "Step 5: Use a switch statement to call the right function",
+      "Step 6: Handle division by zero with an if check",
+      "Step 7: Wrap everything in a loop for repeated use"
+    ],
+    "resources": [
+      "C++ basics: https://cplusplus.com/doc/tutorial/basics",
+      "C++ functions: https://cplusplus.com/doc/tutorial/functions",
+      "C++ reference: https://en.cppreference.com"
+    ],
+    "starter_code": "starter_code/simple_calculator.cpp"
   }
 ]
 

@@ -65,18 +65,24 @@ def score_single_project(
       - Interest match:       +2
       - Time match:           +1
 
-    Returns an integer score (0 means no match at all).
+    Returns a tuple (total_score, skill_score).
+    skill_score is returned separately so the caller can
+    reject projects with zero skill overlap entirely.
     """
     score = 0
 
     # Compare user's skills against the project's required skills
     project_skills = [s.lower() for s in project.get("skills", [])]
+
     # Count how many user skills overlap with the
     # skills required by the current project.
     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
+
+    # Calculate skill score separately so we can check it later
+    skill_score = matched_skills * SCORING_WEIGHTS["skill"]
+
     # Add weighted points based on the number of matching skills.
-    # More overlapping skills result in a higher recommendation score.
-    score += matched_skills * SCORING_WEIGHTS["skill"]
+    score += skill_score
 
     # Award points for each additional matching criterion
     if project.get("level", "").lower() == level.lower():
@@ -88,6 +94,7 @@ def score_single_project(
     if project.get("time", "").lower() == time_availability.lower():
         score += SCORING_WEIGHTS["time"]
 
+    # Return both total score and skill score as a tuple
     return score
 
 
@@ -98,7 +105,9 @@ def get_recommendations(skills_string, level, interest, time_availability):
     Steps:
       1. Parse the raw skills input into a list.
       2. Score every project in the dataset.
-      3. Drop projects with a score of zero (no overlap at all).
+      3. Drop projects with zero skill overlap — even if level
+         or interest matches, a project with no skill match
+         is not relevant to the user.
       4. Sort by score descending.
       5. Return the top MAX_RESULTS projects.
     """
@@ -108,13 +117,19 @@ def get_recommendations(skills_string, level, interest, time_availability):
     scored_projects = []
 
     for project in all_projects:
-        score = score_single_project(
-            project, user_skills, level, interest, time_availability
-        )
-        # Ignore projects with a score of 0 since they
-        # have no meaningful overlap with the user's inputs.
-        if score > 0:
-            scored_projects.append({"project": project, "score": score})
+        score = score_single_project(project, user_skills, level, interest, time_availability)
+
+        # Calculate skill score separately to check for zero skill overlap.
+        # Projects with no skill match are rejected even if level or
+        # interest matches, since they are not relevant to the user.
+        project_skills = [s.lower() for s in project.get("skills", [])]
+        skill_score = sum(1 for skill in user_skills if skill in project_skills) * SCORING_WEIGHTS["skill"]
+
+        if skill_score == 0:
+            continue
+
+
+        scored_projects.append({"project": project, "score": score})
 
     # Sort projects in descending order so the
     # most relevant recommendations appear first.

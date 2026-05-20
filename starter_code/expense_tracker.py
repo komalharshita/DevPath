@@ -1,4 +1,4 @@
-Project:    Personal Expense Tracker
+""" Project:    Personal Expense Tracker
 Difficulty: Beginner
 Skills:     Python, CSV module, datetime module
 Time:       Low (a few hours)
