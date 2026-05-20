@@ -207,6 +207,87 @@ if (isIndexPage) {
     });
   }
 
+  // Function to track skill selection on the server
+  function trackSkillOnServer(skillLabel) {
+    fetch("/api/track-skill", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ skill: skillLabel })
+    })
+    .catch(function (error) {
+      console.warn("Failed to track skill on server:", error);
+      // Silently fail - don't break user experience if tracking fails
+    });
+  }
+
+  // Function to get the top 5 skills from the server
+  function loadTopSkillsFromServer(callback) {
+    fetch("/api/top-skills")
+      .then(function (response) {
+        if (!response.ok) throw new Error("Failed to fetch top skills");
+        return response.json();
+      })
+      .then(function (data) {
+        callback(data.skills || []);
+      })
+      .catch(function (error) {
+        console.warn("Failed to load top skills from server:", error);
+        // Fall back to default skills if server request fails
+        callback([]);
+      });
+  }
+
+  // Function to render the top 5 skills dynamically using server data
+  function renderDynamicTopSkills() {
+    var chipsContainer = document.getElementById("skill-chips-available");
+    if (!chipsContainer) return;
+
+    loadTopSkillsFromServer(function (topSkills) {
+      chipsContainer.innerHTML = "";
+
+      // If there are no top skills from server, show a default set of popular skills
+      if (topSkills.length === 0) {
+        topSkills = [
+          { label: "Python" },
+          { label: "JavaScript" },
+          { label: "HTML" },
+          { label: "CSS" },
+          { label: "React" }
+        ];
+      }
+
+      topSkills.forEach(function (skill) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "skill-chip";
+        btn.setAttribute("data-skill", skill.label);
+        btn.textContent = skill.label;
+
+        btn.addEventListener("click", function () {
+          var skillLabel = btn.getAttribute("data-skill");
+          var isAlreadySelected = selectedSkills.some(function (s) {
+            return s.toLowerCase() === skillLabel.toLowerCase();
+          });
+
+          if (isAlreadySelected) {
+            removeSkill(skillLabel);
+          } else {
+            addSkill(skillLabel);
+          }
+          hideSuggestions();
+          skillsTextInput.value = "";
+        });
+
+        chipsContainer.appendChild(btn);
+      });
+
+      updateQuickPickState();
+    });
+  }
+
+
   // Add skill on Enter key in the text input
   skillsTextInput.addEventListener("keydown", function (evt) {
     if (evt.key === "ArrowDown" || evt.key === "ArrowUp") {
@@ -245,23 +326,9 @@ if (isIndexPage) {
     }
   });
 
-  // Add/toggle skill on quick-pick chip click
-  quickPickChips.forEach(function (chip) {
-    chip.addEventListener("click", function () {
-      var skill = chip.getAttribute("data-skill");
-      var isAlreadySelected = selectedSkills.some(function (s) {
-        return s.toLowerCase() === skill.toLowerCase();
-      });
+  // Dynamic skill chips are now rendered by renderDynamicTopSkills()
+  // Event listeners for chips are added in renderDynamicTopSkills()
 
-      if (isAlreadySelected) {
-        removeSkill(skill);
-      } else {
-        addSkill(skill);
-      }
-      hideSuggestions();
-      skillsTextInput.value = "";
-    });
-  });
 
   // Show suggestions on input
   skillsTextInput.addEventListener("input", function (evt) {
@@ -307,8 +374,13 @@ if (isIndexPage) {
     if (isSkillSelected(skill)) return;
 
     selectedSkills.push(skill);
+    
+    // Track the skill selection on the server
+    trackSkillOnServer(skill);
+    
     renderSelectedChips();
     syncSkillsHiddenInput();
+    renderDynamicTopSkills();
     updateQuickPickState();
     // Once a skill is added, remove the "please add a skill" error if it was showing
     clearFieldError("skills-error");
@@ -321,6 +393,7 @@ if (isIndexPage) {
     });
     renderSelectedChips();
     syncSkillsHiddenInput();
+    renderDynamicTopSkills();
     updateQuickPickState();
   }
 
@@ -355,7 +428,8 @@ if (isIndexPage) {
     skillsHidden.value = selectedSkills.join(", ");
   }
 
-  updateQuickPickState();
+  // Initialize the dynamic top skills rendering
+  renderDynamicTopSkills();
 
 
   // ----------------------------------------------------------
