@@ -206,6 +206,22 @@ def test_home_route():
     response = client.get("/")
     assert response.status_code == 200
 
+def test_security_headers_present():
+    """Security headers should be included in all responses."""
+    client = get_client()
+    response = client.get("/")
+
+    assert response.headers["X-Frame-Options"] == "DENY"
+    assert response.headers["X-Content-Type-Options"] == "nosniff"
+    assert (
+        response.headers["Referrer-Policy"]
+        == "strict-origin-when-cross-origin"
+    )
+    assert (
+        response.headers["Permissions-Policy"]
+        == "geolocation=(), microphone=(), camera=()"
+    )
+
 
 def test_recommend_api_valid():
     client = get_client()
