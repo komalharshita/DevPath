@@ -12,7 +12,6 @@
 
 import sys
 import os
-
 # Allow imports from the project root when running tests directly
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -297,7 +296,19 @@ def test_scoring_weights_has_all_keys():
     expected_keys = {"skill", "level", "interest", "time"}
     assert set(SCORING_WEIGHTS.keys()) == expected_keys
 
+def client():
+    app.config["TESTING"] = True
+    with app.test_client() as client:
+        yield client
 
+def test_health_check():
+    client = get_client()
+    response = client.get("/health")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "status" in data
+    assert "version" in data
+    assert data["status"] == "ok"
 # ============================================================
 # Run tests directly (no pytest required)
 # ============================================================
