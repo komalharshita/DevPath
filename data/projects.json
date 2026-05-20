@@ -273,7 +273,289 @@
       "MDN HTML Forms: https://developer.mozilla.org/en-US/docs/Learn/Forms"
     ],
     "starter_code": "starter_code/survey_form/index.html"
-  }
+  },
+  {
+  "id": 10,
+  "title": "AI Powered Interview Platform",
+  "skills": ["JavaScript", "HTML", "CSS"],
+  "level": "Advanced",
+  "interest": "Web",
+  "time": "High",
+  "description": "A mock interview platform with webcam recording, speech analysis, timer-based coding rounds, and AI-generated interview feedback. Focuses on browser APIs and advanced frontend workflows.",
+  "features": [
+    "Webcam and microphone recording",
+    "AI-based speech feedback analysis",
+    "Coding interview timer",
+    "Performance analytics dashboard"
+  ],
+  "tech_stack": ["HTML", "CSS", "JavaScript", "WebRTC", "Chart.js"],
+  "roadmap": [
+    "Step 1: Build authentication and dashboard UI",
+    "Step 2: Integrate webcam and microphone using WebRTC",
+    "Step 3: Create coding challenge interface",
+    "Step 4: Implement timer and session controls",
+    "Step 5: Add analytics charts and feedback system",
+    "Step 6: Optimize media handling and storage",
+    "Step 7: Deploy and test across browsers"
+  ],
+  "resources": [
+    "WebRTC docs: https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API",
+    "Chart.js docs: https://www.chartjs.org/docs",
+    "MediaDevices API: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices"
+  ],
+  "starter_code": "starter_code/interview_platform.html"
+},
+{
+  "id": 11,
+  "title": "Multiplayer Browser Game Engine",
+  "skills": ["JavaScript", "HTML", "CSS"],
+  "level": "Advanced",
+  "interest": "Games",
+  "time": "High",
+  "description": "A realtime multiplayer browser game engine with player movement, collision detection, matchmaking, and leaderboard systems. Teaches advanced game loops and realtime synchronization.",
+  "features": [
+    "Realtime multiplayer gameplay",
+    "Physics and collision detection",
+    "Matchmaking rooms",
+    "Leaderboard and scoring system"
+  ],
+  "tech_stack": ["HTML", "CSS", "JavaScript", "Canvas API", "Socket.IO"],
+  "roadmap": [
+    "Step 1: Create the game rendering engine",
+    "Step 2: Add player movement and controls",
+    "Step 3: Implement collision detection logic",
+    "Step 4: Create websocket server for multiplayer",
+    "Step 5: Sync game states between players",
+    "Step 6: Add matchmaking and leaderboard system",
+    "Step 7: Optimize performance and FPS rendering"
+  ],
+  "resources": [
+    "Canvas Game Tutorial: https://developer.mozilla.org/en-US/docs/Games",
+    "Socket.IO multiplayer guide: https://socket.io",
+    "Game physics basics: https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection"
+  ],
+  "starter_code": "starter_code/multiplayer_game.html"
+},
+{
+  "id": 12,
+  "title": "Advanced E-Commerce Platform",
+  "skills": ["JavaScript", "HTML", "CSS"],
+  "level": "Advanced",
+  "interest": "Web",
+  "time": "High",
+  "description": "A fully featured e-commerce frontend with product filtering, payment integration, realtime inventory updates, and advanced animations. Focuses on scalable frontend architecture.",
+  "features": [
+    "Advanced product filtering and search",
+    "Shopping cart and checkout flow",
+    "Realtime inventory updates",
+    "Responsive admin dashboard"
+  ],
+  "tech_stack": ["HTML", "CSS", "JavaScript", "Stripe API", "Firebase"],
+  "roadmap": [
+    "Step 1: Design the storefront UI",
+    "Step 2: Build dynamic product listing system",
+    "Step 3: Implement cart and checkout flow",
+    "Step 4: Integrate Stripe payment gateway",
+    "Step 5: Add Firebase realtime database",
+    "Step 6: Build admin analytics dashboard",
+    "Step 7: Optimize responsiveness and loading speed"
+  ],
+  "resources": [
+    "Stripe docs: https://stripe.com/docs",
+    "Firebase docs: https://firebase.google.com/docs",
+    "MDN Web Performance: https://developer.mozilla.org/en-US/docs/Web/Performance"
+  ],
+  "starter_code": "starter_code/ecommerce_platform.html"
+},
+{
+  "id": 13,
+  "title": "Task Management Dashboard",
+  "skills": ["JavaScript", "HTML", "CSS"],
+  "level": "Intermediate",
+  "interest": "Web",
+  "time": "Medium",
+  "description": "A productivity dashboard that allows users to manage tasks, set deadlines, organize projects, and track progress visually. Focuses on dynamic UI interactions and local data management.",
+  "features": [
+    "Create, edit, and delete tasks",
+    "Drag-and-drop task organization",
+    "Progress tracking dashboard",
+    "Dark and light mode support"
+  ],
+  "tech_stack": ["HTML", "CSS", "JavaScript", "LocalStorage API"],
+  "roadmap": [
+    "Step 1: Build the dashboard layout",
+    "Step 2: Create task cards dynamically",
+    "Step 3: Implement task CRUD functionality",
+    "Step 4: Add drag-and-drop support",
+    "Step 5: Store tasks using LocalStorage",
+    "Step 6: Create progress analytics section",
+    "Step 7: Add responsive mobile design"
+  ],
+  "resources": [
+    "MDN LocalStorage: https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage",
+    "Drag and Drop API: https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API",
+    "CSS Grid guide: https://css-tricks.com/snippets/css/complete-guide-grid"
+  ],
+  "starter_code": "starter_code/task_dashboard.html"
+},
+{
+  "id": 14,
+  "title": "Realtime Chat Application",
+  "skills": ["JavaScript", "HTML", "CSS"],
+  "level": "Intermediate",
+  "interest": "Web",
+  "time": "Medium",
+  "description": "A browser-based chat application with realtime messaging, typing indicators, online user tracking, and responsive chat rooms. Teaches realtime frontend communication concepts.",
+  "features": [
+    "Realtime one-to-one messaging",
+    "Typing indicators",
+    "Online/offline user status",
+    "Responsive chat interface"
+  ],
+  "tech_stack": ["HTML", "CSS", "JavaScript", "Socket.IO"],
+  "roadmap": [
+    "Step 1: Build the chat UI layout",
+    "Step 2: Create message rendering components",
+    "Step 3: Set up Socket.IO communication",
+    "Step 4: Implement realtime message sync",
+    "Step 5: Add typing indicator logic",
+    "Step 6: Add responsive mobile layout",
+    "Step 7: Optimize performance and reconnection logic"
+  ],
+  "resources": [
+    "Socket.IO docs: https://socket.io/docs/v4",
+    "WebSocket guide: https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API",
+    "Responsive design basics: https://web.dev/responsive-web-design-basics"
+  ],
+  "starter_code": "starter_code/realtime_chat.html"
+},
+{
+  "id": 15,
+  "title": "Movie Recommendation Web App",
+  "skills": ["JavaScript", "HTML", "CSS"],
+  "level": "Intermediate",
+  "interest": "Web",
+  "time": "Medium",
+  "description": "A movie browsing and recommendation app that fetches movie data from an external API and displays trending films, ratings, and search results with an interactive UI.",
+  "features": [
+    "Search movies by title",
+    "Display trending and popular movies",
+    "Movie rating and details page",
+    "Save favorite movies locally"
+  ],
+  "tech_stack": ["HTML", "CSS", "JavaScript", "TMDB API"],
+  "roadmap": [
+    "Step 1: Design the movie listing interface",
+    "Step 2: Integrate the movie API",
+    "Step 3: Implement search functionality",
+    "Step 4: Create movie details modal",
+    "Step 5: Add favorites system with LocalStorage",
+    "Step 6: Implement pagination",
+    "Step 7: Optimize responsive design"
+  ],
+  "resources": [
+    "TMDB API docs: https://developer.themoviedb.org/docs",
+    "MDN Fetch API: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API",
+    "CSS animations guide: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Animations"
+  ],
+  "starter_code": "starter_code/movie_app.html"
+},
+{
+  "id": 16,
+  "title": "Full Stack Project Management Platform",
+  "skills": ["SQL", "Node.js", "TypeScript", "React"],
+  "level": "Intermediate",
+  "interest": "Web",
+  "time": "High",
+  "description": "A collaborative project management platform where teams can create projects, assign tasks, track progress, and communicate in realtime. Focuses on full stack architecture and scalable frontend development.",
+  "features": [
+    "User authentication and authorization",
+    "Project and task management",
+    "Realtime notifications",
+    "Analytics dashboard"
+  ],
+  "tech_stack": ["React", "TypeScript", "Node.js", "Express.js", "PostgreSQL"],
+  "roadmap": [
+    "Step 1: Set up React frontend with TypeScript",
+    "Step 2: Create Express backend and API routes",
+    "Step 3: Design PostgreSQL database schema",
+    "Step 4: Implement JWT authentication",
+    "Step 5: Build task CRUD functionality",
+    "Step 6: Add realtime notifications using Socket.IO",
+    "Step 7: Deploy frontend and backend"
+  ],
+  "resources": [
+    "React docs: https://react.dev",
+    "TypeScript docs: https://www.typescriptlang.org/docs",
+    "Node.js docs: https://nodejs.org/en/docs",
+    "PostgreSQL docs: https://www.postgresql.org/docs"
+  ],
+  "starter_code": "starter_code/project_management_platform.tsx"
+},
+{
+  "id": 17,
+  "title": "E-Commerce Admin Dashboard",
+  "skills": ["SQL", "Node.js", "TypeScript", "React"],
+  "level": "Intermediate",
+  "interest": "Web",
+  "time": "Medium",
+  "description": "An admin dashboard for managing products, orders, customers, and sales analytics in an e-commerce system. Focuses on API integration, database management, and responsive dashboard design.",
+  "features": [
+    "Product inventory management",
+    "Order tracking system",
+    "Sales analytics charts",
+    "Customer management panel"
+  ],
+  "tech_stack": ["React", "TypeScript", "Node.js", "MySQL", "Chart.js"],
+  "roadmap": [
+    "Step 1: Create responsive admin dashboard layout",
+    "Step 2: Design MySQL database schema",
+    "Step 3: Build REST APIs using Express",
+    "Step 4: Connect frontend with backend APIs",
+    "Step 5: Add analytics charts and reports",
+    "Step 6: Implement role-based authentication",
+    "Step 7: Optimize performance and API handling"
+  ],
+  "resources": [
+    "Express.js guide: https://expressjs.com",
+    "MySQL docs: https://dev.mysql.com/doc",
+    "Chart.js docs: https://www.chartjs.org/docs",
+    "React Router docs: https://reactrouter.com"
+  ],
+  "starter_code": "starter_code/ecommerce_dashboard.tsx"
+},
+{
+  "id": 18,
+  "title": "Realtime Collaboration Notes App",
+  "skills": ["SQL", "Node.js", "TypeScript", "React"],
+  "level": "Advanced",
+  "interest": "Web",
+  "time": "High",
+  "description": "A realtime collaborative notes application where multiple users can edit notes simultaneously with autosave, version history, and team collaboration features.",
+  "features": [
+    "Realtime collaborative editing",
+    "Autosave and version history",
+    "Team workspace management",
+    "Markdown support"
+  ],
+  "tech_stack": ["React", "TypeScript", "Node.js", "Socket.IO", "PostgreSQL"],
+  "roadmap": [
+    "Step 1: Set up React and TypeScript frontend",
+    "Step 2: Build Node.js backend APIs",
+    "Step 3: Design PostgreSQL schema for notes and users",
+    "Step 4: Implement authentication system",
+    "Step 5: Add realtime collaboration using Socket.IO",
+    "Step 6: Implement autosave and history tracking",
+    "Step 7: Deploy using Docker and cloud hosting"
+  ],
+  "resources": [
+    "Socket.IO docs: https://socket.io/docs/v4",
+    "PostgreSQL tutorial: https://www.postgresql.org/docs",
+    "React TypeScript cheatsheet: https://react-typescript-cheatsheet.netlify.app",
+    "Docker docs: https://docs.docker.com"
+  ],
+  "starter_code": "starter_code/collab_notes_app.tsx"
+}
 ]
 
 
