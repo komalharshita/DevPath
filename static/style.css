@@ -2846,3 +2846,42 @@ select:focus {
   white-space: pre;
   color: #e6edf3;
 }
+/* ---- Results Search Input --------------------------------- */
+.results-search-wrap {
+  max-width: 480px;
+  margin: 0 auto 32px auto;
+}
+
+.results-search-input {
+  width: 100%;
+  padding: 12px 18px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-full);
+  background: var(--white);
+  transition: border-color var(--t), box-shadow var(--t);
+}
+
+.results-search-input:focus {
+  outline: none;
+  border-color: var(--indigo-500);
+  box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.12);
+}
+
+.results-search-input::placeholder {
+  color: var(--gray-400);
+}
+
+/* ---- Accessibility ----------------------------------------- */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

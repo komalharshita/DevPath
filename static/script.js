@@ -613,11 +613,8 @@ if (clearFiltersBtn) {
       resultsEmptyEl.style.display  = "block";
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "block";
+      showSearchInput(false); // Hide search when no results
       if (message && emptyMessageEl) emptyMessageEl.textContent = message;
-    if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
-      resultsGrid.style.display      = "none";
-      resultsEmptyEl.style.display   = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message; //if api sent back a message (e.g. "no projects found matching your criteria"), show that 
       resultsSection.scrollIntoView({ behavior: "smooth" });
       return;
     }
@@ -629,6 +626,10 @@ if (clearFiltersBtn) {
     projects.forEach(function (project) {
       resultsGrid.appendChild(buildProjectCard(project));
     });
+
+    // Show search input and setup filter (only once)
+    showSearchInput(true);
+    if (!searchInput) setupFilter();
 
     resultsSection.scrollIntoView({ behavior: "smooth" });
   }
@@ -701,6 +702,62 @@ if (clearFiltersBtn) {
     if (!text) return "";
     // Only add "..." if the text is actually longer than the limit
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
+  }
+
+  // ----------------------------------------------------------
+  // Filter projects based on search input (title, description, AND skills)
+  // ----------------------------------------------------------
+  var searchInput = null;
+  var currentProjects = [];
+
+  function setupFilter() {
+    searchInput = document.getElementById("results-search");
+    if (!searchInput) return;
+    
+    searchInput.addEventListener("input", function (e) {
+      var searchTerm = e.target.value.trim().toLowerCase();
+      var cards = resultsGrid.querySelectorAll(".project-card");
+      
+      cards.forEach(function (card) {
+        // Get title and description
+        var title = card.querySelector(".project-card-title")?.textContent.toLowerCase() || "";
+        var desc = card.querySelector(".project-card-desc")?.textContent.toLowerCase() || "";
+        
+        // Get all skill/tag text from project-tag elements
+        var tags = card.querySelectorAll(".project-tag");
+        var tagTexts = "";
+        tags.forEach(function(tag) {
+          tagTexts += tag.textContent.toLowerCase() + " ";
+        });
+        
+        // Combine all searchable text
+        var searchableText = title + " " + desc + " " + tagTexts;
+        
+        // Check if search term matches ANY content
+        if (searchTerm === "" || searchableText.includes(searchTerm)) {
+          card.style.display = "";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    });
+  }
+
+  function showSearchInput(show) {
+    var wrap = document.getElementById("results-search-wrap");
+    if (wrap) {
+      wrap.style.display = show ? "block" : "none";
+      if (show && searchInput) {
+        searchInput.value = "";
+        // Reset any hidden cards when showing search
+        if (resultsGrid) {
+          var cards = resultsGrid.querySelectorAll(".project-card");
+          cards.forEach(function(card) {
+            card.style.display = "";
+          });
+        }
+      }
+    }
   }
 
 } // end isIndexPage
