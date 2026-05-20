@@ -62,10 +62,11 @@ such as Gunicorn behind a reverse proxy.
 
 ### Path traversal mitigation
 
-The `utils/file_server.py` module uses `os.path.basename()` to strip any
-directory components from starter code paths before resolving them. This
-prevents a crafted `starter_code` value in `projects.json` from reading
-arbitrary files.
+The `utils/file_server.py` module resolves `starter_code` paths only inside the
+`starter_code/` directory (including one level of subfolders such as
+`realtime_chat/app.py`). It rejects `..` segments and uses `os.path.commonpath`
+with the real resolved paths so a crafted `starter_code` value in
+`projects.json` cannot read arbitrary files outside that folder.
 
 ### No user input is stored
 

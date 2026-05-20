@@ -298,6 +298,31 @@ def test_scoring_weights_has_all_keys():
     assert set(SCORING_WEIGHTS.keys()) == expected_keys
 
 
+def test_view_code_nested_starter_realtime_chat():
+    """Nested starter_code paths (e.g. realtime_chat/app.py) must resolve for /code."""
+    client = get_client()
+    response = client.get("/project/8/code")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "code" in data and "filename" in data
+    assert "realtime_chat" in data["filename"] or data["filename"].endswith("app.py")
+    assert "Flask" in data["code"] or "flask" in data["code"].lower()
+
+
+def test_download_nested_starter_realtime_chat():
+    client = get_client()
+    response = client.get("/project/8/download")
+    assert response.status_code == 200
+
+
+def test_view_code_jwt_project():
+    client = get_client()
+    response = client.get("/project/9/code")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "jwt" in data["code"].lower() or "JWT" in data["code"]
+
+
 # ============================================================
 # Run tests directly (no pytest required)
 # ============================================================
