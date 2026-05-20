@@ -6,7 +6,7 @@
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
-from utils.data_loader import find_project_by_id, get_project_stats
+from utils.data_loader import find_project_by_id, get_project_stats, increment_skill_counter, get_top_skills
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
 
 # Create the Blueprint that app.py will register
@@ -59,6 +59,41 @@ def recommend():
         }), 200
 
     return jsonify({"projects": results}), 200
+
+
+@main.route("/api/top-skills", methods=["GET"])
+def top_skills():
+    """
+    Return the top 5 most-selected skills across the community.
+    Returns a JSON array of skill objects with 'label' and 'counter' properties.
+    """
+    top_5 = get_top_skills(5)
+    return jsonify({"skills": top_5}), 200
+
+
+@main.route("/api/track-skill", methods=["POST"])
+def track_skill():
+    """
+    Increment the counter for a given skill.
+    Expects JSON body with 'skill' field (the skill label).
+    Returns the updated counter value or an error message.
+    """
+    payload = request.get_json()
+
+    if not payload:
+        return jsonify({"error": "Request body must be valid JSON."}), 400
+
+    skill = payload.get("skill", "").strip()
+
+    if not skill:
+        return jsonify({"error": "Skill name is required."}), 400
+
+    counter_value = increment_skill_counter(skill)
+
+    if counter_value == -1:
+        return jsonify({"error": f"Skill '{skill}' not found."}), 404
+
+    return jsonify({"skill": skill, "counter": counter_value}), 200
 
 
 @main.route("/project/<int:project_id>")
