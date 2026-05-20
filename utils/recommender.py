@@ -65,14 +65,17 @@ def score_single_project(
       - Interest match:       +2
       - Time match:           +1
 
-    Returns a tuple (total_score, skill_score).
-    skill_score is returned separately so the caller can
-    reject projects with zero skill overlap entirely.
+    Returns the total weighted relevance score for the project.
+    Projects with zero skill overlap are filtered later
+    inside get_recommendations().
     """
     score = 0
 
     # Compare user's skills against the project's required skills
-    project_skills = [s.lower() for s in project.get("skills", [])]
+    project_skills = [
+    SKILL_ALIASES.get(s.lower(), s.lower())
+    for s in project.get("skills", [])
+]
 
     # Count how many user skills overlap with the
     # skills required by the current project.
@@ -122,7 +125,7 @@ def get_recommendations(skills_string, level, interest, time_availability):
         # Calculate skill score separately to check for zero skill overlap.
         # Projects with no skill match are rejected even if level or
         # interest matches, since they are not relevant to the user.
-        project_skills = [s.lower() for s in project.get("skills", [])]
+        project_skills = [ SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", []) ]
         skill_score = sum(1 for skill in user_skills if skill in project_skills) * SCORING_WEIGHTS["skill"]
 
         if skill_score == 0:
