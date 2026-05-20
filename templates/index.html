@@ -394,7 +394,7 @@
         <div class="form-card" id="form-section">
           <form id="recommend-form" novalidate>
             <div class="form-group">
-              <div class="form-label-row" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
+              <div class="form-label-row">
                 <label for="skills-input">
                   Your Skills
                   <span class="tooltip"
@@ -523,28 +523,21 @@
           <div class="form-error-msg" id="time-error"></div>
         </div>
 
-            <!-- Submit button -->
-            <button type="submit" class="btn-submit" id="submit-btn">
-              <span id="btn-label">Generate My Projects</span>
-
-              <span id="btn-loading" class="btn-loading-content" style="display:none;">
-                <span class="loading-spinner"></span>
-                <span>Finding matches...</span>
-              </span>
-            </button>
         <!-- General error (shown above the button) -->
         <p class="form-error-general" id="form-error-general"></p>
 
-        <!-- Submit button -->
+        <!-- Submit + Clear buttons -->
         <div class="form-actions">
           <button type="submit" class="btn-submit" id="submit-btn">
-                <span id="btn-label">Generate My Projects</span>
-              <span id="btn-loading" style="display:none;">Finding matches...</span>
-            </button>
-
-            <button type="button" class="btn-clear" id="clear-filters-btn">
-              <span>Clear Filters</span>
-            </button>
+            <span id="btn-label">Generate My Projects</span>
+            <span id="btn-loading" class="btn-loading-content" style="display:none;">
+              <span class="loading-spinner"></span>
+              <span>Finding matches...</span>
+            </span>
+          </button>
+          <button type="button" class="btn-clear" id="clear-filters-btn">
+            <span>Clear Filters</span>
+          </button>
         </div>
 
         </form>

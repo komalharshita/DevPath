@@ -1131,6 +1131,20 @@ ol {
   text-align: left;
 }
 
+/* Form label row (label + optional action button) */
+.form-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.form-label-row label {
+  margin-bottom: 0;
+}
+
 /* Form groups */
 .form-group {
   margin-bottom: 24px;
@@ -2525,12 +2539,21 @@ select:focus {
 
 
   .form-card {
-    padding: 28px 22px 24px;
+    padding: 28px 20px 24px;
   }
 
   .form-row {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 0;
+  }
+
+  .form-row .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    margin-top: 4px;
+    margin-bottom: 6px;
   }
 
   .results-grid {
