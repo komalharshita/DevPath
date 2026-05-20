@@ -1,15 +1,21 @@
 # utils/recommender.py
 # Contains all recommendation logic: scoring and filtering projects.
+# Upgraded to use vector similarity-based scoring via TF-IDF and cosine similarity.
 # Kept separate from routing so it can be tested and extended independently.
 
 from utils.data_loader import load_all_projects
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 # Maximum number of recommendations returned to the user
 MAX_RESULTS = 3
 
-# Scoring weights used by the recommendation engine.
-# Higher weights mean that criterion has more influence
-# on the final recommendation score.
+# Scale factor to convert cosine similarity (0.0–1.0) to 0–10 range
+# so skill match weight is comparable to bonus_score (max 5 points)
+SIMILARITY_SCALE = 10
+
+# Scoring weights — kept for backward compatibility and reference
+# These are used as bonus points for non-skill criteria
 SCORING_WEIGHTS = {
     "skill":    3,
     "level":    2,
@@ -17,6 +23,10 @@ SCORING_WEIGHTS = {
     "time":     1,
 }
 
+# Individual weight constants for clarity inside scoring function
+WEIGHT_LEVEL    = SCORING_WEIGHTS["level"]
+WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
+WEIGHT_TIME     = SCORING_WEIGHTS["time"]
 
 # Common aliases and abbreviations for skills
 # This improves recommendation accuracy by normalizing user input
@@ -38,7 +48,6 @@ def parse_skills(skills_string):
     Example:
     "JS, HTML5, CSS3" -> ["javascript", "html", "css"]
     """
-
     raw_skills = [
         s.strip().lower()
         for s in skills_string.split(",")
@@ -53,42 +62,76 @@ def parse_skills(skills_string):
     return normalized_skills
 
 
+def compute_skill_similarity(user_skills, project_skills):
+    """
+    Compute cosine similarity between user skills and project skills
+    using TF-IDF vectorization.
+
+    Steps:
+      1. Convert skill lists to single strings
+      2. Fit TF-IDF vectorizer on both
+      3. Compute cosine similarity between vectors
+      4. Return similarity score between 0.0 and 1.0
+
+    Example:
+      user_skills    = ["python", "html"]
+      project_skills = ["python", "css", "html"]
+      returns ~0.82 (high similarity)
+    """
+    # If either has no skills return 0
+    if not user_skills or not project_skills:
+        return 0.0
+
+    # Convert skill lists to strings for TF-IDF
+    user_text    = " ".join(user_skills)
+    project_text = " ".join([s.lower() for s in project_skills])
+
+    # Vectorize both using TF-IDF
+    vectorizer = TfidfVectorizer()
+    try:
+        tfidf_matrix = vectorizer.fit_transform([user_text, project_text])
+    except ValueError:
+        return 0.0
+
+    # Compute cosine similarity between user and project vectors
+    similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])
+
+    # Returns a value between 0.0 and 1.0
+    return float(similarity[0][0])
+
+
 def score_single_project(
         project, user_skills,
         level, interest, time_availability):
     """
-    Calculate a numeric relevance score for one project.
+    Calculate a relevance score for one project using:
+      - TF-IDF cosine similarity for skill matching (0.0 to 1.0)
+      - Fixed points for level, interest, time match
 
-    Each matching criterion adds points:
-      - Each matching skill:  +3
-      - Level match:          +2
-      - Interest match:       +2
-      - Time match:           +1
-
-    Returns an integer score (0 means no match at all).
+    Final score combines both for a balanced ranking.
+    SIMILARITY_SCALE converts cosine score to 0-10 range
+    so it is comparable to bonus_score (max 5 points).
     """
-    score = 0
+    # Vector similarity-based skill score (between 0.0 and 1.0)
+    project_skills = project.get("skills", [])
+    skill_score = compute_skill_similarity(user_skills, project_skills)
 
-    # Compare user's skills against the project's required skills
-    project_skills = [s.lower() for s in project.get("skills", [])]
-    # Count how many user skills overlap with the
-    # skills required by the current project.
-    matched_skills = sum(1 for skill in user_skills if skill in project_skills)
-    # Add weighted points based on the number of matching skills.
-    # More overlapping skills result in a higher recommendation score.
-    score += matched_skills * SCORING_WEIGHTS["skill"]
+    # Fixed points for other criteria
+    bonus_score = 0
 
-    # Award points for each additional matching criterion
     if project.get("level", "").lower() == level.lower():
-        score += SCORING_WEIGHTS["level"]
+        bonus_score += WEIGHT_LEVEL
 
     if project.get("interest", "").lower() == interest.lower():
-        score += SCORING_WEIGHTS["interest"]
+        bonus_score += WEIGHT_INTEREST
 
     if project.get("time", "").lower() == time_availability.lower():
-        score += SCORING_WEIGHTS["time"]
+        bonus_score += WEIGHT_TIME
 
-    return score
+    # Combine: skill similarity (scaled) + bonus points
+    final_score = (skill_score * SIMILARITY_SCALE) + bonus_score
+
+    return final_score
 
 
 def get_recommendations(skills_string, level, interest, time_availability):
@@ -97,7 +140,7 @@ def get_recommendations(skills_string, level, interest, time_availability):
 
     Steps:
       1. Parse the raw skills input into a list.
-      2. Score every project in the dataset.
+      2. Compute cosine similarity score for every project.
       3. Drop projects with a score of zero (no overlap at all).
       4. Sort by score descending.
       5. Return the top MAX_RESULTS projects.
