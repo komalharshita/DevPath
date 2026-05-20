@@ -839,6 +839,19 @@ ol {
   white-space: nowrap;
 }
 
+.skill-strip-track {
+  display: flex;
+  width: max-content;
+  animation: skill-strip-marquee 28s linear infinite;
+}
+
+.skill-strip-marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  width: 100%;
+}
+
 .skill-strip-items {
   display: flex;
   align-items: center;
@@ -1129,6 +1142,20 @@ ol {
   padding: 44px 44px 40px;
   box-shadow: var(--shadow-lg);
   text-align: left;
+}
+
+/* Form label row (label + optional action button) */
+.form-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.form-label-row label {
+  margin-bottom: 0;
 }
 
 /* Form groups */
@@ -2525,12 +2552,21 @@ select:focus {
 
 
   .form-card {
-    padding: 28px 22px 24px;
+    padding: 28px 20px 24px;
   }
 
   .form-row {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 0;
+  }
+
+  .form-row .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    margin-top: 4px;
+    margin-bottom: 6px;
   }
 
   .results-grid {
