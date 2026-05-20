@@ -1,0 +1,89 @@
+/* =============================================================
+   14-misc.css — Error pages (404 etc.), scroll-to-top button,
+                 shared primary button used across pages
+   ============================================================= */
+
+/* ---- Error pages ------------------------------------------ */
+.error-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 24px;
+}
+
+.error-page-inner { max-width: 440px; }
+
+.error-code {
+  font-family: var(--font-display);
+  font-size: 7rem;
+  font-weight: 800;
+  color: var(--gray-200);
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.error-page-inner h1 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin-bottom: 12px;
+}
+
+.error-page-inner p {
+  color: var(--text-body);
+  margin-bottom: 32px;
+}
+
+/* ---- Shared primary button -------------------------------- */
+.btn-primary {
+  display: inline-block;
+  padding: 13px 32px;
+  background: linear-gradient(90deg, var(--indigo-700), var(--purple-600));
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--r-xs);
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(35, 53, 194, 0.3);
+  transition: opacity var(--t), transform var(--t);
+}
+
+.btn-primary:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+/* ---- Scroll-to-top button --------------------------------- */
+/* Appears after user scrolls 300px down on the detail page */
+#scroll-top-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--indigo-700);
+  color: var(--white);
+  font-size: 1.25rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: opacity 0.3s ease, transform 0.2s ease;
+  z-index: 999;
+}
+
+#scroll-top-btn:hover {
+  transform: translateY(-3px);
+  opacity: 0.9;
+}
+
+#scroll-top-btn.visible { display: flex; }

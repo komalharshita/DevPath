@@ -1,0 +1,131 @@
+/* =============================================================
+   07-skill-strip.css — Scrolling skill-tag marquee banner
+   ============================================================= */
+
+.skill-strip {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top left, rgba(79, 110, 247, 0.12), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(91, 33, 182, 0.08), transparent 30%),
+    linear-gradient(180deg, var(--gray-50), var(--indigo-50));
+  border-top: 1px solid rgba(35, 53, 194, 0.08);
+  border-bottom: 1px solid rgba(35, 53, 194, 0.08);
+  padding: 18px 32px;
+}
+
+.skill-strip-inner {
+  max-width: 1140px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 22px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(79, 110, 247, 0.12);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.skill-strip-label {
+  flex-shrink: 0;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--indigo-700);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Marquee container with fade masks */
+.skill-strip-marquee {
+  flex: 1;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+}
+
+.skill-strip-track {
+  display: flex;
+  width: max-content;
+  animation: skill-strip-marquee 30s linear infinite;
+}
+
+.skill-strip-track:hover {
+  animation-play-state: paused;
+}
+
+/* Individual skill pill */
+.ss-item {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--gray-700);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(79, 110, 247, 0.14);
+  border-radius: var(--r-full);
+  padding: 6px 14px;
+  box-shadow: 0 1px 2px rgba(15, 21, 96, 0.04);
+  transition: transform 180ms ease, background 180ms ease, color 180ms ease,
+              border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.ss-item:hover {
+  transform: translateY(-1px);
+  color: var(--indigo-700);
+  background: var(--white);
+  border-color: rgba(79, 110, 247, 0.28);
+  box-shadow: 0 8px 20px rgba(15, 21, 96, 0.08);
+}
+
+.ss-sep {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin: 0 10px;
+  background: rgba(29, 27, 21, 0.3);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+@keyframes skill-strip-marquee {
+  from { transform: translateX(0);    }
+  to   { transform: translateX(-50%); }
+}
+
+/* Pause animation for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .skill-strip-track {
+    animation: none;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .skill-strip-items + .skill-strip-items { display: none; }
+
+  .skill-strip-marquee {
+    overflow: visible;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+}
+
+/* ---- Responsive ------------------------------------------- */
+@media (max-width: 768px) {
+  .skill-strip       { padding: 14px 16px; }
+  .skill-strip-inner { padding: 14px 16px; flex-direction: column; align-items: flex-start; }
+  .skill-strip-label { white-space: normal; }
+  .skill-strip-marquee { width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .skill-strip-inner  { border-radius: var(--r-lg); }
+  .skill-strip-track  { gap: 14px; animation-duration: 36s; }
+  .ss-item            { font-size: 0.8rem; padding: 5px 12px; }
+}

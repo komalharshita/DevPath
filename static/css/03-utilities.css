@@ -1,0 +1,134 @@
+/* =============================================================
+   03-utilities.css — Container, section typography helpers,
+                      badges, shared animations & keyframes
+   ============================================================= */
+
+/* ---- Layout ----------------------------------------------- */
+.container {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ---- Section typography ----------------------------------- */
+.section-eyebrow {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--indigo-600);
+  background: var(--indigo-100);
+  border-radius: var(--r-full);
+  padding: 4px 14px;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  color: var(--text-heading);
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  margin-bottom: 12px;
+}
+
+.section-sub {
+  font-size: 1.02rem;
+  color: var(--text-body);
+  max-width: 540px;
+  margin: 0 auto 56px;
+  line-height: 1.75;
+}
+
+/* ---- Badges ----------------------------------------------- */
+.badge-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  margin-bottom: 24px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: var(--gray-100);
+  color: var(--gray-600);
+}
+
+.badge--beginner {
+  background: var(--green-100);
+  color: var(--green-500);
+}
+
+.badge--web {
+  background: var(--indigo-100);
+  color: var(--indigo-600);
+}
+
+.badge--python {
+  background: var(--yellow-100);
+  color: var(--orange-500);
+}
+
+.badge--data {
+  background: var(--purple-100);
+  color: var(--purple-600);
+}
+
+/* ---- Tooltip --------------------------------------------- */
+.tooltip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--gray-500);
+  cursor: pointer;
+
+  transition: color 180ms ease,
+              transform 180ms ease;
+}
+
+.tooltip:hover {
+  color: var(--indigo-600);
+  transform: scale(1.08);
+}
+
+.tooltip svg {
+  width: 18px;
+  height: 18px;
+}
+
+
+/* ---- Shared Keyframes ------------------------------------- */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
+  40%           { transform: scale(1);   opacity: 1;   }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes dotBounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40%           { transform: scale(1.1); opacity: 1;   }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

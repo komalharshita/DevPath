@@ -1,0 +1,156 @@
+/* =============================================================
+   10-results.css — Results section: loading state, empty state,
+                    project card grid, project tags & actions
+   ============================================================= */
+
+.results-section {
+  padding: 80px 0 108px;
+  background: var(--indigo-50);
+  text-align: center;
+}
+
+/* ---- Loading state ---------------------------------------- */
+.loading-box {
+  padding: 56px 0;
+  color: var(--text-body);
+  animation: fadeInUp 0.35s ease;
+}
+
+.loading-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.loading-dots span {
+  width: 11px;
+  height: 11px;
+  background: var(--indigo-500);
+  border-radius: 50%;
+  animation: pulse 1.2s infinite ease-in-out;
+}
+
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+/* ---- Empty state ------------------------------------------ */
+.empty-state     { padding: 64px 0 32px; }
+.empty-icon      { color: var(--gray-300); margin-bottom: 20px; }
+
+.empty-state h3 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin-bottom: 10px;
+}
+
+.empty-state p   { color: var(--text-body); margin-bottom: 24px; }
+
+.btn-try-again {
+  padding: 11px 24px;
+  background: var(--indigo-100);
+  color: var(--indigo-700);
+  border: 1.5px solid rgba(79, 110, 247, 0.25);
+  border-radius: var(--r-full);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--t);
+}
+
+.btn-try-again:hover { background: var(--indigo-100); }
+
+/* ---- Results grid ----------------------------------------- */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 26px;
+  text-align: left;
+  margin-top: 16px;
+}
+
+/* ---- Project card ----------------------------------------- */
+.project-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 30px 28px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: box-shadow var(--t), transform var(--t), border-color var(--t);
+}
+
+.project-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-5px);
+  border-color: rgba(79, 110, 247, 0.3);
+}
+
+.project-card-title {
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: var(--text-heading);
+}
+
+.project-card-desc {
+  font-size: 0.88rem;
+  color: var(--text-body);
+  line-height: 1.7;
+  flex: 1;
+}
+
+/* Tags */
+.project-card-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+
+.project-tag {
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 3px 11px;
+  border-radius: var(--r-full);
+}
+
+.project-tag--skill        { background: var(--indigo-100); color: var(--indigo-700); }
+.project-tag--time         { background: var(--gray-100);   color: var(--gray-600);   }
+.project-tag--beginner     { background: var(--green-100);  color: #065f46;           }
+.project-tag--intermediate { background: var(--yellow-100); color: #78350f;           }
+.project-tag--advanced     { background: #fee2e2;           color: #7f1d1d;           }
+
+/* Card footer */
+.project-card-footer {
+  padding-top: 8px;
+  border-top: 1px solid var(--gray-100);
+}
+
+.btn-details {
+  display: block;
+  width: 100%;
+  padding: 11px 18px;
+  background: transparent;
+  border: 1.5px solid var(--indigo-500);
+  color: var(--indigo-600);
+  border-radius: var(--r-lg);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: background var(--t), color var(--t);
+  text-decoration: none;
+}
+
+.btn-details:hover {
+  background: var(--indigo-600);
+  color: var(--white);
+  text-decoration: none;
+}
+
+/* ---- Responsive ------------------------------------------- */
+@media (max-width: 640px) {
+  .results-grid { grid-template-columns: 1fr; }
+}

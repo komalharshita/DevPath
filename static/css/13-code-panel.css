@@ -1,0 +1,190 @@
+/* =============================================================
+   13-code-panel.css — Slide-up code viewer overlay,
+                       copy-to-clipboard button & toast,
+                       line-numbered code rows
+   ============================================================= */
+
+/* ---- Overlay backdrop ------------------------------------- */
+.code-panel-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 15, 80, 0.6);
+  z-index: 300;
+}
+
+.code-panel-overlay.active { display: block; }
+
+/* ---- Panel ------------------------------------------------ */
+.code-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 72vh;
+  background: #0d1117;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  box-shadow: 0 -8px 48px rgba(0, 0, 0, 0.45);
+  z-index: 301;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.code-panel.active { transform: translateY(0); }
+
+/* Panel header */
+.code-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.code-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.code-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.code-panel-download {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--yellow-400);
+  padding: 5px 14px;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: var(--r-full);
+  transition: background var(--t);
+}
+
+.code-panel-download:hover {
+  background: rgba(251, 191, 36, 0.1);
+  text-decoration: none;
+}
+
+.code-panel-close {
+  background: rgba(255, 255, 255, 0.07);
+  border: none;
+  border-radius: var(--r-xs);
+  padding: 6px 16px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: background var(--t);
+}
+
+.code-panel-close:hover { background: rgba(255, 255, 255, 0.13); }
+
+/* ---- Copy button ------------------------------------------ */
+.btn-copy-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(79, 110, 247, 0.15);
+  border: 1px solid rgba(79, 110, 247, 0.35);
+  border-radius: var(--r-xs);
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--indigo-500);
+  cursor: pointer;
+  transition: background var(--t), border-color var(--t), color var(--t), transform 0.1s ease;
+}
+
+.btn-copy-code:hover {
+  background: rgba(79, 110, 247, 0.28);
+  border-color: var(--indigo-500);
+  color: #a5b4fc;
+}
+
+.btn-copy-code:active { transform: scale(0.97); }
+
+.btn-copy-code.copied {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #6ee7b7;
+}
+
+/* ---- Copy toast ------------------------------------------- */
+.copy-toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #10b981;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: var(--r-full);
+  box-shadow: 0 6px 24px rgba(16, 185, 129, 0.45);
+  z-index: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.copy-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ---- Code viewer area ------------------------------------- */
+.code-viewer {
+  flex: 1;
+  overflow: auto;
+  padding: 16px 0;
+  font-family: var(--font-mono);
+  font-size: 0.83rem;
+  line-height: 1.75;
+  color: #e6edf3;
+  background: transparent;
+}
+
+/* Line-numbered rows */
+.code-line {
+  display: flex;
+  align-items: flex-start;
+  min-height: 1.75em;
+}
+
+.line-number {
+  display: inline-block;
+  min-width: 44px;
+  padding-right: 16px;
+  text-align: right;
+  color: rgba(255, 255, 255, 0.2);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  margin-right: 16px;
+  user-select: none;
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  line-height: 1.75;
+}
+
+.line-content {
+  flex: 1;
+  white-space: pre;
+  color: #e6edf3;
+}
+
+/* ---- Responsive ------------------------------------------- */
+@media (max-width: 640px) {
+  .code-panel { height: 82vh; }
+}
