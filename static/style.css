@@ -2846,3 +2846,40 @@ select:focus {
   white-space: pre;
   color: #e6edf3;
 }
+
+/* Search bar changes */
+.glass-search-btn {
+  width: 2.5rem;
+  height: 2.2rem;
+  padding: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+  background: rgba(255, 255, 255, 0.08);
+
+  cursor: pointer;
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  transition: all 0.2s ease;
+}
+
+.glass-search-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+#topic-search-form {
+  display: flex;
+
+  height: 2.2rem;
+  margin: 0 20px;
+}
