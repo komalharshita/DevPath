@@ -412,12 +412,15 @@ if (clearFiltersBtn) {
   }
 
   function syncSkillsHiddenInput() {
-    if (!skillsHidden){
+    if (!skillsHidden) {
       var skillsHidden = document.getElementById("skills");
     }
-    // Keep the hidden <input> in sync for form serialisation
-    // The API expects a comma-separated string, so join the array that way
-    skillsHidden.value = selectedSkills.join(", ");
+    // Keep the hidden <input> in sync for form serialisation.
+    // JSON.stringify preserves skill names that contain commas (e.g. "HTML, CSS")
+    // so the backend can reconstruct the exact array without mis-splitting.
+    if (skillsHidden) {
+      skillsHidden.value = JSON.stringify(selectedSkills);
+    }
   }
 
   updateQuickPickState();

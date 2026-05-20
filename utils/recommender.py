@@ -32,18 +32,32 @@ SKILL_ALIASES = {
 
 def parse_skills(skills_string):
     """
-    Convert a raw comma-separated skills string into
-    a normalized lowercase list.
+    Convert a skills string into a normalized lowercase list.
 
-    Example:
-    "JS, HTML5, CSS3" -> ["javascript", "html", "css"]
+    Accepts two formats:
+      1. JSON array (preferred): '["HTML, CSS", "JavaScript"]'
+         Handles skill names that contain commas without mis-splitting.
+      2. Comma-separated string (legacy fallback): "HTML, CSS, JavaScript"
+
+    Example:    
+    '["JS", "HTML5", "CSS3"]' -> ["javascript", "html", "css"]
     """
+    import json
 
-    raw_skills = [
-        s.strip().lower()
-        for s in skills_string.split(",")
-        if s.strip()
-    ]
+    try:
+        # Preferred path: frontend sends a JSON-serialized array
+        parsed = json.loads(skills_string)
+        if isinstance(parsed, list):
+            raw_skills = [s.strip().lower() for s in parsed if isinstance(s, str) and s.strip()]
+        else:
+            raise ValueError("Parsed JSON is not a list")
+    except (json.JSONDecodeError, ValueError, TypeError):
+        # Fallback: handle plain comma-separated strings
+        raw_skills = [
+            s.strip().lower()
+            for s in skills_string.split(",")
+            if s.strip()
+        ]
 
     normalized_skills = [
         SKILL_ALIASES.get(skill, skill)
