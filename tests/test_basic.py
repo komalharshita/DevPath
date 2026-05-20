@@ -105,7 +105,6 @@ def test_score_single_project_full_match():
         interest="Data",
         time_availability="Low"
     )
-    # 1 skill match (3) + level (2) + interest (2) + time (1) = 8
     assert round(score) == 15, f"Expected 15 but got {score}"
 
 
@@ -142,7 +141,6 @@ def test_get_recommendations_max_three():
 def test_get_recommendations_no_match_returns_empty():
     """A very unlikely skill/interest combo should return an empty list."""
     results = get_recommendations("Rust", "Advanced", "Games", "High")
-    # Rust and Games are not in the dataset so this should be empty or minimal
     assert isinstance(results, list)
 
 
@@ -279,7 +277,8 @@ def test_download_code_found():
     client = get_client()
     response = client.get("/project/1/download")
     assert response.status_code == 200
-    
+
+
 def test_health_check():
     """Health check endpoint should return status ok and version."""
     client = get_client()
