@@ -247,22 +247,38 @@ ol {
   font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
   transition: color var(--t);
+
+  text-decoration: none;
+  display: inline-block;
 }
 
 /* Animated underline effect */
 .nav-link::after {
   content: '';
   position: absolute;
+
+  left: 50%;
   bottom: -4px;
-  left: 0;
-  width: 100%;
+
+  width: 75%;
   height: 2px;
-  background: linear-gradient(90deg, var(--indigo-400, #60a5fa), var(--yellow-400));
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-    opacity 0.35s ease;
+
+  background: linear-gradient(
+    90deg,
+    var(--indigo-400, #60a5fa),
+    var(--yellow-400)
+  );
+
+  border-radius: 999px;
+
+  transform: translateX(-50%) scaleX(0);
+  transform-origin: center;
+
   opacity: 0;
+
+  transition:
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.25s ease;
 }
 
 .nav-link:hover {
@@ -271,7 +287,7 @@ ol {
 }
 
 .nav-link:hover::after {
-  transform: scaleX(1);
+  transform: translateX(-50%) scaleX(1);
   opacity: 1;
 }
 
@@ -349,31 +365,44 @@ ol {
 .nav-mobile-link::after {
   content: '';
   position: absolute;
-  bottom: 0;
   left: 0;
-  width: 100%;
+  bottom: 0;
+
+  width: 75%;
   height: 2px;
-  background: linear-gradient(90deg, var(--indigo-400, #60a5fa), var(--yellow-400));
+
+  background: linear-gradient(
+    90deg,
+    var(--indigo-400, #60a5fa),
+    var(--yellow-400)
+  );
+
+  border-radius: 999px;
+
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-    opacity 0.35s ease;
+    opacity 0.25s ease;
   opacity: 0;
 }
 
-.nav-mobile-link:hover {
-  color: var(--white);
-  text-decoration: none;
-}
 
 .nav-mobile-link:hover::after {
   transform: scaleX(1);
   opacity: 1;
 }
 
-.nav-mobile-link:last-child {
-  border-bottom: none;
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+
+  .nav-mobile-toggle {
+    display: flex;
+  }
 }
+
+.nav-mobile-link:last-child { border-bottom: none; }
 
 /* ---- Hero Section ----------------------------------------- */
 .hero {
