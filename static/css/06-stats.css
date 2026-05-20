@@ -1,0 +1,83 @@
+/* =============================================================
+   06-stats.css — Overlapping stats cards beneath the hero
+   ============================================================= */
+
+.stats-section {
+  padding: 40px 0;
+  margin-top: -60px; /* Overlap hero */
+  position: relative;
+  z-index: 10;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.stat-card {
+  background: var(--white);
+  border-radius: var(--r-md);
+  padding: 30px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+  transition: transform var(--t), box-shadow var(--t);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-xl);
+}
+
+.stat-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon--indigo  { background: var(--indigo-100); color: var(--indigo-600); }
+.stat-icon--green   { background: var(--green-100);  color: var(--green-500);  }
+.stat-icon--yellow  { background: var(--yellow-100); color: var(--orange-500); }
+
+.stat-info  { display: flex; flex-direction: column; }
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-heading);
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--gray-500);
+  letter-spacing: 0.02em;
+}
+
+/* ---- Responsive ------------------------------------------- */
+@media (max-width: 992px) {
+  .stats-grid    { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .stats-section { margin-top: -40px; }
+  .stat-card     { padding: 24px; }
+}
+
+@media (max-width: 768px) {
+  .stats-grid    { grid-template-columns: 1fr; gap: 16px; }
+  .stats-section { margin-top: 0; padding: 48px 0 24px; }
+  .stat-card     { padding: 20px; }
+}
+
+@media (max-width: 480px) {
+  .stat-card  { flex-direction: column; text-align: center; gap: 12px; }
+  .stat-icon  { width: 48px; height: 48px; }
+  .stat-value { font-size: 1.5rem; }
+}

@@ -1,0 +1,72 @@
+/* =============================================================
+   01-variables.css — Design tokens & CSS custom properties
+   ============================================================= */
+
+:root {
+  /* Core palette */
+  --indigo-900: #0f1560;
+  --indigo-800: #1a2280;
+  --indigo-700: #2335c2;
+  --indigo-600: #3347e0;
+  --indigo-500: #4f6ef7;
+  --indigo-100: #eef1ff;
+  --indigo-50: #f5f7ff;
+
+  --purple-700: #5b21b6;
+  --purple-600: #7c3aed;
+  --purple-100: #f3f0ff;
+
+  --yellow-400: #fbbf24;
+  --yellow-300: #fcd34d;
+  --yellow-100: #fef9e7;
+
+  --pink-100: #fce7f3;
+  --pink-500: #ec4899;
+
+  --green-500: #10b981;
+  --green-100: #d1fae5;
+
+  --orange-500: #f59e0b;
+  --red-500: #ef4444;
+
+  /* Neutrals */
+  --white: #ffffff;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-900: #111827;
+
+  /* Semantic */
+  --text-heading: var(--gray-900);
+  --text-body: var(--gray-600);
+  --text-light: var(--gray-400);
+  --border: var(--gray-200);
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(15, 21, 96, 0.05);
+  --shadow-sm: 0 2px 8px rgba(15, 21, 96, 0.08);
+  --shadow-md: 0 4px 20px rgba(15, 21, 96, 0.12);
+  --shadow-lg: 0 8px 40px rgba(15, 21, 96, 0.16);
+  --shadow-xl: 0 16px 60px rgba(15, 21, 96, 0.22);
+
+  /* Radii */
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+  --r-full: 9999px;
+
+  /* Fonts */
+  --font-display: "Sora", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", "Courier New", monospace;
+
+  /* Transition */
+  --t: 0.2s ease;
+}

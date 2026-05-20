@@ -1,0 +1,162 @@
+/* =============================================================
+   08-sections.css — "How It Works" steps grid
+                     and "Features" coloured card grid
+   ============================================================= */
+
+/* ---- How It Works ----------------------------------------- */
+.how-section {
+  padding: 96px 0;
+  background: var(--white);
+  text-align: center;
+}
+
+.steps-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-top: 16px;
+}
+
+.step-card {
+  flex: 1;
+  max-width: 300px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 36px 28px;
+  text-align: left;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--t), transform var(--t);
+}
+
+.step-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+}
+
+.step-num {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--indigo-600);
+  background: var(--indigo-100);
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--r-full);
+  margin-bottom: 20px;
+}
+
+.step-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin-bottom: 10px;
+}
+
+.step-card p {
+  font-size: 0.9rem;
+  color: var(--text-body);
+  line-height: 1.65;
+}
+
+.step-connector {
+  color: var(--gray-300);
+  padding: 0 8px;
+  flex-shrink: 0;
+  margin-bottom: 20px;
+}
+
+/* ---- Features --------------------------------------------- */
+.features-section {
+  padding: 96px 0;
+  background: var(--gray-50);
+  text-align: center;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  text-align: left;
+  margin-top: 16px;
+}
+
+.feature-card {
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  padding: 38px 32px;
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--t), box-shadow var(--t);
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.feature-card--pink   { background: var(--pink-100);   }
+.feature-card--yellow { background: var(--yellow-100); }
+.feature-card--purple { background: var(--purple-100); }
+
+.feature-card-icon {
+  width: 52px;
+  height: 52px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 22px;
+  box-shadow: var(--shadow-xs);
+}
+
+.feature-card--pink   .feature-card-icon { color: var(--pink-500);   }
+.feature-card--yellow .feature-card-icon { color: var(--orange-500); }
+.feature-card--purple .feature-card-icon { color: var(--purple-600); }
+
+.feature-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin-bottom: 12px;
+}
+
+.feature-card p {
+  font-size: 0.91rem;
+  color: var(--gray-600);
+  line-height: 1.7;
+  margin-bottom: 22px;
+}
+
+.feature-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--indigo-700);
+  border: 1.5px solid var(--indigo-200, #c7d2fe);
+  background: rgba(255, 255, 255, 0.6);
+  padding: 7px 16px;
+  border-radius: var(--r-full);
+  transition: background var(--t), border-color var(--t);
+}
+
+.feature-card-link:hover {
+  background: var(--indigo-100);
+  border-color: var(--indigo-500);
+  text-decoration: none;
+}
+
+/* ---- Responsive ------------------------------------------- */
+@media (max-width: 860px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .steps-grid    { flex-direction: column; align-items: stretch; }
+  .step-connector { display: none; }
+  .step-card      { max-width: 100%; }
+}

@@ -356,15 +356,22 @@ if (clearFiltersBtn) {
 
   //add a skill to the list if it's not empty or a duplicate
   function addSkill(rawSkill) {
+    console.log('[addSkill] called with:', rawSkill);
     // Clean up any extra spaces and match to canonical skill name
     var skill = getCanonicalSkill(rawSkill);
+    console.log('[addSkill] canonical skill:', skill);
     // Nothing to add if string is empty after trimming
     if (!skill) return;
 
     // Block duplicate entries (case-insensitive)
-    if (isSkillSelected(skill)) return;
+    if (isSkillSelected(skill)) {
+      console.log('[addSkill] skill already selected, returning');
+      return;
+    }
 
+    console.log('[addSkill] adding skill, selectedSkills before:', selectedSkills);
     selectedSkills.push(skill);
+    console.log('[addSkill] selectedSkills after:', selectedSkills);
     renderSelectedChips();
     syncSkillsHiddenInput();
     updateQuickPickState();
@@ -412,12 +419,12 @@ if (clearFiltersBtn) {
   }
 
   function syncSkillsHiddenInput() {
-    if (!skillsHidden){
-      var skillsHidden = document.getElementById("skills");
-    }
     // Keep the hidden <input> in sync for form serialisation
     // The API expects a comma-separated string, so join the array that way
+    console.log('[syncSkillsHiddenInput] selectedSkills:', selectedSkills);
+    console.log('[syncSkillsHiddenInput] skillsHidden:', skillsHidden);
     skillsHidden.value = selectedSkills.join(", ");
+    console.log('[syncSkillsHiddenInput] skillsHidden.value set to:', skillsHidden.value);
   }
 
   updateQuickPickState();
@@ -525,50 +532,14 @@ if (clearFiltersBtn) {
 
           renderResults(data.projects || [], data.message);
         })
-        .catch(function () {
-
+        .catch(function (err) {
+          // this runs if the network request itself fails 
           setLoadingState(false);
-    //combine form values into an object to send to server/api
-    var payload = {
-      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level: document.getElementById("level").value,
-      interest: document.getElementById("interest").value,
-      time: document.getElementById("time").value
-    };
-
-    //post the data to backend api as JSON, then handle the response
-    fetch("/api/recommend", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify(payload) //convert object to json string
-    })
-      .then(function (res) { return res.json(); }) //parse the response as JSON
-      .then(function (data) {
-        setLoadingState(false);
-
           var generalErr = document.getElementById("form-error-general");
-
-          if (generalErr) {
-            generalErr.textContent =
-              "Something went wrong. Please try again.";
-          }
+          if (generalErr) generalErr.textContent = "Something went wrong. Please try again.";
+          console.error("API request failed:", err);
         });
     });
-        if (data.error) {
-          var generalErr = document.getElementById("form-error-general");
-          if (generalErr) generalErr.textContent = data.error;
-          return;
-        }
-        renderResults(data.projects || [], data.message);
-      })
-      .catch(function (err) {
-        // this runs if the network request itself fails 
-        setLoadingState(false);
-        var generalErr = document.getElementById("form-error-general");
-        if (generalErr) generalErr.textContent = "Something went wrong. Please try again.";
-        console.error("API request failed:", err);
-      });
   });
 
   // Manages the loading state of the form and results section(whats visible or not)
@@ -578,8 +549,6 @@ if (clearFiltersBtn) {
     submitBtn.setAttribute("aria-busy", isLoading);
     btnLabel.style.display = isLoading ? "none" : "inline";
     btnLoading.style.display = isLoading ? "inline-flex" : "none";
-    btnLabel.style.display = isLoading ? "none" : "inline";
-    btnLoading.style.display = isLoading ? "inline" : "none";
 
     if (isLoading) {
       // Show the results section with only the loading indicator visible
@@ -603,35 +572,41 @@ if (clearFiltersBtn) {
   //takes the array of projects from the api and draws them on the page as cards
   //if array is empty it shows the "no results" message instead
   function renderResults(projects, message) {
-    resultsSection.style.display = "block";
-    resultsLoadingEl.style.display = "none";
-    // Clear out any cards from a previous search before showing new ones
-    resultsGrid.innerHTML = "";
+  resultsSection.style.display = "block";
+  resultsLoadingEl.style.display = "none";
 
-    if (!projects || projects.length === 0) {
-      resultsGrid.style.display     = "none";
-      resultsEmptyEl.style.display  = "block";
-      resultsGrid.style.display = "none";
-      resultsEmptyEl.style.display = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
-    if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
-      resultsGrid.style.display      = "none";
-      resultsEmptyEl.style.display   = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message; //if api sent back a message (e.g. "no projects found matching your criteria"), show that 
-      resultsSection.scrollIntoView({ behavior: "smooth" });
-      return;
+  // clear old results
+  resultsGrid.innerHTML = "";
+
+  // no projects found
+  if (!projects || projects.length === 0) {
+    resultsGrid.style.display = "none";
+    resultsEmptyEl.style.display = "block";
+
+    if (message && emptyMessageEl) {
+      emptyMessageEl.textContent = message;
     }
 
-    resultsEmptyEl.style.display = "none";
-    resultsGrid.style.display = "grid";
-
-    //build a card for each project and add it to the grid
-    projects.forEach(function (project) {
-      resultsGrid.appendChild(buildProjectCard(project));
+    resultsSection.scrollIntoView({
+      behavior: "smooth"
     });
 
-    resultsSection.scrollIntoView({ behavior: "smooth" });
+    return;
   }
+
+  // show results grid
+  resultsEmptyEl.style.display = "none";
+  resultsGrid.style.display = "grid";
+
+  // render project cards
+  projects.forEach(function(project) {
+    resultsGrid.appendChild(buildProjectCard(project));
+  });
+
+  resultsSection.scrollIntoView({
+    behavior: "smooth"
+  });
+}
 
   // builds one project card as a DOM element and returns it
   // the card has title, short description, tags and link

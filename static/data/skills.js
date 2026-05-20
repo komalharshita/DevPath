@@ -38,4 +38,6 @@ var skills = [
     {id: "ci/cd", label: "CI/CD"},
     {id: "restapi", label: "REST API"},
     {id: "graphql", label: "GraphQL"},
+    {id: "rust", label: "Rust"},
+    {id: "kotlin", label: "Kotlin"},
 ];

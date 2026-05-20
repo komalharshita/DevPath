@@ -30,10 +30,24 @@
        ============================================================ -->
   <nav class="navbar">
     <div class="nav-inner">
-      <a href="/" class="nav-logo">DevPath</a>
+      <div class="nav-left">
+         <a href="/" class="back-to-search"></a>
+         <a href="/" class="nav-logo">DevPath</a>
+      </div>
+       
       <div class="nav-links">
-        <a href="/" class="nav-link">Back to Search</a>
-        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-link nav-link-gh">GitHub</a>
+        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-link nav-link-gh">
+          <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              width="25"
+              height="25"
+              aria-hidden="true"
+            >
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.79-.26.79-.58v-2.23c-3.34.73-4.04-1.42-4.04-1.42-.55-1.38-1.34-1.75-1.34-1.75-1.09-.75.08-.73.08-.73 1.21.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.77.42-1.3.76-1.6-2.67-.31-5.47-1.34-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23A11.5 11.5 0 0 1 12 5.8c1.02.01 2.05.14 3.01.4 2.29-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.17.77.84 1.24 1.91 1.24 3.22 0 4.6-2.81 5.62-5.49 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.19.69.8.58C20.57 21.8 24 17.3 24 12 24 5.37 18.63 0 12 0z"/>
+          </svg>
+        </a>
       </div>
     </div>
   </nav>
@@ -320,18 +334,77 @@
        ============================================================ -->
   <footer class="footer">
     <div class="footer-inner">
-      <div class="footer-brand">
-        <span class="footer-logo">DevPath</span>
-        <p style="color: #D1D5DB;">
-          Open source. Built for learners, by learners.
-        </p>
+      <div class="footer-col footer-col--brand">
+        <span class="footer-logo">Dev<span class="footer-logo-accent">Path</span></span>
+        <p class="footer-tagline">Open source. Built for learners, by learners.</p>
+        <p class="footer-tagline">Helping developers find meaningful projects to build their skills.</p>
       </div>
-      <div class="footer-links">
-        <a href="/">Back to Search</a>
-        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">GitHub</a>
+
+      <div class="footer-col">
+        <h4 class="footer-col-title">Quick Links</h4>
+        <ul class="footer-links-list">
+          <li><a href="/">Home</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#find-project">Find Project</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4 class="footer-col-title">Resources</h4>
+        <ul class="footer-links-list">
+          <li><a href="/project/1">Sample Project</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing Guide</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath/issues" target="_blank" rel="noopener noreferrer">Report an Issue</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4 class="footer-col-title">About Us</h4>
+        <ul class="footer-links-list">
+          <li><a href="#our-story">Our Story</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">Open Source</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">License</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>DevPath is open source. Licensed under the MIT License.</p>
+      <div class="footer-bottom-links">
+        <a href="#our-story">About Us</a>
+        <a href="https://github.com/komalharshita/DevPath/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Project License</a>
       </div>
     </div>
   </footer>
+
+  <!-- GitHub Modal Overlay -->
+  <div class="code-panel-overlay" id="github-modal-overlay" style="align-items: center; justify-content: center; opacity: 1;">
+    <div class="sidebar-card" style="width: 100%; max-width: 400px; margin: 20px; z-index: 400; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
+      
+      <div class="sidebar-card-title">
+        <svg style="width:18px; fill:var(--indigo-600)" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        Sync with GitHub
+      </div>
+      
+      <p class="sidebar-card-desc" style="margin-bottom: 20px;">Enter your username to import coding languages from your top repositories into the skills list.<br/> Note: We use stars to determine top repositories</p>
+      
+      <div class="form-group" style="margin-bottom: 20px;">
+        <div class="skill-input-wrap">
+          <span style="color:var(--gray-400); font-family:var(--font-mono); font-size:0.8rem; margin-left:8px;">@</span>
+          <input type="text" id="github-username" placeholder="username" style="border:none; outline:none; flex:1; padding:10px;">
+        </div>
+        <div class="form-error-msg" id="github-modal-error"></div>
+      </div>
+      
+      <div style="display: flex; gap: 12px;">
+        <button type="button" id="btn-fetch-github" class="btn-primary" style="flex: 2; padding: 10px; font-size: 0.85rem;">Fetch Skills</button>
+        <button type="button" id="btn-close-github" class="btn-view-code-sm" style="flex: 1; border-color: var(--border); color: var(--text-body);">Cancel</button>
+      </div>
+      
+    </div>
+  </div>
 
   <!-- Scroll-to-top button -->
   <button id="scroll-top-btn" aria-label="Back to top" title="Back to top">↑</button>
