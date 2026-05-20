@@ -839,6 +839,19 @@ ol {
   white-space: nowrap;
 }
 
+.skill-strip-track {
+  display: flex;
+  width: max-content;
+  animation: skill-strip-marquee 28s linear infinite;
+}
+
+.skill-strip-marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  width: 100%;
+}
+
 .skill-strip-items {
   display: flex;
   align-items: center;
