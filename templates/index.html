@@ -155,101 +155,129 @@
     <div class="hero-blob hero-blob-2"></div>
   </section>
 
-  <!-- ============================================================
-       Statistics Cards (Dynamic)
-       ============================================================ -->
-  <section class="stats-section">
-    <div class="container">
-      <div class="stats-grid">
-        <!-- Total Projects -->
-        <div class="stat-card">
-          <div class="stat-icon stat-icon--indigo">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-value">{{ stats.total_projects }}</span>
-            <span class="stat-label">Real Projects</span>
-          </div>
-        </div>
+<!-- ============================================================
+     Statistics Cards (Dynamic)
+     ============================================================ -->
+<section class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
 
-        <!-- Unique Skills -->
-        <div class="stat-card">
-          <div class="stat-icon stat-icon--yellow">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-value">{{ stats.unique_skills }}</span>
-            <span class="stat-label">Unique Skills</span>
-          </div>
+      <!-- Total Projects -->
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--indigo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+          </svg>
         </div>
-
-        <!-- Beginner Friendly -->
-        <div class="stat-card">
-          <div class="stat-icon stat-icon--green">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-value">{{ stats.beginner_friendly }}</span>
-            <span class="stat-label">Beginner Friendly</span>
-          </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.total_projects }}</span>
+          <span class="stat-label">Real Projects</span>
         </div>
       </div>
-    </div>
-  </section>
 
+      <!-- Unique Skills -->
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--yellow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          </svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.unique_skills }}</span>
+          <span class="stat-label">Unique Skills</span>
+        </div>
+      </div>
+
+      <!-- Beginner Friendly -->
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--green">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.beginner_friendly }}</span>
+          <span class="stat-label">Beginner Friendly</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
   <!-- ============================================================
        Language / Skill Strip (visual trust element)
        ============================================================ -->
-
 <div class="skill-strip">
   <div class="skill-strip-inner">
     <span class="skill-strip-label">Supports skills including:</span>
     <div class="skill-strip-marquee" aria-label="Supported skills">
       <div class="skill-strip-track">
+        <!-- First set -->
         <div class="skill-strip-items">
           <span class="ss-item">Python</span>
           <span class="ss-sep"></span>
-
           <span class="ss-item">JavaScript</span>
           <span class="ss-sep"></span>
-
           <span class="ss-item">HTML / CSS</span>
           <span class="ss-sep"></span>
-
           <span class="ss-item">Flask</span>
           <span class="ss-sep"></span>
-
           <span class="ss-item">SQL</span>
           <span class="ss-sep"></span>
-
           <span class="ss-item">React</span>
           <span class="ss-sep"></span>
-
           <span class="ss-item">Node.js</span>
           <span class="ss-sep"></span>
-
           <span class="ss-item">pandas</span>
           <span class="ss-sep"></span>
-
           <span class="ss-item">C++</span>
           <span class="ss-sep"></span>
-
           <span class="ss-item">Java</span>
           <span class="ss-sep"></span>
-
           <span class="ss-item">TypeScript</span>
           <span class="ss-sep"></span>
-
           <span class="ss-item">Go</span>
           <span class="ss-sep"></span>
-
           <span class="ss-item">Rust</span>
           <span class="ss-sep"></span>
-
           <span class="ss-item">C#</span>
           <span class="ss-sep"></span>
-
           <span class="ss-item">Kotlin</span>
+          <span class="ss-sep"></span>
+        </div>
+        <!-- Duplicate set for seamless loop -->
+        <div class="skill-strip-items" aria-hidden="true">
+          <span class="ss-item">Python</span>
+          <span class="ss-sep"></span>
+          <span class="ss-item">JavaScript</span>
+          <span class="ss-sep"></span>
+          <span class="ss-item">HTML / CSS</span>
+          <span class="ss-sep"></span>
+          <span class="ss-item">Flask</span>
+          <span class="ss-sep"></span>
+          <span class="ss-item">SQL</span>
+          <span class="ss-sep"></span>
+          <span class="ss-item">React</span>
+          <span class="ss-sep"></span>
+          <span class="ss-item">Node.js</span>
+          <span class="ss-sep"></span>
+          <span class="ss-item">pandas</span>
+          <span class="ss-sep"></span>
+          <span class="ss-item">C++</span>
+          <span class="ss-sep"></span>
+          <span class="ss-item">Java</span>
+          <span class="ss-sep"></span>
+          <span class="ss-item">TypeScript</span>
+          <span class="ss-sep"></span>
+          <span class="ss-item">Go</span>
+          <span class="ss-sep"></span>
+          <span class="ss-item">Rust</span>
+          <span class="ss-sep"></span>
+          <span class="ss-item">C#</span>
+          <span class="ss-sep"></span>
+          <span class="ss-item">Kotlin</span>
+          <span class="ss-sep"></span>
         </div>
       </div>
     </div>
@@ -394,14 +422,18 @@
         <div class="form-card" id="form-section">
           <form id="recommend-form" novalidate>
             <div class="form-group">
+              <label for="skills-input">
+                Your Skills
+                <span class="tooltip"
+                  title="Add technologies, programming languages, or tools you know like Python, React, Git, SQL, etc.">
+                  ⓘ
+                </span>
+
+                <button  id='reset-btn' class='reset-btn' type="reset" style="float: right;">Reset</button>
+                
+              </label>
+              
               <div class="form-label-row" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
-                <label for="skills-input">
-                  Your Skills
-                  <span class="tooltip"
-                    title="Add technologies, programming languages, or tools you know like Python, React, Git, SQL, etc.">
-                    ⓘ
-                  </span>
-                </label>
                 
                 <!-- Inline GitHub Trigger -->
                 <div class="github-inline-trigger" id="github-trigger-wrap" style="line-height: 1.2;">
@@ -413,17 +445,15 @@
               </div>
               <div class="skill-input-wrap" id="skill-input-wrap">
                 <div class="skill-chips-selected" id="skill-chips-selected"></div>
-                
                 <input
                   type="text"
                   id="skills-input" 
                   placeholder="Type a skill and press Enter..."
-                  autocomplete="off" 
-                  />
-                  autocomplete="off"
+                  autocomplete="on"
                   aria-haspopup="listbox"
                   aria-expanded="false"
                   aria-controls="skills-suggestions"
+                  
                 />
                 <div id="skills-suggestions" class="skills-suggestions"></div>
               </div>
@@ -522,7 +552,8 @@
           </span>
           <div class="form-error-msg" id="time-error"></div>
         </div>
-
+        <!-- General error (shown above the button) -->
+        <p class="form-error-general" id="form-error-general"></p>
             <!-- Submit button -->
             <button type="submit" class="btn-submit" id="submit-btn">
               <span id="btn-label">Generate My Projects</span>
@@ -532,20 +563,7 @@
                 <span>Finding matches...</span>
               </span>
             </button>
-        <!-- General error (shown above the button) -->
-        <p class="form-error-general" id="form-error-general"></p>
 
-        <!-- Submit button -->
-        <div class="form-actions">
-          <button type="submit" class="btn-submit" id="submit-btn">
-                <span id="btn-label">Generate My Projects</span>
-              <span id="btn-loading" style="display:none;">Finding matches...</span>
-            </button>
-
-            <button type="button" class="btn-clear" id="clear-filters-btn">
-              <span>Clear Filters</span>
-            </button>
-        </div>
 
         </form>
       </div>
