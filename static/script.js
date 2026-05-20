@@ -955,3 +955,15 @@ if (scrollTopBtn) {
     window.addEventListener('scroll', handleScroll);
     scrollTopBtn.addEventListener('click', scrollToTop);
 }
+
+/* ========================================
+   SIMPLE THEME TOGGLE
+======================================== */
+
+const themeToggleBtn = document.getElementById("themeToggle");
+
+if (themeToggleBtn) {
+  themeToggleBtn.addEventListener("click", () => {
+    document.documentElement.classList.toggle("dark");
+  });
+}

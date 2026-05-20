@@ -2816,9 +2816,41 @@ select:focus {
 }
 
 #scroll-top-btn.visible {
-  display: flex;
+display: flex;
 }
 
+/* ========================================
+   DARK MODE (manual toggle only)
+======================================== */
+
+html.dark body {
+  background: #111827;
+  color: #ffffff;
+}
+
+html.dark .navbar {
+  background: #1f2937;
+}
+
+html.dark .nav-link {
+  color: #ffffff;
+}
+
+html.dark .project-card {
+  background: #1f2937;
+  border: 1px solid #374151;
+}
+
+html.dark .project-card-desc {
+  color: #d1d5db;
+}
+
+html.dark .section-title,
+html.dark h1,
+html.dark h2,
+html.dark h3 {
+  color: #ffffff;
+}
 
 /* Line-numbered code rows */
 .code-line {
