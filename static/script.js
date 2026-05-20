@@ -955,3 +955,32 @@ if (scrollTopBtn) {
     window.addEventListener('scroll', handleScroll);
     scrollTopBtn.addEventListener('click', scrollToTop);
 }
+
+
+// Handle project search form submission and display matching results
+function handleSearchSubmit(event) {
+  event.preventDefault();
+
+  var query = document.getElementById("topic-search").value;
+
+  fetch("/api/search?q=" + encodeURIComponent(query))
+    .then(function (response) {
+      if (!response.ok) {
+        throw new Error("Failed to fetch search results");
+      }
+
+      return response.json();
+    })
+    .then(function (projects) {
+      renderResults(projects);
+    })
+    .catch(function (error) {
+      console.error("Search failed:", error);
+    });
+}
+
+var searchForm = document.getElementById("topic-search-form");
+
+if (searchForm) {
+  searchForm.addEventListener("submit", handleSearchSubmit);
+}
