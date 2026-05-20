@@ -9,6 +9,8 @@
   <title>DevPath — Find Projects Based On Your Skills</title>
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/static/style.css" />
+  <link href="https://fonts.googleapis.com/css2?
+  family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link
     href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet" />
@@ -41,6 +43,15 @@
     </div>
   </nav>
 
+ <!-- ============================================================
+       No-Script Fallback
+       ============================================================ -->
+  <noscript>
+    <div class="noscript-warning">
+      <p>JavaScript is required to use DevPath. Please enable JavaScript in your browser settings and reload the page.</p>
+    </div>
+  </noscript>
+  
   <!-- ============================================================
        Hero Section
        ============================================================ -->
@@ -75,6 +86,9 @@
       <div class="hero-visual">
         <div class="hero-visual-card hero-visual-card--top">
           <div class="hvc-icon hvc-icon--blue">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" 
+  stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6" />
+  <polyline points="8 6 2 12 8 18" /></svg>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
               stroke-linecap="round" stroke-linejoin="round">
               <polyline points="16 18 22 12 16 6" />
@@ -95,6 +109,11 @@
             <span class="hvm-filename">expense_tracker.py</span>
           </div>
           <div class="hvm-code">
+            <span class="hvm-line"><span class="hvm-kw">def</span> <span class="hvm-fn">add_expense</span>(category, amount):</span>
+            <span class="hvm-line hvm-indent"><span class="hvm-cm"># Save entry to CSV</span></span>
+            <span class="hvm-line hvm-indent">date <span class="hvm-op">=</span> datetime.now()</span>
+            <span class="hvm-line hvm-indent"><span class="hvm-kw">with</span> open(DATA_FILE) <span
+  class="hvm-kw">as</span> f:</span>
             <span class="hvm-line"><span class="hvm-kw">def</span> <span class="hvm-fn">add_expense</span>(category,
               amount):</span>
             <span class="hvm-line hvm-indent"><span class="hvm-cm"># Save entry to CSV</span></span>
@@ -111,10 +130,16 @@
 
         <div class="hero-visual-card hero-visual-card--bottom">
           <div class="hvc-icon hvc-icon--green">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
+  width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6
+  12 2 12" /></svg>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
               stroke-linecap="round" stroke-linejoin="round">
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
             </svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+  stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+  </svg>
           </div>
           <div class="hvc-text">
             <span class="hvc-title">7-Step Roadmap</span>
@@ -179,50 +204,54 @@
 <div class="skill-strip">
   <div class="skill-strip-inner">
     <span class="skill-strip-label">Supports skills including:</span>
-    <div class="skill-strip-items">
-      <span class="ss-item">Python</span>
-      <span class="ss-sep"></span>
+    <div class="skill-strip-marquee" aria-label="Supported skills">
+      <div class="skill-strip-track">
+        <div class="skill-strip-items">
+          <span class="ss-item">Python</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">JavaScript</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">JavaScript</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">HTML / CSS</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">HTML / CSS</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">Flask</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">Flask</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">SQL</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">SQL</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">React</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">React</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">Node.js</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">Node.js</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">pandas</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">pandas</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">C++</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">C++</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">Java</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">Java</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">TypeScript</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">TypeScript</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">Go</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">Go</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">Rust</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">Rust</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">C#</span>
-      <span class="ss-sep"></span>
+          <span class="ss-item">C#</span>
+          <span class="ss-sep"></span>
 
-      <span class="ss-item">Kotlin</span>
+          <span class="ss-item">Kotlin</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -244,6 +273,9 @@
           <p>Type your programming skills or click quick-select chips. Add as many as you like.</p>
         </div>
         <div class="step-connector">
+          <svg width="32" height="16" viewBox="0 0 32 16"><path d="M0 8 H28 M22 2 L30 8 L22 14"
+  stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
           <svg width="32" height="16" viewBox="0 0 32 16">
             <path d="M0 8 H28 M22 2 L30 8 L22 14" stroke="currentColor" stroke-width="2" fill="none"
               stroke-linecap="round" stroke-linejoin="round" />
@@ -255,6 +287,9 @@
           <p>Select your experience level, area of interest, and how much time you can commit.</p>
         </div>
         <div class="step-connector">
+          <svg width="32" height="16" viewBox="0 0 32 16"><path d="M0 8 H28 M22 2 L30 8 L22 14"
+  stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
           <svg width="32" height="16" viewBox="0 0 32 16">
             <path d="M0 8 H28 M22 2 L30 8 L22 14" stroke="currentColor" stroke-width="2" fill="none"
               stroke-linecap="round" stroke-linejoin="round" />
@@ -282,6 +317,10 @@
 
         <div class="feature-card feature-card--pink">
           <div class="feature-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
+  width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0
+  0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 
+  0 1 0 7.75"/></svg>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -289,6 +328,10 @@
               <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
               <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
+  stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+  <circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
           </div>
           <h3>Personalized Matches</h3>
           <p>Projects are scored against your exact skills, level, and interest — not pulled from a generic list.</p>
@@ -297,10 +340,16 @@
 
         <div class="feature-card feature-card--yellow">
           <div class="feature-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
+  width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 
+  2 12"/></svg>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
             </svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
+  stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+  </svg>
           </div>
           <h3>Step-by-Step Roadmaps</h3>
           <p>Each project includes a numbered roadmap so you always know what to build next, without guessing.</p>
@@ -309,6 +358,13 @@
 
         <div class="feature-card feature-card--purple">
           <div class="feature-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
+  stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/>
+  <polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <h3>Starter Code Included</h3>
+          <p>Download a working template for every project. Skip the blank-page problem and start 
+  building immediately.</p>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
               <polyline points="16 18 22 12 16 6" />
@@ -337,23 +393,33 @@
       <div class="form-card-outer">
         <div class="form-card" id="form-section">
           <form id="recommend-form" novalidate>
-
-            <!-- Skills input with chip selector -->
             <div class="form-group">
-              <label for="skills-input">
-                Your Skills
-                <span class="tooltip"
-                  title="Add technologies, programming languages, or tools you know like Python, React, Git, SQL, etc.">
-                  ⓘ
-                </span>
-              </label>
+              <div class="form-label-row" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
+                <label for="skills-input">
+                  Your Skills
+                  <span class="tooltip"
+                    title="Add technologies, programming languages, or tools you know like Python, React, Git, SQL, etc.">
+                    ⓘ
+                  </span>
+                </label>
+                
+                <!-- Inline GitHub Trigger -->
+                <div class="github-inline-trigger" id="github-trigger-wrap" style="line-height: 1.2;">
+                  <button type="button" id="btn-show-github" class="resource-link" style="padding: 4px 8px; border-radius: var(--r-xs); font-size: 0.75rem; gap: 6px;">
+                    <svg style="width:14px; fill:currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    <span>Import from GitHub</span>
+                  </button>
+                </div>
+              </div>
               <div class="skill-input-wrap" id="skill-input-wrap">
                 <div class="skill-chips-selected" id="skill-chips-selected"></div>
-                <input type="text" id="skills-input" placeholder="Type a skill and press Enter..." autocomplete="off" />
+                
                 <input
                   type="text"
-                  id="skills-input"
+                  id="skills-input" 
                   placeholder="Type a skill and press Enter..."
+                  autocomplete="off" 
+                  />
                   autocomplete="off"
                   aria-haspopup="listbox"
                   aria-expanded="false"
@@ -401,6 +467,9 @@
                     <option value="Advanced">Advanced</option>
                   </select>
                 </div>
+                <span class="form-hint">
+                    Select your current proficiency level such as Beginner, Intermediate, or Advanced.
+                </span>
                 <div class="form-error-msg" id="level-error"></div>
               </div>
 
@@ -454,14 +523,29 @@
           <div class="form-error-msg" id="time-error"></div>
         </div>
 
+            <!-- Submit button -->
+            <button type="submit" class="btn-submit" id="submit-btn">
+              <span id="btn-label">Generate My Projects</span>
+
+              <span id="btn-loading" class="btn-loading-content" style="display:none;">
+                <span class="loading-spinner"></span>
+                <span>Finding matches...</span>
+              </span>
+            </button>
         <!-- General error (shown above the button) -->
         <p class="form-error-general" id="form-error-general"></p>
 
         <!-- Submit button -->
-        <button type="submit" class="btn-submit" id="submit-btn">
-          <span id="btn-label">Generate My Projects</span>
-          <span id="btn-loading" style="display:none;">Finding matches...</span>
-        </button>
+        <div class="form-actions">
+          <button type="submit" class="btn-submit" id="submit-btn">
+                <span id="btn-label">Generate My Projects</span>
+              <span id="btn-loading" style="display:none;">Finding matches...</span>
+            </button>
+
+            <button type="button" class="btn-clear" id="clear-filters-btn">
+              <span>Clear Filters</span>
+            </button>
+        </div>
 
         </form>
       </div>
@@ -490,6 +574,9 @@
       <div id="results-empty" style="display:none;">
         <div class="empty-state">
           <div class="empty-icon">
+            <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" 
+  stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8" /><line 
+  x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
             <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
               stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8" />
@@ -598,7 +685,59 @@
     </div>
   </footer>
 
-  <script src="/static/data/skills.js"></script>
+  <!-- GitHub Modal Overlay -->
+  <div class="code-panel-overlay" id="github-modal-overlay" style="align-items: center; justify-content: center; opacity: 1;">
+    <div class="sidebar-card" style="width: 100%; max-width: 400px; margin: 20px; z-index: 400; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
+      
+      <div class="sidebar-card-title">
+        <svg style="width:18px; fill:var(--indigo-600)" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        Sync with GitHub
+      </div>
+      
+      <p class="sidebar-card-desc" style="margin-bottom: 20px;">Enter your username to import coding languages from your top repositories into the skills list.<br/> Note: We use stars to determine top repositories</p>
+      
+      <div class="form-group" style="margin-bottom: 20px;">
+        <div class="skill-input-wrap">
+          <span style="color:var(--gray-400); font-family:var(--font-mono); font-size:0.8rem; margin-left:8px;">@</span>
+          <input type="text" id="github-username" placeholder="username" style="border:none; outline:none; flex:1; padding:10px;">
+        </div>
+        <div class="form-error-msg" id="github-modal-error"></div>
+      </div>
+      
+      <div style="display: flex; gap: 12px;">
+        <button type="button" id="btn-fetch-github" class="btn-primary" style="flex: 2; padding: 10px; font-size: 0.85rem;">Fetch Skills</button>
+        <button type="button" id="btn-close-github" class="btn-view-code-sm" style="flex: 1; border-color: var(--border); color: var(--text-body);">Cancel</button>
+      </div>
+      
+    </div>
+  </div>
+<style>
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    align-items: center;
+}
+
+.btn-clear {
+    background-color: #f3f4f6;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-clear:hover {
+    background-color: #e5e7eb;
+}
+</style>
+
+
+
+    <script src="/static/data/skills.js"></script>
   <script src="/static/script.js"></script>
 </body>
 
