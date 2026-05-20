@@ -645,11 +645,31 @@ if (clearFiltersBtn) {
     title.textContent = project.title;
 
     // Description (truncated for visual consistency)
+    // Description with Read More toggle
     var desc = document.createElement("p");
     desc.className = "project-card-desc";
-    // Cut description to 120 chars so all cards stay the same height
-    desc.textContent = truncate(project.description, 120);
 
+    var shortText = truncate(project.description, 120);
+    var fullText = project.description;
+    var isExpanded = false;
+
+    desc.textContent = shortText;
+
+    // Only add Read More button if description is actually truncated
+    if (fullText.length > 120) {
+      var readMoreBtn = document.createElement("button");
+      readMoreBtn.className = "read-more-btn";
+      readMoreBtn.textContent = "Read more";
+
+      readMoreBtn.addEventListener("click", function () {
+        isExpanded = !isExpanded;
+        desc.textContent = isExpanded ? fullText : shortText;
+        readMoreBtn.textContent = isExpanded ? "Read less" : "Read more";
+        desc.appendChild(readMoreBtn); // re-append button since textContent clears it
+      });
+
+      desc.appendChild(readMoreBtn);
+    }
     // Tags row
     var tagsRow = document.createElement("div");
     tagsRow.className = "project-card-tags";
