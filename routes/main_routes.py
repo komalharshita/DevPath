@@ -10,8 +10,17 @@ from utils.data_loader import find_project_by_id, get_project_stats
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
 import os
 
+from utils.link_helper import parse_external_link
+
 # Create the Blueprint that app.py will register
 main = Blueprint("main", __name__)
+
+
+@main.app_template_filter("parse_resource")
+def parse_resource_filter(resource_str):
+    """Jinja filter to parse a resource string into a standardized dict."""
+    return parse_external_link(resource_str)
+
 
 
 @main.route("/")
