@@ -32,10 +32,17 @@ def internal_server_error(error):
     """Render a friendly 500 page for unexpected server errors."""
     return render_template("500.html"), 500
 
+ fix/skills-input-validation
   
 @app.route('/health')
 def health_check():
     return {'status': 'ok'}, 200
+=======
+@app.errorhandler(405)
+def method_not_allowed(error):
+    """Render a friendly 405 page when the wrong HTTP method is used."""
+    return render_template("405.html"), 405
+ main
 
 
 if __name__ == "__main__":

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport"
+        content="width=device-width,
+        initial-scale=1.0">
+        <title>Survey Form</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <h1>Feedback Survey Form</h1>
+        <form>
+            <h2>Your Details</h2>
+            <label>Your Name:</label><br>
+            <input type="text" name="username"
+            placeholder="Enter name" required><br><br>
+            <label>Your Email:</label><br>
+            <input type="text" name ="email"
+            placeholder="Enter email" required><br><br>
+            <label>Your Age:</label><br>
+            <input type="number" name="age" 
+            placeholder="Enter age" required><br><br>
+            <h2>Survey Report</h2>
+            <label>How is the website experience?</label><br>
+            <select name="experience" required>
+                <option value="">Select an option</option>
+                <option value="excellent">Excellent</option>
+                <option value="good">Good</option>
+                <option value="average">Average</option>
+                <option value="poor">Poor</option>
+            </select><br><br>
+            <label>What improvements would you suggest?</label><br>
+            <textarea name="Improvements"
+            placeholder="Enter your suggestions here..."></textarea><br><br>
+            <input type="submit" value="Submit">
+        </form>
+
+    </body>
+</html>
