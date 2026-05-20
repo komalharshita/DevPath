@@ -75,6 +75,27 @@
   --t: 0.2s ease;
 }
 
+[data-theme="dark"] {
+  --white: #0b1120;
+  --gray-50: #111827;
+  --gray-100: #1f2937;
+  --gray-200: #374151;
+  --gray-300: #4b5563;
+  --gray-400: #9ca3af;
+  --gray-500: #d1d5db;
+  --gray-600: #e5e7eb;
+  --gray-700: #f3f4f6;
+  --gray-900: #ffffff;
+
+  --text-heading: #ffffff;
+  --text-body: #d1d5db;
+  --border: #374151;
+
+  background: #0b1120;
+  color: #f9fafb;
+}.feature-card--pink
+
+
 /* ---- Reset ------------------------------------------------- */
 *,
 *::before,
@@ -133,6 +154,13 @@ ol {
   border-radius: var(--r-full);
   padding: 4px 14px;
   margin-bottom: 16px;
+}
+
+/* Dark mode section eyebrow */
+[data-theme="dark"] .section-eyebrow {
+  background: #1f2937;
+  color: #f9fafb;
+  border: 1px solid #374151;
 }
 
 .section-title {
@@ -290,6 +318,26 @@ ol {
   border-color: rgba(255, 255, 255, 0.45);
   text-decoration: none;
 }
+
+/* Dark mode toggle button */
+.theme-toggle {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.25s ease;
+}
+
+.theme-toggle:hover {
+  background: rgba(255,255,255,0.18);
+  transform: translateY(-2px);
+}
+
+
 
 /* Mobile hamburger */
 .nav-mobile-toggle {
@@ -491,6 +539,16 @@ ol {
   text-decoration: none;
 }
 
+[data-theme="dark"] .btn-hero-primary {
+  background: #fbbf24;
+  color: #111827;
+  box-shadow: none;
+}
+
+[data-theme="dark"] .btn-hero-primary:hover {
+  background: #f59e0b;
+}
+
 .btn-hero-ghost {
   display: inline-flex;
   align-items: center;
@@ -531,6 +589,12 @@ ol {
   box-shadow: var(--shadow-lg);
 }
 
+/* Dark mode hero visual cards */
+[data-theme="dark"] .hero-visual-card {
+  background: #111827;
+  border: 1px solid #374151;
+}
+
 .hvc-icon {
   width: 40px;
   height: 40px;
@@ -551,6 +615,11 @@ ol {
   color: var(--green-500);
 }
 
+[data-theme="dark"] .hvc-icon {
+  background: #1f2937;
+  border: 1px solid #374151;
+}
+
 .hvc-text {
   display: flex;
   flex-direction: column;
@@ -564,9 +633,17 @@ ol {
   color: var(--gray-900);
 }
 
+[data-theme="dark"] .hvc-title {
+  color: #f9fafb;
+}
+
 .hvc-sub {
   font-size: 0.77rem;
   color: var(--gray-500);
+}
+
+[data-theme="dark"] .hvc-sub {
+  color: #d1d5db;
 }
 
 /* Code preview card */
@@ -814,6 +891,17 @@ ol {
   padding: 18px 32px;
 }
 
+[data-theme="dark"] .skill-strip {
+  background:
+    radial-gradient(circle at top left,
+      rgba(79, 70, 229, 0.08),
+      transparent 35%),
+    radial-gradient(circle at bottom right,
+      rgba(99, 102, 241, 0.06),
+      transparent 30%),
+    #020617;
+}
+
 .skill-strip-inner {
   max-width: 1140px;
   margin: 0 auto;
@@ -827,6 +915,13 @@ ol {
   box-shadow: var(--shadow-sm);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+}
+
+/* Dark mode skill strip */
+[data-theme="dark"] .skill-strip-inner {
+  background: #111827;
+  border: 1px solid #374151;
+  box-shadow: none;
 }
 
 .skill-strip-label {
@@ -866,6 +961,15 @@ ol {
     border-color 180ms ease,
     box-shadow 180ms ease;
 }
+
+/* Dark mode tech stack pills */
+[data-theme="dark"] .ss-item {
+  background: rgba(31, 41, 55, 0.9);
+  color: #f9fafb;
+  border: 1px solid rgba(75, 85, 99, 0.4);
+}
+
+
 .ss-item:hover {
   transform: translateY(-1px);
   color: var(--indigo-700);
@@ -881,6 +985,10 @@ ol {
   background: rgba(79, 110, 247, 0.3);
   border-radius: 50%;
   flex-shrink: 0;
+}
+
+[data-theme="dark"] .ss-sep {
+  color: #818cf8;
 }
 
 @keyframes skill-strip-marquee {
@@ -902,10 +1010,17 @@ ol {
   }
 
   .skill-strip-marquee {
-    overflow: visible;
-    mask-image: none;
-    -webkit-mask-image: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  overflow: hidden;
   }
+}
+
+.skill-strip-marquee > * {
+  flex-shrink: 0;
 }
 
 @media (max-width: 768px) {
@@ -1051,6 +1166,14 @@ ol {
   background: var(--purple-100);
 }
 
+/* Dark mode feature cards */
+[data-theme="dark"] .feature-card.feature-card--pink,
+[data-theme="dark"] .feature-card.feature-card--yellow,
+[data-theme="dark"] .feature-card.feature-card--purple {
+  background: #111827;
+  border: 1px solid #374151;
+}
+
 .feature-card-icon {
   width: 52px;
   height: 52px;
@@ -1061,6 +1184,17 @@ ol {
   justify-content: center;
   margin-bottom: 22px;
   box-shadow: var(--shadow-xs);
+  
+}
+
+/* Dark mode feature icons */
+[data-theme="dark"] .feature-card-icon {
+  background: #1f2937;
+  border: 1px solid #374151;
+}
+
+[data-theme="dark"] .feature-card-icon svg {
+  stroke: #f9fafb;
 }
 
 .feature-card--pink .feature-card-icon {
@@ -1102,6 +1236,19 @@ ol {
   padding: 7px 16px;
   border-radius: var(--r-full);
   transition: background var(--t), border-color var(--t);
+  
+}
+
+/* Dark mode feature buttons */
+[data-theme="dark"] .feature-card-link {
+  background: #1f2937;
+  color: #f9fafb;
+  border: 1px solid #374151;
+}
+
+[data-theme="dark"] .feature-card-link:hover {
+  background: #374151;
+  color: white;
 }
 
 .feature-card-link:hover {
@@ -1307,6 +1454,14 @@ label {
   transition: background var(--t), border-color var(--t), color var(--t);
 }
 
+[data-theme="dark"] .skill-pill,
+[data-theme="dark"] .skill-chip,
+[data-theme="dark"] .tech-pill {
+  background: #1f2937;
+  color: #f9fafb;
+  border: 1px solid #374151;
+}
+
 .skill-chip:hover,
 .skill-chip.active {
   background: var(--indigo-700);
@@ -1408,6 +1563,17 @@ select:focus {
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+/* Dark mode clear button */
+[data-theme="dark"] .btn-clear {
+  background: #1f2937;
+  color: #f9fafb;
+  border: 1px solid #374151;
+}
+
+[data-theme="dark"] .btn-clear:hover {
+  background: #374151;
 }
 
 /* ---- Results Section -------------------------------------- */
@@ -2586,6 +2752,17 @@ select:focus {
 #btn-show-github:hover {
     background: var(--indigo-100);
     border-color: rgba(79, 110, 247, 0.2);
+}
+
+/* Dark mode GitHub import button */
+[data-theme="dark"] #btn-show-github {
+  background: #1f2937 !important;
+  color: #f9fafb !important;
+  border: 1px solid #374151 !important;
+}
+
+[data-theme="dark"] #btn-show-github:hover {
+  background: #374151 !important;
 }
 
 #github-modal-overlay.active {
