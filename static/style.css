@@ -1987,6 +1987,7 @@ select:focus {
 #scroll-top-btn.visible {
     display: flex;
 }
+/*Styling for input fields in login and signup pages*/
 input {
   width: 100%;
   padding: 12px 14px;
@@ -2003,7 +2004,8 @@ input:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
-/*Google Login*/
+
+/*Google Login styling*/
 .google-btn {
   display: flex;
   align-items: center;
@@ -2030,7 +2032,8 @@ input:focus {
   background: #f5f5f5;
   transform: translateY(-1px);
 }
-/*Flash Messages*/
+
+/*Flash Messages Styling*/
 .flash-container{
   width: min(900px, 92%);
   margin: 100px auto 20px auto;

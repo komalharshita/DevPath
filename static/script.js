@@ -434,6 +434,7 @@ if (isIndexPage) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     })
+    //means user not logged in/session expired
       .then(function (res) { if(res.status===401){
         window.location.href="/login";
         return;
@@ -615,6 +616,7 @@ if (isDetailPage) {
     if (codeContentEl) codeContentEl.textContent = "Loading starter code...";
 
     fetch("/project/" + PROJECT_ID + "/code")
+    //means user not logged in/session expired
       .then(function (res) {if(res.status===401){
         window.location.href="/login";
         return;
@@ -751,7 +753,7 @@ if (scrollTopBtn) {
     window.addEventListener('scroll', handleScroll);
     scrollTopBtn.addEventListener('click', scrollToTop);
 }
-/*Flash Messages Auto Handle*/
+/*Flash Messages Auto Handle to remove after a certain time*/
 setTimeout(function () {
   document.querySelectorAll(".flash-message").forEach(function (msg) {
     msg.style.opacity = "0";

@@ -22,7 +22,7 @@ class User(db.Model):
             self.password.encode("utf-8")
         )
 
-
+#Signup route
 @auth.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -52,6 +52,7 @@ def signup():
 
     return render_template('signup.html')
 
+#Login Route
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
 
@@ -72,6 +73,7 @@ def login():
 
     return render_template('login.html')
 
+#DashBoard Route
 @auth.route('/dashboard')
 def dashboard():
     # Check if logged in
@@ -86,6 +88,7 @@ def dashboard():
     flash("Please login first.", "error")    
     return redirect('/login')
 
+#Logout Route
 @auth.route('/logout')
 def logout():
 
@@ -93,13 +96,13 @@ def logout():
     flash("Logged out successfully.", "success")
     return redirect('/login')
 
-#Google Login
+#Google Login Route
 @auth.route('/login/google')
 def login_google():
     google = current_app.extensions['google_auth']
     return google.authorize_redirect(
         'http://127.0.0.1:5000/login/google/authorized',
-        prompt="consent select_account"
+        prompt="consent select_account"#ensure account selection during google login
     )
 
 

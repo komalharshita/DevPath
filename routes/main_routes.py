@@ -31,7 +31,7 @@ def recommend():
         interest (str) - Web | Data | Education | Automation | Games
         time     (str) - Low | Medium | High
     """
-    if 'email' not in session:
+    if 'email' not in session:   #done to ensure that only authenticated users get to use website features
         return jsonify({
             "error": "Please login to use DevPath."
         }), 401
