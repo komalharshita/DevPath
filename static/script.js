@@ -955,3 +955,82 @@ if (scrollTopBtn) {
     window.addEventListener('scroll', handleScroll);
     scrollTopBtn.addEventListener('click', scrollToTop);
 }
+
+/* ---- Dark mode toggle with localStorage persistence ---- */
+(function initTheme() {
+  var toggle = document.getElementById('theme-toggle');
+  if (!toggle) return;
+
+  var stored = localStorage.getItem('devpath-theme');
+  if (stored === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    toggle.textContent = '\u2600\uFE0F';
+  }
+
+  toggle.addEventListener('click', function () {
+    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('devpath-theme', 'light');
+      toggle.textContent = '\uD83C\uDF19';
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('devpath-theme', 'dark');
+      toggle.textContent = '\u2600\uFE0F';
+    }
+  });
+})();
+
+/* ---- Project progress tracking ---- */
+(function initProgress() {
+  var steps = document.querySelectorAll('.roadmap-step');
+  var progressFill = document.getElementById('progress-fill');
+  var progressText = document.getElementById('progress-text');
+  if (!steps.length || !progressFill) return;
+
+  var projectId = typeof PROJECT_ID !== 'undefined' ? PROJECT_ID : null;
+  var storageKey = projectId ? 'devpath-progress-' + projectId : null;
+
+  function loadProgress() {
+    if (!storageKey) return {};
+    try {
+      return JSON.parse(localStorage.getItem(storageKey)) || {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveProgress(state) {
+    if (!storageKey) return;
+    localStorage.setItem(storageKey, JSON.stringify(state));
+  }
+
+  function updateUI(state) {
+    var completed = 0;
+    steps.forEach(function (step, i) {
+      if (state[i]) {
+        step.classList.add('completed');
+        completed++;
+      } else {
+        step.classList.remove('completed');
+      }
+    });
+    var pct = steps.length ? (completed / steps.length * 100) : 0;
+    progressFill.style.width = pct + '%';
+    if (progressText) {
+      progressText.textContent = completed + ' / ' + steps.length + ' completed';
+    }
+  }
+
+  var saved = loadProgress();
+  updateUI(saved);
+
+  steps.forEach(function (step, i) {
+    step.addEventListener('click', function () {
+      var state = loadProgress();
+      state[i] = !state[i];
+      saveProgress(state);
+      updateUI(state);
+    });
+  });
+})();
