@@ -9,6 +9,11 @@ from utils.recommender import get_recommendations, validate_recommendation_input
 from utils.data_loader import find_project_by_id, get_project_stats
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
 import os
+import re
+
+def sanitize_input(value):
+    """Remove HTML tags and strip whitespace from user input."""
+    return re.sub(r"<[^>]*>", "", value).strip()
 
 # Create the Blueprint that app.py will register
 main = Blueprint("main", __name__)
@@ -47,10 +52,10 @@ def recommend():
     if not payload:
         return jsonify({"error": "Request body must be valid JSON."}), 400
 
-    skills            = payload.get("skills", "").strip()
-    level             = payload.get("level", "").strip()
-    interest          = payload.get("interest", "").strip()
-    time_availability = payload.get("time", "").strip()
+    skills            = sanitize_input(payload.get("skills", ""))
+    level             = sanitize_input(payload.get("level", ""))
+    interest          = sanitize_input(payload.get("interest", ""))
+    time_availability = sanitize_input(payload.get("time", ""))
 
     # Validate before running the recommendation engine
     errors = validate_recommendation_inputs(skills, level, interest, time_availability)
