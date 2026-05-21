@@ -7,7 +7,7 @@
   <!-- Page title uses the project title injected by Flask's Jinja2 template engine -->
   
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
-  <title>{{ project.title }} — {{ project.level }}{% if project.skills %} {{ project.skills[0] }}{% endif %} Project | DevPath</title>
+  <title> {{project.title}} — {{project.level}} % if project.skills % {{project.skills[0]}} % endif % Project | DevPath</title>
   
   <meta property="og:title" content="{{ project.title }} — DevPath" />
   <meta property="og:description" content="{{ project.description[:155] }}" />
@@ -37,6 +37,46 @@
       </div>
     </div>
   </nav>
+
+  <style>
+    body {
+      background-color: white;
+      color: rgb(8, 4, 44);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: right;
+      padding-top: 50px;
+      transition: 0.3s;
+    }
+
+    .dark {
+      background-color: #121212;
+      color: white;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Dark Mode</h1>
+
+  <button onclick="toggleMode()">
+    Toggle Dark Mode
+  </button>
+
+  <script>
+    function toggleMode() {
+      document.body.classList.toggle("dark");
+    }
+  </script>
+
+</body>
+</html>
 
   <!-- ============================================================
        Project Hero Banner
