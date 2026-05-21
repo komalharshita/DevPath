@@ -501,6 +501,104 @@
           <div class="form-error-msg" id="time-error"></div>
         </div>
 
+        <!-- Advanced Search Toggle Trigger -->
+        <div class="advanced-search-trigger-wrap">
+          <button type="button" class="btn-advanced-toggle" id="btn-advanced-toggle" aria-expanded="false" aria-controls="advanced-search-panel">
+            <span>Advanced Search Filters</span>
+            <span class="toggle-icon">▼</span>
+          </button>
+        </div>
+
+        <!-- Collapsible Advanced Search Panel -->
+        <div class="advanced-search-panel" id="advanced-search-panel">
+          
+          <div class="advanced-search-grid">
+            <!-- Keyword Fuzzy Text Search -->
+            <div class="form-group">
+              <label for="adv-keyword-input">
+                Fuzzy Search Keyword
+                <span class="tooltip" title="Search by keywords inside project titles, descriptions, skills, or tech stacks.">ⓘ</span>
+              </label>
+              <div class="skill-input-wrap">
+                <input type="text" id="adv-keyword-input" placeholder="Search title or description..." autocomplete="off" />
+              </div>
+              <span class="form-hint">Matches title, description, skills or tech stack.</span>
+            </div>
+
+            <!-- Sorting selector -->
+            <div class="form-group">
+              <label for="adv-sort">Sort Results By</label>
+              <div class="select-wrap">
+                <select id="adv-sort" name="sort_by">
+                  <option value="relevance" selected>Relevance (Recommended)</option>
+                  <option value="views">Popularity (Most Viewed)</option>
+                  <option value="recommendations">User Recommended</option>
+                  <option value="hours_asc">Estimated Hours (Shortest first)</option>
+                  <option value="hours_desc">Estimated Hours (Longest first)</option>
+                </select>
+              </div>
+              <span class="form-hint">Choose how matching projects are sorted.</span>
+            </div>
+          </div>
+
+          <div class="advanced-search-grid">
+            <!-- Tech Stack Filter Chips -->
+            <div class="form-group">
+              <label>Filter by Tech Stack</label>
+              <div class="checkbox-chip-group" id="tech-stack-group">
+                <span class="checkbox-chip" data-value="Python">Python</span>
+                <span class="checkbox-chip" data-value="JavaScript">JavaScript</span>
+                <span class="checkbox-chip" data-value="HTML">HTML</span>
+                <span class="checkbox-chip" data-value="CSS">CSS</span>
+                <span class="checkbox-chip" data-value="Flask">Flask</span>
+                <span class="checkbox-chip" data-value="pandas">pandas</span>
+                <span class="checkbox-chip" data-value="Regex">Regex</span>
+                <span class="checkbox-chip" data-value="matplotlib">matplotlib</span>
+              </div>
+              <span class="form-hint">Multi-select technologies to include.</span>
+            </div>
+
+            <!-- Prerequisite Skills Filter Chips -->
+            <div class="form-group">
+              <label>Filter by Prerequisite Skills</label>
+              <div class="checkbox-chip-group" id="prereq-group">
+                <span class="checkbox-chip" data-value="Basic Programming Concepts">Basic Programming</span>
+                <span class="checkbox-chip" data-value="Loops and Functions">Loops & Functions</span>
+                <span class="checkbox-chip" data-value="HTML Basics">HTML Basics</span>
+                <span class="checkbox-chip" data-value="CSS Basics">CSS Basics</span>
+                <span class="checkbox-chip" data-value="Python Dictionaries">Dictionaries</span>
+                <span class="checkbox-chip" data-value="File Handling in Python">File Handling</span>
+              </div>
+              <span class="form-hint">Select prerequisite knowledge levels.</span>
+            </div>
+          </div>
+
+          <div class="advanced-search-grid">
+            <!-- Estimated Hours Range -->
+            <div class="form-group">
+              <label>Estimated Project Duration</label>
+              <div class="hours-range-wrap">
+                <div class="hours-input-box">
+                  <input type="number" id="adv-min-hours" placeholder="Min" min="0" max="100" />
+                </div>
+                <span class="hours-range-to">to</span>
+                <div class="hours-input-box">
+                  <input type="number" id="adv-max-hours" placeholder="Max" min="0" max="100" />
+                </div>
+                <span class="hours-range-to">hours</span>
+              </div>
+              <span class="form-hint">Filter by specific hour commitments.</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Trending Searches Widget -->
+        <div class="trending-searches-wrap">
+          <span class="trending-title">Trending:</span>
+          <div class="trending-chips" id="trending-chips"></div>
+        </div>
+
             <!-- Submit button -->
             <button type="submit" class="btn-submit" id="submit-btn">
               <span id="btn-label">Generate My Projects</span>

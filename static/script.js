@@ -487,6 +487,59 @@ if (clearFiltersBtn) {
       hideSuggestions();
     }
 
+    if (isAdvancedMode) {
+      // In Advanced Search Mode, we skip dropdown validation (allow empty criteria)
+      setLoadingState(true);
+
+      var queryParams = [];
+      
+      var q = document.getElementById("adv-keyword-input").value.trim();
+      if (q) queryParams.push("q=" + encodeURIComponent(q));
+      
+      var skills = skillsHidden.value.trim() || skillsTextInput.value.trim();
+      if (skills) queryParams.push("skills=" + encodeURIComponent(skills));
+      
+      var level = document.getElementById("level").value;
+      if (level) queryParams.push("level=" + encodeURIComponent(level));
+      
+      var interest = document.getElementById("interest").value;
+      if (interest) queryParams.push("interest=" + encodeURIComponent(interest));
+      
+      var timeVal = document.getElementById("time").value;
+      if (timeVal) queryParams.push("time=" + encodeURIComponent(timeVal));
+      
+      var techStack = getSelectedChips("tech-stack-group");
+      if (techStack) queryParams.push("tech_stack=" + encodeURIComponent(techStack));
+      
+      var prereqs = getSelectedChips("prereq-group");
+      if (prereqs) queryParams.push("prerequisite_skills=" + encodeURIComponent(prereqs));
+      
+      var minHours = document.getElementById("adv-min-hours").value.trim();
+      if (minHours) queryParams.push("min_hours=" + encodeURIComponent(minHours));
+      
+      var maxHours = document.getElementById("adv-max-hours").value.trim();
+      if (maxHours) queryParams.push("max_hours=" + encodeURIComponent(maxHours));
+      
+      var sortBy = document.getElementById("adv-sort").value;
+      if (sortBy) queryParams.push("sort_by=" + encodeURIComponent(sortBy));
+
+      var url = "/api/search?" + queryParams.join("&");
+
+      fetch(url)
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          setLoadingState(false);
+          if (data.error) {
+            var generalErr = document.getElementById("form-error-general");
+            if (generalErr) generalErr.textContent = data.error;
+            return;
+          }
+          // Refresh trending keywords list in real-time
+          fetchTrending();
+          renderResults(data.projects || [], "No projects found matching your advanced search criteria. Try adjusting your filters.", true);
+        })
+        .catch(function (err) {
+          setLoadingState(false);
     if (!validateForm()) return; //stop - anything missing/invalid
 
     setLoadingState(true);
@@ -557,18 +610,45 @@ if (clearFiltersBtn) {
     });
         if (data.error) {
           var generalErr = document.getElementById("form-error-general");
-          if (generalErr) generalErr.textContent = data.error;
-          return;
-        }
-        renderResults(data.projects || [], data.message);
+          if (generalErr) generalErr.textContent = "Something went wrong. Please try again.";
+          console.error("API request failed:", err);
+        });
+
+    } else {
+      // Legacy recommendation mode
+      if (!validateForm()) return; //stop - anything missing/invalid
+
+      setLoadingState(true);
+
+      var payload = {
+        skills:   skillsHidden.value.trim() || skillsTextInput.value.trim(),
+        level:    document.getElementById("level").value,
+        interest: document.getElementById("interest").value,
+        time:     document.getElementById("time").value
+      };
+
+      fetch("/api/recommend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(payload)
       })
-      .catch(function (err) {
-        // this runs if the network request itself fails 
-        setLoadingState(false);
-        var generalErr = document.getElementById("form-error-general");
-        if (generalErr) generalErr.textContent = "Something went wrong. Please try again.";
-        console.error("API request failed:", err);
-      });
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          setLoadingState(false);
+          if (data.error) {
+            var generalErr = document.getElementById("form-error-general");
+            if (generalErr) generalErr.textContent = data.error;
+            return;
+          }
+          renderResults(data.projects || [], data.message, false);
+        })
+        .catch(function (err) {
+          setLoadingState(false);
+          var generalErr = document.getElementById("form-error-general");
+          if (generalErr) generalErr.textContent = "Something went wrong. Please try again.";
+          console.error("API request failed:", err);
+        });
+    }
   });
 
   // Manages the loading state of the form and results section(whats visible or not)
@@ -602,11 +682,31 @@ if (clearFiltersBtn) {
 
   //takes the array of projects from the api and draws them on the page as cards
   //if array is empty it shows the "no results" message instead
-  function renderResults(projects, message) {
+  function renderResults(projects, message, isAdvanced) {
     resultsSection.style.display = "block";
     resultsLoadingEl.style.display = "none";
     // Clear out any cards from a previous search before showing new ones
     resultsGrid.innerHTML = "";
+
+    // Dynamically update result titles & badges
+    var titleEl = resultsSection.querySelector(".section-title");
+    var subtitleEl = document.getElementById("results-subtitle");
+
+    if (isAdvanced) {
+      if (titleEl) {
+        titleEl.innerHTML = 'Search Results <span class="results-count-badge">' + projects.length + ' ' + (projects.length === 1 ? 'Project' : 'Projects') + ' Found</span>';
+      }
+      if (subtitleEl) {
+        subtitleEl.textContent = "We found these projects matching your advanced filters.";
+      }
+    } else {
+      if (titleEl) {
+        titleEl.innerHTML = 'Recommended Projects';
+      }
+      if (subtitleEl) {
+        subtitleEl.textContent = "Based on your inputs, here are your top matches.";
+      }
+    }
 
     if (!projects || projects.length === 0) {
       resultsGrid.style.display     = "none";
@@ -667,6 +767,21 @@ if (clearFiltersBtn) {
     // Time tag
     tagsRow.appendChild(createTag("Time: " + project.time, "time"));
 
+    // Add Estimated Hours tag if present
+    if (project.estimated_hours) {
+      tagsRow.appendChild(createTag(project.estimated_hours + " hrs", "hours"));
+    }
+
+    // Add Views tag if present
+    if (project.views !== undefined) {
+      tagsRow.appendChild(createTag(project.views + " views", "views"));
+    }
+
+    // Add Recommendations tag if present
+    if (project.recommendations !== undefined) {
+      tagsRow.appendChild(createTag(project.recommendations + " recs", "recs"));
+    }
+
     // Footer with view-details link
     var footer = document.createElement("div");
     footer.className = "project-card-footer";
@@ -702,6 +817,80 @@ if (clearFiltersBtn) {
     // Only add "..." if the text is actually longer than the limit
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
   }
+
+  // ----------------------------------------------------------
+  // Advanced Search Setup & Control Flow
+  // ----------------------------------------------------------
+  var advToggleBtn   = document.getElementById("btn-advanced-toggle");
+  var advPanel       = document.getElementById("advanced-search-panel");
+  var trendingChips  = document.getElementById("trending-chips");
+  var isAdvancedMode = false;
+
+  // Toggle advanced options panel
+  if (advToggleBtn && advPanel) {
+    advToggleBtn.addEventListener("click", function () {
+      isAdvancedMode = advPanel.classList.toggle("expanded");
+      advToggleBtn.classList.toggle("active", isAdvancedMode);
+      advToggleBtn.setAttribute("aria-expanded", isAdvancedMode ? "true" : "false");
+      if (btnLabel) {
+        btnLabel.textContent = isAdvancedMode ? "Search Projects" : "Generate My Projects";
+      }
+    });
+  }
+
+  // Handle checkable tags/chips
+  document.querySelectorAll(".checkbox-chip-group .checkbox-chip").forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      chip.classList.toggle("active");
+    });
+  });
+
+  function getSelectedChips(groupId) {
+    var group = document.getElementById(groupId);
+    if (!group) return "";
+    var selected = [];
+    group.querySelectorAll(".checkbox-chip.active").forEach(function (chip) {
+      var val = chip.getAttribute("data-value");
+      if (val) selected.push(val);
+    });
+    return selected.join(",");
+  }
+
+  // Fetch trending keywords from endpoint
+  function fetchTrending() {
+    if (!trendingChips) return;
+    fetch("/api/trending?limit=5")
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        trendingChips.innerHTML = "";
+        if (data.trending && data.trending.length > 0) {
+          data.trending.forEach(function (term) {
+            var chip = document.createElement("span");
+            chip.className = "trending-chip";
+            chip.textContent = term;
+            chip.addEventListener("click", function () {
+              var kwInput = document.getElementById("adv-keyword-input");
+              if (kwInput) {
+                kwInput.value = term;
+                // Expand panel if not already open
+                if (!isAdvancedMode && advToggleBtn) {
+                  advToggleBtn.click();
+                }
+                // Auto trigger search
+                form.dispatchEvent(new Event("submit"));
+              }
+            });
+            trendingChips.appendChild(chip);
+          });
+        }
+      })
+      .catch(function (e) {
+        console.error("Failed to load trending items:", e);
+      });
+  }
+
+  // Initial call to load trending chips
+  fetchTrending();
 
 } // end isIndexPage
 

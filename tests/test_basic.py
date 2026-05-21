@@ -299,6 +299,88 @@ def test_scoring_weights_has_all_keys():
 
 
 # ============================================================
+# Advanced Search Tests
+# ============================================================
+
+from utils.search_engine import search_projects
+
+def test_search_projects_fuzzy_query():
+    """Verify that fuzzy queries match title and description."""
+    # Searching 'expense' should match Personal Expense Tracker
+    results = search_projects({"q": "expense"})
+    assert len(results) >= 1
+    assert any(p["title"] == "Personal Expense Tracker" for p in results)
+
+    # Searching 'REST' should match Task Manager REST API
+    results = search_projects({"q": "REST"})
+    assert len(results) >= 1
+    assert any("REST API" in p["title"] for p in results)
+
+
+def test_search_projects_filters():
+    """Verify combined filters (tech_stack, prerequisite_skills, hours, etc.)."""
+    # 1. Tech stack: Python + CSV
+    results = search_projects({"tech_stack": "Python,CSV module"})
+    assert len(results) >= 1
+    assert all("Python" in p["skills"] for p in results)
+
+    # 2. Prerequisite skills: Loops and Functions
+    results = search_projects({"prerequisite_skills": "Loops and Functions"})
+    assert len(results) >= 1
+    assert any(p["title"] == "Personal Expense Tracker" for p in results)
+
+    # 3. Hours range bounds: min_hours=10, max_hours=20
+    results = search_projects({"min_hours": "10", "max_hours": "20"})
+    assert len(results) >= 1
+    for p in results:
+        assert 10 <= p["estimated_hours"] <= 20
+
+
+def test_search_projects_sorting():
+    """Verify sorting options work correctly (views, recommendations, hours, relevance)."""
+    # Sort by views (most viewed)
+    results = search_projects({"sort_by": "views"})
+    assert len(results) > 1
+    views = [p["views"] for p in results]
+    assert views == sorted(views, reverse=True)
+
+    # Sort by recommendations (most recommended)
+    results = search_projects({"sort_by": "recommendations"})
+    assert len(results) > 1
+    recs = [p["recommendations"] for p in results]
+    assert recs == sorted(recs, reverse=True)
+
+    # Sort by duration asc (shortest first)
+    results = search_projects({"sort_by": "hours_asc"})
+    assert len(results) > 1
+    hours = [p["estimated_hours"] for p in results]
+    assert hours == sorted(hours)
+
+
+def test_api_search_endpoint():
+    """Verify GET /api/search works and returns expected JSON structure."""
+    client = get_client()
+    response = client.get("/api/search?q=weather&sort_by=views")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "projects" in data
+    assert "count" in data
+    assert data["count"] >= 1
+    assert data["projects"][0]["title"] == "Weather Dashboard"
+
+
+def test_api_trending_endpoint():
+    """Verify GET /api/trending returns a list of tags."""
+    client = get_client()
+    response = client.get("/api/trending?limit=3")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "trending" in data
+    assert len(data["trending"]) <= 3
+
+
+
+# ============================================================
 # Run tests directly (no pytest required)
 # ============================================================
 

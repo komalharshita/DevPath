@@ -8,6 +8,8 @@ from flask import Blueprint, render_template, request, jsonify, send_from_direct
 from utils.recommender import get_recommendations, validate_recommendation_inputs
 from utils.data_loader import find_project_by_id, get_project_stats
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
+from utils.search_engine import search_projects
+from utils.analytics import log_search_query, get_trending_searches
 import os
 
 # Create the Blueprint that app.py will register
@@ -70,6 +72,52 @@ def recommend():
         }), 200
 
     return jsonify({"projects": results}), 200
+
+
+@main.route("/api/search", methods=["GET"])
+def search():
+    """
+    Advanced search route (GET).
+    Accepts query params: q, skills, level, interest, time, tech_stack,
+                         prerequisite_skills, min_hours, max_hours, sort_by
+    Returns matching projects list as JSON, and logs the search query in analytics.
+    """
+    query_params = {
+        "q": request.args.get("q", ""),
+        "skills": request.args.get("skills", ""),
+        "level": request.args.get("level", ""),
+        "interest": request.args.get("interest", ""),
+        "time": request.args.get("time", ""),
+        "tech_stack": request.args.get("tech_stack", ""),
+        "prerequisite_skills": request.args.get("prerequisite_skills", ""),
+        "min_hours": request.args.get("min_hours", ""),
+        "max_hours": request.args.get("max_hours", ""),
+        "sort_by": request.args.get("sort_by", "relevance")
+    }
+
+    results = search_projects(query_params)
+    
+    # Log to search analytics
+    q_text = query_params["q"].strip()
+    log_search_query(q_text, query_params, len(results))
+
+    return jsonify({
+        "projects": results,
+        "count": len(results)
+    }), 200
+
+
+@main.route("/api/trending", methods=["GET"])
+def trending_searches():
+    """
+    Trending searches endpoint (GET).
+    Returns a list of popular search keywords based on search history.
+    """
+    limit = request.args.get("limit", 5, type=int)
+    trending = get_trending_searches(limit=limit)
+    return jsonify({
+        "trending": trending
+    }), 200
 
 
 @main.route("/project/<int:project_id>")

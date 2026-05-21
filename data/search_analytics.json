@@ -1,0 +1,293 @@
+[
+  {
+    "q": "weather",
+    "filters": {
+      "q": "weather",
+      "sort_by": "views"
+    },
+    "result_count": 1,
+    "timestamp": "2026-05-18T14:18:41.549438"
+  },
+  {
+    "q": "weather",
+    "filters": {
+      "q": "weather",
+      "sort_by": "views"
+    },
+    "result_count": 1,
+    "timestamp": "2026-05-18T14:18:38.005235"
+  },
+  {
+    "q": "weather",
+    "filters": {
+      "q": "weather",
+      "level": "Advanced",
+      "interest": "Web",
+      "time": "High",
+      "tech_stack": "Python",
+      "min_hours": "1",
+      "max_hours": "10",
+      "sort_by": "views"
+    },
+    "result_count": 0,
+    "timestamp": "2026-05-18T14:15:07.502670"
+  },
+  {
+    "q": "weather",
+    "filters": {
+      "q": "weather",
+      "level": "Advanced",
+      "interest": "Web",
+      "time": "High",
+      "sort_by": "views"
+    },
+    "result_count": 0,
+    "timestamp": "2026-05-18T14:14:15.807509"
+  },
+  {
+    "q": "weather",
+    "filters": {
+      "q": "weather",
+      "skills": "Python",
+      "level": "Advanced",
+      "interest": "Web",
+      "time": "Medium",
+      "sort_by": "views"
+    },
+    "result_count": 0,
+    "timestamp": "2026-05-18T14:13:58.162471"
+  },
+  {
+    "q": "weather",
+    "filters": {
+      "q": "weather",
+      "skills": "Python",
+      "level": "Advanced",
+      "interest": "Web",
+      "time": "Medium",
+      "tech_stack": "Python",
+      "prerequisite_skills": "Basic Programming Concepts",
+      "sort_by": "views"
+    },
+    "result_count": 0,
+    "timestamp": "2026-05-18T14:13:54.568062"
+  },
+  {
+    "q": "Python",
+    "filters": {
+      "q": "Python",
+      "skills": "Python",
+      "level": "Advanced",
+      "interest": "Web",
+      "time": "Medium",
+      "tech_stack": "Python",
+      "prerequisite_skills": "Basic Programming Concepts",
+      "sort_by": "relevance"
+    },
+    "result_count": 0,
+    "timestamp": "2026-05-18T14:12:23.079858"
+  },
+  {
+    "q": "Python",
+    "filters": {
+      "q": "Python",
+      "skills": "Python",
+      "level": "Advanced",
+      "interest": "Web",
+      "time": "Medium",
+      "tech_stack": "Python",
+      "sort_by": "relevance"
+    },
+    "result_count": 0,
+    "timestamp": "2026-05-18T14:12:18.151602"
+  },
+  {
+    "q": "Matplotlib",
+    "filters": {
+      "q": "Matplotlib",
+      "skills": "Python",
+      "level": "Advanced",
+      "interest": "Web",
+      "time": "Medium",
+      "tech_stack": "Python",
+      "min_hours": "15",
+      "max_hours": "24",
+      "sort_by": "views"
+    },
+    "result_count": 0,
+    "timestamp": "2026-05-18T14:11:53.983472"
+  },
+  {
+    "q": "Weather",
+    "filters": {
+      "q": "Weather",
+      "skills": "Python",
+      "level": "Advanced",
+      "interest": "Web",
+      "time": "Medium",
+      "tech_stack": "Python",
+      "min_hours": "15",
+      "max_hours": "24",
+      "sort_by": "views"
+    },
+    "result_count": 0,
+    "timestamp": "2026-05-18T14:11:52.399515"
+  },
+  {
+    "q": "Matplotlib",
+    "filters": {
+      "q": "Matplotlib",
+      "skills": "Python",
+      "level": "Advanced",
+      "interest": "Web",
+      "time": "Medium",
+      "tech_stack": "Python",
+      "min_hours": "15",
+      "max_hours": "24",
+      "sort_by": "views"
+    },
+    "result_count": 0,
+    "timestamp": "2026-05-18T14:11:50.727012"
+  },
+  {
+    "q": "Flask",
+    "filters": {
+      "q": "Flask",
+      "skills": "Python",
+      "level": "Advanced",
+      "interest": "Web",
+      "time": "Medium",
+      "tech_stack": "Python",
+      "min_hours": "15",
+      "max_hours": "24",
+      "sort_by": "views"
+    },
+    "result_count": 0,
+    "timestamp": "2026-05-18T14:11:48.975190"
+  },
+  {
+    "q": "Python",
+    "filters": {
+      "q": "Python",
+      "skills": "Python",
+      "level": "Advanced",
+      "interest": "Web",
+      "time": "Medium",
+      "tech_stack": "Python",
+      "min_hours": "15",
+      "max_hours": "24",
+      "sort_by": "views"
+    },
+    "result_count": 0,
+    "timestamp": "2026-05-18T14:11:46.527072"
+  },
+  {
+    "q": "Python",
+    "filters": {
+      "q": "Python",
+      "skills": "Python",
+      "level": "Advanced",
+      "interest": "Web",
+      "time": "Medium",
+      "tech_stack": "Python",
+      "min_hours": "15",
+      "max_hours": "24",
+      "sort_by": "views"
+    },
+    "result_count": 0,
+    "timestamp": "2026-05-18T14:11:43.863352"
+  },
+  {
+    "q": "Python",
+    "filters": {
+      "q": "Python",
+      "skills": "Python",
+      "level": "Advanced",
+      "interest": "Web",
+      "time": "Medium",
+      "tech_stack": "Python,pandas,matplotlib",
+      "prerequisite_skills": "Basic Programming Concepts,Loops and Functions,File Handling in Python",
+      "min_hours": "0",
+      "max_hours": "10",
+      "sort_by": "views"
+    },
+    "result_count": 0,
+    "timestamp": "2026-05-18T14:11:26.000485"
+  },
+  {
+    "q": "Python",
+    "filters": {
+      "q": "Python",
+      "skills": "Python",
+      "level": "Advanced",
+      "interest": "Web",
+      "time": "Medium",
+      "sort_by": "relevance"
+    },
+    "result_count": 0,
+    "timestamp": "2026-05-18T14:11:02.217383"
+  },
+  {
+    "q": "weather",
+    "filters": {
+      "q": "weather",
+      "sort_by": "views"
+    },
+    "result_count": 1,
+    "timestamp": "2026-05-18T14:09:30.838594"
+  },
+  {
+    "q": "weather",
+    "filters": {
+      "q": "weather",
+      "sort_by": "views"
+    },
+    "result_count": 1,
+    "timestamp": "2026-05-18T14:08:40.816360"
+  },
+  {
+    "q": "Flask",
+    "filters": {
+      "q": "Flask",
+      "skills": "Python",
+      "level": "Intermediate",
+      "interest": "Data",
+      "time": "Medium",
+      "tech_stack": "pandas",
+      "sort_by": "relevance"
+    },
+    "result_count": 0,
+    "timestamp": "2026-05-18T14:07:55.295821"
+  },
+  {
+    "q": "Flask",
+    "filters": {
+      "q": "Flask",
+      "skills": "Python",
+      "level": "Intermediate",
+      "interest": "Data",
+      "time": "Medium",
+      "sort_by": "relevance"
+    },
+    "result_count": 0,
+    "timestamp": "2026-05-18T14:07:51.321866"
+  },
+  {
+    "q": "weather",
+    "filters": {
+      "q": "weather",
+      "sort_by": "views"
+    },
+    "result_count": 1,
+    "timestamp": "2026-05-18T14:06:19.575494"
+  },
+  {
+    "q": "weather",
+    "filters": {
+      "q": "weather",
+      "sort_by": "views"
+    },
+    "result_count": 1,
+    "timestamp": "2026-05-18T14:06:11.797241"
+  }
+]

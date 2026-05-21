@@ -2,7 +2,9 @@
   {
     "id": 1,
     "title": "Personal Expense Tracker",
-    "skills": ["Python"],
+    "skills": [
+      "Python"
+    ],
     "level": "Beginner",
     "interest": "Data",
     "time": "Low",
@@ -13,7 +15,11 @@
       "View monthly summary",
       "Export data to CSV file"
     ],
-    "tech_stack": ["Python", "CSV module", "datetime module"],
+    "tech_stack": [
+      "Python",
+      "CSV module",
+      "datetime module"
+    ],
     "roadmap": [
       "Step 1: Set up the project folder and create main.py",
       "Step 2: Design the expense data structure as a dictionary",
@@ -28,12 +34,23 @@
       "CSV module guide: https://docs.python.org/3/library/csv.html",
       "Real Python beginner tutorials: https://realpython.com"
     ],
-    "starter_code": "starter_code/expense_tracker.py"
+    "starter_code": "starter_code/expense_tracker.py",
+    "estimated_hours": 4,
+    "prerequisite_skills": [
+      "Basic Programming Concepts",
+      "Loops and Functions"
+    ],
+    "views": 180,
+    "recommendations": 45
   },
   {
     "id": 2,
     "title": "Weather Dashboard",
-    "skills": ["JavaScript", "HTML", "CSS"],
+    "skills": [
+      "JavaScript",
+      "HTML",
+      "CSS"
+    ],
     "level": "Beginner",
     "interest": "Web",
     "time": "Low",
@@ -44,10 +61,13 @@
       "Show a weather icon based on conditions",
       "Toggle between Celsius and Fahrenheit"
     ],
-    "tech_stack": ["HTML", "CSS", "JavaScript", "OpenWeatherMap API"],
+    "tech_stack": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "OpenWeatherMap API"
+    ],
     "roadmap": [
-      "Step 1: Create the HTML structure with a search form",
-      "Step 2: Style the page with CSS flexbox",
       "Step 3: Sign up for a free OpenWeatherMap API key",
       "Step 4: Write the fetch() call to get weather data",
       "Step 5: Parse the JSON response and extract key fields",
@@ -59,12 +79,22 @@
       "OpenWeatherMap free tier: https://openweathermap.org/api",
       "CSS Flexbox guide: https://css-tricks.com/snippets/css/a-guide-to-flexbox"
     ],
-    "starter_code": "starter_code/weather_dashboard.html"
+    "starter_code": "starter_code/weather_dashboard.html",
+    "estimated_hours": 6,
+    "prerequisite_skills": [
+      "HTML Basics",
+      "CSS Basics",
+      "JavaScript Variables"
+    ],
+    "views": 320,
+    "recommendations": 98
   },
   {
     "id": 3,
     "title": "Student Grade Manager",
-    "skills": ["Python"],
+    "skills": [
+      "Python"
+    ],
     "level": "Beginner",
     "interest": "Education",
     "time": "Medium",
@@ -75,7 +105,11 @@
       "Assign letter grades automatically",
       "Save and load data from a JSON file"
     ],
-    "tech_stack": ["Python", "json module", "os module"],
+    "tech_stack": [
+      "Python",
+      "json module",
+      "os module"
+    ],
     "roadmap": [
       "Step 1: Define the student data structure using a dictionary",
       "Step 2: Write add_student() and add_grade() functions",
@@ -90,12 +124,21 @@
       "Python functions tutorial: https://realpython.com/defining-your-own-python-function",
       "W3Schools Python: https://www.w3schools.com/python"
     ],
-    "starter_code": "starter_code/grade_manager.py"
+    "starter_code": "starter_code/grade_manager.py",
+    "estimated_hours": 12,
+    "prerequisite_skills": [
+      "Python Dictionaries",
+      "File Handling in Python"
+    ],
+    "views": 95,
+    "recommendations": 30
   },
   {
     "id": 4,
     "title": "Task Manager REST API",
-    "skills": ["Python"],
+    "skills": [
+      "Python"
+    ],
     "level": "Intermediate",
     "interest": "Web",
     "time": "Medium",
@@ -106,7 +149,12 @@
       "Assign priority levels to tasks",
       "Persist data to a JSON file"
     ],
-    "tech_stack": ["Python", "Flask", "JSON", "Postman (for testing)"],
+    "tech_stack": [
+      "Python",
+      "Flask",
+      "JSON",
+      "Postman (for testing)"
+    ],
     "roadmap": [
       "Step 1: Install Flask and create the app.py file",
       "Step 2: Define the task data model as a dictionary",
@@ -122,12 +170,24 @@
       "REST API design guide: https://restfulapi.net",
       "Postman download: https://www.postman.com/downloads"
     ],
-    "starter_code": "starter_code/task_api.py"
+    "starter_code": "starter_code/task_api.py",
+    "estimated_hours": 18,
+    "prerequisite_skills": [
+      "Python functions",
+      "Basic HTTP concepts",
+      "JSON data structure"
+    ],
+    "views": 240,
+    "recommendations": 75
   },
   {
     "id": 5,
     "title": "Portfolio Website",
-    "skills": ["HTML", "CSS", "JavaScript"],
+    "skills": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
     "level": "Beginner",
     "interest": "Web",
     "time": "Low",
@@ -138,7 +198,11 @@
       "Skills list with visual indicators",
       "Contact form with basic validation"
     ],
-    "tech_stack": ["HTML", "CSS", "JavaScript"],
+    "tech_stack": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
     "roadmap": [
       "Step 1: Plan the page sections on paper first",
       "Step 2: Write the HTML structure for all sections",
@@ -154,12 +218,24 @@
       "CSS Grid guide: https://css-tricks.com/snippets/css/complete-guide-grid",
       "Responsive design basics: https://web.dev/learn/design"
     ],
-    "starter_code": "starter_code/portfolio.html"
+    "starter_code": "starter_code/portfolio.html",
+    "estimated_hours": 5,
+    "prerequisite_skills": [
+      "HTML Structure",
+      "CSS Selectors"
+    ],
+    "views": 480,
+    "recommendations": 135
   },
   {
     "id": 6,
     "title": "URL Shortener",
-    "skills": ["Python", "JavaScript", "HTML", "CSS"],
+    "skills": [
+      "Python",
+      "JavaScript",
+      "HTML",
+      "CSS"
+    ],
     "level": "Intermediate",
     "interest": "Web",
     "time": "High",
@@ -170,7 +246,14 @@
       "Track how many times a link was clicked",
       "List all shortened links in a dashboard"
     ],
-    "tech_stack": ["Python", "Flask", "HTML", "CSS", "JavaScript", "JSON"],
+    "tech_stack": [
+      "Python",
+      "Flask",
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "JSON"
+    ],
     "roadmap": [
       "Step 1: Set up Flask app with two routes: home and redirect",
       "Step 2: Write a random 6-character code generator",
@@ -186,12 +269,22 @@
       "Python secrets module: https://docs.python.org/3/library/secrets.html",
       "UUID in Python: https://docs.python.org/3/library/uuid.html"
     ],
-    "starter_code": "starter_code/url_shortener.py"
+    "starter_code": "starter_code/url_shortener.py",
+    "estimated_hours": 35,
+    "prerequisite_skills": [
+      "Python basics",
+      "Web forms",
+      "HTML/CSS basics"
+    ],
+    "views": 410,
+    "recommendations": 115
   },
   {
     "id": 7,
     "title": "Data Analysis Report Generator",
-    "skills": ["Python"],
+    "skills": [
+      "Python"
+    ],
     "level": "Intermediate",
     "interest": "Data",
     "time": "High",
@@ -202,7 +295,12 @@
       "Calculate mean, median, and mode per column",
       "Generate bar charts for categorical data"
     ],
-    "tech_stack": ["Python", "pandas", "matplotlib", "os module"],
+    "tech_stack": [
+      "Python",
+      "pandas",
+      "matplotlib",
+      "os module"
+    ],
     "roadmap": [
       "Step 1: Install pandas and matplotlib via pip",
       "Step 2: Write a CSV loader that validates the file path",
@@ -217,12 +315,21 @@
       "matplotlib tutorials: https://matplotlib.org/stable/tutorials",
       "Real Python data analysis: https://realpython.com/pandas-dataframe"
     ],
-    "starter_code": "starter_code/data_report.py"
+    "starter_code": "starter_code/data_report.py",
+    "estimated_hours": 30,
+    "prerequisite_skills": [
+      "Python Basics",
+      "Understanding of lists and tabular data"
+    ],
+    "views": 210,
+    "recommendations": 60
   },
   {
     "id": 8,
     "title": "Password Strength Checker",
-    "skills": ["Python"],
+    "skills": [
+      "Python"
+    ],
     "level": "Beginner",
     "interest": "Cybersecurity",
     "time": "Low",
@@ -233,7 +340,10 @@
       "Suggest stronger password improvements",
       "Prevent weak password patterns"
     ],
-    "tech_stack": ["Python", "Regex"],
+    "tech_stack": [
+      "Python",
+      "Regex"
+    ],
     "roadmap": [
       "Step 1: Create the password input system",
       "Step 2: Check password length",
@@ -246,12 +356,21 @@
       "Python regex docs: https://docs.python.org/3/library/re.html",
       "OWASP password guidelines: https://owasp.org"
     ],
-    "starter_code": "starter_code/password_checker.py"
+    "starter_code": "starter_code/password_checker.py",
+    "estimated_hours": 3,
+    "prerequisite_skills": [
+      "Basic Python Syntax",
+      "String operations"
+    ],
+    "views": 150,
+    "recommendations": 35
   },
   {
     "id": 9,
     "title": "Feedback Survey Form",
-    "skills": ["HTML"],
+    "skills": [
+      "HTML"
+    ],
     "level": "Beginner",
     "interest": "Web",
     "time": "Low",
@@ -261,7 +380,9 @@
       "Dropdown menu for experience selection",
       "Text area for detailed user suggestions"
     ],
-    "tech_stack": ["HTML"],
+    "tech_stack": [
+      "HTML"
+    ],
     "roadmap": [
       "Step 1: Create the HTML folder structure inside starter_code",
       "Step 2: Build the input text fields and labels",
@@ -272,12 +393,22 @@
     "resources": [
       "MDN HTML Forms: https://developer.mozilla.org/en-US/docs/Learn/Forms"
     ],
-    "starter_code": "starter_code/survey_form/index.html"
+    "starter_code": "starter_code/survey_form/index.html",
+    "estimated_hours": 3,
+    "prerequisite_skills": [
+      "HTML Basics"
+    ],
+    "views": 110,
+    "recommendations": 25
   },
   {
-    "id":10,
+    "id": 10,
     "title": "API ETL Pipeline",
-    "skills": ["Python","pandas","requests"],
+    "skills": [
+      "Python",
+      "pandas",
+      "requests"
+    ],
     "level": "Intermediate",
     "interest": "Data",
     "time": "Medium",
@@ -289,7 +420,12 @@
       "Generate summary statistics",
       "Export the processed CSV for any other Analytics projects"
     ],
-    "tech_stack": ["Python", "pandas","requests","JSON"],
+    "tech_stack": [
+      "Python",
+      "pandas",
+      "requests",
+      "JSON"
+    ],
     "roadmap": [
       "Step 1:  Install required modules via pip",
       "Step 2:  Find a public API key for this project",
@@ -309,9 +445,14 @@
       "REST API tutorial: https://restfulapi.net/",
       "Real Python API guide: https://realpython.com/api-integration-in-python/"
     ],
-    "starter_code": "starter_code/api_data_pipeline.py"
+    "starter_code": "starter_code/api_data_pipeline.py",
+    "estimated_hours": 25,
+    "prerequisite_skills": [
+      "Python Basics",
+      "Understanding APIs",
+      "pandas library basics"
+    ],
+    "views": 180,
+    "recommendations": 55
   }
 ]
-
-
-
