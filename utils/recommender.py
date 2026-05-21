@@ -7,16 +7,19 @@ from utils.data_loader import load_all_projects
 # Maximum number of recommendations returned to the user
 MAX_RESULTS = 3
 
+# Minimum score required for a project
+# to be considered relevant enough for recommendation.
+MIN_SCORE_THRESHOLD = 4
+
 # Scoring weights used by the recommendation engine.
 # Higher weights mean that criterion has more influence
 # on the final recommendation score.
 SCORING_WEIGHTS = {
-    "skill":    3,
-    "level":    2,
-    "interest": 2,
-    "time":     1,
+    "skill": 3,
+    "level": 2,
+    "interest": 4,
+    "time": 1,
 }
-
 
 # Common aliases and abbreviations for skills
 # This improves recommendation accuracy by normalizing user input
@@ -26,7 +29,9 @@ SKILL_ALIASES = {
     "html5": "html",
     "css3": "css",
     "c++": "cpp",
-    "web dev": "javascript"
+    "web dev": "javascript",
+    "ml": "machine learning",
+    "ai": "artificial intelligence"
 }
 
 
@@ -54,81 +59,129 @@ def parse_skills(skills_string):
 
 
 def score_single_project(
-        project, user_skills,
-        level, interest, time_availability):
+        project,
+        user_skills,
+        level,
+        interest,
+        time_availability):
     """
     Calculate a numeric relevance score for one project.
 
-    Each matching criterion adds points:
-      - Each matching skill:  +3
-      - Level match:          +2
-      - Interest match:       +2
-      - Time match:           +1
+    Scoring criteria:
+      - Matching skills
+      - Matching level
+      - Matching interest
+      - Matching time availability
 
-    Returns an integer score (0 means no match at all).
+    Returns:
+        Integer relevance score.
+        Returns 0 immediately if the interest category does not match.
     """
+
+    # Normalize project fields
+    project_interest = project.get("interest", "").lower()
+    project_level = project.get("level", "").lower()
+    project_time = project.get("time", "").lower()
+
+    # Strict interest filtering
+    # Prevent unrelated category recommendations
+    if project_interest != interest.lower():
+        return 0
+
     score = 0
 
-    # Compare user's skills against the project's required skills
-    project_skills = [s.lower() for s in project.get("skills", [])]
-    # Count how many user skills overlap with the
-    # skills required by the current project.
-    matched_skills = sum(1 for skill in user_skills if skill in project_skills)
-    # Add weighted points based on the number of matching skills.
-    # More overlapping skills result in a higher recommendation score.
+    # Compare user's skills against project skills
+    project_skills = [
+        s.lower()
+        for s in project.get("skills", [])
+    ]
+
+    matched_skills = sum(
+        1 for skill in user_skills
+        if skill in project_skills
+    )
+
+    # Add weighted skill score
     score += matched_skills * SCORING_WEIGHTS["skill"]
 
-    # Award points for each additional matching criterion
-    if project.get("level", "").lower() == level.lower():
+    # Add score for matching level
+    if project_level == level.lower():
         score += SCORING_WEIGHTS["level"]
 
-    if project.get("interest", "").lower() == interest.lower():
-        score += SCORING_WEIGHTS["interest"]
+    # Add score for matching interest
+    score += SCORING_WEIGHTS["interest"]
 
-    if project.get("time", "").lower() == time_availability.lower():
+    # Add score for matching time availability
+    if project_time == time_availability.lower():
         score += SCORING_WEIGHTS["time"]
 
     return score
 
 
-def get_recommendations(skills_string, level, interest, time_availability):
+def get_recommendations(
+        skills_string,
+        level,
+        interest,
+        time_availability):
     """
-    Return the top N recommended projects for the given user inputs.
+    Return the top recommended projects for the given user inputs.
 
     Steps:
-      1. Parse the raw skills input into a list.
-      2. Score every project in the dataset.
-      3. Drop projects with a score of zero (no overlap at all).
-      4. Sort by score descending.
-      5. Return the top MAX_RESULTS projects.
+      1. Parse user skills.
+      2. Score all projects.
+      3. Remove weak/irrelevant matches.
+      4. Sort by highest score.
+      5. Return top MAX_RESULTS projects.
     """
+
     user_skills = parse_skills(skills_string)
     all_projects = load_all_projects()
 
     scored_projects = []
 
     for project in all_projects:
+
         score = score_single_project(
-            project, user_skills, level, interest, time_availability
+            project,
+            user_skills,
+            level,
+            interest,
+            time_availability
         )
-        # Ignore projects with a score of 0 since they
-        # have no meaningful overlap with the user's inputs.
-        if score > 0:
-            scored_projects.append({"project": project, "score": score})
 
-    # Sort projects in descending order so the
-    # most relevant recommendations appear first.
-    scored_projects.sort(key=lambda item: item["score"], reverse=True)
+        # Ignore weak matches
+        if score >= MIN_SCORE_THRESHOLD:
+            scored_projects.append({
+                "project": project,
+                "score": score
+            })
 
-    # Return only the project dicts, not the score metadata
-    return [item["project"] for item in scored_projects[:MAX_RESULTS]]
+    # Sort projects by descending score
+    scored_projects.sort(
+        key=lambda item: item["score"],
+        reverse=True
+    )
+
+    # Return only project data
+    return [
+        item["project"]
+        for item in scored_projects[:MAX_RESULTS]
+    ]
 
 
-def validate_recommendation_inputs(skills, level, interest, time_availability):
+def validate_recommendation_inputs(
+        skills,
+        level,
+        interest,
+        time_availability):
     """
-    Validate all four required fields.
-    Returns a list of error strings. An empty list means all inputs are valid.
+    Validate all required recommendation inputs.
+
+    Returns:
+        List of validation error messages.
+        Empty list means all inputs are valid.
     """
+
     errors = []
 
     if not skills or not skills.strip():

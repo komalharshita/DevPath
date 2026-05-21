@@ -414,17 +414,15 @@
               <div class="skill-input-wrap" id="skill-input-wrap">
                 <div class="skill-chips-selected" id="skill-chips-selected"></div>
                 
-                <input
-                  type="text"
-                  id="skills-input" 
-                  placeholder="Type a skill and press Enter..."
-                  autocomplete="off" 
+                  <input
+                    type="text"
+                    id="skills-input"
+                    placeholder="Type a skill and press Enter..."
+                    autocomplete="off"
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                    aria-controls="skills-suggestions"
                   />
-                  autocomplete="off"
-                  aria-haspopup="listbox"
-                  aria-expanded="false"
-                  aria-controls="skills-suggestions"
-                />
                 <div id="skills-suggestions" class="skills-suggestions"></div>
               </div>
               <!-- Hidden field holds the final comma-separated value -->
@@ -523,7 +521,7 @@
           <div class="form-error-msg" id="time-error"></div>
         </div>
 
-            <!-- Submit button -->
+            <!-- Submit button
             <button type="submit" class="btn-submit" id="submit-btn">
               <span id="btn-label">Generate My Projects</span>
 
@@ -531,7 +529,7 @@
                 <span class="loading-spinner"></span>
                 <span>Finding matches...</span>
               </span>
-            </button>
+            </button> -->
         <!-- General error (shown above the button) -->
         <p class="form-error-general" id="form-error-general"></p>
 
