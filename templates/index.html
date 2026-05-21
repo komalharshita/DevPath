@@ -8,6 +8,22 @@
     content="DevPath recommends real coding projects based on your skills, level, and interests — with full roadmaps and starter code." />
   <title>DevPath — Find Projects Based On Your Skills</title>
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+  <!--
+    Anti-FOUC theme script — MUST come before the stylesheet.
+    Reads localStorage synchronously and sets html[data-theme] so the
+    browser applies the correct CSS variables on the very first paint.
+    Falls back to the OS prefers-color-scheme if no preference is saved.
+  -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('devpath-theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = saved || (prefersDark ? 'dark' : 'light');
+        document.documentElement.dataset.theme = theme;
+      } catch (e) { /* localStorage blocked in some private modes */ }
+    }());
+  </script>
   <link rel="stylesheet" href="/static/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 </head>
@@ -16,7 +32,7 @@
   <!-- ============================================================
        Navigation
        ============================================================ -->
-  <nav class="navbar" id="navbar">
+  <nav class="navbar" id="navbar" aria-label="Main navigation">
     <div class="nav-inner">
       <a href="/" class="nav-logo">Dev<span class="nav-logo-accent">Path</span></a>
       <div class="nav-links">
@@ -24,18 +40,76 @@
         <a href="#features" class="nav-link">Features</a>
         <a href="#find-project" class="nav-link">Find Project</a>
         <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-btn-outline">GitHub</a>
+        <!-- Dark/light mode toggle — aria-pressed and aria-label are set
+             dynamically by initTheme() in script.js on every page load -->
+        <button class="theme-toggle" id="theme-toggle-desktop"
+                aria-pressed="false"
+                aria-label="Switch to dark mode">
+          <!-- Moon icon: shown in light mode (clicking switches to dark) -->
+          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <!-- Sun icon: shown in dark mode (clicking switches to light) -->
+          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
       </div>
       <!-- Mobile hamburger toggle -->
-      <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation">
+      <button class="nav-mobile-toggle" id="nav-mobile-toggle"
+              aria-label="Toggle navigation"
+              aria-expanded="false"
+              aria-controls="nav-mobile-menu">
         <span></span><span></span><span></span>
       </button>
     </div>
     <!-- Mobile menu -->
-    <div class="nav-mobile-menu" id="nav-mobile-menu">
-      <a href="#how-it-works" class="nav-mobile-link">How It Works</a>
-      <a href="#features" class="nav-mobile-link">Features</a>
-      <a href="#find-project" class="nav-mobile-link">Find Project</a>
-      <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-mobile-link">GitHub</a>
+    <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
+      <a href="#how-it-works" class="nav-mobile-link" role="menuitem">How It Works</a>
+      <a href="#features" class="nav-mobile-link" role="menuitem">Features</a>
+      <a href="#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
+      <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-mobile-link" role="menuitem">GitHub</a>
+      <!-- Theme toggle in mobile menu — same .theme-toggle class so
+           the JS engine updates both this and the desktop button together -->
+      <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile"
+              style="background:none;border:none;text-align:left;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;padding:10px 0;font-size:0.95rem;font-weight:500;color:rgba(255,255,255,0.8);"
+              aria-pressed="false"
+              aria-label="Switch to dark mode"
+              role="menuitem">
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <span class="theme-toggle-label">Dark Mode</span>
+      </button>
     </div>
   </nav>
 
@@ -534,7 +608,8 @@
   <!-- ============================================================
        Results Section
        ============================================================ -->
-  <section class="results-section" id="results-section" style="display:none;">
+  <!-- aria-live="polite" announces newly injected results to screen readers -->
+  <section class="results-section" id="results-section" style="display:none;" aria-live="polite" aria-atomic="false">
     <div class="container">
       <div class="section-eyebrow">Your Matches</div>
       <h2 class="section-title">Recommended Projects</h2>

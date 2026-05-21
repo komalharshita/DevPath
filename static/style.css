@@ -75,6 +75,96 @@
   --t: 0.2s ease;
 }
 
+/* ---- Dark Mode Variables ----------------------------------- */
+
+html[data-theme="dark"] {
+  /* ---- Semantic text colours ---- */
+  --text-heading: #e2e8f0;           
+  --text-body:    #94a3b8;         
+  --text-light:   #64748b;           
+
+  /* ---- Border ---- */
+  --border:       #1e293b;          
+
+  /* ---- "White" surface → dark surface ---- */
+  --white:        #0f172a;           
+  /* ---- Gray scale remapped to dark equivalents ---- */
+  --gray-50:      #1e293b;           
+  --gray-100:     #1e293b;           
+  --gray-200:     #334155;           
+  --gray-300:     #475569;
+  --gray-400:     #64748b;
+  --gray-500:     #94a3b8;
+  --gray-600:     #cbd5e1;
+  --gray-700:     #e2e8f0;
+  --gray-900:     #f1f5f9;          
+
+  /* ---- Indigo scale softened for dark surfaces ---- */
+  --indigo-50:    #1e2a4a;           
+  --indigo-100:   #1e3a6e;           
+
+  /* ---- Purple tints ---- */
+  --purple-100:   #2d1b69;
+
+  /* ---- Pink / yellow / green tints ---- */
+  --pink-100:     #3b1130;
+  --yellow-100:   #3b2a00;
+  --green-100:    #052e16;
+
+  /* ---- Shadows (darker on dark bg look heavy; lighten them) ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.55);
+  --shadow-xl: 0 16px 60px rgba(0, 0, 0, 0.6);
+}
+
+/* ---- Smooth theme transitions --------------------------------
+   Applied to every element so switching themes fades smoothly.
+   The theme-toggle button itself is excluded (handled inline). */
+.theme-ready *,
+.theme-ready *::before,
+.theme-ready *::after {
+  transition:
+    background-color 0.3s ease,
+    border-color     0.3s ease,
+    color            0.3s ease,
+    box-shadow       0.3s ease;
+}
+
+/* ---- Theme Toggle Button ----------------------------------- */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-full);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.85);
+  flex-shrink: 0;
+  /* Intentionally NOT covered by the global theme-ready transition
+     so the icon swap is instant on click. Individual fill/stroke
+     animate fine via the inherited rule. */
+}
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--yellow-400);
+  outline-offset: 3px;
+}
+
+/* Icon visibility is controlled by data-theme on <html> */
+.theme-toggle .icon-sun  { display: none;   }
+.theme-toggle .icon-moon { display: block;  }
+
+html[data-theme="dark"] .theme-toggle .icon-sun  { display: block;  }
+html[data-theme="dark"] .theme-toggle .icon-moon { display: none;   }
+
 /* ---- Reset ------------------------------------------------- */
 *,
 *::before,
@@ -95,6 +185,14 @@ body {
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
+/* Dark mode: body background shifts to deep navy, distinct from --white card surfaces */
+html[data-theme="dark"] body { background: #080f1e; }
+/* Dark mode: the detail page (gray-50 bg) also needs updating */
+html[data-theme="dark"] .detail-page { background: #080f1e; }
+img { display: block; max-width: 100%; }
+a { color: var(--indigo-500); text-decoration: none; }
+a:hover { text-decoration: underline; }
+ul, ol { list-style: none; }
 
 img {
   display: block;
@@ -2562,6 +2660,162 @@ select:focus {
   .section-sub {
     margin-bottom: 40px;
   }
+}
+
+/* =============================================================
+   Dark Mode — Component-specific overrides
+   These handle hard-coded values that CSS variables alone
+   cannot reach (e.g., border-trick chevrons, inline colours).
+   ============================================================= */
+
+/* Select chevron arrow — uses border colours, not text colour */
+html[data-theme="dark"] .select-wrap::after {
+  border-top-color: var(--gray-500);
+}
+
+/* Form fields: explicit text/background so browser doesn't invert */
+html[data-theme="dark"] select,
+html[data-theme="dark"] input[type="text"]:not(.skill-input-wrap input) {
+  color: var(--gray-700);
+  background: var(--gray-50);
+  border-color: var(--border);
+}
+html[data-theme="dark"] select:focus {
+  background: var(--gray-100);
+  border-color: var(--indigo-500);
+}
+html[data-theme="dark"] .skill-input-wrap input[type="text"] {
+  color: var(--gray-700);
+}
+html[data-theme="dark"] .skill-input-wrap {
+  background: var(--gray-50);
+  border-color: var(--border);
+}
+html[data-theme="dark"] .skill-input-wrap:focus-within {
+  background: var(--gray-100);
+}
+
+/* Skill autocomplete dropdown */
+html[data-theme="dark"] .skills-suggestions {
+  background: var(--gray-50);
+  border-color: var(--border);
+}
+html[data-theme="dark"] .suggestion-item {
+  color: var(--gray-700);
+  border-bottom-color: var(--border);
+}
+html[data-theme="dark"] .suggestion-item:hover,
+html[data-theme="dark"] .suggestion-item--active {
+  background: var(--indigo-50);
+  color: var(--indigo-500);
+}
+
+/* Skill chip selected (inside the input wrap) */
+html[data-theme="dark"] .skill-chip-selected {
+  color: #a5b4fc;
+  background: var(--indigo-100);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+html[data-theme="dark"] .skill-chip-remove { color: #a5b4fc; }
+html[data-theme="dark"] .skill-chip-remove:hover { color: #f87171; }
+
+/* Quick-pick chips (available row) */
+html[data-theme="dark"] .skill-chip {
+  color: var(--gray-500);
+  background: var(--gray-50);
+  border-color: var(--border);
+}
+html[data-theme="dark"] .skill-chip:hover,
+html[data-theme="dark"] .skill-chip.active {
+  background: var(--indigo-700);
+  border-color: var(--indigo-700);
+  color: #ffffff;
+}
+
+/* Difficulty value colours — light theme uses dark green/amber/red,
+   which are unreadable on dark surfaces; switch to lighter tones */
+html[data-theme="dark"] .stats-value--beginner     { color: #6ee7b7; }
+html[data-theme="dark"] .stats-value--intermediate { color: #fcd34d; }
+html[data-theme="dark"] .stats-value--advanced     { color: #fca5a5; }
+
+/* Project tag level variants */
+html[data-theme="dark"] .project-tag--beginner     { color: #6ee7b7; background: #052e16; }
+html[data-theme="dark"] .project-tag--intermediate { color: #fcd34d; background: #3b2a00; }
+html[data-theme="dark"] .project-tag--advanced     { color: #fca5a5; background: #3b0f0f; }
+
+/* Sidebar code card gradient — adjust for dark */
+html[data-theme="dark"] .sidebar-card--code {
+  background: linear-gradient(135deg, #1a1f3a 0%, #2d1b69 100%);
+  border-color: rgba(99, 102, 241, 0.25);
+}
+
+/* View Code button on dark sidebar card */
+html[data-theme="dark"] .btn-view-code-sm {
+  background: var(--gray-50);
+  color: #a5b4fc;
+  border-color: rgba(99, 102, 241, 0.4);
+}
+html[data-theme="dark"] .btn-view-code-sm:hover {
+  background: var(--indigo-600);
+  color: #ffffff;
+}
+
+/* Resource links */
+html[data-theme="dark"] .resource-link {
+  background: var(--gray-50);
+  border-color: var(--border);
+  color: var(--indigo-500);
+}
+html[data-theme="dark"] .resource-link:hover {
+  background: var(--indigo-50);
+  border-color: rgba(79, 110, 247, 0.4);
+}
+
+/* Step connector arrows */
+html[data-theme="dark"] .step-connector { color: var(--gray-400); }
+
+/* Feature card icon backgrounds */
+html[data-theme="dark"] .feature-card-icon {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Error page large code number */
+html[data-theme="dark"] .error-code { color: var(--gray-300); }
+
+/* Scrollbar in dark mode (Webkit) */
+html[data-theme="dark"] .skills-suggestions::-webkit-scrollbar-track { background: var(--gray-100); }
+html[data-theme="dark"] .skills-suggestions::-webkit-scrollbar-thumb { background: var(--indigo-500); }
+
+/* Mobile menu dark bg */
+html[data-theme="dark"] .nav-mobile-menu {
+  background: #0d1526;
+  border-top-color: rgba(255,255,255,0.06);
+}
+
+/* Mobile toggle label: use CSS content so "Dark Mode" / "Light Mode"
+   updates automatically without needing JavaScript string manipulation */
+.theme-toggle-label { font-size: 0; }       /* hide raw text node */
+.theme-toggle-label::before {
+  content: "Dark Mode";
+  font-size: 0.95rem;
+}
+html[data-theme="dark"] .theme-toggle-label::before {
+  content: "Light Mode";
+}
+
+/* ---- Dark Mode: Contrast fixes --------------------------------
+ */
+html[data-theme="dark"] .nav-logo {
+  color: #ffffff;
+}
+
+
+ 
+html[data-theme="dark"] .hvc-title {
+  color: #1e293b;   
+}
+html[data-theme="dark"] .hvc-sub {
+  color: #475569;
 }
 
 .github-input-reveal input {
