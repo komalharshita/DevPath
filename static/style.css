@@ -96,6 +96,48 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+.back-to-top {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 220;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: var(--r-full);
+  background: linear-gradient(135deg, var(--indigo-600), var(--indigo-800));
+  color: var(--white);
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(16px) scale(0.92);
+  pointer-events: none;
+  transition:
+    opacity var(--t),
+    transform var(--t),
+    box-shadow var(--t),
+    background var(--t);
+}
+
+.back-to-top:hover {
+  background: linear-gradient(135deg, var(--indigo-500), var(--indigo-700));
+  box-shadow: var(--shadow-xl);
+}
+
+.back-to-top:focus-visible {
+  outline: 3px solid rgba(251, 191, 36, 0.75);
+  outline-offset: 3px;
+}
+
+.back-to-top--visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
 img {
   display: block;
   max-width: 100%;
@@ -251,16 +293,21 @@ ol {
 
 /* Animated underline effect */
 .nav-link::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -4px;
   left: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, var(--indigo-400, #60a5fa), var(--yellow-400));
+  background: linear-gradient(
+    90deg,
+    var(--indigo-400, #60a5fa),
+    var(--yellow-400)
+  );
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
     opacity 0.35s ease;
   opacity: 0;
 }
@@ -282,7 +329,9 @@ ol {
   border: 1.5px solid rgba(255, 255, 255, 0.28);
   border-radius: var(--r-full);
   padding: 7px 18px;
-  transition: background var(--t), border-color var(--t);
+  transition:
+    background var(--t),
+    border-color var(--t);
 }
 
 .nav-btn-outline:hover {
@@ -308,7 +357,9 @@ ol {
   height: 2px;
   background: var(--white);
   border-radius: 2px;
-  transition: transform var(--t), opacity var(--t);
+  transition:
+    transform var(--t),
+    opacity var(--t);
 }
 
 .nav-mobile-toggle.open span:nth-child(1) {
@@ -347,16 +398,21 @@ ol {
 
 /* Animated underline for mobile links */
 .nav-mobile-link::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, var(--indigo-400, #60a5fa), var(--yellow-400));
+  background: linear-gradient(
+    90deg,
+    var(--indigo-400, #60a5fa),
+    var(--yellow-400)
+  );
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
     opacity 0.35s ease;
   opacity: 0;
 }
@@ -379,7 +435,12 @@ ol {
 .hero {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(140deg, var(--indigo-900) 0%, var(--indigo-800) 40%, var(--purple-700) 100%);
+  background: linear-gradient(
+    140deg,
+    var(--indigo-900) 0%,
+    var(--indigo-800) 40%,
+    var(--purple-700) 100%
+  );
   padding: 130px 32px 90px;
   min-height: 92vh;
   display: flex;
@@ -390,7 +451,10 @@ ol {
 .hero-bg-grid {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.06) 1px,
+    transparent 1px
+  );
   background-size: 28px 28px;
   pointer-events: none;
 }
@@ -459,8 +523,6 @@ ol {
   max-width: 500px;
 }
 
-
-
 /* Hero CTA buttons */
 .hero-cta-row {
   display: flex;
@@ -481,7 +543,10 @@ ol {
   font-weight: 700;
   border-radius: var(--r-full);
   box-shadow: 0 4px 20px rgba(251, 191, 36, 0.4);
-  transition: background var(--t), transform var(--t), box-shadow var(--t);
+  transition:
+    background var(--t),
+    transform var(--t),
+    box-shadow var(--t);
 }
 
 .btn-hero-primary:hover {
@@ -700,7 +765,9 @@ ol {
   gap: 20px;
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--border);
-  transition: transform var(--t), box-shadow var(--t);
+  transition:
+    transform var(--t),
+    box-shadow var(--t);
 }
 
 .stat-card:hover {
@@ -759,12 +826,27 @@ ol {
     gap: 20px;
   }
 
+  .back-to-top {
+    right: 18px;
+    bottom: 18px;
+    width: 44px;
+    height: 44px;
+  }
   .stats-section {
     margin-top: -40px;
   }
 
   .stat-card {
     padding: 24px;
+  }
+}
+
+@media (max-width: 576px) {
+  .back-to-top {
+    right: 14px;
+    bottom: 14px;
+    width: 42px;
+    height: 42px;
   }
 }
 
@@ -806,8 +888,16 @@ ol {
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(circle at top left, rgba(79, 110, 247, 0.12), transparent 34%),
-    radial-gradient(circle at bottom right, rgba(91, 33, 182, 0.08), transparent 30%),
+    radial-gradient(
+      circle at top left,
+      rgba(79, 110, 247, 0.12),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at bottom right,
+      rgba(91, 33, 182, 0.08),
+      transparent 30%
+    ),
     linear-gradient(180deg, var(--gray-50), var(--indigo-50));
   border-top: 1px solid rgba(35, 53, 194, 0.08);
   border-bottom: 1px solid rgba(35, 53, 194, 0.08);
@@ -884,8 +974,12 @@ ol {
 }
 
 @keyframes skill-strip-marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -968,7 +1062,9 @@ ol {
   padding: 36px 28px;
   text-align: left;
   box-shadow: var(--shadow-sm);
-  transition: box-shadow var(--t), transform var(--t);
+  transition:
+    box-shadow var(--t),
+    transform var(--t);
 }
 
 .step-card:hover {
@@ -1031,7 +1127,9 @@ ol {
   padding: 38px 32px;
   position: relative;
   overflow: hidden;
-  transition: transform var(--t), box-shadow var(--t);
+  transition:
+    transform var(--t),
+    box-shadow var(--t);
 }
 
 .feature-card:hover {
@@ -1101,7 +1199,9 @@ ol {
   background: rgba(255, 255, 255, 0.6);
   padding: 7px 16px;
   border-radius: var(--r-full);
-  transition: background var(--t), border-color var(--t);
+  transition:
+    background var(--t),
+    border-color var(--t);
 }
 
 .feature-card-link:hover {
@@ -1165,7 +1265,9 @@ label {
   align-items: center;
   gap: 6px;
   cursor: text;
-  transition: border-color var(--t), box-shadow var(--t);
+  transition:
+    border-color var(--t),
+    box-shadow var(--t);
 }
 
 .skill-input-wrap:focus-within {
@@ -1251,7 +1353,9 @@ label {
 .suggestion-item {
   padding: 12px 14px;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
   font-size: 0.9rem;
   color: var(--gray-700);
   border-bottom: 1px solid var(--gray-100);
@@ -1304,7 +1408,10 @@ label {
   border-radius: var(--r-full);
   padding: 5px 14px;
   cursor: pointer;
-  transition: background var(--t), border-color var(--t), color var(--t);
+  transition:
+    background var(--t),
+    border-color var(--t),
+    color var(--t);
 }
 
 .skill-chip:hover,
@@ -1345,7 +1452,9 @@ input[type="text"]:not(.skill-input-wrap input) {
   background: var(--gray-50);
   appearance: none;
   -webkit-appearance: none;
-  transition: border-color var(--t), box-shadow var(--t);
+  transition:
+    border-color var(--t),
+    box-shadow var(--t);
 }
 
 select:focus {
@@ -1383,7 +1492,11 @@ select:focus {
 .btn-submit {
   width: 100%;
   padding: 16px 24px;
-  background: linear-gradient(90deg, var(--indigo-700) 0%, var(--purple-600) 100%);
+  background: linear-gradient(
+    90deg,
+    var(--indigo-700) 0%,
+    var(--purple-600) 100%
+  );
   color: var(--white);
   border: none;
   border-radius: var(--r-sm);
@@ -1393,7 +1506,10 @@ select:focus {
   cursor: pointer;
   letter-spacing: 0.01em;
   box-shadow: 0 4px 20px rgba(35, 53, 194, 0.35);
-  transition: opacity var(--t), transform var(--t), box-shadow var(--t);
+  transition:
+    opacity var(--t),
+    transform var(--t),
+    box-shadow var(--t);
   margin-top: 8px;
 }
 
@@ -1446,7 +1562,6 @@ select:focus {
 }
 
 @keyframes dotBounce {
-
   0%,
   80%,
   100% {
@@ -1519,7 +1634,10 @@ select:focus {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  transition: box-shadow var(--t), transform var(--t), border-color var(--t);
+  transition:
+    box-shadow var(--t),
+    transform var(--t),
+    border-color var(--t);
 }
 
 .project-card:hover {
@@ -1598,7 +1716,9 @@ select:focus {
   font-weight: 600;
   text-align: center;
   cursor: pointer;
-  transition: background var(--t), color var(--t);
+  transition:
+    background var(--t),
+    color var(--t);
   text-decoration: none;
 }
 
@@ -1611,7 +1731,11 @@ select:focus {
 /* ---- CTA Banner ------------------------------------------- */
 .cta-section {
   padding: 96px 32px;
-  background: linear-gradient(135deg, var(--indigo-800) 0%, var(--purple-700) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--indigo-800) 0%,
+    var(--purple-700) 100%
+  );
   text-align: center;
 }
 
@@ -1647,7 +1771,9 @@ select:focus {
   font-weight: 700;
   border-radius: var(--r-full);
   box-shadow: 0 6px 24px rgba(251, 191, 36, 0.45);
-  transition: background var(--t), transform var(--t);
+  transition:
+    background var(--t),
+    transform var(--t);
 }
 
 .btn-cta:hover {
@@ -1756,7 +1882,12 @@ select:focus {
 }
 
 .detail-hero {
-  background: linear-gradient(135deg, var(--indigo-900) 0%, var(--indigo-800) 50%, var(--purple-700) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--indigo-900) 0%,
+    var(--indigo-800) 50%,
+    var(--purple-700) 100%
+  );
   padding: 108px 0 60px;
   position: relative;
   overflow: hidden;
@@ -1766,7 +1897,10 @@ select:focus {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.04) 1px,
+    transparent 1px
+  );
   background-size: 28px 28px;
   pointer-events: none;
 }
@@ -1878,7 +2012,9 @@ select:focus {
   border-radius: var(--r-xs);
   white-space: nowrap;
   box-shadow: 0 4px 16px rgba(251, 191, 36, 0.35);
-  transition: background var(--t), transform var(--t);
+  transition:
+    background var(--t),
+    transform var(--t);
 }
 
 .btn-download:hover {
@@ -2011,22 +2147,24 @@ select:focus {
 }
 
 .roadmap-dot {
-  width: 16px; height: 16px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: var(--white);
   border: 2px solid var(--indigo-600);
-  position: relative; z-index: 1;
+  position: relative;
+  z-index: 1;
   margin-top: 4px;
 }
-.roadmap-step:first-child .roadmap-dot{
-  background: var(--indigo-600) ;
-  border-color:var(--indigo-100);
-  box-shadow:0 0 0 3px var(--indigo-100);
+.roadmap-step:first-child .roadmap-dot {
+  background: var(--indigo-600);
+  border-color: var(--indigo-100);
+  box-shadow: 0 0 0 3px var(--indigo-100);
 }
 .roadmap-line {
   flex: 1;
   width: 0;
-  border-left:2px dashed var(--border);
+  border-left: 2px dashed var(--border);
   margin: 4px 0;
 }
 
@@ -2080,7 +2218,9 @@ select:focus {
   border: 1px solid var(--border);
   border-radius: var(--r-xs);
   width: 100%;
-  transition: background var(--t), border-color var(--t);
+  transition:
+    background var(--t),
+    border-color var(--t);
 }
 
 .resource-link:hover {
@@ -2117,7 +2257,11 @@ select:focus {
 }
 
 .sidebar-card--code {
-  background: linear-gradient(135deg, var(--indigo-50) 0%, var(--purple-100) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--indigo-50) 0%,
+    var(--purple-100) 100%
+  );
   border-color: rgba(79, 110, 247, 0.18);
 }
 
@@ -2209,7 +2353,9 @@ select:focus {
   font-weight: 600;
   cursor: pointer;
   text-align: center;
-  transition: background var(--t), color var(--t);
+  transition:
+    background var(--t),
+    color var(--t);
 }
 
 .btn-view-code-sm:hover {
@@ -2337,7 +2483,11 @@ select:focus {
   font-weight: 600;
   color: var(--indigo-500);
   cursor: pointer;
-  transition: background var(--t), border-color var(--t), color var(--t), transform 0.1s ease;
+  transition:
+    background var(--t),
+    border-color var(--t),
+    color var(--t),
+    transform 0.1s ease;
 }
 
 .btn-copy-code:hover {
@@ -2375,7 +2525,9 @@ select:focus {
   z-index: 500;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
 }
 
 .copy-toast.show {
@@ -2384,7 +2536,8 @@ select:focus {
 }
 
 .code-viewer {
-  flex: 1; overflow: auto;
+  flex: 1;
+  overflow: auto;
   padding: 16px 0;
   font-family: var(--font-mono);
   font-size: 0.83rem;
@@ -2442,7 +2595,9 @@ select:focus {
   border-radius: var(--r-xs);
   cursor: pointer;
   box-shadow: 0 4px 18px rgba(35, 53, 194, 0.3);
-  transition: opacity var(--t), transform var(--t);
+  transition:
+    opacity var(--t),
+    transform var(--t);
 }
 
 .btn-primary:hover {
@@ -2523,7 +2678,6 @@ select:focus {
     padding: 110px 20px 72px;
   }
 
-
   .form-card {
     padding: 28px 22px 24px;
   }
@@ -2565,51 +2719,54 @@ select:focus {
 }
 
 .github-input-reveal input {
-    border: 1px solid var(--border);
-    border-radius: var(--r-xs);
-    font-family: var(--font-body);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+  font-family: var(--font-body);
 }
 
 .github-input-reveal input:focus {
-    border-color: var(--indigo-400);
-    outline: none;
-    background: var(--white);
+  border-color: var(--indigo-400);
+  outline: none;
+  background: var(--white);
 }
 
 #btn-show-github {
-    border: 1px solid transparent;
-    transition: all var(--t);
-    color: var(--indigo-600);
-    background: var(--indigo-50);
+  border: 1px solid transparent;
+  transition: all var(--t);
+  color: var(--indigo-600);
+  background: var(--indigo-50);
 }
 
 #btn-show-github:hover {
-    background: var(--indigo-100);
-    border-color: rgba(79, 110, 247, 0.2);
+  background: var(--indigo-100);
+  border-color: rgba(79, 110, 247, 0.2);
 }
 
 #github-modal-overlay.active {
-    display: flex !important; /* Overrides the 'none' display */
-    backdrop-filter: blur(4px);
-    animation: fadeIn 0.2s ease;
+  display: flex !important; /* Overrides the 'none' display */
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease;
 }
 
 #github-modal-overlay .sidebar-card {
-    transform: scale(0.9);
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: scale(0.9);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 #github-modal-overlay.active .sidebar-card {
-    transform: scale(1);
+  transform: scale(1);
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 768px) {
-
   .footer {
     padding: 56px 24px 0;
   }
@@ -2637,7 +2794,6 @@ select:focus {
 }
 
 @media (max-width: 480px) {
-
   .footer {
     padding: 48px 18px 0;
   }
@@ -2691,13 +2847,11 @@ select:focus {
   }
 }
 
-
 .btn-submit:disabled {
   opacity: 0.75;
   cursor: not-allowed;
   transform: none;
 }
- 
 
 .btn-loading-content {
   display: inline-flex;
@@ -2705,17 +2859,15 @@ select:focus {
   gap: 10px;
   justify-content: center;
 }
- 
 
 .loading-spinner {
   width: 18px;
   height: 18px;
-  border: 2px solid rgba(255,255,255,0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-top-color: #ffffff;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
- 
 
 .loading-box {
   animation: fadeInUp 0.35s ease;
@@ -2732,17 +2884,17 @@ select:focus {
 .loading-dots span:nth-child(3) {
   animation-delay: 0.4s;
 }
- 
 
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
- 
 
 @keyframes pulse {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     transform: scale(0.7);
     opacity: 0.5;
   }
@@ -2752,7 +2904,7 @@ select:focus {
     opacity: 1;
   }
 }
- 
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -2806,7 +2958,9 @@ select:focus {
   font-size: 1.25rem;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: opacity 0.3s ease, transform 0.2s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.2s ease;
   z-index: 999;
 }
 
@@ -2818,7 +2972,6 @@ select:focus {
 #scroll-top-btn.visible {
   display: flex;
 }
-
 
 /* Line-numbered code rows */
 .code-line {
