@@ -839,12 +839,32 @@ ol {
   white-space: nowrap;
 }
 
+.skill-strip-marquee {
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: visible;
+  position: relative;
+  padding: 8px 0;
+}
+
+.skill-strip-track {
+  display: flex;
+  width: max-content;
+  animation: skill-strip-marquee 16s linear infinite;
+}
+
+.skill-strip-track:hover {
+  animation-play-state: paused;
+}
+
 .skill-strip-items {
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
   gap: 0;
   white-space: nowrap;
+  width: max-content;
+  padding-right: 18px;
 }
 
 .ss-item {
@@ -884,8 +904,13 @@ ol {
 }
 
 @keyframes skill-strip-marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-45%);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
