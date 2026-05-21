@@ -2845,4 +2845,20 @@ select:focus {
   flex: 1;
   white-space: pre;
   color: #e6edf3;
+}@media (max-width: 768px) {
+  .project-card {
+    width: 100%;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .project-card {
+    width: 48%;
+  }
+}
+
+@media (min-width: 1025px) {
+  .project-card {
+    width: 30%;
+  }
 }
