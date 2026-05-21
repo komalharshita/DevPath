@@ -2846,3 +2846,63 @@ select:focus {
   white-space: pre;
   color: #e6edf3;
 }
+/* ============================================================
+   Project Resources Section
+   ============================================================ */
+
+.project-resources-section {
+  padding: 80px 20px;
+  background: #0f172a;
+}
+
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.resource-card {
+  background: #111827;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  padding: 24px;
+  transition: 0.3s ease;
+}
+
+.resource-card:hover {
+  transform: translateY(-6px);
+  border-color: #6366f1;
+}
+
+.resource-icon {
+  font-size: 2rem;
+  margin-bottom: 16px;
+}
+
+.resource-card h3 {
+  color: white;
+  margin-bottom: 12px;
+}
+
+.resource-card p {
+  color: #cbd5e1;
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+
+.resource-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.resource-links a {
+  color: #818cf8;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.resource-links a:hover {
+  color: #a5b4fc;
+}
