@@ -6,7 +6,11 @@
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
-from utils.data_loader import find_project_by_id, get_project_stats
+from utils.data_loader import (
+    find_project_by_id,
+    get_project_stats,
+    load_all_projects
+)
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
 import os
 
@@ -109,3 +113,32 @@ def download_code(project_id):
     import os
     filename = os.path.basename(full_path)
     return send_from_directory(get_starter_code_dir(), filename, as_attachment=True)
+
+@main.route("/api/search")
+def search_projects():
+    """Return projects matching the user's search query."""
+
+    query = request.args.get("q", "").strip().lower()
+
+    if not query:
+        return jsonify([])
+
+    projects = load_all_projects()
+    filtered_projects = []
+
+    for project in projects:
+
+        # Combine searchable project fields into one lowercase string
+        searchable_text = " ".join([
+            project.get("title", ""),
+            project.get("description", ""),
+            project.get("interest", ""),
+            " ".join(project.get("skills", [])),
+            " ".join(project.get("tech_stack", [])),
+            " ".join(project.get("features", []))
+        ]).lower()
+
+        if query in searchable_text:
+            filtered_projects.append(project)
+
+    return jsonify(filtered_projects)

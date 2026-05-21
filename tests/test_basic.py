@@ -298,6 +298,42 @@ def test_scoring_weights_has_all_keys():
     assert set(SCORING_WEIGHTS.keys()) == expected_keys
 
 
+def test_search_api_returns_results():
+    """Search API should return matching projects for a valid query."""
+    client = get_client()
+
+    response = client.get("/api/search?q=python")
+
+    assert response.status_code == 200
+
+    data = response.get_json()
+
+    assert isinstance(data, list)
+
+
+
+def test_search_api_empty_query():
+    """Search API should return an empty list for blank queries."""
+    client = get_client()
+
+    response = client.get("/api/search?q=")
+
+    assert response.status_code == 200
+
+    data = response.get_json()
+
+    assert data == []
+
+
+def test_search_api_no_match():
+    """Search should return empty list for nonsense query."""
+    client = get_client()
+    response = client.get("/api/search?q=nonexistentqueryxyz")
+    assert response.status_code == 200
+
+    data = response.get_json()
+    assert isinstance(data, list)
+    assert len(data) == 0
 # ============================================================
 # Run tests directly (no pytest required)
 # ============================================================
