@@ -5,12 +5,18 @@
 
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort
 
+ feat/match-bookmarks-export
 from utils.recommender import (
     get_recommendations_with_match,
     validate_recommendation_inputs,
 )
 from utils.data_loader import find_project_by_id
+
+from utils.recommender import get_recommendations, validate_recommendation_inputs
+from utils.data_loader import find_project_by_id, get_project_stats
+ main
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
+import os
 
 # Create the Blueprint that app.py will register
 main = Blueprint("main", __name__)
@@ -18,8 +24,19 @@ main = Blueprint("main", __name__)
 
 @main.route("/")
 def index():
-    """Render the homepage with the skill input form."""
-    return render_template("index.html")
+    """Render the homepage with the skill input form and dynamic stats."""
+    stats = get_project_stats()
+    return render_template("index.html", stats=stats)
+
+@main.route("/health")
+def health_check():
+    """
+    Returns server status. Useful for uptime monitors and Docker health checks.
+    """
+    return jsonify({
+        "status": "ok",
+        "version": os.getenv("APP_VERSION", "1.0.0")
+    }), 200
 
 
 @main.route("/api/recommend", methods=["POST"])
