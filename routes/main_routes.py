@@ -109,3 +109,39 @@ def download_code(project_id):
     import os
     filename = os.path.basename(full_path)
     return send_from_directory(get_starter_code_dir(), filename, as_attachment=True)
+
+
+import json
+
+PROGRESS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "progress_store.json")
+
+def _load_progress_store():
+    if not os.path.exists(PROGRESS_FILE):
+        return {}
+    try:
+        with open(PROGRESS_FILE) as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+def _save_progress_store(store):
+    os.makedirs(os.path.dirname(PROGRESS_FILE), exist_ok=True)
+    with open(PROGRESS_FILE, "w") as f:
+        json.dump(store, f)
+
+
+@main.route("/api/progress/<int:project_id>", methods=["GET", "PUT"])
+def project_progress(project_id):
+    if request.method == "GET":
+        store = _load_progress_store()
+        data = store.get(str(project_id), {})
+        return jsonify({"project_id": project_id, "progress": data}), 200
+
+    payload = request.get_json()
+    if not payload or "progress" not in payload:
+        return jsonify({"error": "Missing 'progress' field."}), 400
+
+    store = _load_progress_store()
+    store[str(project_id)] = payload["progress"]
+    _save_progress_store(store)
+    return jsonify({"status": "ok"}), 200

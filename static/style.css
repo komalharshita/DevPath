@@ -75,6 +75,325 @@
   --t: 0.2s ease;
 }
 
+/* Dark theme */
+[data-theme="dark"] {
+  --indigo-900: #1e1b4b;
+  --indigo-800: #2e2a6e;
+  --indigo-700: #3b36a0;
+  --indigo-600: #4f46e5;
+  --indigo-500: #6366f1;
+  --indigo-100: #1e1b4b;
+  --indigo-50: #0f0d2e;
+
+  --white: #0f0d2e;
+  --gray-50: #1a1838;
+  --gray-100: #221f44;
+  --gray-200: #2d2950;
+  --gray-300: #4a4680;
+  --gray-400: #7c78a8;
+  --gray-500: #a5a1c9;
+  --gray-600: #c4c1df;
+  --gray-700: #dddaf0;
+  --gray-900: #f0eff7;
+
+  --text-heading: var(--gray-900);
+  --text-body: var(--gray-600);
+  --text-light: var(--gray-500);
+  --border: var(--gray-200);
+
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.5);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
+  --shadow-xl: 0 16px 60px rgba(0,0,0,0.7);
+}
+
+[data-theme="dark"] body {
+  background: var(--white);
+  color: var(--text-body);
+}
+
+[data-theme="dark"] .navbar {
+  background: rgba(15, 13, 46, 0.95);
+  border-bottom-color: var(--gray-200);
+}
+
+[data-theme="dark"] .nav-logo {
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .nav-link {
+  color: var(--gray-500);
+}
+
+[data-theme="dark"] .nav-link:hover {
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .nav-btn-outline {
+  border-color: var(--gray-300);
+  color: var(--gray-300);
+}
+
+[data-theme="dark"] .nav-btn-outline:hover {
+  border-color: var(--indigo-500);
+  color: var(--indigo-500);
+  background: rgba(79, 70, 229, 0.1);
+}
+
+[data-theme="dark"] .hero {
+  background: linear-gradient(135deg, var(--indigo-900) 0%, #0f0d2e 50%, #1a1838 100%);
+}
+
+[data-theme="dark"] .hero-title {
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .hero-sub {
+  color: var(--gray-500);
+}
+
+[data-theme="dark"] .section-title {
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .section-sub {
+  color: var(--gray-500);
+}
+
+[data-theme="dark"] .feature-card {
+  background: var(--gray-50);
+  border-color: var(--gray-200);
+}
+
+[data-theme="dark"] .feature-card h3 {
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .feature-card p {
+  color: var(--gray-500);
+}
+
+[data-theme="dark"] .feature-card-icon {
+  background: rgba(79, 70, 229, 0.15);
+}
+
+[data-theme="dark"] .form-card {
+  background: var(--gray-50);
+  border-color: var(--gray-200);
+}
+
+[data-theme="dark"] .form-card label {
+  color: var(--gray-700);
+}
+
+[data-theme="dark"] .form-card input,
+[data-theme="dark"] .form-card select {
+  background: var(--white);
+  border-color: var(--gray-200);
+  color: var(--gray-700);
+}
+
+[data-theme="dark"] .form-card input:focus,
+[data-theme="dark"] .form-card select:focus {
+  border-color: var(--indigo-500);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+[data-theme="dark"] .tag {
+  background: rgba(79, 70, 229, 0.15);
+  color: var(--indigo-500);
+}
+
+[data-theme="dark"] .result-card {
+  background: var(--gray-50);
+  border-color: var(--gray-200);
+}
+
+[data-theme="dark"] .result-card:hover {
+  border-color: var(--indigo-500);
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .result-card h3 {
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .result-card p {
+  color: var(--gray-500);
+}
+
+[data-theme="dark"] .stats-grid .stat-value {
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .stats-grid .stat-label {
+  color: var(--gray-500);
+}
+
+[data-theme="dark"] .footer {
+  background: var(--indigo-900);
+}
+
+[data-theme="dark"] .footer-heading {
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .footer-link {
+  color: var(--gray-400);
+}
+
+[data-theme="dark"] .footer-link:hover {
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .detail-hero {
+  background: linear-gradient(135deg, var(--indigo-900) 0%, #0f0d2e 100%);
+}
+
+[data-theme="dark"] .detail-page .detail-body {
+  background: var(--white);
+}
+
+[data-theme="dark"] .detail-section h2 {
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .feature-list-item {
+  color: var(--text-body);
+}
+
+[data-theme="dark"] .roadmap-step-text {
+  color: var(--text-body);
+}
+
+[data-theme="dark"] .roadmap-dot {
+  background: var(--indigo-500);
+  border-color: var(--indigo-800);
+}
+
+[data-theme="dark"] .roadmap-line {
+  background: var(--gray-200);
+}
+
+[data-theme="dark"] .resource-link {
+  color: var(--indigo-500);
+}
+
+[data-theme="dark"] .resource-link:hover {
+  color: var(--indigo-600);
+}
+
+[data-theme="dark"] .breadcrumb a {
+  color: var(--gray-500);
+}
+
+[data-theme="dark"] .breadcrumb a:hover {
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .detail-sidebar-box {
+  background: var(--gray-50);
+  border-color: var(--gray-200);
+}
+
+[data-theme="dark"] .detail-sidebar-box h3 {
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .detail-sidebar-box p {
+  color: var(--gray-500);
+}
+
+[data-theme="dark"] .code-header {
+  background: var(--gray-100);
+  border-color: var(--gray-200);
+}
+
+[data-theme="dark"] .code-header span {
+  color: var(--gray-500);
+}
+
+[data-theme="dark"] .code-block {
+  background: #0a0a14;
+}
+
+[data-theme="dark"] .btn-primary {
+  background: var(--indigo-600);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+  background: var(--indigo-700);
+}
+
+[data-theme="dark"] .loading-spinner {
+  border-color: var(--gray-200);
+  border-top-color: var(--indigo-500);
+}
+
+[data-theme="dark"] .toast {
+  background: var(--gray-100);
+  color: var(--gray-700);
+  border-color: var(--gray-200);
+}
+
+[data-theme="dark"] .nav-mobile-menu {
+  background: var(--white);
+  border-color: var(--gray-200);
+}
+
+[data-theme="dark"] .nav-mobile-link {
+  color: var(--gray-600);
+}
+
+[data-theme="dark"] .nav-mobile-link:hover {
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .noscript-warning {
+  background: #451a1a;
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .github-modal-content {
+  background: var(--gray-50);
+  border-color: var(--gray-200);
+}
+
+[data-theme="dark"] .github-modal-content h2 {
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .github-modal-content p {
+  color: var(--gray-500);
+}
+
+[data-theme="dark"] .github-modal-overlay {
+  background: rgba(0,0,0,0.6);
+}
+
+[data-theme="dark"] .nav-theme-toggle {
+  color: var(--gray-500);
+}
+
+[data-theme="dark"] .nav-theme-toggle:hover {
+  color: var(--gray-900);
+  background: rgba(79, 70, 229, 0.1);
+}
+
+[data-theme="dark"] .roadmap-step.completed .roadmap-dot {
+  background: var(--green-500);
+  border-color: var(--green-500);
+}
+
+[data-theme="dark"] .roadmap-step.completed .roadmap-step-num {
+  color: var(--green-500);
+}
+
+[data-theme="dark"] .roadmap-progress-text {
+  color: var(--gray-500);
+}
+
 /* ---- Reset ------------------------------------------------- */
 *,
 *::before,
@@ -289,6 +608,27 @@ ol {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.45);
   text-decoration: none;
+}
+
+.nav-theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-400);
+  transition: var(--t);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.nav-theme-toggle:hover {
+  color: var(--indigo-500);
+  background: rgba(79, 70, 229, 0.08);
 }
 
 /* Mobile hamburger */
@@ -2055,6 +2395,57 @@ select:focus {
   font-size: 0.92rem;
   color: var(--text-body);
   line-height: 1.65;
+}
+
+.roadmap-step.completed .roadmap-dot {
+  background: var(--green-500);
+  border-color: var(--green-500);
+}
+
+.roadmap-step.completed .roadmap-step-num {
+  color: var(--green-500);
+}
+
+.roadmap-step.completed .roadmap-step-text {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.roadmap-step {
+  cursor: pointer;
+}
+
+.roadmap-progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: var(--gray-50);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+}
+
+.roadmap-progress-fill {
+  height: 6px;
+  background: var(--indigo-500);
+  border-radius: 3px;
+  transition: width var(--t);
+}
+
+.roadmap-progress-track {
+  flex: 1;
+  height: 6px;
+  background: var(--gray-200);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.roadmap-progress-text {
+  font-size: 12px;
+  color: var(--gray-500);
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 /* Resources list */
