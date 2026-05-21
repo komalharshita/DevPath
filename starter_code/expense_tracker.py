@@ -115,7 +115,8 @@ pass
 
     # Get today's date in YYYY-MM-DD format
 import csv
-import datetime
+from datetime import datetime
+date= datetime.now().strftime("%Y-%m-%d")
 
 # General default values for demonstration/testing
 amount = 0.0
