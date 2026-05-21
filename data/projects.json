@@ -23,11 +23,33 @@
       "Step 6: Add CSV export functionality",
       "Step 7: Test with sample data and fix bugs"
     ],
-    "resources": [
-      "Python official docs: https://docs.python.org",
-      "CSV module guide: https://docs.python.org/3/library/csv.html",
-      "Real Python beginner tutorials: https://realpython.com"
-    ],
+   "resources": [
+  {
+    "name": "Python Official Docs",
+    "url": "https://docs.python.org/3/"
+  },
+  {
+    "name": "CSV Module Guide",
+    "url": "https://docs.python.org/3/library/csv.html"
+  },
+  {
+    "name": "Real Python Tutorials",
+    "url": "https://realpython.com/"
+  }
+],
+
+"learning_materials": [
+  {
+    "title": "Python Beginner Tutorial",
+    "type": "Video",
+    "link": "https://www.youtube.com/watch?v=_uQrJ0TkZlc"
+  },
+  {
+    "title": "Python File Handling",
+    "type": "Article",
+    "link": "https://realpython.com/read-write-files-python/"
+  }
+],
     "starter_code": "starter_code/expense_tracker.py"
   },
   {
@@ -55,10 +77,19 @@
       "Step 7: Add the Celsius/Fahrenheit toggle button"
     ],
     "resources": [
-      "MDN Fetch API: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API",
-      "OpenWeatherMap free tier: https://openweathermap.org/api",
-      "CSS Flexbox guide: https://css-tricks.com/snippets/css/a-guide-to-flexbox"
-    ],
+  {
+    "name": "MDN Fetch API",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API"
+  },
+  {
+    "name": "OpenWeatherMap Free Tier",
+    "url": "https://openweathermap.org/api"
+  },
+  {
+    "name": "CSS Flexbox Guide",
+    "url": "https://css-tricks.com/snippets/css/a-guide-to-flexbox"
+  }
+],
     "starter_code": "starter_code/weather_dashboard.html"
   },
   {
@@ -86,10 +117,19 @@
       "Step 7: Write a class report printer function"
     ],
     "resources": [
-      "Python JSON module: https://docs.python.org/3/library/json.html",
-      "Python functions tutorial: https://realpython.com/defining-your-own-python-function",
-      "W3Schools Python: https://www.w3schools.com/python"
-    ],
+  {
+    "name": "Python JSON Module",
+    "url": "https://docs.python.org/3/library/json.html"
+  },
+  {
+    "name": "Python Functions Tutorial",
+    "url": "https://realpython.com/defining-your-own-python-function"
+  },
+  {
+    "name": "W3Schools Python",
+    "url": "https://www.w3schools.com/python"
+  }
+],
     "starter_code": "starter_code/grade_manager.py"
   },
   {
@@ -118,10 +158,19 @@
       "Step 8: Test all endpoints using Postman or curl"
     ],
     "resources": [
-      "Flask quickstart: https://flask.palletsprojects.com/quickstart",
-      "REST API design guide: https://restfulapi.net",
-      "Postman download: https://www.postman.com/downloads"
-    ],
+  {
+    "name": "Flask Quickstart",
+    "url": "https://flask.palletsprojects.com/quickstart"
+  },
+  {
+    "name": "REST API Design Guide",
+    "url": "https://restfulapi.net"
+  },
+  {
+    "name": "Postman Download",
+    "url": "https://www.postman.com/downloads"
+  }
+],
     "starter_code": "starter_code/task_api.py"
   },
   {
@@ -150,10 +199,19 @@
       "Step 8: Make the site responsive with media queries"
     ],
     "resources": [
-      "HTML reference: https://developer.mozilla.org/en-US/docs/Web/HTML",
-      "CSS Grid guide: https://css-tricks.com/snippets/css/complete-guide-grid",
-      "Responsive design basics: https://web.dev/learn/design"
-    ],
+  {
+    "name": "HTML Reference",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/HTML"
+  },
+  {
+    "name": "CSS Grid Guide",
+    "url": "https://css-tricks.com/snippets/css/complete-guide-grid"
+  },
+  {
+    "name": "Responsive Design Basics",
+    "url": "https://web.dev/learn/design"
+  }
+],
     "starter_code": "starter_code/portfolio.html"
   },
   {
@@ -182,10 +240,19 @@
       "Step 8: Build a simple dashboard to list all links"
     ],
     "resources": [
-      "Flask routing docs: https://flask.palletsprojects.com/en/stable/quickstart/#routing",
-      "Python secrets module: https://docs.python.org/3/library/secrets.html",
-      "UUID in Python: https://docs.python.org/3/library/uuid.html"
-    ],
+  {
+    "name": "Flask Routing Docs",
+    "url": "https://flask.palletsprojects.com/en/stable/quickstart/#routing"
+  },
+  {
+    "name": "Python Secrets Module",
+    "url": "https://docs.python.org/3/library/secrets.html"
+  },
+  {
+    "name": "UUID in Python",
+    "url": "https://docs.python.org/3/library/uuid.html"
+  }
+],
     "starter_code": "starter_code/url_shortener.py"
   },
   {
@@ -213,10 +280,19 @@
       "Step 7: Export the full report to a text or HTML file"
     ],
     "resources": [
-      "pandas docs: https://pandas.pydata.org/docs",
-      "matplotlib tutorials: https://matplotlib.org/stable/tutorials",
-      "Real Python data analysis: https://realpython.com/pandas-dataframe"
-    ],
+  {
+    "name": "Pandas Documentation",
+    "url": "https://pandas.pydata.org/docs"
+  },
+  {
+    "name": "Matplotlib Tutorials",
+    "url": "https://matplotlib.org/stable/tutorials"
+  },
+  {
+    "name": "Real Python Data Analysis",
+    "url": "https://realpython.com/pandas-dataframe"
+  }
+],
     "starter_code": "starter_code/data_report.py"
   },
   {
@@ -243,9 +319,15 @@
       "Step 6: Display password strength feedback"
     ],
     "resources": [
-      "Python regex docs: https://docs.python.org/3/library/re.html",
-      "OWASP password guidelines: https://owasp.org"
-    ],
+  {
+    "name": "Python Regex Docs",
+    "url": "https://docs.python.org/3/library/re.html"
+  },
+  {
+    "name": "OWASP Password Guidelines",
+    "url": "https://owasp.org"
+  }
+],
     "starter_code": "starter_code/password_checker.py"
   },
   {
@@ -270,8 +352,11 @@
       "Step 5: Test the form using Live Server"
     ],
     "resources": [
-      "MDN HTML Forms: https://developer.mozilla.org/en-US/docs/Learn/Forms"
-    ],
+  {
+    "name": "MDN HTML Forms",
+    "url": "https://developer.mozilla.org/en-US/docs/Learn/Forms"
+  }
+],
     "starter_code": "starter_code/survey_form/index.html"
   },
   {
@@ -303,15 +388,29 @@
       "Step 10: Test the file with at least two different public APIs"
     ],
     "resources": [
-      "pandas docs: https://pandas.pydata.org/docs",
-      "requests docs: https://requests.readthedocs.io/en/latest/",
-      "JSON handling in Python: https://docs.python.org/3/library/json.html",
-      "REST API tutorial: https://restfulapi.net/",
-      "Real Python API guide: https://realpython.com/api-integration-in-python/"
-    ],
+  {
+    "name": "Pandas Docs",
+    "url": "https://pandas.pydata.org/docs"
+  },
+  {
+    "name": "Requests Docs",
+    "url": "https://requests.readthedocs.io/en/latest/"
+  },
+  {
+    "name": "JSON Handling in Python",
+    "url": "https://docs.python.org/3/library/json.html"
+  },
+  {
+    "name": "REST API Tutorial",
+    "url": "https://restfulapi.net/"
+  },
+  {
+    "name": "Real Python API Guide",
+    "url": "https://realpython.com/api-integration-in-python/"
+  }
+],
     "starter_code": "starter_code/api_data_pipeline.py"
   }
 ]
-
 
 
