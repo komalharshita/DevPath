@@ -33,6 +33,7 @@
       <a href="/" class="nav-logo">DevPath</a>
       <div class="nav-links">
         <a href="/" class="nav-link">Back to Search</a>
+        <button class="nav-theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
         <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-link nav-link-gh">GitHub</a>
       </div>
     </div>
@@ -139,6 +140,11 @@
               <h2>Project Roadmap</h2>
             </div>
             <p class="detail-section-sub">Follow these steps in order. Each one builds on the previous.</p>
+
+            <div class="roadmap-progress-bar" id="progress-bar">
+              <span class="roadmap-progress-track"><span class="roadmap-progress-fill" id="progress-fill" style="width:0%"></span></span>
+              <span class="roadmap-progress-text" id="progress-text">0 / {{ project.roadmap | length }} completed</span>
+            </div>
 
             <!-- Vertical timeline list — each step is one milestone -->
             <ol class="roadmap-timeline">
