@@ -13,9 +13,8 @@
 </head>
 
 <body>
-  <!-- ============================================================
-       Navigation
-       ============================================================ -->
+  <a class="skip-link" href="#find-project">Skip to form</a>
+
   <nav class="navbar" id="navbar">
     <div class="nav-inner">
       <a href="/" class="nav-logo">Dev<span class="nav-logo-accent">Path</span></a>
@@ -337,6 +336,24 @@
     </div>
   </section>
 
+  <section class="library-section" id="recent-section" hidden>
+    <div class="container">
+      <div class="section-eyebrow">Pick up where you left off</div>
+      <h2 class="section-title">Recently Viewed</h2>
+      <p class="section-sub">Projects you opened lately — stored only in this browser.</p>
+      <ul class="library-list" id="recent-list"></ul>
+    </div>
+  </section>
+
+  <section class="library-section library-section--alt" id="saved-section" hidden>
+    <div class="container">
+      <div class="section-eyebrow">Your shortlist</div>
+      <h2 class="section-title">Saved Projects</h2>
+      <p class="section-sub">Bookmark projects to compare or come back to later.</p>
+      <ul class="library-list" id="saved-list"></ul>
+    </div>
+  </section>
+
   <!-- ============================================================
        Find Project Form Section
        ============================================================ -->
@@ -350,6 +367,9 @@
         <div class="form-card" id="form-section">
           <form id="recommend-form" novalidate>
             <div class="form-group">
+ feat/match-bookmarks-export
+              <label for="skills-input">Your Skills <span class="label-required" aria-hidden="true">*</span></label>
+
               <div class="form-label-row" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
                 <label for="skills-input">
                   Your Skills
@@ -367,6 +387,7 @@
                   </button>
                 </div>
               </div>
+ main
               <div class="skill-input-wrap" id="skill-input-wrap">
                 <div class="skill-chips-selected" id="skill-chips-selected"></div>
                 
@@ -378,6 +399,8 @@
                   aria-haspopup="listbox"
                   aria-expanded="false"
                   aria-controls="skills-suggestions"
+                  aria-describedby="skills-error"
+                  aria-required="true"
                 />
                 <div id="skills-suggestions" class="skills-suggestions"></div>
               </div>
@@ -436,9 +459,9 @@
             <!-- Level + Interest in a row -->
             <div class="form-row">
               <div class="form-group">
-                <label for="level">Experience Level</label>
+                <label for="level">Experience Level <span class="label-required" aria-hidden="true">*</span></label>
                 <div class="select-wrap">
-                  <select id="level" name="level">
+                  <select id="level" name="level" aria-describedby="level-error" aria-required="true">
                     <option value="" disabled selected>Select level</option>
                     <option value="Beginner">Beginner</option>
                     <option value="Intermediate">Intermediate</option>
@@ -452,6 +475,8 @@
               </div>
 
               <div class="form-group">
+ feat/match-bookmarks-export
+                <label for="interest">Area of Interest <span class="label-required" aria-hidden="true">*</span></label>
                 <label for="interest">
                   Area of Interest
                   <span class="tooltip"
@@ -459,8 +484,9 @@
                     ⓘ
                   </span>
                 </label>
+ main
                 <div class="select-wrap">
-                  <select id="interest" name="interest">
+                  <select id="interest" name="interest" aria-describedby="interest-error" aria-required="true">
                     <option value="" disabled selected>Select interest</option>
                     <option value="Web">Web Development</option>
                     <option value="Data">Data and Analytics</option>
@@ -471,10 +497,25 @@
                 </div>
              
 
+ feat/match-bookmarks-export
+            <!-- Time availability -->
+            <div class="form-group">
+              <label for="time">Time Availability <span class="label-required" aria-hidden="true">*</span></label>
+              <div class="select-wrap">
+                <select id="time" name="time" aria-describedby="time-error" aria-required="true">
+                  <option value="" disabled selected>How much time can you commit?</option>
+                  <option value="Low">Low — a few hours total</option>
+                  <option value="Medium">Medium — across a weekend</option>
+                  <option value="High">High — a week or more</option>
+                </select>
+              </div>
+              <div class="form-error-msg" id="time-error"></div>
+
               <span class="form-hint">
                 Pick the domain you want to explore such as Web Development, Automation, or Games.
               </span>
               <div class="form-error-msg" id="interest-error"></div>
+main
             </div>
         </div>
 
@@ -501,6 +542,15 @@
           <div class="form-error-msg" id="time-error"></div>
         </div>
 
+feat/match-bookmarks-export
+            <div class="form-actions">
+              <button type="submit" class="btn-submit" id="submit-btn">
+                <span id="btn-label">Generate My Projects</span>
+                <span id="btn-loading" style="display:none;">Finding matches...</span>
+              </button>
+              <button type="button" class="btn-form-reset" id="form-reset-btn">Clear form</button>
+            </div>
+
             <!-- Submit button -->
             <button type="submit" class="btn-submit" id="submit-btn">
               <span id="btn-label">Generate My Projects</span>
@@ -519,6 +569,7 @@
                 <span id="btn-label">Generate My Projects</span>
               <span id="btn-loading" style="display:none;">Finding matches...</span>
             </button>
+ main
 
             <button type="button" class="btn-clear" id="clear-filters-btn">
               <span>Clear Filters</span>
@@ -570,6 +621,19 @@
       </div>
 
       <!-- Cards grid -->
+      <div class="results-toolbar" id="results-toolbar" style="display:none;">
+        <label class="results-filter-label" for="results-filter">Filter matches</label>
+        <input
+          type="search"
+          id="results-filter"
+          class="results-filter-input"
+          placeholder="Search by title or skill..."
+          autocomplete="off"
+        />
+        <span class="results-count" id="results-count" aria-live="polite"></span>
+        <button type="button" class="btn-export-results" id="export-results-btn">Copy list</button>
+      </div>
+
       <div class="results-grid" id="results-grid"></div>
     </div>
   </section>
@@ -663,6 +727,14 @@
     </div>
   </footer>
 
+ feat/match-bookmarks-export
+  <button type="button" class="back-to-top" id="back-to-top" aria-label="Back to top" hidden>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script src="/static/data/skills.js"></script>
+  <script src="/static/storage.js"></script>
+
   <!-- GitHub Modal Overlay -->
   <div class="code-panel-overlay" id="github-modal-overlay" style="align-items: center; justify-content: center; opacity: 1;">
     <div class="sidebar-card" style="width: 100%; max-width: 400px; margin: 20px; z-index: 400; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
@@ -716,6 +788,7 @@
 
 
     <script src="/static/data/skills.js"></script>
+ main
   <script src="/static/script.js"></script>
 </body>
 
