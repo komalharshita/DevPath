@@ -26,7 +26,7 @@ SKILL_ALIASES = {
     "html5": "html",
     "css3": "css",
     "c++": "cpp",
-    "web dev": "javascript"
+    "web dev": ["javascript", "html", "css"]
 }
 
 
@@ -45,10 +45,13 @@ def parse_skills(skills_string):
         if s.strip()
     ]
 
-    normalized_skills = [
-        SKILL_ALIASES.get(skill, skill)
-        for skill in raw_skills
-    ]
+    normalized_skills = []
+    for skill in raw_skills:
+        alias = SKILL_ALIASES.get(skill, skill)
+        if isinstance(alias, list):
+            normalized_skills.extend(alias)
+        else:
+            normalized_skills.append(alias)
 
     return normalized_skills
 
@@ -118,7 +121,7 @@ def get_recommendations(skills_string, level, interest, time_availability):
 
     # Sort projects in descending order so the
     # most relevant recommendations appear first.
-    scored_projects.sort(key=lambda item: item["score"], reverse=True)
+    scored_projects.sort(key=lambda item: (item["score"], item["project"].get("id", 0)), reverse=True)
 
     # Return only the project dicts, not the score metadata
     return [item["project"] for item in scored_projects[:MAX_RESULTS]]
