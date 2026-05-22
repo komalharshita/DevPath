@@ -279,6 +279,31 @@ def test_download_code_found():
     client = get_client()
     response = client.get("/project/1/download")
     assert response.status_code == 200
+
+
+def test_view_code_nested_path():
+    """Project 9 has a nested starter_code path; /code should still return 200."""
+    client = get_client()
+    response = client.get("/project/9/code")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "code" in data
+    assert "filename" in data
+    assert len(data["code"]) > 0
+
+
+def test_download_code_nested_path():
+    """Project 9 has a nested starter_code path; /download should still return 200."""
+    client = get_client()
+    response = client.get("/project/9/download")
+    assert response.status_code == 200
+
+
+def test_resolve_starter_file_path_traversal():
+    """resolve_starter_file must return None for path traversal attempts."""
+    from utils.file_server import resolve_starter_file
+    malicious = {"starter_code": "starter_code/../../routes/main_routes.py"}
+    assert resolve_starter_file(malicious) is None
     
 def test_health_check():
     client = get_client()

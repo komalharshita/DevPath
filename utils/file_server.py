@@ -12,15 +12,27 @@ STARTER_CODE_DIR = os.path.abspath(
 def resolve_starter_file(project):
     """
     Given a project dict, return the absolute path to its starter code file.
+    Supports nested paths within the starter_code directory (e.g. survey_form/index.html).
     Returns None if the project has no starter_code field or the file does not exist.
+    Path traversal attempts (e.g. ../../etc/passwd) are blocked by verifying the
+    resolved path stays inside STARTER_CODE_DIR.
     """
     raw_path = project.get("starter_code", "")
     if not raw_path:
         return None
 
-    # Only use the filename portion — never trust a full path from the data file
-    filename = os.path.basename(raw_path)
-    full_path = os.path.join(STARTER_CODE_DIR, filename)
+    # Normalize to the local OS separator and strip any leading "starter_code/" prefix
+    # so values like "starter_code/survey_form/index.html" and "survey_form/index.html"
+    # are both handled correctly.
+    relative = raw_path.replace("/", os.sep)
+    prefix = "starter_code" + os.sep
+    if relative.startswith(prefix):
+        relative = relative[len(prefix):]
+
+    # Resolve to an absolute path and confirm it stays within STARTER_CODE_DIR
+    full_path = os.path.normpath(os.path.join(STARTER_CODE_DIR, relative))
+    if not full_path.startswith(STARTER_CODE_DIR + os.sep):
+        return None
 
     if not os.path.exists(full_path):
         return None
