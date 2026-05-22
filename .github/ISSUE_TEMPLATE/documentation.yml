@@ -1,0 +1,56 @@
+# .github/ISSUE_TEMPLATE/documentation.yml
+# Template for documentation improvements.
+
+name: Documentation Improvement
+description: Report missing, unclear, or incorrect documentation.
+title: "[Docs]: "
+labels: ["documentation"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Good documentation is as important as good code.
+        Documentation issues are an excellent entry point for first-time contributors.
+
+  - type: dropdown
+    id: doc-type
+    attributes:
+      label: Which document needs improvement?
+      options:
+        - README.md
+        - CONTRIBUTING.md
+        - docs/architecture.md
+        - docs/contribution_guide.md
+        - docs/project_overview.md
+        - Code comments (Python)
+        - Code comments (JavaScript)
+        - Code comments (CSS)
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong or missing?
+      description: Be as specific as possible. Quote the problematic text if relevant.
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested improvement
+      description: What should it say instead? A draft is helpful but not required.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before submitting
+      options:
+        - label: I checked whether this documentation issue has already been reported.
+          required: true

@@ -1,0 +1,35 @@
+name: DevPath CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Setup Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      # Run tests
+      - name: Run tests
+        run: |
+          python -m unittest tests/test_basic.py
+
+      # Optional: Print success
+      - name: Success message
+        run: echo "Build and tests passed successfully"

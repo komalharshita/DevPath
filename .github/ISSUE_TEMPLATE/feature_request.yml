@@ -1,0 +1,88 @@
+# .github/ISSUE_TEMPLATE/feature_request.yml
+# Template for proposing a new feature or meaningful improvement.
+
+name: Feature Request
+description: Propose a new feature or a meaningful improvement to existing functionality.
+title: "[Feature]: "
+labels: ["feature", "needs-discussion"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Feature requests are reviewed within 48 hours.
+        Before submitting, search existing issues to avoid duplicates.
+        The more detail you provide, the faster a decision can be made.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the gap or limitation you have encountered. Be specific.
+      placeholder: |
+        When I search for projects and get no results, the empty state gives
+        no guidance on what to change. I do not know whether to try a different
+        skill, a different level, or something else.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What would you like to see built or changed?
+      placeholder: |
+        The empty state should show which input field is the most likely
+        cause of no match and suggest a concrete alternative. For example:
+        "No projects match 'Rust'. Try Python, JavaScript, or HTML."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Have you considered simpler or different approaches?
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of the app does this affect?
+      options:
+        - Homepage and form
+        - Recommendation engine (backend)
+        - Project detail page
+        - Starter code system
+        - Mobile responsiveness
+        - Documentation
+        - Testing
+        - CI/CD
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Estimated complexity
+      description: Your honest assessment — maintainers will verify this.
+      options:
+        - Small (a few lines of CSS or JS)
+        - Medium (one function and one template change)
+        - Large (multiple modules, new route, tests required)
+        - Unknown
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and this has not been requested before.
+          required: true
+        - label: This change would benefit contributors beyond my own use case.
+          required: true

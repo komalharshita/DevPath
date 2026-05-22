@@ -1,0 +1,13 @@
+# .github/ISSUE_TEMPLATE/config.yml
+# Controls the "New Issue" chooser page on GitHub.
+# Contributors see these templates before writing anything.
+
+blank_issues_enabled: false
+
+contact_links:
+  - name: Ask a Question or Get Help
+    url: https://github.com/komalharshita/devpath/discussions
+    about: Use GitHub Discussions for questions, ideas, or general help before opening an issue.
+  - name: GSSoC Program Information
+    url: https://gssoc.girlscript.tech
+    about: Information about the GirlScript Summer of Code program.

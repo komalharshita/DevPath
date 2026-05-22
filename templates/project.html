@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Page title uses the project title injected by Flask's Jinja2 template engine -->
+  
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+  <title>{{ project.title }} — {{ project.level }}{% if project.skills %} {{ project.skills[0] }}{% endif %} Project | DevPath</title>
+  
+  <meta property="og:title" content="{{ project.title }} — DevPath" />
+  <meta property="og:description" content="{{ project.description[:155] }}" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://mydevpath-github.vercel.app/project/{{ project.id }}" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="{{ project.title }} — DevPath" />
+  <meta name="twitter:description" content="{{ project.description[:155] }}" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+</head>
+
+<body class="detail-page">
+
+  <!-- ============================================================
+       Navigation
+       ============================================================ -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">DevPath</a>
+      <div class="nav-links">
+        <a href="/" class="nav-link">Back to Search</a>
+        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-link nav-link-gh">GitHub</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============================================================
+       Project Hero Banner
+       ============================================================ -->
+  <div class="detail-hero">
+    <div class="container">
+      <!-- Breadcrumb trail -->
+      <nav class="breadcrumb" aria-label="breadcrumb">
+        <a href="/">Home</a>
+        <span class="breadcrumb-sep">&#8250;</span>
+        <span>{{ project.title }}</span>
+      </nav>
+
+      <div class="detail-hero-content">
+        <div class="detail-hero-left">
+          <h1 class="detail-title">{{ project.title }}</h1>
+          <!-- Difficulty, interest, and skill badges -->
+          <div class="badge-group">
+            <span class="badge badge--{{ project.level | lower }}">{{ project.level }}</span>
+            <span class="badge badge--{{ project.interest | lower }}">{{ project.interest }}</span>
+            {% for skill in project.skills %}
+            <span class="badge badge--{{ skill | lower }}">{{ skill }}</span>
+            {% endfor %}
+            <span class="badge badge--time">{{ project.time }} effort</span>
+          </div>
+          <p class="detail-description">{{ project.description }}</p>
+        </div>
+
+        <!-- Quick-action buttons in the hero -->
+        <div class="detail-hero-actions">
+          <a href="/project/{{ project.id }}/download" class="btn-download">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Download Starter Code
+          </a>
+          <button class="btn-view-code" id="btn-view-code">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6" />
+              <polyline points="8 6 2 12 8 18" />
+            </svg>
+            View Code
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Main Detail Content
+       ============================================================ -->
+  <div class="detail-body">
+    <div class="container">
+      <div class="detail-grid">
+
+        <!-- LEFT COLUMN: Features, Roadmap, Resources -->
+        <div class="detail-main">
+
+          <!-- Features Section -->
+          <section class="detail-section">
+            <div class="detail-section-header">
+              <div class="detail-section-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 11 12 14 22 4" />
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                  </polyline>
+                </svg>
+              </div>
+              <h2>Features</h2>
+            </div>
+            <ul class="feature-list">
+              {% for feature in project.features %}
+              <li class="feature-list-item">
+                <span class="feature-check">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </span>
+                {{ feature }}
+              </li>
+              {% endfor %}
+            </ul>
+          </section>
+
+          <!-- Roadmap Section with visual timeline -->
+          <section class="detail-section">
+            <div class="detail-section-header">
+              <div class="detail-section-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                </svg>
+              </div>
+              <h2>Project Roadmap</h2>
+            </div>
+            <p class="detail-section-sub">Follow these steps in order. Each one builds on the previous.</p>
+
+            <!-- Vertical timeline list — each step is one milestone -->
+            <ol class="roadmap-timeline">
+              {% for step in project.roadmap %}
+              <li class="roadmap-step">
+                <div class="roadmap-marker">
+                  <span class="roadmap-dot"></span>
+                  <span class="roadmap-line"></span>
+                </div>
+                <div class="roadmap-content">
+                  <!-- Step number badge derived from loop index -->
+                  <span class="roadmap-step-num">Step {{ loop.index }}</span>
+                  <!-- Strip the "Step N:" prefix if present in the data -->
+                  <p class="roadmap-step-text">{{ step | replace("Step " + loop.index|string + ": ", "") }}</p>
+                </div>
+              </li>
+              {% endfor %}
+            </ol>
+          </section>
+
+          <!-- Resources Section -->
+          <section class="detail-section">
+            <div class="detail-section-header">
+              <div class="detail-section-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+              </div>
+              <h2>Learning Resources</h2>
+            </div>
+            <ul class="resource-list">
+              {% for resource in project.resources %}
+              <li class="resource-item">
+                <!-- Parse the "Label: URL" format stored in the data -->
+                {% set parts = resource.split(": http") %}
+                {% if parts|length > 1 %}
+                <a href="http{{ parts[1] }}" target="_blank" rel="noopener noreferrer" class="resource-link">
+                  <span>{{ parts[0] }}</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
+                {% else %}
+                <span class="resource-plain">{{ resource }}</span>
+                {% endif %}
+              </li>
+              {% endfor %}
+            </ul>
+          </section>
+
+        </div>
+
+        <!-- RIGHT COLUMN: Tech stack sidebar + starter code panel -->
+        <aside class="detail-sidebar">
+
+          <!-- Tech Stack card -->
+          <div class="sidebar-card">
+            <h3 class="sidebar-card-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                <line x1="8" y1="21" x2="16" y2="21" />
+                <line x1="12" y1="17" x2="12" y2="21" />
+              </svg>
+              Tech Stack
+            </h3>
+            <div class="tech-tags">
+              {% for tech in project.tech_stack %}
+              <span class="tech-tag">{{ tech }}</span>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Project stats card -->
+          <div class="sidebar-card">
+            <h3 class="sidebar-card-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              Project Details
+            </h3>
+            <ul class="stats-list">
+              <li>
+                <span class="stats-label">Difficulty</span>
+                <span class="stats-value stats-value--{{ project.level | lower }}">{{ project.level }}</span>
+              </li>
+              <li>
+                <span class="stats-label">Interest</span>
+                <span class="stats-value">{{ project.interest }}</span>
+              </li>
+              <li>
+                <span class="stats-label">Effort</span>
+                <span class="stats-value">{{ project.time }}</span>
+              </li>
+              <li>
+                <span class="stats-label">Roadmap Steps</span>
+                <span class="stats-value">{{ project.roadmap | length }} steps</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Starter code actions card -->
+          <div class="sidebar-card sidebar-card--code">
+            <h3 class="sidebar-card-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 18 22 12 16 6" />
+                <polyline points="8 6 2 12 8 18" />
+              </svg>
+              Starter Code
+            </h3>
+            <p class="sidebar-card-desc">A working template to kick off this project without starting from scratch.</p>
+            <div class="sidebar-code-actions">
+              <button class="btn-view-code-sm" id="btn-view-code-sm">View Code</button>
+              <a href="/project/{{ project.id }}/download" class="btn-download-sm">Download</a>
+            </div>
+          </div>
+
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Starter Code Viewer Panel (slides in from bottom)
+       ============================================================ -->
+  <div class="code-panel" id="code-panel">
+    <div class="code-panel-header">
+      <div class="code-panel-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="16 18 22 12 16 6" />
+          <polyline points="8 6 2 12 8 18" />
+        </svg>
+        <span id="code-panel-filename">starter_code</span>
+      </div>
+      <div class="code-panel-actions">
+        <a href="/project/{{ project.id }}/download" class="code-panel-download">Download file</a>
+        <button class="btn-copy-code" id="btn-copy-code" aria-label="Copy code to clipboard">
+          <svg class="copy-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+          <svg class="check-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <span class="copy-btn-label">Copy Code</span>
+        </button>
+        <button class="code-panel-close" id="code-panel-close">Close</button>
+      </div>
+    </div>
+    <!-- Code is injected here by script.js -->
+    <pre class="code-viewer" id="code-viewer"><code id="code-content" style="display:block">Loading...</code></pre>
+  </div>
+  <!-- Dark overlay behind the code panel -->
+  <div class="code-panel-overlay" id="code-panel-overlay"></div>
+
+  <!-- Copy success toast notification -->
+  <div class="copy-toast" id="copy-toast" role="status" aria-live="polite">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+    Copied to clipboard!
+  </div>
+
+  <!-- ============================================================
+       Footer
+       ============================================================ -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="footer-logo">DevPath</span>
+        <p style="color: #D1D5DB;">
+          Open source. Built for learners, by learners.
+        </p>
+      </div>
+      <div class="footer-links">
+        <a href="/">Back to Search</a>
+        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll-to-top button -->
+  <button id="scroll-top-btn" aria-label="Back to top" title="Back to top">↑</button>
+
+  <!-- Pass project ID to the JavaScript without hardcoding -->
+  <script>
+    var PROJECT_ID = parseInt("{{ project.id }}", 10);
+  </script>
+  <script src="/static/script.js"></script>
+</body>
+
+</html>

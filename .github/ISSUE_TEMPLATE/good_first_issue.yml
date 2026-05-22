@@ -1,0 +1,101 @@
+# .github/ISSUE_TEMPLATE/good_first_issue.yml
+# Template used by maintainers when creating good first issues.
+# Contributors do NOT use this template — it is for project admins only.
+
+name: Good First Issue (Maintainer Use)
+description: Create a well-scoped beginner issue. For maintainer use only.
+title: "[Good First Issue]: "
+labels: ["good first issue", "help wanted"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This template is for maintainers preparing issues for first-time contributors.
+        A good first issue must be completable by someone unfamiliar with the full codebase.
+        It must have a clear outcome that the contributor can verify themselves.
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Background and context
+      description: Why does this need to be done? What is the current state?
+      placeholder: |
+        The form currently has no aria-required attributes on its inputs.
+        Screen readers cannot indicate to users which fields are required
+        before form submission.
+    validations:
+      required: true
+
+  - type: textarea
+    id: task
+    attributes:
+      label: Exact task
+      description: A precise description of what needs to be built or changed.
+      placeholder: |
+        Add aria-required="true" to the four required inputs in templates/index.html:
+        #skills-input, #level, #interest, and #time.
+        Add aria-describedby linking each input to its hint and error message elements.
+    validations:
+      required: true
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Expected outcome
+      description: How will the contributor and reviewer know the task is complete?
+      placeholder: |
+        After the change, running a screen reader on the form announces
+        "required" for each input. The HTML changes are limited to
+        templates/index.html and no other files should be modified.
+    validations:
+      required: true
+
+  - type: textarea
+    id: files
+    attributes:
+      label: Files to look at
+      description: List the exact files the contributor needs to read or modify.
+      placeholder: |
+        - templates/index.html (modify — the form inputs)
+        - static/style.css (read only — for context on class names)
+    validations:
+      required: true
+
+  - type: textarea
+    id: resources
+    attributes:
+      label: Helpful resources
+      description: Links that will help a beginner complete this task.
+      placeholder: |
+        - MDN aria-required: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-required
+        - MDN aria-describedby: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-describedby
+    validations:
+      required: false
+
+  - type: dropdown
+    id: estimated-time
+    attributes:
+      label: Estimated time to complete
+      options:
+        - Less than 1 hour
+        - 1 to 3 hours
+        - 3 to 6 hours
+        - Half a day
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: maintainer-checklist
+    attributes:
+      label: Maintainer checklist
+      options:
+        - label: This task can be completed without understanding the full codebase.
+          required: true
+        - label: The expected outcome is verifiable by the contributor.
+          required: true
+        - label: The files listed are all a contributor needs to read.
+          required: true
+        - label: This is not a complex architectural change mislabelled as beginner.
+          required: true

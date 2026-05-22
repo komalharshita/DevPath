@@ -1,0 +1,130 @@
+# .github/ISSUE_TEMPLATE/data_contribution.yml
+# Template for proposing a new project entry in data/projects.json.
+# This is the most beginner-accessible contribution type.
+
+name: Add a New Project to the Dataset
+description: Propose a new coding project to add to data/projects.json.
+title: "[Data]: Add project — "
+labels: ["data", "good first issue"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Adding a new project to the DevPath dataset is one of the best first contributions.
+        No backend or frontend knowledge is required — just a good project idea and attention to detail.
+
+        Complete every field below exactly. Maintainers will check your proposal against
+        the schema before assigning the issue to you.
+
+  - type: input
+    id: title
+    attributes:
+      label: Project title
+      placeholder: "e.g. Todo CLI App"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: level
+    attributes:
+      label: Difficulty level
+      options:
+        - Beginner
+        - Intermediate
+        - Advanced
+    validations:
+      required: true
+
+  - type: dropdown
+    id: interest
+    attributes:
+      label: Interest area
+      options:
+        - Web
+        - Data
+        - Education
+        - Automation
+        - Games
+    validations:
+      required: true
+
+  - type: dropdown
+    id: time
+    attributes:
+      label: Time commitment
+      options:
+        - Low (a few hours total)
+        - Medium (across a weekend)
+        - High (a week or more)
+    validations:
+      required: true
+
+  - type: input
+    id: skills
+    attributes:
+      label: Required skills (comma-separated)
+      placeholder: "e.g. Python, json module, os module"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Project description (one paragraph)
+      description: Explain what the project does and why it is useful for learning.
+      placeholder: |
+        A command-line task manager that stores todos in a JSON file.
+        Teaches dictionary manipulation, file I/O, and building a simple
+        text-based menu interface in Python.
+    validations:
+      required: true
+
+  - type: textarea
+    id: features
+    attributes:
+      label: Key features (one per line)
+      placeholder: |
+        Add and remove tasks
+        Mark tasks as complete
+        Filter by status (pending / done)
+        Save tasks to a JSON file
+    validations:
+      required: true
+
+  - type: textarea
+    id: roadmap
+    attributes:
+      label: Roadmap steps (one per line, prefix with "Step N:")
+      placeholder: |
+        Step 1: Define the task data structure as a Python dictionary
+        Step 2: Write an add_task() function
+        Step 3: Write a remove_task() function
+        Step 4: Implement a mark_complete() function
+        Step 5: Add JSON file save and load functions
+        Step 6: Build the text menu loop
+    validations:
+      required: true
+
+  - type: textarea
+    id: resources
+    attributes:
+      label: Learning resources (one per line, format "Label: https://url")
+      placeholder: |
+        Python json module: https://docs.python.org/3/library/json.html
+        Python file I/O: https://docs.python.org/3/tutorial/inputoutput.html
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing projects and this idea is not already in the dataset.
+          required: true
+        - label: This project is genuinely achievable at the difficulty level I selected.
+          required: true
+        - label: I am willing to write the starter code file if this proposal is approved.
+          required: true

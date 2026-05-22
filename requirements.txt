@@ -1,0 +1,13 @@
+# requirements.txt — Python dependencies for DevPath
+#
+# Install all dependencies with:
+#   pip install -r requirements.txt
+#
+# To also install test dependencies:
+#   pip install -r requirements.txt pytest
+
+# Web framework (only runtime dependency)
+Flask==3.0.3
+
+# Testing (optional but recommended for contributors)
+pytest==8.2.2

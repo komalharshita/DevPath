@@ -1,0 +1,99 @@
+# .github/ISSUE_TEMPLATE/bug_report.yml
+# Template for reporting bugs or broken behaviour.
+
+name: Bug Report
+description: Report something that is broken or not working as expected.
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a bug.
+        Please fill in every section below — incomplete reports slow down the fix.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of what is broken. Include what you expected to happen and what actually happened.
+      placeholder: |
+        Expected: clicking "Generate My Projects" returns project cards.
+        Actual: the page shows a blank results section with no error message.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Exact steps that reliably reproduce the bug.
+      placeholder: |
+        1. Open http://127.0.0.1:5000
+        2. Enter "Python" as skill, select Beginner / Data / Low
+        3. Click "Generate My Projects"
+        4. Results section appears but is empty
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: What should happen instead?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area of the app affected
+      options:
+        - Homepage form
+        - Recommendation results
+        - Project detail page
+        - Starter code viewer
+        - Starter code download
+        - Mobile layout
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: python-version
+    attributes:
+      label: Python version
+      placeholder: "e.g. 3.11.4"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: "e.g. macOS 14.2, Ubuntu 22.04, Windows 11"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant error output or logs
+      description: Paste any terminal errors or browser console errors here.
+      render: shell
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and this has not been reported before.
+          required: true
+        - label: I can reproduce this bug consistently with the steps above.
+          required: true
+        - label: I am running the latest version of the main branch.
+          required: true

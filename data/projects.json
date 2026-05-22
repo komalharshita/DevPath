@@ -1,0 +1,317 @@
+[
+  {
+    "id": 1,
+    "title": "Personal Expense Tracker",
+    "skills": ["Python"],
+    "level": "Beginner",
+    "interest": "Data",
+    "time": "Low",
+    "description": "A command-line tool that helps users track daily expenses, categorize spending, and generate simple summary reports. Great for learning file handling, loops, and basic data processing.",
+    "features": [
+      "Add and delete expense entries",
+      "Categorize expenses (food, transport, bills)",
+      "View monthly summary",
+      "Export data to CSV file"
+    ],
+    "tech_stack": ["Python", "CSV module", "datetime module"],
+    "roadmap": [
+      "Step 1: Set up the project folder and create main.py",
+      "Step 2: Design the expense data structure as a dictionary",
+      "Step 3: Write functions to add and delete expenses",
+      "Step 4: Implement category filtering logic",
+      "Step 5: Write the summary report generator",
+      "Step 6: Add CSV export functionality",
+      "Step 7: Test with sample data and fix bugs"
+    ],
+    "resources": [
+      "Python official docs: https://docs.python.org",
+      "CSV module guide: https://docs.python.org/3/library/csv.html",
+      "Real Python beginner tutorials: https://realpython.com"
+    ],
+    "starter_code": "starter_code/expense_tracker.py"
+  },
+  {
+    "id": 2,
+    "title": "Weather Dashboard",
+    "skills": ["JavaScript", "HTML", "CSS"],
+    "level": "Beginner",
+    "interest": "Web",
+    "time": "Low",
+    "description": "A simple web page that fetches weather data from a free API and displays current conditions for any city. Teaches API calls, DOM manipulation, and basic UI design.",
+    "features": [
+      "Search weather by city name",
+      "Display temperature, humidity, and conditions",
+      "Show a weather icon based on conditions",
+      "Toggle between Celsius and Fahrenheit"
+    ],
+    "tech_stack": ["HTML", "CSS", "JavaScript", "OpenWeatherMap API"],
+    "roadmap": [
+      "Step 1: Create the HTML structure with a search form",
+      "Step 2: Style the page with CSS flexbox",
+      "Step 3: Sign up for a free OpenWeatherMap API key",
+      "Step 4: Write the fetch() call to get weather data",
+      "Step 5: Parse the JSON response and extract key fields",
+      "Step 6: Display the data dynamically using DOM methods",
+      "Step 7: Add the Celsius/Fahrenheit toggle button"
+    ],
+    "resources": [
+      "MDN Fetch API: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API",
+      "OpenWeatherMap free tier: https://openweathermap.org/api",
+      "CSS Flexbox guide: https://css-tricks.com/snippets/css/a-guide-to-flexbox"
+    ],
+    "starter_code": "starter_code/weather_dashboard.html"
+  },
+  {
+    "id": 3,
+    "title": "Student Grade Manager",
+    "skills": ["Python"],
+    "level": "Beginner",
+    "interest": "Education",
+    "time": "Medium",
+    "description": "A Python application to store student names and their grades, compute averages, and display a class report. Ideal for practicing data structures, functions, and file persistence.",
+    "features": [
+      "Add students and assign grades per subject",
+      "Calculate individual and class averages",
+      "Assign letter grades automatically",
+      "Save and load data from a JSON file"
+    ],
+    "tech_stack": ["Python", "json module", "os module"],
+    "roadmap": [
+      "Step 1: Define the student data structure using a dictionary",
+      "Step 2: Write add_student() and add_grade() functions",
+      "Step 3: Implement average calculation logic",
+      "Step 4: Create a letter grade converter function",
+      "Step 5: Build the JSON save/load functions",
+      "Step 6: Create a simple text menu for user interaction",
+      "Step 7: Write a class report printer function"
+    ],
+    "resources": [
+      "Python JSON module: https://docs.python.org/3/library/json.html",
+      "Python functions tutorial: https://realpython.com/defining-your-own-python-function",
+      "W3Schools Python: https://www.w3schools.com/python"
+    ],
+    "starter_code": "starter_code/grade_manager.py"
+  },
+  {
+    "id": 4,
+    "title": "Task Manager REST API",
+    "skills": ["Python"],
+    "level": "Intermediate",
+    "interest": "Web",
+    "time": "Medium",
+    "description": "A RESTful API built with Flask that allows clients to create, read, update, and delete tasks. Perfect for learning API design, HTTP methods, and JSON responses.",
+    "features": [
+      "CRUD endpoints for tasks",
+      "Filter tasks by status (pending, done)",
+      "Assign priority levels to tasks",
+      "Persist data to a JSON file"
+    ],
+    "tech_stack": ["Python", "Flask", "JSON", "Postman (for testing)"],
+    "roadmap": [
+      "Step 1: Install Flask and create the app.py file",
+      "Step 2: Define the task data model as a dictionary",
+      "Step 3: Create the GET /tasks endpoint to list all tasks",
+      "Step 4: Create the POST /tasks endpoint to add a task",
+      "Step 5: Create PUT /tasks/<id> to update a task",
+      "Step 6: Create DELETE /tasks/<id> to remove a task",
+      "Step 7: Add JSON file persistence for saving tasks",
+      "Step 8: Test all endpoints using Postman or curl"
+    ],
+    "resources": [
+      "Flask quickstart: https://flask.palletsprojects.com/quickstart",
+      "REST API design guide: https://restfulapi.net",
+      "Postman download: https://www.postman.com/downloads"
+    ],
+    "starter_code": "starter_code/task_api.py"
+  },
+  {
+    "id": 5,
+    "title": "Portfolio Website",
+    "skills": ["HTML", "CSS", "JavaScript"],
+    "level": "Beginner",
+    "interest": "Web",
+    "time": "Low",
+    "description": "A personal portfolio site with sections for bio, projects, and contact. A great first project that teaches HTML layout, CSS styling, and a bit of JavaScript for interactivity.",
+    "features": [
+      "Hero section with name and tagline",
+      "Projects grid with cards",
+      "Skills list with visual indicators",
+      "Contact form with basic validation"
+    ],
+    "tech_stack": ["HTML", "CSS", "JavaScript"],
+    "roadmap": [
+      "Step 1: Plan the page sections on paper first",
+      "Step 2: Write the HTML structure for all sections",
+      "Step 3: Add CSS reset and base typography styles",
+      "Step 4: Style the navigation and hero section",
+      "Step 5: Build the projects grid using CSS Grid",
+      "Step 6: Add the contact form with labels and inputs",
+      "Step 7: Write JavaScript for form validation",
+      "Step 8: Make the site responsive with media queries"
+    ],
+    "resources": [
+      "HTML reference: https://developer.mozilla.org/en-US/docs/Web/HTML",
+      "CSS Grid guide: https://css-tricks.com/snippets/css/complete-guide-grid",
+      "Responsive design basics: https://web.dev/learn/design"
+    ],
+    "starter_code": "starter_code/portfolio.html"
+  },
+  {
+    "id": 6,
+    "title": "URL Shortener",
+    "skills": ["Python", "JavaScript", "HTML", "CSS"],
+    "level": "Intermediate",
+    "interest": "Web",
+    "time": "High",
+    "description": "A full-stack web app that takes long URLs and generates short codes. Users can paste a link and get a shorter one back. Teaches Flask routing, random code generation, and front-end form handling.",
+    "features": [
+      "Shorten any valid URL",
+      "Redirect short codes to original URL",
+      "Track how many times a link was clicked",
+      "List all shortened links in a dashboard"
+    ],
+    "tech_stack": ["Python", "Flask", "HTML", "CSS", "JavaScript", "JSON"],
+    "roadmap": [
+      "Step 1: Set up Flask app with two routes: home and redirect",
+      "Step 2: Write a random 6-character code generator",
+      "Step 3: Store URL mappings in a JSON file",
+      "Step 4: Build the HTML form for pasting long URLs",
+      "Step 5: Display the shortened URL after submission",
+      "Step 6: Implement the redirect route using the short code",
+      "Step 7: Add a click counter that updates on each visit",
+      "Step 8: Build a simple dashboard to list all links"
+    ],
+    "resources": [
+      "Flask routing docs: https://flask.palletsprojects.com/en/stable/quickstart/#routing",
+      "Python secrets module: https://docs.python.org/3/library/secrets.html",
+      "UUID in Python: https://docs.python.org/3/library/uuid.html"
+    ],
+    "starter_code": "starter_code/url_shortener.py"
+  },
+  {
+    "id": 7,
+    "title": "Data Analysis Report Generator",
+    "skills": ["Python"],
+    "level": "Intermediate",
+    "interest": "Data",
+    "time": "High",
+    "description": "Upload a CSV file and automatically generate a summary report with statistics, missing value counts, and basic charts. A practical project for learning data wrangling and pandas.",
+    "features": [
+      "Load and inspect CSV files",
+      "Show column types and null counts",
+      "Calculate mean, median, and mode per column",
+      "Generate bar charts for categorical data"
+    ],
+    "tech_stack": ["Python", "pandas", "matplotlib", "os module"],
+    "roadmap": [
+      "Step 1: Install pandas and matplotlib via pip",
+      "Step 2: Write a CSV loader that validates the file path",
+      "Step 3: Generate a summary table of column info",
+      "Step 4: Compute descriptive statistics for numeric columns",
+      "Step 5: Count and display missing values per column",
+      "Step 6: Build chart generation functions using matplotlib",
+      "Step 7: Export the full report to a text or HTML file"
+    ],
+    "resources": [
+      "pandas docs: https://pandas.pydata.org/docs",
+      "matplotlib tutorials: https://matplotlib.org/stable/tutorials",
+      "Real Python data analysis: https://realpython.com/pandas-dataframe"
+    ],
+    "starter_code": "starter_code/data_report.py"
+  },
+  {
+    "id": 8,
+    "title": "Password Strength Checker",
+    "skills": ["Python"],
+    "level": "Beginner",
+    "interest": "Cybersecurity",
+    "time": "Low",
+    "description": "A tool that checks password strength based on length, symbols, uppercase letters, and numbers. Helps beginners understand input validation and security basics.",
+    "features": [
+      "Check password complexity",
+      "Display strength rating",
+      "Suggest stronger password improvements",
+      "Prevent weak password patterns"
+    ],
+    "tech_stack": ["Python", "Regex"],
+    "roadmap": [
+      "Step 1: Create the password input system",
+      "Step 2: Check password length",
+      "Step 3: Detect uppercase and lowercase letters",
+      "Step 4: Detect numbers and symbols",
+      "Step 5: Create a scoring system",
+      "Step 6: Display password strength feedback"
+    ],
+    "resources": [
+      "Python regex docs: https://docs.python.org/3/library/re.html",
+      "OWASP password guidelines: https://owasp.org"
+    ],
+    "starter_code": "starter_code/password_checker.py"
+  },
+  {
+    "id": 9,
+    "title": "Feedback Survey Form",
+    "skills": ["HTML"],
+    "level": "Beginner",
+    "interest": "Web",
+    "time": "Low",
+    "description": "A simple student feedback form that collects user names, emails, and ratings. Teaches basic HTML form handling and layout design.",
+    "features": [
+      "Collect user name, email, and age with validation",
+      "Dropdown menu for experience selection",
+      "Text area for detailed user suggestions"
+    ],
+    "tech_stack": ["HTML"],
+    "roadmap": [
+      "Step 1: Create the HTML folder structure inside starter_code",
+      "Step 2: Build the input text fields and labels",
+      "Step 3: Add select options and textarea elements",
+      "Step 4: Align the form to the center for better layout",
+      "Step 5: Test the form using Live Server"
+    ],
+    "resources": [
+      "MDN HTML Forms: https://developer.mozilla.org/en-US/docs/Learn/Forms"
+    ],
+    "starter_code": "starter_code/survey_form/index.html"
+  },
+  {
+    "id":10,
+    "title": "API ETL Pipeline",
+    "skills": ["Python","pandas","requests"],
+    "level": "Intermediate",
+    "interest": "Data",
+    "time": "Medium",
+    "description": "Enter a public API URL to fetch data and automatically transform it into a structured CSV dataset.",
+    "features": [
+      "Fetch data from public APIs",
+      "handle missing values",
+      "Normalize nested JSON",
+      "Generate summary statistics",
+      "Export the processed CSV for any other Analytics projects"
+    ],
+    "tech_stack": ["Python", "pandas","requests","JSON"],
+    "roadmap": [
+      "Step 1:  Install required modules via pip",
+      "Step 2:  Find a public API key for this project",
+      "Step 3:  Fetch the data from the API using requests",
+      "Step 4:  Validate the response you just fetched From the API",
+      "Step 5:  Normalize the nested JSON data by flattening it",
+      "Step 6:  Use the fetched data to build a pandas dataframe",
+      "Step 7:  Handle missing values or duplicate values",
+      "Step 8:  Export the cleaned dataset to CSV format",
+      "Step 9:  Generate a summary for the newly created CSV dataset",
+      "Step 10: Test the file with at least two different public APIs"
+    ],
+    "resources": [
+      "pandas docs: https://pandas.pydata.org/docs",
+      "requests docs: https://requests.readthedocs.io/en/latest/",
+      "JSON handling in Python: https://docs.python.org/3/library/json.html",
+      "REST API tutorial: https://restfulapi.net/",
+      "Real Python API guide: https://realpython.com/api-integration-in-python/"
+    ],
+    "starter_code": "starter_code/api_data_pipeline.py"
+  }
+]
+
+
+
