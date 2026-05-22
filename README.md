@@ -336,6 +336,17 @@ Thanks to all the amazing people who contribute to DevPath.
 
 ---
 
+## 📋 Project History
+
+All notable changes — new features, bug fixes, and documentation updates —
+are tracked in [CHANGELOG.md](CHANGELOG.md).
+
+The changelog follows the [Keep a Changelog v1.0.0](https://keepachangelog.com/en/1.0.0/)
+format. Contributors are expected to update it for every user-facing or
+documentation change before opening a pull request.
+
+---
+
 ## Code of Conduct
 
 All contributors are expected to follow the
