@@ -8,6 +8,9 @@ STARTER_CODE_DIR = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "starter_code")
 )
 
+# Only these file extensions are allowed for download
+ALLOWED_EXTENSIONS = {'.py', '.js', '.html', '.css', '.json', '.md', '.txt'}
+
 
 def resolve_starter_file(project):
     """
@@ -20,6 +23,9 @@ def resolve_starter_file(project):
 
     # Only use the filename portion — never trust a full path from the data file
     filename = os.path.basename(raw_path)
+    ext = os.path.splitext(filename)[1].lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        return None
     full_path = os.path.join(STARTER_CODE_DIR, filename)
 
     if not os.path.exists(full_path):
