@@ -33,6 +33,13 @@
       <a href="/" class="nav-logo">DevPath</a>
       <div class="nav-links">
         <a href="/" class="nav-link">Back to Search</a>
+        {% if session.get('email') %}
+        <a href="/dashboard" class="nav-link">Dashboard</a>
+        <a href="/logout" class="nav-btn-outline">Logout</a>
+        {% else %}
+        <a href="/login" class="nav-link">Login</a>
+        <a href="/signup" class="nav-btn-outline">Sign Up</a>
+        {% endif %}
         <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-link nav-link-gh">GitHub</a>
       </div>
     </div>

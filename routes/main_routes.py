@@ -3,7 +3,7 @@
 # Each route is kept thin: it validates input, calls a utility function,
 # and returns a response. No business logic lives here.
 
-from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort
+from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, redirect,session
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
 from utils.data_loader import find_project_by_id, get_project_stats
@@ -42,6 +42,10 @@ def recommend():
         interest (str) - Web | Data | Education | Automation | Games
         time     (str) - Low | Medium | High
     """
+    if 'email' not in session:   #done to ensure that only authenticated users get to use website features
+        return jsonify({
+            "error": "Please login to use DevPath."
+        }), 401
     payload = request.get_json()
 
     if not payload:
@@ -75,6 +79,8 @@ def recommend():
 @main.route("/project/<int:project_id>")
 def project_detail(project_id):
     """Render the full detail page for a single project."""
+    if 'email' not in session:
+        return redirect('/login')
     project = find_project_by_id(project_id)
     if not project:
         abort(404)
@@ -84,6 +90,10 @@ def project_detail(project_id):
 @main.route("/project/<int:project_id>/code")
 def view_code(project_id):
     """Return the starter code file contents as JSON for inline display."""
+    if 'email' not in session:
+        return jsonify({
+        "error": "Unauthorized"
+        }), 401
     project = find_project_by_id(project_id)
     if not project:
         return jsonify({"error": "Project not found."}), 404
@@ -98,6 +108,8 @@ def view_code(project_id):
 @main.route("/project/<int:project_id>/download")
 def download_code(project_id):
     """Serve the starter code file as a downloadable attachment."""
+    if 'email' not in session:
+       return redirect('/login')
     project = find_project_by_id(project_id)
     if not project:
         abort(404)

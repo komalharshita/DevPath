@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Signup — DevPath</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">Dev<span class="nav-logo-accent">Path</span></a>
+      <div class="nav-links">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/login" class="nav-link">Login</a>
+      </div>
+    </div>
+  </nav>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  {% endwith %}
+  <section class="form-section">
+    <div class="container">
+      <div class="section-eyebrow">
+        Join DevPath
+      </div>
+      <h2 class="section-title">
+        Create Your Account
+      </h2>
+      <p class="section-sub">
+        Save your skills, track projects, and personalize recommendations.
+      </p>
+      <div class="form-card-outer">
+        <div class="form-card">
+          <form method="POST">
+            <div class="form-group">
+              <label>Name</label>
+              <input
+                type="text"
+                name="name"
+                placeholder="Enter your name"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input
+                type="password"
+                name="password"
+                placeholder="Create a password"
+                required
+              />
+            </div>
+            {% if error %}
+            <p class="form-error-general">
+              {{ error }}
+            </p>
+            {% endif %}
+            <button type="submit" class="btn-submit">
+              Create Account
+            </button>
+          </form>
+          <p style="margin-top:20px;text-align:center;">
+            Already have an account?
+            <a href="/login">Login</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

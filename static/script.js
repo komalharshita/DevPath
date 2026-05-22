@@ -543,7 +543,16 @@ if (clearFiltersBtn) {
       headers: { "Content-Type": "application/json" },
       body:    JSON.stringify(payload) //convert object to json string
     })
+auth-feature
+    //means user not logged in/session expired
+      .then(function (res) { if(res.status===401){
+        window.location.href="/login";
+        return;
+      }
+        return res.json(); })
+
       .then(function (res) { return res.json(); }) //parse the response as JSON
+       main
       .then(function (data) {
         setLoadingState(false);
 
@@ -751,7 +760,11 @@ if (isDetailPage) {
     if (codeContentEl) codeContentEl.textContent = "Loading starter code...";
 
     fetch("/project/" + PROJECT_ID + "/code")
-      .then(function (res) { return res.json(); })
+    //means user not logged in/session expired
+      .then(function (res) {if(res.status===401){
+        window.location.href="/login";
+        return;
+      } return res.json(); })
       .then(function (data) {
         if (data.error) {
           if (codeContentEl) codeContentEl.textContent = "Error: " + data.error;
@@ -955,3 +968,14 @@ if (scrollTopBtn) {
     window.addEventListener('scroll', handleScroll);
     scrollTopBtn.addEventListener('click', scrollToTop);
 }
+/*Flash Messages Auto Handle to remove after a certain time*/
+setTimeout(function () {
+  document.querySelectorAll(".flash-message").forEach(function (msg) {
+    msg.style.opacity = "0";
+    msg.style.transform = "translateY(-10px)";
+
+    setTimeout(function () {
+      msg.remove();
+    }, 300);
+  });
+}, 3000);
