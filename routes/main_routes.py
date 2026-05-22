@@ -106,6 +106,6 @@ def download_code(project_id):
     if not full_path:
         abort(404)
 
-    import os
     filename = os.path.basename(full_path)
-    return send_from_directory(get_starter_code_dir(), filename, as_attachment=True)
+    file_dir = os.path.dirname(full_path)
+    return send_from_directory(file_dir, filename, as_attachment=True)
