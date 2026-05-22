@@ -744,6 +744,33 @@ if (isDetailPage) {
     document.body.style.overflow = "";
   }
 
+  // Splits a code string into an array of DOM rows, each containing a
+  // gutter line-number span and a code-content span.
+  // Returns an array of div.code-line elements ready to append to the viewer.
+  function renderCodeWithLineNumbers(code) {
+    var lines = code.split("\n");
+    var rows = [];
+
+    for (var i = 0; i < lines.length; i++) {
+      var row = document.createElement("div");
+      row.className = "code-line";
+
+      var gutter = document.createElement("span");
+      gutter.className = "line-number";
+      gutter.textContent = i + 1;
+
+      var content = document.createElement("span");
+      content.className = "line-content";
+      content.textContent = lines[i];
+
+      row.appendChild(gutter);
+      row.appendChild(content);
+      rows.push(row);
+    }
+
+    return rows;
+  }
+
   //fetches the starter code from the server via an API call
   //inserts the code into the panel and handles loading/error states
   function fetchStarterCode() {
