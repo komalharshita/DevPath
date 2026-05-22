@@ -839,12 +839,48 @@ ol {
   white-space: nowrap;
 }
 
+.skill-strip-marquee {
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+  width: 100%;
+
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+}
+
+.skill-strip-track {
+  display: flex;
+  width: max-content;
+  animation: skill-strip-scroll 28s linear infinite;
+}
+
+.skill-strip-marquee:hover .skill-strip-track {
+  animation-play-state: paused;
+}
+
 .skill-strip-items {
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
-  gap: 0;
   white-space: nowrap;
+}
+
+.skill-strip-items:first-child {
+  margin-right: 28px;
 }
 
 .ss-item {
@@ -866,6 +902,7 @@ ol {
     border-color 180ms ease,
     box-shadow 180ms ease;
 }
+
 .ss-item:hover {
   transform: translateY(-1px);
   color: var(--indigo-700);
@@ -883,22 +920,21 @@ ol {
   flex-shrink: 0;
 }
 
-@keyframes skill-strip-marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+@keyframes skill-strip-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .skill-strip-track {
     animation: none;
-    width: 100%;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 12px;
-  }
-
-  .skill-strip-items + .skill-strip-items {
-    display: none;
   }
 
   .skill-strip-marquee {
@@ -934,7 +970,6 @@ ol {
   }
 
   .skill-strip-track {
-    gap: 14px;
     animation-duration: 36s;
   }
 
