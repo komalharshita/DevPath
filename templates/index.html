@@ -348,7 +348,7 @@
 
       <div class="form-card-outer">
         <div class="form-card" id="form-section">
-          <form id="recommend-form" novalidate>
+          <form id="recommend-form" novalidate onsubmit="event.preventDefault()">
             <div class="form-group">
               <div class="form-label-row" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
                 <label for="skills-input">
@@ -372,8 +372,8 @@
                 
                 <input
                   type="text"
-                  id="skills-input" 
-                  placeholder="Type a skill and press Enter..."
+                  id="skills-input"
+                  placeholder="Type a skill..."
                   autocomplete="off"
                   aria-haspopup="listbox"
                   aria-expanded="false"

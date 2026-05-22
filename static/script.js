@@ -135,18 +135,32 @@ if (clearFiltersBtn) {
   var visibleSuggestions = [];
   var activeSuggestionIndex = -1;
 
+  // Capture Enter key at the form level to avoid accidental submits
+  // when the skills input is focused (some browsers can still submit).
+  if (form && skillsTextInput) {
+    form.addEventListener("keydown", function (evt) {
+      if (evt.key === "Enter" && document.activeElement === skillsTextInput) {
+        // Run in capture-phase to intercept before other handlers
+        evt.preventDefault();
+        evt.stopPropagation();
+
+        if (activeSuggestionIndex >= 0 && visibleSuggestions[activeSuggestionIndex]) {
+          selectSuggestion(visibleSuggestions[activeSuggestionIndex]);
+          return;
+        }
+
+        if (skillsTextInput.value && skillsTextInput.value.trim()) {
+          addSkill(skillsTextInput.value);
+          skillsTextInput.value = "";
+        }
+        hideSuggestions();
+      }
+    }, true);
+  }
+
   function initSkillStripMarquee() {
     var marquee = document.querySelector(".skill-strip-marquee");
-    var track = marquee && marquee.querySelector(".skill-strip-track");
-
-    if (!marquee || !track || track.querySelector(".skill-strip-items[data-marquee-clone='true']")) {
-      return;
-    }
-
-    var clone = track.querySelector(".skill-strip-items").cloneNode(true);
-    clone.setAttribute("aria-hidden", "true");
-    clone.setAttribute("data-marquee-clone", "true");
-    track.appendChild(clone);
+    if (!marquee) return;
   }
 
   availableSkills = availableSkills.filter(function (skill, index, list) {
@@ -370,6 +384,18 @@ if (clearFiltersBtn) {
     updateQuickPickState();
     // Once a skill is added, remove the "please add a skill" error if it was showing
     clearFieldError("skills-error");
+    // Ensure the corresponding quick-pick chip is visually active immediately
+    try {
+      var quickChip = document.querySelector('.skill-chip[data-skill="' + skill + '"]');
+      if (quickChip) {
+        quickChip.classList.add('active', 'selected');
+        quickChip.setAttribute('aria-pressed', 'true');
+      }
+    } catch (e) {
+      // ignore DOM errors
+    }
+    // Keep focus in the input so user can continue typing
+    if (skillsTextInput) skillsTextInput.focus();
   }
 
   // remove a skill from the list and update the UI accordingly
@@ -381,6 +407,16 @@ if (clearFiltersBtn) {
     renderSelectedChips();
     syncSkillsHiddenInput();
     updateQuickPickState();
+    // Also clear the visual active state on the quick-pick chip if present
+    try {
+      var quickChip = document.querySelector('.skill-chip[data-skill="' + skill + '"]');
+      if (quickChip) {
+        quickChip.classList.remove('active', 'selected');
+        quickChip.setAttribute('aria-pressed', 'false');
+      }
+    } catch (e) {
+      // ignore DOM errors
+    }
   }
 
   // recreate the selected skills chips based on the current array(selectedSkills)
@@ -926,6 +962,8 @@ if (
       }
   });
 }
+
+} // end github modal handlers
 
 /* ---- Scroll-to-top button ---- */
 
