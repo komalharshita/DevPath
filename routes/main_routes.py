@@ -47,10 +47,17 @@ def recommend():
     if not payload:
         return jsonify({"error": "Request body must be valid JSON."}), 400
 
-    skills            = payload.get("skills", "").strip()
-    level             = payload.get("level", "").strip()
-    interest          = payload.get("interest", "").strip()
-    time_availability = payload.get("time", "").strip()
+    # Reject non-string values (e.g. null, lists, numbers) before calling .strip()
+    string_fields = ("skills", "level", "interest", "time")
+    for field in string_fields:
+        value = payload.get(field)
+        if value is not None and not isinstance(value, str):
+            return jsonify({"error": f"'{field}' must be a string value."}), 400
+
+    skills            = (payload.get("skills") or "").strip()
+    level             = (payload.get("level") or "").strip()
+    interest          = (payload.get("interest") or "").strip()
+    time_availability = (payload.get("time") or "").strip()
 
     # Validate before running the recommendation engine
     errors = validate_recommendation_inputs(skills, level, interest, time_availability)

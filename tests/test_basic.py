@@ -234,6 +234,34 @@ def test_recommend_api_missing_field():
     assert "error" in response.get_json()
 
 
+def test_recommend_api_null_field():
+    """The API should return 400 when a field is explicitly set to null."""
+    client = get_client()
+    response = client.post("/api/recommend", json={
+        "skills": None,
+        "level": "Beginner",
+        "interest": "Web",
+        "time": "Low"
+    })
+    assert response.status_code == 400
+    data = response.get_json()
+    assert "error" in data
+
+
+def test_recommend_api_non_string_field():
+    """The API should return 400 when a field is a non-string type (e.g. a list)."""
+    client = get_client()
+    response = client.post("/api/recommend", json={
+        "skills": ["Python", "HTML"],
+        "level": "Beginner",
+        "interest": "Web",
+        "time": "Low"
+    })
+    assert response.status_code == 400
+    data = response.get_json()
+    assert "error" in data
+
+
 def test_recommend_api_empty_body():
     """The API should return 400 when the body is not valid JSON."""
     client = get_client()
