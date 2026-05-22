@@ -22,6 +22,45 @@ var fetchBtn = document.getElementById('btn-fetch-github');
 var githubInput = document.getElementById('github-username');
 var errorMsg = document.getElementById('github-modal-error');
 
+// ============================================================
+// Lenis Smooth Scrolling Initialization (runs on all pages)
+// ============================================================
+(function initLenis() {
+  // Check if Lenis is available
+  if (typeof Lenis === 'undefined') return;
+  
+  const lenis = new Lenis({
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    smoothWheel: true,
+    smoothTouch: false
+  });
+
+  function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+  
+  requestAnimationFrame(raf);
+
+  // Integrate with anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      const href = this.getAttribute('href');
+      if (href === '#') return;
+      
+      e.preventDefault();
+      const target = document.querySelector(href);
+      if (target) {
+        lenis.scrollTo(target, {
+          offset: 0,
+          duration: 1.2
+        });
+      }
+    });
+  });
+})();
+
 
 // ============================================================
 // Mobile navigation toggle (runs on all pages)

@@ -22,5 +22,18 @@
       <a href="/" class="btn-primary" style="display:inline-block;text-decoration:none;padding:14px 32px;">Back to Home</a>
     </div>
   </div>
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script>
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true
+    });
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+  </script>
 </body>
 </html>
