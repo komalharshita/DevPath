@@ -437,13 +437,19 @@
             <div class="form-row">
               <div class="form-group">
                 <label for="level">Experience Level</label>
-                <div class="select-wrap">
-                  <select id="level" name="level">
+                <div class="select-wrap custom-select">
+                  <select id="level" name="level" style="display: none;">
                     <option value="" disabled selected>Select level</option>
                     <option value="Beginner">Beginner</option>
                     <option value="Intermediate">Intermediate</option>
                     <option value="Advanced">Advanced</option>
                   </select>
+                  <div class="custom-select-trigger">Select level</div>
+                  <div class="custom-select-options">
+                    <div class="custom-option" data-value="Beginner">Beginner</div>
+                    <div class="custom-option" data-value="Intermediate">Intermediate</div>
+                    <div class="custom-option" data-value="Advanced">Advanced</div>
+                  </div>
                 </div>
                 <span class="form-hint">
                     Select your current proficiency level such as Beginner, Intermediate, or Advanced.
@@ -459,8 +465,8 @@
                     ⓘ
                   </span>
                 </label>
-                <div class="select-wrap">
-                  <select id="interest" name="interest">
+                <div class="select-wrap custom-select">
+                  <select id="interest" name="interest" style="display: none;">
                     <option value="" disabled selected>Select interest</option>
                     <option value="Web">Web Development</option>
                     <option value="Data">Data and Analytics</option>
@@ -468,6 +474,14 @@
                     <option value="Automation">Automation</option>
                     <option value="Games">Games</option>
                   </select>
+                  <div class="custom-select-trigger">Select interest</div>
+                  <div class="custom-select-options">
+                    <div class="custom-option" data-value="Web">Web Development</div>
+                    <div class="custom-option" data-value="Data">Data and Analytics</div>
+                    <div class="custom-option" data-value="Education">Education Tools</div>
+                    <div class="custom-option" data-value="Automation">Automation</div>
+                    <div class="custom-option" data-value="Games">Games</div>
+                  </div>
                 </div>
              
 
@@ -487,13 +501,19 @@
               ⓘ
             </span>
           </label>
-          <div class="select-wrap">
-            <select id="time" name="time">
+          <div class="select-wrap custom-select">
+            <select id="time" name="time" style="display: none;">
               <option value="" disabled selected>How much time can you commit?</option>
               <option value="Low">Low — a few hours total</option>
               <option value="Medium">Medium — across a weekend</option>
               <option value="High">High — a week or more</option>
             </select>
+            <div class="custom-select-trigger">How much time can you commit?</div>
+            <div class="custom-select-options">
+              <div class="custom-option" data-value="Low">Low — a few hours total</div>
+              <div class="custom-option" data-value="Medium">Medium — across a weekend</div>
+              <div class="custom-option" data-value="High">High — a week or more</div>
+            </div>
           </div>
           <span class="form-hint">
             Include coding, debugging, learning, and reviewing time in your estimate.
@@ -501,28 +521,22 @@
           <div class="form-error-msg" id="time-error"></div>
         </div>
 
-            <!-- Submit button -->
-            <button type="submit" class="btn-submit" id="submit-btn">
-              <span id="btn-label">Generate My Projects</span>
-
-              <span id="btn-loading" class="btn-loading-content" style="display:none;">
-                <span class="loading-spinner"></span>
-                <span>Finding matches...</span>
-              </span>
-            </button>
         <!-- General error (shown above the button) -->
         <p class="form-error-general" id="form-error-general"></p>
 
-        <!-- Submit button -->
+        <!-- Submit button & Clear filters -->
         <div class="form-actions">
           <button type="submit" class="btn-submit" id="submit-btn">
-                <span id="btn-label">Generate My Projects</span>
-              <span id="btn-loading" style="display:none;">Finding matches...</span>
-            </button>
+            <span id="btn-label">Generate My Projects</span>
+            <span id="btn-loading" class="btn-loading-content" style="display:none;">
+              <span class="loading-spinner"></span>
+              <span>Finding matches...</span>
+            </span>
+          </button>
 
-            <button type="button" class="btn-clear" id="clear-filters-btn">
-              <span>Clear Filters</span>
-            </button>
+          <button type="button" class="btn-clear" id="clear-filters-btn">
+            <span>Clear Filters</span>
+          </button>
         </div>
 
         </form>
@@ -689,29 +703,7 @@
       
     </div>
   </div>
-<style>
-.form-actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 20px;
-    align-items: center;
-}
 
-.btn-clear {
-    background-color: #f3f4f6;
-    color: #1f2937;
-    border: 1px solid #d1d5db;
-    padding: 12px 24px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-.btn-clear:hover {
-    background-color: #e5e7eb;
-}
-</style>
 
 
 

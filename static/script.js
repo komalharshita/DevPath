@@ -510,65 +510,25 @@ if (clearFiltersBtn) {
           return res.json();
         })
         .then(function (data) {
-
           setLoadingState(false);
-
           if (data.error) {
             var generalErr = document.getElementById("form-error-general");
-
             if (generalErr) {
               generalErr.textContent = data.error;
             }
-
             return;
           }
-
           renderResults(data.projects || [], data.message);
         })
-        .catch(function () {
-
+        .catch(function (err) {
           setLoadingState(false);
-    //combine form values into an object to send to server/api
-    var payload = {
-      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level: document.getElementById("level").value,
-      interest: document.getElementById("interest").value,
-      time: document.getElementById("time").value
-    };
-
-    //post the data to backend api as JSON, then handle the response
-    fetch("/api/recommend", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify(payload) //convert object to json string
-    })
-      .then(function (res) { return res.json(); }) //parse the response as JSON
-      .then(function (data) {
-        setLoadingState(false);
-
           var generalErr = document.getElementById("form-error-general");
-
           if (generalErr) {
-            generalErr.textContent =
-              "Something went wrong. Please try again.";
+            generalErr.textContent = "Something went wrong. Please try again.";
           }
+          console.error("API request failed:", err);
         });
     });
-        if (data.error) {
-          var generalErr = document.getElementById("form-error-general");
-          if (generalErr) generalErr.textContent = data.error;
-          return;
-        }
-        renderResults(data.projects || [], data.message);
-      })
-      .catch(function (err) {
-        // this runs if the network request itself fails 
-        setLoadingState(false);
-        var generalErr = document.getElementById("form-error-general");
-        if (generalErr) generalErr.textContent = "Something went wrong. Please try again.";
-        console.error("API request failed:", err);
-      });
   });
 
   // Manages the loading state of the form and results section(whats visible or not)
@@ -608,12 +568,6 @@ if (clearFiltersBtn) {
     // Clear out any cards from a previous search before showing new ones
     resultsGrid.innerHTML = "";
 
-    if (!projects || projects.length === 0) {
-      resultsGrid.style.display     = "none";
-      resultsEmptyEl.style.display  = "block";
-      resultsGrid.style.display = "none";
-      resultsEmptyEl.style.display = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
     if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
       resultsGrid.style.display      = "none";
       resultsEmptyEl.style.display   = "block";
@@ -702,6 +656,85 @@ if (clearFiltersBtn) {
     // Only add "..." if the text is actually longer than the limit
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
   }
+
+  // ----------------------------------------------------------
+  // Custom Dropdowns
+  // ----------------------------------------------------------
+  var customSelects = document.querySelectorAll(".custom-select");
+  
+  customSelects.forEach(function(customSelect) {
+    var trigger = customSelect.querySelector(".custom-select-trigger");
+    var optionsContainer = customSelect.querySelector(".custom-select-options");
+    var customOptions = customSelect.querySelectorAll(".custom-option");
+    var nativeSelect = customSelect.querySelector("select");
+
+    if (!trigger || !nativeSelect) return;
+
+    // Sync visual trigger with initial native select value (if prefilled)
+    if (nativeSelect.value) {
+      customOptions.forEach(function(opt) {
+        if (opt.getAttribute("data-value") === nativeSelect.value) {
+          trigger.textContent = opt.textContent;
+          trigger.style.color = "var(--gray-900)";
+          opt.classList.add("selected");
+        }
+      });
+    }
+
+    // Open/close menu when trigger is clicked
+    trigger.addEventListener("click", function(e) {
+      e.stopPropagation();
+      var isOpen = customSelect.classList.contains("open");
+      
+      // Close all other open dropdowns first
+      document.querySelectorAll(".custom-select").forEach(function(el) {
+        el.classList.remove("open");
+      });
+
+      if (!isOpen) {
+        customSelect.classList.add("open");
+      }
+    });
+
+    // Handle option selection
+    customOptions.forEach(function(option) {
+      option.addEventListener("click", function(e) {
+        e.stopPropagation();
+        var value = this.getAttribute("data-value");
+        var text = this.textContent;
+
+        // Update visual trigger text
+        trigger.textContent = text;
+        trigger.style.color = "var(--gray-900)";
+
+        // Remove selected class from all and add to clicked
+        customOptions.forEach(function(opt) { opt.classList.remove("selected"); });
+        this.classList.add("selected");
+
+        // Update native select
+        nativeSelect.value = value;
+        // Trigger change event for any validation logic
+        nativeSelect.dispatchEvent(new Event("change"));
+        
+        // Remove error messages immediately if present
+        if (typeof clearFieldError === "function") {
+          clearFieldError(nativeSelect.id + "-error");
+        }
+
+        // Close menu
+        customSelect.classList.remove("open");
+      });
+    });
+  });
+
+  // Close custom dropdowns when clicking outside
+  document.addEventListener("click", function(e) {
+    document.querySelectorAll(".custom-select").forEach(function(customSelect) {
+      if (!customSelect.contains(e.target)) {
+        customSelect.classList.remove("open");
+      }
+    });
+  });
 
 } // end isIndexPage
 
