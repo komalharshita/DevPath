@@ -22,6 +22,9 @@ from utils.recommender import (
     validate_recommendation_inputs,
     parse_skills,
     score_single_project,
+    WEIGHT_LEVEL,
+    WEIGHT_INTEREST,
+    WEIGHT_TIME,
 )
 from app import app, internal_server_error
 
@@ -107,6 +110,70 @@ def test_score_single_project_full_match():
     )
     # 1 skill match (3) + level (2) + interest (2) + time (1) = 8
     assert score == 8, f"Expected 8 but got {score}"
+# --------------
+def test_score_single_project_partial_skill_coverage():
+    """Matching 1 of 2 required skills should score less than matching both."""
+    project = {
+        "skills": ["Python", "Flask"],
+        "level": "Beginner",
+        "interest": "Data",
+        "time": "Low"
+    }
+    # User knows only Python (1 of 2)
+    score_partial = score_single_project(
+        project,
+        user_skills=["python"],
+        level="Beginner",
+        interest="Data",
+        time_availability="Low"
+    )
+    # User knows both Python and Flask (2 of 2)
+    score_full = score_single_project(
+        project,
+        user_skills=["python", "flask"],
+        level="Beginner",
+        interest="Data",
+        time_availability="Low"
+    )
+    assert score_partial < score_full, (
+        f"Partial match ({score_partial}) should score less than full match ({score_full})"
+    )
+
+
+def test_score_coverage_ratio_exact_values():
+    """Verify the coverage-weighted formula produces the correct numeric result."""
+    project = {"skills": ["Python", "Flask"], "level": "X", "interest": "X", "time": "X"}
+
+    # 1 of 2 skills matched: coverage = 0.5, score = 1 * 3 * 0.5 = 1.5
+    score = score_single_project(project, ["python"], "X", "X", "X")
+    assert score == 1.5, f"Expected 1.5 but got {score}"
+
+    # 2 of 2 skills matched: coverage = 1.0, score = 2 * 3 * 1.0 = 6.0
+    score = score_single_project(project, ["python", "flask"], "X", "X", "X")
+    assert score == 6.0, f"Expected 6.0 but got {score}"
+
+
+def test_score_no_project_skills_does_not_crash():
+    """A project with an empty skills list should not raise ZeroDivisionError."""
+    project = {"skills": [], "level": "Beginner", "interest": "Data", "time": "Low"}
+    score = score_single_project(project, ["python"], "Beginner", "Data", "Low")
+    # Skill score is 0, but other criteria still score
+    assert score == WEIGHT_LEVEL + WEIGHT_INTEREST + WEIGHT_TIME  # 2+2+1 = 5
+
+
+def test_score_three_skills_partial_coverage():
+    """Matching 2 of 3 skills should produce a score between 0-skill and 3-skill matches."""
+    project = {"skills": ["Python", "Flask", "SQL"], "level": "X", "interest": "X", "time": "X"}
+
+    score_0 = score_single_project(project, ["rust"],               "X", "X", "X")
+    score_2 = score_single_project(project, ["python", "flask"],    "X", "X", "X")
+    score_3 = score_single_project(project, ["python", "flask", "sql"], "X", "X", "X")
+
+    assert score_0 == 0
+    assert score_0 < score_2 < score_3, (
+        f"Expected 0 < {score_2} < {score_3}"
+    )
+# --------------
 
 
 def test_score_single_project_no_match():
