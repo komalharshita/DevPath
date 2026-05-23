@@ -71,9 +71,13 @@ if (isIndexPage) {
   var skillsTextInput   = document.getElementById("skills-input"); //visible text box in which user types skills
   var chipsSelectedEl   = document.getElementById("skill-chips-selected"); //selected skills tags container
   var quickPickChips    = document.querySelectorAll(".skill-chip"); // predefined skills user can click
+  var savedProjectsGrid = document.getElementById("saved-projects-grid");
+  var savedProjectsEmpty = document.getElementById("saved-projects-empty");
 
   // Tracks currently selected skills to prevent duplicates
   var selectedSkills = [];
+  var savedProjectsStorageKey = "devpath:saved-projects";
+  var savedProjects = loadSavedProjects();
   // Clear Filters Button Functionality
 var clearFiltersBtn = document.getElementById("clear-filters-btn");
 if (clearFiltersBtn) {
@@ -479,8 +483,8 @@ if (clearFiltersBtn) {
 
   form.addEventListener("submit", function (evt) {
     evt.preventDefault(); //stop the browser from reloading the page on form submit
-    clearAllErrors()
-    
+    clearAllErrors();
+
     if (skillsTextInput.value.trim()) {
       addSkill(skillsTextInput.value);
       skillsTextInput.value = "";
@@ -493,7 +497,6 @@ if (clearFiltersBtn) {
 
     // Allow browser to paint spinner before request starts
     requestAnimationFrame(function () {
-
       var payload = {
         skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
         level: document.getElementById("level").value,
@@ -510,65 +513,23 @@ if (clearFiltersBtn) {
           return res.json();
         })
         .then(function (data) {
-
           setLoadingState(false);
 
           if (data.error) {
             var generalErr = document.getElementById("form-error-general");
-
-            if (generalErr) {
-              generalErr.textContent = data.error;
-            }
-
+            if (generalErr) generalErr.textContent = data.error;
             return;
           }
 
           renderResults(data.projects || [], data.message);
         })
-        .catch(function () {
-
+        .catch(function (err) {
           setLoadingState(false);
-    //combine form values into an object to send to server/api
-    var payload = {
-      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level: document.getElementById("level").value,
-      interest: document.getElementById("interest").value,
-      time: document.getElementById("time").value
-    };
-
-    //post the data to backend api as JSON, then handle the response
-    fetch("/api/recommend", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify(payload) //convert object to json string
-    })
-      .then(function (res) { return res.json(); }) //parse the response as JSON
-      .then(function (data) {
-        setLoadingState(false);
-
           var generalErr = document.getElementById("form-error-general");
-
-          if (generalErr) {
-            generalErr.textContent =
-              "Something went wrong. Please try again.";
-          }
+          if (generalErr) generalErr.textContent = "Something went wrong. Please try again.";
+          console.error("API request failed:", err);
         });
     });
-        if (data.error) {
-          var generalErr = document.getElementById("form-error-general");
-          if (generalErr) generalErr.textContent = data.error;
-          return;
-        }
-        renderResults(data.projects || [], data.message);
-      })
-      .catch(function (err) {
-        // this runs if the network request itself fails 
-        setLoadingState(false);
-        var generalErr = document.getElementById("form-error-general");
-        if (generalErr) generalErr.textContent = "Something went wrong. Please try again.";
-        console.error("API request failed:", err);
-      });
   });
 
   // Manages the loading state of the form and results section(whats visible or not)
@@ -609,15 +570,9 @@ if (clearFiltersBtn) {
     resultsGrid.innerHTML = "";
 
     if (!projects || projects.length === 0) {
-      resultsGrid.style.display     = "none";
-      resultsEmptyEl.style.display  = "block";
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "block";
       if (message && emptyMessageEl) emptyMessageEl.textContent = message;
-    if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
-      resultsGrid.style.display      = "none";
-      resultsEmptyEl.style.display   = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message; //if api sent back a message (e.g. "no projects found matching your criteria"), show that 
       resultsSection.scrollIntoView({ behavior: "smooth" });
       return;
     }
@@ -627,15 +582,89 @@ if (clearFiltersBtn) {
 
     //build a card for each project and add it to the grid
     projects.forEach(function (project) {
-      resultsGrid.appendChild(buildProjectCard(project));
+      resultsGrid.appendChild(buildProjectCard(project, { context: "results" }));
     });
 
     resultsSection.scrollIntoView({ behavior: "smooth" });
   }
 
+  function loadSavedProjects() {
+    try {
+      var storedProjects = JSON.parse(localStorage.getItem(savedProjectsStorageKey) || "[]");
+      return Array.isArray(storedProjects) ? storedProjects : [];
+    } catch (err) {
+      console.warn("Could not read saved projects:", err);
+      return [];
+    }
+  }
+
+  function persistSavedProjects() {
+    localStorage.setItem(savedProjectsStorageKey, JSON.stringify(savedProjects));
+  }
+
+  function getProjectKey(project) {
+    return String(project.id || project.title || "").toLowerCase();
+  }
+
+  function isProjectSaved(project) {
+    var projectKey = getProjectKey(project);
+    return savedProjects.some(function (savedProject) {
+      return getProjectKey(savedProject) === projectKey;
+    });
+  }
+
+  function saveProject(project) {
+    if (isProjectSaved(project)) return;
+    savedProjects.push(project);
+    persistSavedProjects();
+    renderSavedProjects();
+    updateSaveButtons();
+  }
+
+  function removeSavedProject(project) {
+    var projectKey = getProjectKey(project);
+    savedProjects = savedProjects.filter(function (savedProject) {
+      return getProjectKey(savedProject) !== projectKey;
+    });
+    persistSavedProjects();
+    renderSavedProjects();
+    updateSaveButtons();
+  }
+
+  function renderSavedProjects() {
+    if (!savedProjectsGrid || !savedProjectsEmpty) return;
+
+    savedProjectsGrid.innerHTML = "";
+
+    if (savedProjects.length === 0) {
+      savedProjectsEmpty.style.display = "block";
+      savedProjectsGrid.style.display = "none";
+      return;
+    }
+
+    savedProjectsEmpty.style.display = "none";
+    savedProjectsGrid.style.display = "grid";
+    savedProjects.forEach(function (project) {
+      savedProjectsGrid.appendChild(buildProjectCard(project, { context: "saved" }));
+    });
+  }
+
+  function updateSaveButtons() {
+    document.querySelectorAll(".btn-save-project").forEach(function (button) {
+      var isSaved = savedProjects.some(function (project) {
+        return getProjectKey(project) === button.getAttribute("data-project-key");
+      });
+
+      button.classList.toggle("is-saved", isSaved);
+      button.textContent = isSaved ? "Saved" : "Save Project";
+      button.setAttribute("aria-pressed", isSaved ? "true" : "false");
+    });
+  }
+
   // builds one project card as a DOM element and returns it
   // the card has title, short description, tags and link
-  function buildProjectCard(project) {
+  function buildProjectCard(project, options) {
+    options = options || {};
     var card = document.createElement("div");
     card.className = "project-card";
 
@@ -676,6 +705,27 @@ if (clearFiltersBtn) {
     link.textContent = "View Full Project";
     link.href = "/project/" + project.id; //each project has a unique id
 
+    var actionBtn = document.createElement("button");
+    actionBtn.type = "button";
+    actionBtn.className = options.context === "saved" ? "btn-remove-project" : "btn-save-project";
+    actionBtn.setAttribute("data-project-key", getProjectKey(project));
+
+    if (options.context === "saved") {
+      actionBtn.textContent = "Remove";
+      actionBtn.addEventListener("click", function () {
+        removeSavedProject(project);
+      });
+    } else {
+      var saved = isProjectSaved(project);
+      actionBtn.textContent = saved ? "Saved" : "Save Project";
+      actionBtn.classList.toggle("is-saved", saved);
+      actionBtn.setAttribute("aria-pressed", saved ? "true" : "false");
+      actionBtn.addEventListener("click", function () {
+        saveProject(project);
+      });
+    }
+
+    footer.appendChild(actionBtn);
     footer.appendChild(link);
 
     // Assemble the card in order
@@ -702,6 +752,8 @@ if (clearFiltersBtn) {
     // Only add "..." if the text is actually longer than the limit
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
   }
+
+  renderSavedProjects();
 
 } // end isIndexPage
 

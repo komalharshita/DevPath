@@ -1509,6 +1509,32 @@ select:focus {
   margin-top: 16px;
 }
 
+.saved-projects-section {
+  padding: 88px 0 72px;
+  background: var(--gray-50);
+  text-align: center;
+}
+
+.saved-projects-section .section-sub {
+  margin-bottom: 32px;
+}
+
+.saved-projects-empty {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 26px 28px;
+  border: 1.5px dashed rgba(79, 110, 247, 0.28);
+  border-radius: var(--r-md);
+  background: var(--white);
+  color: var(--text-body);
+  font-size: 0.95rem;
+  box-shadow: var(--shadow-xs);
+}
+
+.saved-projects-grid {
+  margin-top: 0;
+}
+
 /* Project card */
 .project-card {
   background: var(--white);
@@ -1583,6 +1609,8 @@ select:focus {
 .project-card-footer {
   padding-top: 8px;
   border-top: 1px solid var(--gray-100);
+  display: grid;
+  gap: 10px;
 }
 
 .btn-details {
@@ -1606,6 +1634,49 @@ select:focus {
   background: var(--indigo-600);
   color: var(--white);
   text-decoration: none;
+}
+
+.btn-save-project,
+.btn-remove-project {
+  display: block;
+  width: 100%;
+  padding: 11px 18px;
+  border-radius: var(--r-xs);
+  font-family: var(--font-body);
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--t), border-color var(--t), color var(--t), transform var(--t);
+}
+
+.btn-save-project {
+  background: var(--yellow-400);
+  border: 1.5px solid var(--yellow-400);
+  color: var(--indigo-900);
+}
+
+.btn-save-project:hover {
+  background: var(--yellow-300);
+  border-color: var(--yellow-300);
+  transform: translateY(-1px);
+}
+
+.btn-save-project.is-saved {
+  background: var(--green-100);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #065f46;
+  cursor: default;
+}
+
+.btn-remove-project {
+  background: var(--white);
+  border: 1.5px solid var(--red-500);
+  color: var(--red-500);
+}
+
+.btn-remove-project:hover {
+  background: #fef2f2;
+  transform: translateY(-1px);
 }
 
 /* ---- CTA Banner ------------------------------------------- */
