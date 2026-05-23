@@ -109,3 +109,17 @@ def download_code(project_id):
     import os
     filename = os.path.basename(full_path)
     return send_from_directory(get_starter_code_dir(), filename, as_attachment=True)
+
+
+@main.route("/robots.txt")
+def robots_txt():
+    """Serve robots.txt with the correct plain-text content type."""
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
+    return send_from_directory(static_dir, "robots.txt", mimetype="text/plain")
+
+
+@main.route("/sitemap.xml")
+def sitemap_xml():
+    """Serve sitemap.xml with the correct XML content type."""
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
+    return send_from_directory(static_dir, "sitemap.xml", mimetype="application/xml")

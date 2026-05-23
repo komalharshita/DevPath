@@ -299,6 +299,146 @@ def test_scoring_weights_has_all_keys():
 
 
 # ============================================================
+# Open Graph / Twitter Card meta tag tests
+# ============================================================
+
+def test_homepage_og_title():
+    """Homepage must include the OG title tag."""
+    client = get_client()
+    response = client.get("/")
+    assert b'og:title' in response.data
+
+
+def test_homepage_og_description():
+    """Homepage must include an OG description tag."""
+    client = get_client()
+    response = client.get("/")
+    assert b'og:description' in response.data
+
+
+def test_homepage_og_image():
+    """Homepage must include an OG image tag pointing to og-banner.png."""
+    client = get_client()
+    response = client.get("/")
+    assert b'og:image' in response.data
+    assert b'og-banner.png' in response.data
+
+
+def test_homepage_og_url():
+    """Homepage must include an OG url tag."""
+    client = get_client()
+    response = client.get("/")
+    assert b'og:url' in response.data
+
+
+def test_homepage_og_site_name():
+    """Homepage must include the og:site_name tag."""
+    client = get_client()
+    response = client.get("/")
+    assert b'og:site_name' in response.data
+    assert b'DevPath' in response.data
+
+
+def test_homepage_twitter_card():
+    """Homepage must include a twitter:card tag set to summary_large_image."""
+    client = get_client()
+    response = client.get("/")
+    assert b'twitter:card' in response.data
+    assert b'summary_large_image' in response.data
+
+
+def test_homepage_twitter_image():
+    """Homepage must include a twitter:image tag."""
+    client = get_client()
+    response = client.get("/")
+    assert b'twitter:image' in response.data
+
+
+def test_project_page_og_title():
+    """Project detail page must include a dynamic OG title containing the project title."""
+    client = get_client()
+    response = client.get("/project/1")
+    assert b'og:title' in response.data
+    assert b'DevPath' in response.data
+
+
+def test_project_page_og_description():
+    """Project detail page must include a dynamic OG description."""
+    client = get_client()
+    response = client.get("/project/1")
+    assert b'og:description' in response.data
+
+
+def test_project_page_og_image():
+    """Project detail page must include an OG image tag."""
+    client = get_client()
+    response = client.get("/project/1")
+    assert b'og:image' in response.data
+    assert b'og-banner.png' in response.data
+
+
+def test_project_page_og_url():
+    """Project detail page must include a dynamic OG URL with the project ID."""
+    client = get_client()
+    response = client.get("/project/1")
+    assert b'og:url' in response.data
+    assert b'/project/1' in response.data
+
+
+def test_project_page_og_site_name():
+    """Project detail page must include og:site_name."""
+    client = get_client()
+    response = client.get("/project/1")
+    assert b'og:site_name' in response.data
+
+
+def test_project_page_twitter_card():
+    """Project detail page must include twitter:card set to summary_large_image."""
+    client = get_client()
+    response = client.get("/project/1")
+    assert b'twitter:card' in response.data
+    assert b'summary_large_image' in response.data
+
+
+def test_project_page_twitter_image():
+    """Project detail page must include a twitter:image tag."""
+    client = get_client()
+    response = client.get("/project/1")
+    assert b'twitter:image' in response.data
+
+
+def test_404_page_og_tags():
+    """404 error page must include OG tags."""
+    client = get_client()
+    response = client.get("/project/99999")
+    assert b'og:title' in response.data
+
+
+def test_404_page_noindex():
+    """404 error page must have a robots noindex directive."""
+    client = get_client()
+    response = client.get("/project/99999")
+    assert b'noindex' in response.data
+
+
+def test_robots_txt_route():
+    """GET /robots.txt must return 200 with text/plain content type."""
+    client = get_client()
+    response = client.get("/robots.txt")
+    assert response.status_code == 200
+    assert b'User-agent' in response.data
+
+
+def test_sitemap_xml_route():
+    """GET /sitemap.xml must return 200 with valid XML content."""
+    client = get_client()
+    response = client.get("/sitemap.xml")
+    assert response.status_code == 200
+    assert b'urlset' in response.data
+    assert b'mydevpath-github.vercel.app' in response.data
+
+
+# ============================================================
 # Run tests directly (no pytest required)
 # ============================================================
 

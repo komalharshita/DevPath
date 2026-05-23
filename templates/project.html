@@ -5,18 +5,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Page title uses the project title injected by Flask's Jinja2 template engine -->
-  
+
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
-  <title>{{ project.title }} — {{ project.level }}{% if project.skills %} {{ project.skills[0] }}{% endif %} Project | DevPath</title>
-  
+  <title>{{ project.title }} — {{ project.level }}{% if project.skills %} {{ project.skills[0] }}{% endif %} Project |
+    DevPath</title>
+
+  <!-- Open Graph meta tags for rich social media previews -->
   <meta property="og:title" content="{{ project.title }} — DevPath" />
   <meta property="og:description" content="{{ project.description[:155] }}" />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://mydevpath-github.vercel.app/project/{{ project.id }}" />
+  <meta property="og:image" content="https://mydevpath-github.vercel.app/static/og-banner.png" />
+  <meta property="og:site_name" content="DevPath" />
 
-  <meta name="twitter:card" content="summary" />
+  <!-- Twitter Card meta tags -->
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="{{ project.title }} — DevPath" />
   <meta name="twitter:description" content="{{ project.description[:155] }}" />
+  <meta name="twitter:image" content="https://mydevpath-github.vercel.app/static/og-banner.png" />
+
   <link rel="stylesheet" href="/static/style.css" />
   <link
     href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
@@ -33,7 +40,8 @@
       <a href="/" class="nav-logo">DevPath</a>
       <div class="nav-links">
         <a href="/" class="nav-link">Back to Search</a>
-        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-link nav-link-gh">GitHub</a>
+        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
+          class="nav-link nav-link-gh">GitHub</a>
       </div>
     </div>
   </nav>
