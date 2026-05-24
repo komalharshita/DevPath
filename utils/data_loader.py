@@ -3,15 +3,27 @@
 
 import json
 import os
+import copy
 
 # Build the path to projects.json relative to this file's location
 DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "projects.json")
 
+# Module-level project cache and tracking states
+_projects_cache = None
+_read_count = 0
+
 
 def load_all_projects():
-    """Read and return the full list of projects from the JSON file."""
-    with open(DATA_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+    """
+    Read and return the full list of projects from the JSON file.
+    Returns a deep copy of the cache to prevent callers from mutating the state.
+    """
+    global _projects_cache, _read_count
+    if _projects_cache is None:
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            _projects_cache = json.load(f)
+            _read_count += 1
+    return copy.deepcopy(_projects_cache)
 
 
 def find_project_by_id(project_id):
@@ -48,11 +60,15 @@ def get_project_stats():
         "beginner_friendly": beginner_friendly
     }
 
-# Cache for loaded projects
-_projects_cache = None
+
+def get_read_count():
+    """Return the total number of times projects.json was read from disk."""
+    global _read_count
+    return _read_count
 
 
 def clear_cache():
-    """Reset the in-memory project cache."""
-    global _projects_cache
+    """Reset the in-memory project cache and reset read tracking."""
+    global _projects_cache, _read_count
     _projects_cache = None
+    _read_count = 0

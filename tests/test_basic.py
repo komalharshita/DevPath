@@ -16,7 +16,7 @@ import os
 # Allow imports from the project root when running tests directly
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from utils.data_loader import load_all_projects, find_project_by_id, clear_cache
+from utils.data_loader import load_all_projects, find_project_by_id, clear_cache, get_read_count
 from utils.recommender import (
     get_recommendations,
     validate_recommendation_inputs,
@@ -378,6 +378,39 @@ def test_project_links_have_noopener():
     assert response.status_code == 200
     assert b'target="_blank"' in response.data
     assert b'rel="noopener noreferrer"' in response.data
+
+
+# ============================================================
+# Caching Tests (Issue 12)
+# ============================================================
+
+def test_data_loader_caching():
+    """Verify that projects are cached in memory after the first read."""
+    clear_cache()
+    
+    assert get_read_count() == 0
+    
+    # First load - triggers file read
+    projects_first = load_all_projects()
+    assert get_read_count() == 1
+    
+    # Second load - should read from cache (no new file read)
+    projects_second = load_all_projects()
+    assert get_read_count() == 1
+    
+    # Third load - verifying that we received identical data
+    assert len(projects_first) == len(projects_second)
+    
+    # Verify that mutating the returned list does NOT mutate the cache (defensive copying)
+    projects_first.append({"id": 9999, "title": "Malicious Mutator"})
+    projects_third = load_all_projects()
+    assert not any(p.get("id") == 9999 for p in projects_third), "Accidental cache mutation detected"
+    
+    # Clear cache and verify it is reloaded fresh from disk
+    clear_cache()
+    assert get_read_count() == 0
+    projects_fourth = load_all_projects()
+    assert get_read_count() == 1
 
 
 
