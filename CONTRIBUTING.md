@@ -209,6 +209,13 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
 
 ---
 
+### External Links
+
+- External URLs added to `projects.json` are rendered using `target="_blank"`
+- Only include trustworthy, safe, and relevant links
+- Avoid shortened or obfuscated URLs
+- Verify that all links are accessible before submitting a PR
+
 ## Commit Message Format
 
 Use the same `type/scope: description` format as branch names for commit messages.
@@ -261,6 +268,7 @@ If you add a new feature, add at least one corresponding test in `tests/test_bas
 - Your branch is up to date with the upstream `main` branch
 - Your code follows the style rules above
 - You have removed all debug `print()` statements and commented-out code
+- Update `CHANGELOG.md` for any user-facing or documentation-related changes
 
 ### Steps
 
