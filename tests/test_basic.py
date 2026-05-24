@@ -299,6 +299,63 @@ def test_scoring_weights_has_all_keys():
 
 
 # ============================================================
+# Sitemap and robots.txt tests
+# ============================================================
+
+def test_sitemap_returns_200():
+    """The /sitemap.xml route must return HTTP 200."""
+    client = get_client()
+    response = client.get("/sitemap.xml")
+    assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+
+
+def test_sitemap_content_type():
+    """The /sitemap.xml route must return XML content type."""
+    client = get_client()
+    response = client.get("/sitemap.xml")
+    assert "application/xml" in response.content_type, (
+        f"Expected application/xml, got {response.content_type}"
+    )
+
+
+def test_sitemap_contains_homepage():
+    """The sitemap must include the homepage URL."""
+    client = get_client()
+    response = client.get("/sitemap.xml")
+    assert b"<loc>" in response.data, "Expected <loc> tags in sitemap"
+    assert b"</urlset>" in response.data, "Expected closing </urlset> tag"
+
+
+def test_sitemap_contains_all_project_ids():
+    """The sitemap must include a URL for every project in the dataset."""
+    client = get_client()
+    response = client.get("/sitemap.xml")
+    xml = response.data.decode("utf-8")
+
+    projects = load_all_projects()
+    for project in projects:
+        expected = f"/project/{project['id']}"
+        assert expected in xml, (
+            f"Sitemap missing URL for project id={project['id']}"
+        )
+
+
+def test_robots_txt_returns_200():
+    """The /robots.txt route must return HTTP 200."""
+    client = get_client()
+    response = client.get("/robots.txt")
+    assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+
+
+def test_robots_txt_references_sitemap():
+    """robots.txt must contain the Sitemap directive."""
+    client = get_client()
+    response = client.get("/robots.txt")
+    assert b"Sitemap:" in response.data, "robots.txt must contain a Sitemap: directive"
+    assert b"sitemap.xml" in response.data, "robots.txt must reference sitemap.xml"
+
+
+# ============================================================
 # Run tests directly (no pytest required)
 # ============================================================
 

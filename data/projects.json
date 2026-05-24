@@ -311,6 +311,102 @@
     ],
     "starter_code": "starter_code/api_data_pipeline.py"
   }
+
+  ,
+  {
+    "id": 8,
+    "title": "Number Guessing Game",
+    "skills": ["Python"],
+    "level": "Beginner",
+    "interest": "Games",
+    "time": "Low",
+    "description": "A fun command-line game where the computer picks a random number and the user tries to guess it. Great for learning loops, conditionals, and user input handling.",
+    "features": [
+      "Generate random number between 1 and 100",
+      "Give hints: too high or too low",
+      "Count number of attempts",
+      "Show final score at the end"
+    ],
+    "tech_stack": ["Python", "random module"],
+    "roadmap": [
+      "Step 1: Set up the Python file and import random module",
+      "Step 2: Generate a random number using random.randint()",
+      "Step 3: Write a loop to take user input",
+      "Step 4: Compare guess with the number",
+      "Step 5: Give hints if guess is too high or too low",
+      "Step 6: Count the number of attempts",
+      "Step 7: Display win message with attempt count"
+    ],
+    "resources": [
+      "Python random module: https://docs.python.org/3/library/random.html",
+      "W3Schools Python: https://www.w3schools.com/python",
+      "Real Python: https://realpython.com"
+    ],
+    "starter_code": "starter_code/number_guessing.py"
+  },
+  {
+    "id": 9,
+    "title": "Simple Email Automation",
+    "skills": ["Python"],
+    "level": "Beginner",
+    "interest": "Automation",
+    "time": "Low",
+    "description": "A Python script that sends automated emails using the smtplib library. Learn how to automate repetitive tasks and work with Python standard libraries.",
+    "features": [
+      "Compose and send emails via Python",
+      "Send to multiple recipients",
+      "Add subject and body text",
+      "Read recipient list from a text file"
+    ],
+    "tech_stack": ["Python", "smtplib", "email module"],
+    "roadmap": [
+      "Step 1: Set up Python file and import smtplib",
+      "Step 2: Configure sender email and password",
+      "Step 3: Write the email composition function",
+      "Step 4: Connect to Gmail SMTP server",
+      "Step 5: Send email to one recipient and test",
+      "Step 6: Read recipient list from a text file",
+      "Step 7: Loop through recipients and send to all"
+    ],
+    "resources": [
+      "Python smtplib docs: https://docs.python.org/3/library/smtplib.html",
+      "Real Python email guide: https://realpython.com/python-send-email",
+      "Gmail SMTP settings: https://support.google.com/mail"
+    ],
+    "starter_code": "starter_code/email_automation.py"
+  },
+  {
+    "id": 10,
+    "title": "Quiz App",
+    "skills": ["HTML", "CSS", "JavaScript"],
+    "level": "Beginner",
+    "interest": "Games",
+    "time": "Low",
+    "description": "A browser-based quiz app with multiple choice questions, a score counter, and a results screen. Perfect for practising DOM manipulation and event handling in JavaScript.",
+    "features": [
+      "Display one question at a time",
+      "Four multiple choice options per question",
+      "Show correct or incorrect feedback instantly",
+      "Display final score on results screen"
+    ],
+    "tech_stack": ["HTML", "CSS", "JavaScript"],
+    "roadmap": [
+      "Step 1: Create HTML structure for question and options",
+      "Step 2: Style the quiz card with CSS",
+      "Step 3: Store questions as a JavaScript array of objects",
+      "Step 4: Write a function to display each question",
+      "Step 5: Add click event listeners to option buttons",
+      "Step 6: Check the selected answer and update score",
+      "Step 7: Move to the next question automatically",
+      "Step 8: Show the results screen with final score"
+    ],
+    "resources": [
+      "MDN DOM guide: https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model",
+      "JavaScript events: https://javascript.info/events",
+      "W3Schools JavaScript: https://www.w3schools.com/js"
+    ],
+    "starter_code": "starter_code/quiz_app.html"
+  }
 ]
 
 
