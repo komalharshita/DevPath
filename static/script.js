@@ -554,7 +554,183 @@ if (isIndexPage) {
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
   }
 
-} // end isIndexPage
+   } // end isIndexPage
+
+   // ============================================================
+   // SHAREABLE URL FEATURE
+   // ============================================================
+   function initShareFeature() {
+     // DOM elements
+     const shareBtn = document.getElementById('share-btn');
+     const shareToast = document.getElementById('share-toast');
+     const resultsSection = document.getElementById('results-section');
+     
+     if (!shareBtn || !shareToast) return;
+     
+     let toastTimeout = null;
+     
+     // Show share button when results are loaded
+     function showShareButton() {
+       shareBtn.style.display = 'inline-block';
+     }
+     
+     // Hide share button
+     function hideShareButton() {
+       shareBtn.style.display = 'none';
+     }
+     
+     // Generate shareable URL from current form state
+     function generateShareUrl() {
+       const baseUrl = window.location.origin + window.location.pathname;
+       const params = new URLSearchParams();
+       
+       // Get skills
+       const skillsInput = document.getElementById('skills');
+       if (skillsInput && skillsInput.value.trim()) {
+         params.append('skills', skillsInput.value.trim());
+       }
+       
+       // Get level
+       const levelSelect = document.getElementById('level');
+       if (levelSelect && levelSelect.value) {
+         params.append('level', levelSelect.value);
+       }
+       
+       // Get interest
+       const interestSelect = document.getElementById('interest');
+       if (interestSelect && interestSelect.value) {
+         params.append('interest', interestSelect.value);
+       }
+       
+       // Get time
+       const timeSelect = document.getElementById('time');
+       if (timeSelect && timeSelect.value) {
+         params.append('time', timeSelect.value);
+       }
+       
+       // Construct final URL
+       const queryString = params.toString();
+       return queryString ? `${baseUrl}?${queryString}` : baseUrl;
+     }
+     
+     // Copy URL to clipboard and show toast
+     async function copyShareUrl() {
+       const shareUrl = generateShareUrl();
+       
+       try {
+         await navigator.clipboard.writeText(shareUrl);
+         showToast();
+       } catch (err) {
+         // Fallback for older browsers
+         const textarea = document.createElement('textarea');
+         textarea.value = shareUrl;
+         document.body.appendChild(textarea);
+         textarea.select();
+         document.execCommand('copy');
+         document.body.removeChild(textarea);
+         showToast();
+       }
+     }
+     
+     // Show toast notification
+     function showToast() {
+       shareToast.classList.add('show');
+       
+       // Clear previous timeout
+       if (toastTimeout) {
+         clearTimeout(toastTimeout);
+       }
+       
+       // Hide toast after 2 seconds
+       toastTimeout = setTimeout(() => {
+         shareToast.classList.remove('show');
+       }, 2000);
+     }
+     
+     // Restore form state from URL parameters
+     function restoreFormState() {
+       const params = new URLSearchParams(window.location.search);
+       const hasParams = params.toString().length > 0;
+       
+       if (!hasParams) return;
+       
+       // Restore skills
+       const skillsParam = params.get('skills');
+       if (skillsParam) {
+         // Clear existing skills
+         selectedSkills = [];
+         renderSelectedChips();
+         
+         // Add skills from param (comma-separated)
+         const skillsArray = skillsParam.split(',').map(skill => skill.trim()).filter(skill => skill);
+         skillsArray.forEach(skill => {
+           addSkill(skill);
+         });
+         
+         // Sync hidden input
+         syncSkillsHiddenInput();
+       }
+       
+       // Restore level
+       const levelParam = params.get('level');
+       if (levelParam) {
+         const levelSelect = document.getElementById('level');
+         if (levelSelect) {
+           levelSelect.value = levelParam;
+         }
+       }
+       
+       // Restore interest
+       const interestParam = params.get('interest');
+       if (interestParam) {
+         const interestSelect = document.getElementById('interest');
+         if (interestSelect) {
+           interestSelect.value = interestParam;
+         }
+       }
+       
+       // Restore time
+       const timeParam = params.get('time');
+       if (timeParam) {
+         const timeSelect = document.getElementById('time');
+         if (timeSelect) {
+           timeSelect.value = timeParam;
+         }
+       }
+       
+       // Trigger automatic recommendation generation
+       // Small delay to ensure DOM is ready
+       setTimeout(() => {
+         if (validateForm()) {
+           form.dispatchEvent(new Event('submit'));
+         }
+       }, 100);
+     }
+     
+     // Event listeners
+     shareBtn.addEventListener('click', copyShareUrl);
+     
+     // Initialize
+     // Show share button when results are loaded
+     const originalRenderResults = renderResults;
+     renderResults = function(projects, message) {
+       originalRenderResults.call(this, projects, message);
+       if (projects && projects.length > 0) {
+         showShareButton();
+       } else {
+         hideShareButton();
+       }
+     };
+     
+     // Restore state on page load
+     restoreFormState();
+   }
+   
+   // Initialize share feature on index page
+   if (isIndexPage) {
+     initShareFeature();
+   }
+ 
 
 
 // ============================================================
