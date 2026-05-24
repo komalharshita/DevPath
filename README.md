@@ -60,6 +60,8 @@ Clean Python, readable code, and 27 passing tests.
 
 ## Quick Start
 
+### Standard Setup
+
 ```bash
 git clone https://github.com/komalharshita/devpath.git
 cd devpath
@@ -69,10 +71,22 @@ pip install -r requirements.txt
 python app.py
 ```
 
+### Using Docker (Recommended)
+
+**Prerequisites**: You must have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
+
+To start the project using Docker without installing Python locally:
+
+```bash
+git clone https://github.com/komalharshita/devpath.git
+cd devpath
+docker-compose up --build
+```
+
 **http://127.0.0.1:5000** — that is the entire setup.
 
 ```bash
-# Verify everything works
+# Verify everything works (Standard setup)
 python tests/test_basic.py
 # 27 passed, 0 failed out of 27 tests
 ```
