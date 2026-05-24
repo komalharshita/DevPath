@@ -744,6 +744,27 @@ if (isDetailPage) {
     document.body.style.overflow = "";
   }
 
+  // Helper to split code into rows containing a line number and content span
+  function renderCodeWithLineNumbers(codeString) {
+    var lines = codeString.split("\n");
+    return lines.map(function (line, idx) {
+      var row = document.createElement("div");
+      row.className = "code-row";
+
+      var num = document.createElement("span");
+      num.className = "line-number";
+      num.textContent = idx + 1;
+
+      var content = document.createElement("span");
+      content.className = "line-content";
+      content.textContent = line;
+
+      row.appendChild(num);
+      row.appendChild(content);
+      return row;
+    });
+  }
+
   //fetches the starter code from the server via an API call
   //inserts the code into the panel and handles loading/error states
   function fetchStarterCode() {
