@@ -52,8 +52,110 @@ var errorMsg = document.getElementById('github-modal-error');
 
 
 // ============================================================
-// INDEX PAGE
+// Active Navbar Highlighting (Scroll Spy)
+//
+// How it works:
+//   1. We collect all nav links that point to an on-page anchor (href="#...")
+//   2. We map each link to its target <section> element
+//   3. On every scroll event (throttled for performance) we check which
+//      section is currently closest to the top of the viewport
+//   4. We add the class "active" to the matching nav + mobile link
+//      and remove it from all others
 // ============================================================
+(function initScrollSpy() {
+
+  // Navbar height so we account for the fixed bar when measuring visibility
+  var NAVBAR_HEIGHT = 72; // px — slightly above the 64px bar to give breathing room
+
+  // Collect all desktop nav links that point to a same-page anchor
+  var navLinks = Array.prototype.slice.call(
+    document.querySelectorAll(".nav-link[href^='#']")
+  );
+
+  // Collect matching mobile links so both menus stay in sync
+  var mobileLinks = Array.prototype.slice.call(
+    document.querySelectorAll(".nav-mobile-link[href^='#']")
+  );
+
+  // If there are no anchor links on this page, nothing to do
+  if (navLinks.length === 0) return;
+
+  // Build an array of { sectionEl, href } objects we'll check on scroll
+  var sections = navLinks.reduce(function (acc, link) {
+    var href = link.getAttribute("href"); // e.g. "#how-it-works"
+    var el   = document.querySelector(href);
+    if (el) acc.push({ el: el, href: href });
+    return acc;
+  }, []);
+
+  if (sections.length === 0) return;
+
+  // Helper: remove "active" from all desktop + mobile links
+  function clearActive() {
+    navLinks.forEach(function (l)    { l.classList.remove("active"); });
+    mobileLinks.forEach(function (l) { l.classList.remove("active"); });
+  }
+
+  // Helper: add "active" to every link (desktop + mobile) matching a given href
+  function setActive(href) {
+    navLinks.forEach(function (l) {
+      l.classList.toggle("active", l.getAttribute("href") === href);
+    });
+    mobileLinks.forEach(function (l) {
+      l.classList.toggle("active", l.getAttribute("href") === href);
+    });
+  }
+
+  // Core detection: find which section's top edge is closest to (but still
+  // above or at) the scroll trigger line.  The trigger line sits just below
+  // the fixed navbar so the active link updates the moment a section header
+  // appears on screen.
+  function getActiveSection() {
+    var triggerY = window.pageYOffset + NAVBAR_HEIGHT + 24; // 24px grace zone
+
+    // Walk sections bottom-up; the last one whose top is above triggerY wins
+    var active = null;
+    for (var i = 0; i < sections.length; i++) {
+      if (sections[i].el.getBoundingClientRect().top + window.pageYOffset <= triggerY) {
+        active = sections[i];
+      }
+    }
+    return active;
+  }
+
+  // Throttle: only run the detection logic once per animation frame to avoid
+  // performance issues during fast scrolling
+  var ticking = false;
+
+  function onScroll() {
+    if (ticking) return; // already queued — skip this event
+    ticking = true;
+
+    // requestAnimationFrame batches the work to the next repaint cycle
+    requestAnimationFrame(function () {
+      var active = getActiveSection();
+      if (active) {
+        setActive(active.href);
+      } else {
+        // User scrolled above every tracked section (e.g. at very top of page)
+        clearActive();
+      }
+      ticking = false; // allow the next scroll event to queue again
+    });
+  }
+
+  // Attach the scroll listener to the window
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  // Run once on page load so the correct link is highlighted if the page
+  // loads mid-scroll (e.g. user refreshes while scrolled down, or lands on
+  // a #hash URL)
+  onScroll();
+
+})();
+
+
+
 if (isIndexPage) {
 
   // DOM references
@@ -954,4 +1056,4 @@ function scrollToTop() {
 if (scrollTopBtn) {
     window.addEventListener('scroll', handleScroll);
     scrollTopBtn.addEventListener('click', scrollToTop);
-}
+}}

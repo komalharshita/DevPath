@@ -275,6 +275,16 @@ ol {
   opacity: 1;
 }
 
+/* Active nav link — shown when the linked section is in view */
+.nav-link.active {
+  color: var(--white);
+}
+
+.nav-link.active::after {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
 .nav-btn-outline {
   font-size: 0.86rem;
   font-weight: 600;
@@ -367,6 +377,16 @@ ol {
 }
 
 .nav-mobile-link:hover::after {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+/* Active mobile nav link — shown when the linked section is in view */
+.nav-mobile-link.active {
+  color: var(--white);
+}
+
+.nav-mobile-link.active::after {
   transform: scaleX(1);
   opacity: 1;
 }
