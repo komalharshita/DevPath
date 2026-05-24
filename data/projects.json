@@ -224,7 +224,7 @@
     "title": "Password Strength Checker",
     "skills": ["Python"],
     "level": "Beginner",
-    "interest": "Cybersecurity",
+    "interest": "Data",
     "time": "Low",
     "description": "A tool that checks password strength based on length, symbols, uppercase letters, and numbers. Helps beginners understand input validation and security basics.",
     "features": [
@@ -275,9 +275,9 @@
     "starter_code": "starter_code/survey_form/index.html"
   },
   {
-    "id":10,
+    "id": 10,
     "title": "API ETL Pipeline",
-    "skills": ["Python","pandas","requests"],
+    "skills": ["Python", "pandas", "requests"],
     "level": "Intermediate",
     "interest": "Data",
     "time": "Medium",
@@ -289,7 +289,7 @@
       "Generate summary statistics",
       "Export the processed CSV for any other Analytics projects"
     ],
-    "tech_stack": ["Python", "pandas","requests","JSON"],
+    "tech_stack": ["Python", "pandas", "requests", "JSON"],
     "roadmap": [
       "Step 1:  Install required modules via pip",
       "Step 2:  Find a public API key for this project",
@@ -310,11 +310,9 @@
       "Real Python API guide: https://realpython.com/api-integration-in-python/"
     ],
     "starter_code": "starter_code/api_data_pipeline.py"
-  }
-
-  ,
+  },
   {
-    "id": 8,
+    "id": 11,
     "title": "Number Guessing Game",
     "skills": ["Python"],
     "level": "Beginner",
@@ -345,7 +343,7 @@
     "starter_code": "starter_code/number_guessing.py"
   },
   {
-    "id": 9,
+    "id": 12,
     "title": "Simple Email Automation",
     "skills": ["Python"],
     "level": "Beginner",
@@ -376,7 +374,7 @@
     "starter_code": "starter_code/email_automation.py"
   },
   {
-    "id": 10,
+    "id": 13,
     "title": "Quiz App",
     "skills": ["HTML", "CSS", "JavaScript"],
     "level": "Beginner",
@@ -406,8 +404,96 @@
       "W3Schools JavaScript: https://www.w3schools.com/js"
     ],
     "starter_code": "starter_code/quiz_app.html"
+  },
+  {
+    "id": 14,
+    "title": "Interactive Rock Paper Scissors Game",
+    "skills": ["JavaScript", "HTML", "CSS"],
+    "level": "Beginner",
+    "interest": "Games",
+    "time": "Low",
+    "description": "A classic Rock, Paper, Scissors game played directly in the browser against a random computer opponent. Great for mastering DOM manipulation, state tracking, and simple random choice logic in JS.",
+    "features": [
+      "Score tracking for player and computer",
+      "Visual indicators for wins, losses, and ties",
+      "Responsive styling for mobile and desktop",
+      "Reset game option"
+    ],
+    "tech_stack": ["HTML", "CSS", "JavaScript"],
+    "roadmap": [
+      "Step 1: Create index.html with layout and buttons",
+      "Step 2: Add CSS layout and select effects",
+      "Step 3: Define variables for score and selection in script.js",
+      "Step 4: Implement random choice generator for computer",
+      "Step 5: Write win/loss determination logic",
+      "Step 6: Update DOM text and classes to show results",
+      "Step 7: Test state persistence across rounds"
+    ],
+    "resources": [
+      "MDN Event Listeners: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener",
+      "CSS Transitions Guide: https://css-tricks.com/almanac/properties/t/transition/"
+    ],
+    "starter_code": "starter_code/rock_paper_scissors.html"
+  },
+  {
+    "id": 15,
+    "title": "Text File Keyword Searcher",
+    "skills": ["Python"],
+    "level": "Beginner",
+    "interest": "Automation",
+    "time": "Low",
+    "description": "A Python tool that searches through local text files to locate all occurrences of a keyword, listing line numbers and matching text snippets. Excellent for learning file IO, string search, and exception handling.",
+    "features": [
+      "Read files in directory",
+      "Filter lines matching case-insensitive search",
+      "Output line numbers and context snippets",
+      "Export matching lines to output file"
+    ],
+    "tech_stack": ["Python", "os module", "sys module"],
+    "roadmap": [
+      "Step 1: Set up keyword_searcher.py script",
+      "Step 2: Read command line arguments or request input",
+      "Step 3: Check if input file exists",
+      "Step 4: Read file line by line with exception handling",
+      "Step 5: Compare keywords and collect matches",
+      "Step 6: Format print statement with line number and snippet",
+      "Step 7: Save results to output file"
+    ],
+    "resources": [
+      "Python File IO tutorial: https://docs.python.org/3/tutorial/inputoutput.html#reading-and-writing-files",
+      "Python os path checks: https://docs.python.org/3/library/os.path.html"
+    ],
+    "starter_code": "starter_code/keyword_searcher.py"
+  },
+  {
+    "id": 16,
+    "title": "Markdown to HTML Converter CLI",
+    "skills": ["Python"],
+    "level": "Beginner",
+    "interest": "Automation",
+    "time": "Medium",
+    "description": "A CLI tool that reads a Markdown file (.md) and converts basic syntax—such as headers, bold text, and lists—into clean, valid HTML output. Teaches custom parsing and string replacement rules.",
+    "features": [
+      "Load input markdown file",
+      "Convert #, ## to h1, h2 headers",
+      "Convert **bold** syntax to <strong> tags",
+      "Wrap standard lines in paragraphs",
+      "Write output directly to HTML file"
+    ],
+    "tech_stack": ["Python", "re module", "os module"],
+    "roadmap": [
+      "Step 1: Define markdown_converter.py CLI structure",
+      "Step 2: Implement markdown line reading",
+      "Step 3: Write regex rules for heading translation",
+      "Step 4: Write regex rules for bold and italic text styles",
+      "Step 5: Handle unordered lists conversion",
+      "Step 6: Bundle final content in HTML skeleton tags",
+      "Step 7: Save the generated string to index.html"
+    ],
+    "resources": [
+      "Python re module guide: https://docs.python.org/3/library/re.html",
+      "Markdown guide: https://www.markdownguide.org/"
+    ],
+    "starter_code": "starter_code/markdown_converter.py"
   }
 ]
-
-
-

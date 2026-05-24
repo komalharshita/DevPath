@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rock Paper Scissors Game</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      background: #f3f4f6;
+      padding: 40px;
+      color: #333;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .choices {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 30px 0;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      border: none;
+      background: #6366f1;
+      color: white;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #4f46e5;
+    }
+    .score-board {
+      display: flex;
+      justify-content: space-around;
+      font-size: 1.2rem;
+      margin-top: 20px;
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Rock, Paper, Scissors</h1>
+    <p>Choose your move to play against the computer:</p>
+    
+    <div class="choices">
+      <!-- TODO: Bind click events to playRound('rock'), playRound('paper'), and playRound('scissors') -->
+      <button id="rock-btn">✊ Rock</button>
+      <button id="paper-btn">✋ Paper</button>
+      <button id="scissors-btn">✌️ Scissors</button>
+    </div>
+
+    <div class="results">
+      <h2 id="round-winner">Make a move to start!</h2>
+      <p id="choices-made"></p>
+    </div>
+
+    <div class="score-board">
+      <div>Player: <span id="player-score">0</span></div>
+      <div>Computer: <span id="computer-score">0</span></div>
+    </div>
+  </div>
+
+  <script>
+    // Game State Variables
+    let playerScore = 0;
+    let computerScore = 0;
+
+    // TODO: Write computerPlay() to randomly return 'rock', 'paper', or 'scissors'
+    function computerPlay() {
+      const choices = ['rock', 'paper', 'scissors'];
+      // Your code here
+      return 'rock'; 
+    }
+
+    // TODO: Write playRound(playerSelection) to determine the winner and update scores
+    function playRound(playerSelection) {
+      const computerSelection = computerPlay();
+      
+      // Determine win, loss, or tie
+      // Update DOM elements:
+      //   - #round-winner (e.g. "You Win!", "Computer Wins!", "It's a Tie!")
+      //   - #choices-made (e.g. "You chose Rock, Computer chose Scissors")
+      //   - #player-score and #computer-score
+    }
+
+    // TODO: Attach event listeners to buttons
+  </script>
+</body>
+</html>

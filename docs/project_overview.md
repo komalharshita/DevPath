@@ -70,7 +70,7 @@ JSON object describing everything a developer needs: skills required, level,
 interest area, time commitment, a description, features, tech stack, roadmap
 steps, learning resources, and the path to its starter code file.
 
-The dataset is deliberately small (7 projects) to keep it easy for contributors
+The dataset is deliberately compact (16 projects) to keep it easy for contributors
 to add their own entries without needing to understand the full codebase.
 
 ---
