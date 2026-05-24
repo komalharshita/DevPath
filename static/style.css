@@ -2846,3 +2846,149 @@ select:focus {
   white-space: pre;
   color: #e6edf3;
 }
+
+/* ---- Bookmarks Dropdown Styles (Issue 10) ---- */
+.bookmarks-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.btn-bookmarks-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  font-weight: inherit;
+  padding: 0;
+  transition: color var(--t);
+}
+
+.bookmarks-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 320px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  text-align: left;
+  overflow: hidden;
+  transform-origin: top right;
+  animation: fadeInUp 0.2s ease;
+}
+
+.bookmarks-panel.active {
+  display: block;
+}
+
+.bookmarks-panel-header {
+  padding: 14px 18px;
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text-head);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.bookmarks-list {
+  max-height: 260px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.bookmark-empty {
+  padding: 24px 20px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--gray-400);
+  font-style: italic;
+}
+
+.bookmark-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--gray-100);
+  transition: background 0.2s;
+}
+
+.bookmark-item:last-child {
+  border-bottom: none;
+}
+
+.bookmark-item:hover {
+  background: var(--gray-50);
+}
+
+.bookmark-link {
+  font-size: 0.88rem;
+  color: var(--text-head);
+  text-decoration: none;
+  font-weight: 600;
+  max-width: 82%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.bookmark-link:hover {
+  color: var(--indigo-600);
+  text-decoration: none;
+}
+
+.bookmark-remove-btn {
+  background: none;
+  border: none;
+  color: var(--gray-400);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.bookmark-remove-btn:hover {
+  color: #ef4444;
+}
+
+/* ---- Recently Viewed Custom Transitions & Hover effects (Issue 11) ---- */
+.recently-viewed-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06) !important;
+  border-color: rgba(99, 102, 241, 0.45) !important;
+  background: var(--white) !important;
+}
+
+.recently-viewed-card:hover h4 {
+  color: var(--indigo-600) !important;
+}
+
+.recently-viewed-grid::-webkit-scrollbar {
+  height: 6px;
+}
+
+.recently-viewed-grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.recently-viewed-grid::-webkit-scrollbar-thumb {
+  background: var(--gray-200);
+  border-radius: 3px;
+}
+
+.recently-viewed-grid::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-300);
+}

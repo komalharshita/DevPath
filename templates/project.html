@@ -33,6 +33,20 @@
       <a href="/" class="nav-logo">DevPath</a>
       <div class="nav-links">
         <a href="/" class="nav-link">Back to Search</a>
+        
+        <!-- Bookmarks Dropdown (Issue 10) -->
+        <div class="bookmarks-dropdown-container">
+          <button class="nav-link btn-bookmarks-toggle" id="btn-bookmarks-toggle" aria-haspopup="true" aria-expanded="false">
+            Saved 🌟 (<span id="bookmark-count">0</span>)
+          </button>
+          <div class="bookmarks-panel" id="bookmarks-panel">
+            <div class="bookmarks-panel-header">Saved Projects</div>
+            <div class="bookmarks-list" id="bookmarks-list">
+              <div class="bookmark-empty">No bookmarked projects yet.</div>
+            </div>
+          </div>
+        </div>
+
         <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-link nav-link-gh">GitHub</a>
       </div>
     </div>

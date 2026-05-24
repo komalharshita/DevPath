@@ -605,27 +605,26 @@ if (clearFiltersBtn) {
   function renderResults(projects, message) {
     resultsSection.style.display = "block";
     resultsLoadingEl.style.display = "none";
-    // Clear out any cards from a previous search before showing new ones
     resultsGrid.innerHTML = "";
 
+    var filterContainer = document.getElementById("results-filter-container");
+    var searchInput = document.getElementById("results-search-input");
+    if (searchInput) searchInput.value = ""; // Reset search input
+
     if (!projects || projects.length === 0) {
-      resultsGrid.style.display     = "none";
-      resultsEmptyEl.style.display  = "block";
+      if (filterContainer) filterContainer.style.display = "none";
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "block";
       if (message && emptyMessageEl) emptyMessageEl.textContent = message;
-    if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
-      resultsGrid.style.display      = "none";
-      resultsEmptyEl.style.display   = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message; //if api sent back a message (e.g. "no projects found matching your criteria"), show that 
       resultsSection.scrollIntoView({ behavior: "smooth" });
       return;
     }
 
+    if (filterContainer) filterContainer.style.display = "block";
     resultsEmptyEl.style.display = "none";
     resultsGrid.style.display = "grid";
 
-    //build a card for each project and add it to the grid
+    // Build a card for each project and add it to the grid
     projects.forEach(function (project) {
       resultsGrid.appendChild(buildProjectCard(project));
     });
@@ -638,10 +637,37 @@ if (clearFiltersBtn) {
   function buildProjectCard(project) {
     var card = document.createElement("div");
     card.className = "project-card";
+    card.style.position = "relative";
+
+    // Bookmark star toggle button (Issue 10)
+    var starBtn = document.createElement("button");
+    starBtn.type = "button";
+    starBtn.className = "btn-bookmark-toggle";
+    starBtn.setAttribute("data-id", project.id);
+    var isBookmarked = (typeof bookmarks !== "undefined") && bookmarks.some(function (b) { return b.id === project.id; });
+    starBtn.classList.toggle("bookmarked", isBookmarked);
+    starBtn.innerHTML = isBookmarked ? "★" : "☆";
+    starBtn.title = isBookmarked ? "Remove Bookmark" : "Bookmark Project";
+    
+    starBtn.style.cssText = "position: absolute; top: 18px; right: 18px; background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #fbbf24; padding: 0; line-height: 1; transition: transform 0.2s; z-index: 10;";
+    starBtn.addEventListener("mouseenter", function () {
+      starBtn.style.transform = "scale(1.2)";
+    });
+    starBtn.addEventListener("mouseleave", function () {
+      starBtn.style.transform = "scale(1)";
+    });
+    starBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleBookmark(project.id, project.title);
+    });
+    
+    card.appendChild(starBtn);
 
     // Title
     var title = document.createElement("h3");
     title.className = "project-card-title";
+    title.style.paddingRight = "30px"; // Avoid overlapping title with star button
     title.textContent = project.title;
 
     // Description (truncated for visual consistency)
@@ -703,6 +729,26 @@ if (clearFiltersBtn) {
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
   }
 
+  // Wire up the live search filter (Issue 8)
+  (function initLiveFilter() {
+    var searchInput = document.getElementById("results-search-input");
+    if (searchInput) {
+      searchInput.addEventListener("input", function (e) {
+        var query = e.target.value.toLowerCase().trim();
+        var cards = resultsGrid.querySelectorAll(".project-card");
+        cards.forEach(function (card) {
+          var cTitle = card.querySelector(".project-card-title").textContent.toLowerCase();
+          var cDesc = card.querySelector(".project-card-desc").textContent.toLowerCase();
+          if (cTitle.includes(query) || cDesc.includes(query)) {
+            card.style.display = "flex";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      });
+    }
+  })();
+
 } // end isIndexPage
 
 
@@ -742,6 +788,27 @@ if (isDetailPage) {
     if (codePanelOverlay) codePanelOverlay.classList.remove("active");
     // Restore normal scrolling once the panel is closed
     document.body.style.overflow = "";
+  }
+
+  // Helper to split code into rows containing a line number and content span
+  function renderCodeWithLineNumbers(codeString) {
+    var lines = codeString.split("\n");
+    return lines.map(function (line, idx) {
+      var row = document.createElement("div");
+      row.className = "code-row";
+
+      var num = document.createElement("span");
+      num.className = "line-number";
+      num.textContent = idx + 1;
+
+      var content = document.createElement("span");
+      content.className = "line-content";
+      content.textContent = line;
+
+      row.appendChild(num);
+      row.appendChild(content);
+      return row;
+    });
   }
 
   //fetches the starter code from the server via an API call
@@ -955,3 +1022,147 @@ if (scrollTopBtn) {
     window.addEventListener('scroll', handleScroll);
     scrollTopBtn.addEventListener('click', scrollToTop);
 }
+
+
+// ============================================================
+// BOOKMARKS SYSTEM (Runs globally on all pages)
+// ============================================================
+var bookmarks = [];
+
+function loadBookmarks() {
+  try {
+    var stored = localStorage.getItem("devpath_bookmarks");
+    bookmarks = stored ? JSON.parse(stored) : [];
+  } catch (e) {
+    bookmarks = [];
+  }
+  updateBookmarksUI();
+}
+
+function saveBookmarks() {
+  try {
+    localStorage.setItem("devpath_bookmarks", JSON.stringify(bookmarks));
+  } catch (e) {}
+  updateBookmarksUI();
+}
+
+function toggleBookmark(id, title) {
+  var index = bookmarks.findIndex(function (b) { return b.id === id; });
+  if (index >= 0) {
+    bookmarks.splice(index, 1);
+  } else {
+    bookmarks.push({ id: id, title: title });
+  }
+  saveBookmarks();
+  
+  // If on index page, synchronize the card star icons state
+  if (typeof isIndexPage !== "undefined" && isIndexPage) {
+    var cards = document.querySelectorAll(".project-card");
+    cards.forEach(function (card) {
+      var btn = card.querySelector(".btn-bookmark-toggle");
+      if (btn && parseInt(btn.getAttribute("data-id"), 10) === id) {
+        var isBookmarked = bookmarks.some(function (b) { return b.id === id; });
+        btn.classList.toggle("bookmarked", isBookmarked);
+        btn.innerHTML = isBookmarked ? "★" : "☆";
+        btn.title = isBookmarked ? "Remove Bookmark" : "Bookmark Project";
+      }
+    });
+  }
+}
+
+function updateBookmarksUI() {
+  var countEl = document.getElementById("bookmark-count");
+  if (countEl) countEl.textContent = bookmarks.length;
+
+  var listEl = document.getElementById("bookmarks-list");
+  if (listEl) {
+    listEl.innerHTML = "";
+    if (bookmarks.length === 0) {
+      listEl.innerHTML = '<div class="bookmark-empty">No bookmarked projects yet.</div>';
+    } else {
+      bookmarks.forEach(function (b) {
+        var item = document.createElement("div");
+        item.className = "bookmark-item";
+        
+        var link = document.createElement("a");
+        link.className = "bookmark-link";
+        link.href = "/project/" + b.id;
+        link.textContent = b.title;
+        
+        var removeBtn = document.createElement("button");
+        removeBtn.className = "bookmark-remove-btn";
+        removeBtn.innerHTML = "&times;";
+        removeBtn.title = "Remove Bookmark";
+        removeBtn.setAttribute("aria-label", "Remove " + b.title);
+        removeBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleBookmark(b.id, b.title);
+        });
+        
+        item.appendChild(link);
+        item.appendChild(removeBtn);
+        listEl.appendChild(item);
+      });
+    }
+  }
+
+  // Update mobile bookmarks panel list if present
+  var mobileListEl = document.getElementById("mobile-bookmarks-list");
+  if (mobileListEl) {
+    mobileListEl.innerHTML = "";
+    if (bookmarks.length === 0) {
+      mobileListEl.innerHTML = '<div style="font-size: 0.85rem; color: var(--gray-400); font-style: italic;">No bookmarked projects.</div>';
+    } else {
+      bookmarks.forEach(function (b) {
+        var item = document.createElement("div");
+        item.className = "bookmark-item";
+        item.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 6px 0;";
+        
+        var link = document.createElement("a");
+        link.href = "/project/" + b.id;
+        link.textContent = b.title;
+        link.style.cssText = "font-size: 0.85rem; color: var(--text-head); text-decoration: none; max-width: 80%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;";
+        
+        var removeBtn = document.createElement("button");
+        removeBtn.innerHTML = "&times;";
+        removeBtn.title = "Remove Bookmark";
+        removeBtn.setAttribute("aria-label", "Remove " + b.title);
+        removeBtn.style.cssText = "background: none; border: none; color: var(--gray-400); font-size: 1.1rem; cursor: pointer; padding: 0;";
+        removeBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleBookmark(b.id, b.title);
+        });
+        
+        item.appendChild(link);
+        item.appendChild(removeBtn);
+        mobileListEl.appendChild(item);
+      });
+    }
+  }
+}
+
+// Wire up global bookmarks dropdown panel toggler
+(function initBookmarksToggler() {
+  var toggleBtn = document.getElementById("btn-bookmarks-toggle");
+  var panel = document.getElementById("bookmarks-panel");
+  
+  if (toggleBtn && panel) {
+    toggleBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var active = panel.classList.toggle("active");
+      toggleBtn.setAttribute("aria-expanded", active ? "true" : "false");
+    });
+    
+    document.addEventListener("click", function (e) {
+      if (panel.classList.contains("active") && !panel.contains(e.target) && e.target !== toggleBtn) {
+        panel.classList.remove("active");
+        toggleBtn.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+})();
+
+// Initial trigger to load bookmarks on window load
+loadBookmarks();

@@ -380,6 +380,24 @@ def test_project_links_have_noopener():
     assert b'rel="noopener noreferrer"' in response.data
 
 
+# ============================================================
+# Session Tracker Tests (Issue 11)
+# ============================================================
+
+def test_recently_viewed_tracking():
+    """Verify that visiting a project detail page tracks it in session recently viewed."""
+    client = get_client()
+    
+    # Visit project 1
+    response = client.get("/project/1")
+    assert response.status_code == 200
+    
+    # Verify session transaction has recorded the visit
+    with client.session_transaction() as sess:
+        assert "recently_viewed" in sess
+        assert 1 in sess["recently_viewed"]
+
+
 
 # ============================================================
 # Run tests directly (no pytest required)

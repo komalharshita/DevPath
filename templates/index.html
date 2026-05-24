@@ -24,6 +24,20 @@
         <a href="#how-it-works" class="nav-link">How It Works</a>
         <a href="#features" class="nav-link">Features</a>
         <a href="#find-project" class="nav-link">Find Project</a>
+        
+        <!-- Bookmarks Dropdown (Issue 10) -->
+        <div class="bookmarks-dropdown-container">
+          <button class="nav-link btn-bookmarks-toggle" id="btn-bookmarks-toggle" aria-haspopup="true" aria-expanded="false">
+            Saved 🌟 (<span id="bookmark-count">0</span>)
+          </button>
+          <div class="bookmarks-panel" id="bookmarks-panel">
+            <div class="bookmarks-panel-header">Saved Projects</div>
+            <div class="bookmarks-list" id="bookmarks-list">
+              <div class="bookmark-empty">No bookmarked projects yet.</div>
+            </div>
+          </div>
+        </div>
+
         <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-btn-outline">GitHub</a>
       </div>
       <!-- Mobile hamburger toggle -->
@@ -37,6 +51,14 @@
       <a href="#how-it-works" class="nav-mobile-link">How It Works</a>
       <a href="#features" class="nav-mobile-link">Features</a>
       <a href="#find-project" class="nav-mobile-link">Find Project</a>
+      
+      <div class="mobile-bookmarks" style="padding: 15px 20px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); text-align: left;">
+        <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray-400); display: block; margin-bottom: 8px;">Saved Projects 🌟</span>
+        <div id="mobile-bookmarks-list">
+          <div style="font-size: 0.85rem; color: var(--gray-400); font-style: italic;">No bookmarked projects.</div>
+        </div>
+      </div>
+      
       <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-mobile-link">GitHub</a>
     </div>
   </nav>
@@ -521,6 +543,27 @@
         </form>
       </div>
     </div>
+
+    <!-- Recently Viewed Section (Issue 11) -->
+    {% if recently_viewed_projects %}
+    <div class="recently-viewed-container" style="margin-top: 50px; text-align: center;">
+      <div class="section-eyebrow" style="text-align: center;">Jump Back In</div>
+      <h3 style="text-align: center; color: var(--text-head); font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; margin-top: 8px; margin-bottom: 25px;">Recently Viewed Projects</h3>
+      <div class="recently-viewed-grid" style="display: flex; gap: 20px; overflow-x: auto; padding: 10px 5px; scrollbar-width: thin; max-width: 900px; margin: 0 auto;">
+        {% for proj in recently_viewed_projects %}
+        <a href="/project/{{ proj.id }}" class="recently-viewed-card" style="flex: 0 0 280px; text-decoration: none; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: var(--r-md); padding: 20px; transition: all 0.3s ease; text-align: left; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span class="project-tag project-tag--skill" style="font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; font-weight: 600;">{{ proj.level }}</span>
+            <span style="font-size: 0.75rem; color: var(--gray-400); font-weight: 500;">⏳ {{ proj.time }}</span>
+          </div>
+          <h4 style="font-size: 1rem; font-weight: 700; color: var(--text-head); margin-bottom: 8px; font-family: var(--font-display); transition: color 0.2s;">{{ proj.title }}</h4>
+          <p style="font-size: 0.8rem; color: var(--text-body); line-height: 1.5; margin: 0;">{{ proj.description[:85] }}...</p>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
     </div>
   </section>
 
@@ -559,6 +602,13 @@
           <button class="btn-try-again"
             onclick="document.getElementById('find-project').scrollIntoView({behavior:'smooth'})">Try Different
             Inputs</button>
+        </div>
+      </div>
+
+      <!-- Live Search Filter (Issue 8) -->
+      <div class="results-filter-container" id="results-filter-container" style="display:none; max-width: 480px; margin: 0 auto 30px auto;">
+        <div class="skill-input-wrap" style="background: white; border: 1px solid var(--border); border-radius: var(--r-md); box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; align-items: center; padding: 2px 8px;">
+          <input type="text" id="results-search-input" placeholder="🔍 Filter results by keyword..." style="border:none; outline:none; flex:1; padding:10px 14px; font-size:0.9rem; background: transparent; color: var(--text-head);" autocomplete="off" />
         </div>
       </div>
 

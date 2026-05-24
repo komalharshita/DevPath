@@ -13,7 +13,10 @@
 from flask import Flask, render_template
 from routes.main_routes import main
 
+import os
+
 app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY", os.urandom(24))
 
 # Register all routes defined in the main Blueprint
 app.register_blueprint(main)

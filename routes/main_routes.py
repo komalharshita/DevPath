@@ -3,7 +3,7 @@
 # Each route is kept thin: it validates input, calls a utility function,
 # and returns a response. No business logic lives here.
 
-from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response
+from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response, session
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
 from utils.data_loader import find_project_by_id, load_all_projects, get_project_stats
@@ -18,7 +18,16 @@ main = Blueprint("main", __name__)
 def index():
     """Render the homepage with the skill input form and dynamic stats."""
     stats = get_project_stats()
-    return render_template("index.html", stats=stats)
+    
+    # Load recently viewed projects from Flask session
+    recently_viewed_ids = session.get("recently_viewed", [])
+    recently_viewed_projects = []
+    for pid in recently_viewed_ids:
+        proj = find_project_by_id(pid)
+        if proj:
+            recently_viewed_projects.append(proj)
+            
+    return render_template("index.html", stats=stats, recently_viewed_projects=recently_viewed_projects)
 
 @main.route("/health")
 def health_check():
@@ -78,6 +87,29 @@ def project_detail(project_id):
     project = find_project_by_id(project_id)
     if not project:
         abort(404)
+        
+    # Track recently viewed projects (limit to 5 unique IDs, most-recent-first)
+    recently_viewed = session.get("recently_viewed", [])
+    
+    # Defensively convert and filter valid integer IDs to avoid ValueError or mixed types
+    clean_ids = []
+    for x in recently_viewed:
+        try:
+            clean_ids.append(int(x))
+        except (ValueError, TypeError):
+            continue
+            
+    try:
+        pid = int(project_id)
+    except (ValueError, TypeError):
+        pid = None
+        
+    if pid is not None:
+        if pid in clean_ids:
+            clean_ids.remove(pid)
+        clean_ids.insert(0, pid)
+        session["recently_viewed"] = clean_ids[:5]
+    
     return render_template("project.html", project=project)
 
 
