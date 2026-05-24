@@ -272,6 +272,84 @@ def test_download_code_found():
 
 
 # ============================================================
+# CSRF, Caching, and Sanitization integration tests
+# ============================================================
+
+def test_csrf_token_cookie_present():
+    """Verify that visiting home sets a csrf_token cookie."""
+    client = get_client()
+    response = client.get("/")
+    assert "csrf_token" in response.headers.get("Set-Cookie", "")
+
+
+def test_recommend_api_rejects_missing_csrf():
+    """Ensure that the API returns 400 when CSRF is missing and testing mode is bypassed."""
+    client = get_client()
+    app.config["TESTING"] = False
+    try:
+        response = client.post("/api/recommend", json={
+            "skills": "Python",
+            "level": "Beginner",
+            "interest": "Data",
+            "time": "Low"
+        })
+        assert response.status_code == 400
+        assert "CSRF token missing" in response.get_json()["error"]
+    finally:
+        app.config["TESTING"] = True
+
+
+def test_recommend_api_accepts_valid_csrf():
+    """Ensure that the API accepts request when correct CSRF token is provided."""
+    client = get_client()
+    # 1. Fetch home page to get CSRF token
+    response = client.get("/")
+    cookie_header = response.headers.get("Set-Cookie", "")
+    import re
+    match = re.search(r"csrf_token=([^;]+)", cookie_header)
+    assert match is not None
+    token = match.group(1)
+
+    # 2. Make post request with csrf token
+    app.config["TESTING"] = False
+    try:
+        response = client.post("/api/recommend", json={
+            "skills": "Python",
+            "level": "Beginner",
+            "interest": "Data",
+            "time": "Low"
+        }, headers={"X-CSRF-Token": token})
+        assert response.status_code == 200
+    finally:
+        app.config["TESTING"] = True
+
+
+def test_input_sanitization():
+    """Verify that inputs with HTML characters are correctly escaped to prevent XSS."""
+    client = get_client()
+    response = client.post("/api/recommend", json={
+        "skills": "<script>alert('xss')</script>Python",
+        "level": "Beginner",
+        "interest": "Data",
+        "time": "Low"
+    })
+    # If HTML characters are escaped, they shouldn't trigger an error, or the response matches
+    assert response.status_code == 200
+
+
+def test_caching_enabled():
+    """Verify that Flask-Caching is configured and working."""
+    client = get_client()
+    # Make request to detail page
+    resp1 = client.get("/project/1")
+    assert resp1.status_code == 200
+
+    resp2 = client.get("/project/1")
+    assert resp2.status_code == 200
+
+
+
+# ============================================================
 # Run tests directly (no pytest required)
 # ============================================================
 

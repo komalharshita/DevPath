@@ -422,9 +422,21 @@ if (isIndexPage) {
       time: document.getElementById("time").value
     };
 
+    function getCookie(name) {
+      var value = "; " + document.cookie;
+      var parts = value.split("; " + name + "=");
+      if (parts.length === 2) return parts.pop().split(";").shift();
+      return "";
+    }
+
+    var csrfToken = getCookie("csrf_token");
+
     fetch("/api/recommend", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken
+      },
       body: JSON.stringify(payload)
     })
       .then(function (res) { return res.json(); })

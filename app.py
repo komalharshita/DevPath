@@ -10,10 +10,46 @@
 # Business logic, recommendation scoring, and data loading all live in
 # the utils/ and routes/ packages, not here.
 
-from flask import Flask, render_template
+import os
+import secrets
+from flask import Flask, render_template, request, session, jsonify
 from routes.main_routes import main
+from extensions import cache
 
 app = Flask(__name__)
+
+# Enforce secure configuration parameters
+app.secret_key = os.environ.get("SECRET_KEY", "devpath-insecure-flask-secret-key-12345")
+
+# Initialize Flask-Caching using local in-memory SimpleCache
+app.config["CACHE_TYPE"] = "SimpleCache"
+app.config["CACHE_DEFAULT_TIMEOUT"] = 300
+cache.init_app(app)
+
+# ---- CSRF Protection Middleware ----
+
+@app.before_request
+def csrf_protect():
+    """Lightweight, zero-dependency CSRF token verification middleware."""
+    if "csrf_token" not in session:
+        session["csrf_token"] = secrets.token_hex(32)
+    
+    # Bypass CSRF checks in test client environment
+    if app.config.get("TESTING"):
+        return
+
+    if request.method == "POST":
+        token = request.headers.get("X-CSRF-Token")
+        session_token = session.get("csrf_token")
+        if not session_token or not token or not secrets.compare_digest(session_token, token):
+            return jsonify({"error": "CSRF token missing or invalid."}), 400
+
+@app.after_request
+def set_csrf_cookie(response):
+    """Automatically append CSRF token value in the cookie headers."""
+    if "csrf_token" in session:
+        response.set_cookie("csrf_token", session["csrf_token"], samesite="Lax")
+    return response
 
 # Register all routes defined in the main Blueprint
 app.register_blueprint(main)
@@ -34,6 +70,6 @@ def internal_server_error(error):
 
 
 if __name__ == "__main__":
-    # debug=True is only for local development.
-    # Never run with debug=True in a production deployment.
-    app.run(debug=True)
+    # Control debug mode dynamically from the environment, defaulting to False in production
+    debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
+    app.run(debug=debug_mode)

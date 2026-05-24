@@ -3,11 +3,13 @@
 # Each route is kept thin: it validates input, calls a utility function,
 # and returns a response. No business logic lives here.
 
+import html
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
 from utils.data_loader import find_project_by_id
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
+from extensions import cache
 
 # Create the Blueprint that app.py will register
 main = Blueprint("main", __name__)
@@ -35,10 +37,11 @@ def recommend():
     if not payload:
         return jsonify({"error": "Request body must be valid JSON."}), 400
 
-    skills            = payload.get("skills", "").strip()
-    level             = payload.get("level", "").strip()
-    interest          = payload.get("interest", "").strip()
-    time_availability = payload.get("time", "").strip()
+    # Sanitize each input string to prevent XSS vulnerability attacks
+    skills            = html.escape(payload.get("skills", "").strip())
+    level             = html.escape(payload.get("level", "").strip())
+    interest          = html.escape(payload.get("interest", "").strip())
+    time_availability = html.escape(payload.get("time", "").strip())
 
     # Validate before running the recommendation engine
     errors = validate_recommendation_inputs(skills, level, interest, time_availability)
@@ -61,8 +64,9 @@ def recommend():
 
 
 @main.route("/project/<int:project_id>")
+@cache.memoize(timeout=600)
 def project_detail(project_id):
-    """Render the full detail page for a single project."""
+    """Render the full detail page for a single project (cached)."""
     project = find_project_by_id(project_id)
     if not project:
         abort(404)
@@ -70,8 +74,9 @@ def project_detail(project_id):
 
 
 @main.route("/project/<int:project_id>/code")
+@cache.memoize(timeout=600)
 def view_code(project_id):
-    """Return the starter code file contents as JSON for inline display."""
+    """Return the starter code file contents as JSON for inline display (cached)."""
     project = find_project_by_id(project_id)
     if not project:
         return jsonify({"error": "Project not found."}), 404
