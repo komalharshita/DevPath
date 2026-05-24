@@ -71,6 +71,8 @@ def score_single_project(
 
     # Compare user's skills against the project's required skills
     project_skills = [s.lower() for s in project.get("skills", [])]
+    total_project_skills = len(project_skills)
+
     # Count how many user skills overlap with the
     # skills required by the current project.
     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
@@ -78,7 +80,12 @@ def score_single_project(
     # More overlapping skills result in a higher recommendation score.
     score += matched_skills * SCORING_WEIGHTS["skill"]
 
+    if total_project_skills >0 :
+        density_bonus = matched_skills/total_project_skills
+        score += density_bonus 
+
     # Award points for each additional matching criterion
+
     if project.get("level", "").lower() == level.lower():
         score += SCORING_WEIGHTS["level"]
 
@@ -118,7 +125,8 @@ def get_recommendations(skills_string, level, interest, time_availability):
 
     # Sort projects in descending order so the
     # most relevant recommendations appear first.
-    scored_projects.sort(key=lambda item: item["score"], reverse=True)
+    # if score ties then sort alphabetically  by project skills
+    scored_projects.sort(key=lambda item:(-item["score"],item["project"].get("title","")), reverse=False)
 
     # Return only the project dicts, not the score metadata
     return [item["project"] for item in scored_projects[:MAX_RESULTS]]

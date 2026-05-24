@@ -105,8 +105,8 @@ def test_score_single_project_full_match():
         interest="Data",
         time_availability="Low"
     )
-    # 1 skill match (3) + level (2) + interest (2) + time (1) = 8
-    assert score == 8, f"Expected 8 but got {score}"
+    # 1 skill match (3) + level (2) + interest (2) + time (1) + density bonus (1.0) = 9.0
+    assert score == 9.0, f"Expected 9.0 but got {score}"
 
 
 def test_score_single_project_no_match():
