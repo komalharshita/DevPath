@@ -10,10 +10,12 @@ MAX_RESULTS = 3
 # Scoring weights used by the recommendation engine.
 # Higher weights mean that criterion has more influence
 # on the final recommendation score.
-WEIGHT_SKILL = 3   # highest because they best reflect project compatibility
-WEIGHT_LEVEL = 2   # helps avoid projects that are too easy or too difficult
-WEIGHT_INTEREST = 2   # Interest alignment improves recommendation relevance
-WEIGHT_TIME = 1    # Time availability acts as a smaller tie-breaker factor
+SCORING_WEIGHTS = {
+    "skill":    3,
+    "level":    2,
+    "interest": 2,
+    "time":     1,
+}
 
 
 # Common aliases and abbreviations for skills
@@ -65,6 +67,11 @@ def score_single_project(
 
     Returns an integer score (0 means no match at all).
     """
+    # Compare time availability, return results with the same time availibity or lower.
+    TIME_AVAILABILITY = ['low', 'medium', 'high']
+    time_availability_index =   TIME_AVAILABILITY.index(time_availability.strip().lower())
+    valid_time = TIME_AVAILABILITY[ : time_availability_index + 1 ]
+    
     score = 0
 
     # Compare user's skills against the project's required skills
@@ -74,19 +81,21 @@ def score_single_project(
     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
     # Add weighted points based on the number of matching skills.
     # More overlapping skills result in a higher recommendation score.
-    score += matched_skills * WEIGHT_SKILL
+    score += matched_skills * SCORING_WEIGHTS["skill"]
 
     # Award points for each additional matching criterion
     if project.get("level", "").lower() == level.lower():
-        score += WEIGHT_LEVEL
+        score += SCORING_WEIGHTS["level"]
 
     if project.get("interest", "").lower() == interest.lower():
-        score += WEIGHT_INTEREST
+        score += SCORING_WEIGHTS["interest"]
 
     if project.get("time", "").lower() == time_availability.lower():
-        score += WEIGHT_TIME
+        score += SCORING_WEIGHTS["time"]
 
-    return score
+    if project.get("time", "").lower() in valid_time :
+        return score
+    return 0
 
 
 def get_recommendations(skills_string, level, interest, time_availability):
