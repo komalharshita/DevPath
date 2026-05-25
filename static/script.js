@@ -321,13 +321,17 @@ if (clearFiltersBtn) {
   });
 
   // Show suggestions on input
+  let debounceTimer;
   skillsTextInput.addEventListener("input", function (evt) {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
     var typedValue = evt.target.value.trim();
     if (typedValue.length === 0) {
       hideSuggestions();
       return;
     }
     displaySuggestions(getFilteredSkills(typedValue));
+    }, 300);
   });
 
   skillsTextInput.addEventListener("focus", function () {
