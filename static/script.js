@@ -575,8 +575,7 @@ form.addEventListener("submit", function (evt) {
 
   //takes the array of projects from the api and draws them on the page as cards
   //if array is empty it shows the "no results" message instead
- function renderResults(projects, message) {
-
+function renderResults(projects, message) {
   resultsSection.style.display = "block";
   resultsLoadingEl.style.display = "none";
 
@@ -585,12 +584,21 @@ form.addEventListener("submit", function (evt) {
 
   // No results
   if (!projects || projects.length === 0) {
-
     resultsGrid.style.display = "none";
     resultsEmptyEl.style.display = "block";
 
-    if (message && emptyMessageEl) {
+    // Friendly custom message
+    var selectedInterest =
+      document.getElementById("interest")?.value;
+
+    if (selectedInterest) {
+      emptyMessageEl.textContent =
+        "No projects are currently available for this interest. Please check back later or try a different interest area.";
+    } else if (message) {
       emptyMessageEl.textContent = message;
+    } else {
+      emptyMessageEl.textContent =
+        "Try adjusting your skills or choosing a different interest area.";
     }
 
     resultsSection.scrollIntoView({
@@ -613,6 +621,8 @@ form.addEventListener("submit", function (evt) {
     behavior: "smooth"
   });
 }
+
+ 
 function buildProjectCard(project) {
 
   var card = document.createElement("div");
@@ -623,19 +633,19 @@ function buildProjectCard(project) {
   title.className = "project-card-title";
   title.textContent = project.title;
 
-  // Description
-  var desc = document.createElement("p");
-  desc.className = "project-card-desc";
-  desc.textContent = truncate(project.description, 120);
+ // Description
+ var desc = document.createElement("p");
+ desc.className = "project-card-desc";
+ desc.textContent = truncate(project.description, 120);
 
-  // Tags row
-  var tagsRow = document.createElement("div");
-  tagsRow.className = "project-card-tags";
+ // Tags row
+ var tagsRow = document.createElement("div");
+ tagsRow.className = "project-card-tags";
 
-  // Skill tags
-  (project.skills || []).slice(0, 2).forEach(function (skill) {
-    tagsRow.appendChild(createTag(skill, "skill"));
-  });
+ // Show all project skills
+ (project.skills || []).forEach(function (skill) {
+   tagsRow.appendChild(createTag(skill, "skill"));
+ });
 
   // Level tag
   var levelClass = "level " + (project.level || "").toLowerCase();
