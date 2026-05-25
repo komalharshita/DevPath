@@ -1,3 +1,8 @@
+import logging
+import json
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 # app.py
 # Application entry point for DevPath.
 #
@@ -10,13 +15,17 @@
 # Business logic, recommendation scoring, and data loading all live in
 # the utils/ and routes/ packages, not here.
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from routes.main_routes import main
 
 app = Flask(__name__)
 
 # Register all routes defined in the main Blueprint
 app.register_blueprint(main)
+
+@app.before_request
+def log_request():
+    logger.info(json.dumps({'path': request.path, 'method': request.method}))
 
 @app.after_request
 def add_security_headers(response):
