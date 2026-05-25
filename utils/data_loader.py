@@ -8,6 +8,8 @@ import os
 DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "projects.json")
 
 
+import functools
+@functools.lru_cache(maxsize=128)
 def load_all_projects():
     """Read and return the full list of projects from the JSON file."""
     with open(DATA_FILE, "r", encoding="utf-8") as f:
