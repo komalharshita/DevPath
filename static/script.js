@@ -75,38 +75,38 @@ if (isIndexPage) {
   // Tracks currently selected skills to prevent duplicates
   var selectedSkills = [];
   // Clear Filters Button Functionality
-var clearFiltersBtn = document.getElementById("clear-filters-btn");
-if (clearFiltersBtn) {
-    clearFiltersBtn.addEventListener("click", function() {
-        var recommendForm = document.getElementById("recommend-form");
-        if (recommendForm) {
-            // 1. Reset standard form dropdowns and fields
-            recommendForm.reset();
-            
-            // 2. Clear out the internal JavaScript array tracker completely
-            selectedSkills = [];
-            
-            // 3. Clear the hidden inputs and visual chips using the file's own variables
-            if (skillsHidden) skillsHidden.value = "";
-            if (chipsSelectedEl) chipsSelectedEl.innerHTML = "";
-            if (skillsTextInput) {
-                skillsTextInput.value = "";
-                skillsTextInput.focus(); // Place cursor back on input
-            }
-            
-            // 4. Hide autocomplete suggestions if any are open
-            var suggestionsBox = document.getElementById("skills-suggestions");
-            if (suggestionsBox) suggestionsBox.innerHTML = "";
+  var clearFiltersBtn = document.getElementById("clear-filters-btn");
+  if (clearFiltersBtn) {
+      clearFiltersBtn.addEventListener("click", function() {
+          var recommendForm = document.getElementById("recommend-form");
+          if (recommendForm) {
+              // 1. Reset standard form dropdowns and fields
+              recommendForm.reset();
+              
+              // 2. Clear out the internal JavaScript array tracker completely
+              selectedSkills = [];
+              
+              // 3. Clear the hidden inputs and visual chips using the file's own variables
+              if (skillsHidden) skillsHidden.value = "";
+              if (chipsSelectedEl) chipsSelectedEl.innerHTML = "";
+              if (skillsTextInput) {
+                  skillsTextInput.value = "";
+                  skillsTextInput.focus(); // Place cursor back on input
+              }
+              
+              // 4. Hide autocomplete suggestions if any are open
+              var suggestionsBox = document.getElementById("skills-suggestions");
+              if (suggestionsBox) suggestionsBox.innerHTML = "";
 
-            // 5. Reset quick-pick chip visual active states if they have any
-            if (quickPickChips) {
-                quickPickChips.forEach(function(chip) {
-                    chip.classList.remove("active", "selected");
-                });
-            }
-        }
-    });
-}
+              // 5. Reset quick-pick chip visual active states if they have any
+              if (quickPickChips) {
+                  quickPickChips.forEach(function(chip) {
+                      chip.classList.remove("active", "selected");
+                  });
+              }
+          }
+      });
+  }
 
 
   // ----------------------------------------------------------
@@ -479,7 +479,7 @@ if (clearFiltersBtn) {
 
   form.addEventListener("submit", function (evt) {
     evt.preventDefault(); //stop the browser from reloading the page on form submit
-    clearAllErrors()
+    clearAllErrors();
     
     if (skillsTextInput.value.trim()) {
       addSkill(skillsTextInput.value);
@@ -493,82 +493,44 @@ if (clearFiltersBtn) {
 
     // Allow browser to paint spinner before request starts
     requestAnimationFrame(function () {
-
+      //combine form values into an object to send to server/api
       var payload = {
+        // Prefer the hidden input value; fall back to raw text box if hidden input is empty
         skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
         level: document.getElementById("level").value,
         interest: document.getElementById("interest").value,
         time: document.getElementById("time").value
       };
 
+      //post the data to backend api as JSON, then handle the response
       fetch("/api/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body:    JSON.stringify(payload) //convert object to json string
       })
-        .then(function (res) {
-          return res.json();
-        })
+        .then(function (res) { return res.json(); }) //parse the response as JSON
         .then(function (data) {
-
           setLoadingState(false);
 
           if (data.error) {
             var generalErr = document.getElementById("form-error-general");
-
             if (generalErr) {
               generalErr.textContent = data.error;
             }
-
             return;
           }
-
           renderResults(data.projects || [], data.message);
         })
-        .catch(function () {
-
+        .catch(function (err) {
+          // this runs if the network request itself fails 
           setLoadingState(false);
-    //combine form values into an object to send to server/api
-    var payload = {
-      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level: document.getElementById("level").value,
-      interest: document.getElementById("interest").value,
-      time: document.getElementById("time").value
-    };
-
-    //post the data to backend api as JSON, then handle the response
-    fetch("/api/recommend", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify(payload) //convert object to json string
-    })
-      .then(function (res) { return res.json(); }) //parse the response as JSON
-      .then(function (data) {
-        setLoadingState(false);
-
           var generalErr = document.getElementById("form-error-general");
-
           if (generalErr) {
-            generalErr.textContent =
-              "Something went wrong. Please try again.";
+            generalErr.textContent = "Something went wrong. Please try again.";
           }
+          console.error("API request failed:", err);
         });
     });
-        if (data.error) {
-          var generalErr = document.getElementById("form-error-general");
-          if (generalErr) generalErr.textContent = data.error;
-          return;
-        }
-        renderResults(data.projects || [], data.message);
-      })
-      .catch(function (err) {
-        // this runs if the network request itself fails 
-        setLoadingState(false);
-        var generalErr = document.getElementById("form-error-general");
-        if (generalErr) generalErr.textContent = "Something went wrong. Please try again.";
-        console.error("API request failed:", err);
-      });
   });
 
   // Manages the loading state of the form and results section(whats visible or not)
@@ -578,8 +540,6 @@ if (clearFiltersBtn) {
     submitBtn.setAttribute("aria-busy", isLoading);
     btnLabel.style.display = isLoading ? "none" : "inline";
     btnLoading.style.display = isLoading ? "inline-flex" : "none";
-    btnLabel.style.display = isLoading ? "none" : "inline";
-    btnLoading.style.display = isLoading ? "inline" : "none";
 
     if (isLoading) {
       // Show the results section with only the loading indicator visible
@@ -591,7 +551,7 @@ if (clearFiltersBtn) {
       resultsSection.scrollIntoView({ behavior: "smooth" });
     } else {
       resultsLoadingEl.style.display  = "none";
-      resultsGrid.style.display       = "grid"; //switch back to gird layout 
+      resultsGrid.style.display       = "grid"; //switch back to grid layout 
     }
   }
 
@@ -608,12 +568,6 @@ if (clearFiltersBtn) {
     // Clear out any cards from a previous search before showing new ones
     resultsGrid.innerHTML = "";
 
-    if (!projects || projects.length === 0) {
-      resultsGrid.style.display     = "none";
-      resultsEmptyEl.style.display  = "block";
-      resultsGrid.style.display = "none";
-      resultsEmptyEl.style.display = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
     if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
       resultsGrid.style.display      = "none";
       resultsEmptyEl.style.display   = "block";
@@ -716,11 +670,36 @@ if (isDetailPage) {
   var codeContentEl     = document.getElementById("code-content"); // <pre> element inside the panel where the code will be inserted
   var codePanelFilename = document.getElementById("code-panel-filename"); // filename display
   var btnViewCode       = document.getElementById("btn-view-code"); // button to open the code panel on desktop
-  var btnViewCodeSm     = document.getElementById("btn-view-code-sm"); // button to open the code panel on mobile (could be the same button with different styling, but we have two here for simplicity)
+  var btnViewCodeSm     = document.getElementById("btn-view-code-sm"); // button to open the code panel on mobile
   var btnClosePanel     = document.getElementById("code-panel-close"); // button inside the panel to close it
 
   // Cache flag so code is only fetched once per page load
   var codeFetched = false;
+
+  // Generates structured lines with line numbers for copying and accessibility
+  function renderCodeWithLineNumbers(code) {
+    var lines = code.split("\n");
+    return lines.map(function (lineText, index) {
+      var row = document.createElement("div");
+      row.className = "code-line";
+      row.style.display = "flex";
+
+      var num = document.createElement("span");
+      num.className = "line-number";
+      num.style.userSelect = "none";
+      num.style.marginRight = "1em";
+      num.style.opacity = "0.5";
+      num.textContent = index + 1;
+
+      var content = document.createElement("span");
+      content.className = "line-content";
+      content.textContent = lineText;
+
+      row.appendChild(num);
+      row.appendChild(content);
+      return row;
+    });
+  }
 
   //opens the sliding code panel 
   function openCodePanel() {
@@ -866,6 +845,11 @@ if (isDetailPage) {
   }
 } // end isDetailPage
 
+
+// ============================================================
+// GLOBAL INTEGRATIONS (GitHub & Scroll To Top)
+// ============================================================
+
 if (
     openModalBtn &&
     closeModalBtn &&
@@ -874,15 +858,15 @@ if (
     fetchBtn &&
     errorMsg
 ) {
-// 1. Open Github Input Modal
-  openModalBtn.addEventListener('click', (e) => {
+  // 1. Open Github Input Modal
+  openModalBtn.addEventListener('click', function (e) {
       e.preventDefault();
       modal.classList.add('active');
       githubInput.focus();
   });
 
   // 2. Close Github Input Modal
-  const closeGithubModal = () => {
+  var closeGithubModal = function () {
       modal.classList.remove('active');
       githubInput.value = '';
       errorMsg.textContent = '';
@@ -891,27 +875,27 @@ if (
   closeModalBtn.addEventListener('click', closeGithubModal);
 
   // Close on clicking outside the card
-  modal.addEventListener('click', (e) => {
+  modal.addEventListener('click', function (e) {
       if (e.target === modal) closeGithubModal();
   });
 
   // 3. Fetch Skills Logic
-  fetchBtn.addEventListener('click', async () => {
-      const username = githubInput.value.trim();
+  fetchBtn.addEventListener('click', async function () {
+      var username = githubInput.value.trim();
       if (!username) return;
 
       fetchBtn.disabled = true;
       fetchBtn.textContent = 'Syncing...';
 
       try {
-          const response = await fetch(`https://api.github.com/users/${username}/repos`);
+          var response = await fetch(`https://api.github.com/users/${username}/repos`);
           if (!response.ok) throw new Error();
           
-          const repos = await response.json();
-          const langs = [...new Set(repos.map(r => r.language).filter(Boolean))];
+          var repos = await response.json();
+          var langs = [...new Set(repos.map(function (r) { return r.language; }).filter(Boolean))];
 
           if (langs.length > 0) {
-              langs.forEach(lang => {
+              langs.forEach(function (lang) {
                   if (typeof addSkill === 'function') addSkill(lang);
               });
               closeGithubModal();
