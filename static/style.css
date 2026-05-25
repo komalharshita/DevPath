@@ -2846,3 +2846,80 @@ select:focus {
   white-space: pre;
   color: #e6edf3;
 }
+
+/* ============================================================
+   Project Navigation
+   ============================================================ */
+
+.project-navigation {
+  margin-top: 4rem;
+  padding: 2rem 0;
+}
+
+.project-navigation-inner {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.project-nav-card {
+  flex: 1 1 240px;
+  min-width: 240px;
+  padding: 1.25rem;
+  border-radius: 16px;
+
+  background: #111827;
+  border: 1px solid #1f2937;
+
+  text-decoration: none;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.project-nav-card:hover {
+  transform: translateY(-2px);
+  border-color: #374151;
+  background: #0f172a;
+}
+
+.project-nav-card:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 3px;
+}
+
+.project-nav-card--right {
+  text-align: right;
+}
+
+.project-nav-label {
+  display: block;
+  margin-bottom: 0.4rem;
+
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.project-nav-title {
+  display: block;
+
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+
+  color: #f9fafb;
+}
+
+/* Mobile stacking */
+@media (max-width: 640px) {
+  .project-navigation-inner {
+    flex-direction: column;
+  }
+
+  .project-nav-card--right {
+    text-align: left;
+  }
+}

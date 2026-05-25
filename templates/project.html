@@ -315,6 +315,31 @@
   </div>
 
   <!-- ============================================================
+     Project Navigation
+     ============================================================ -->
+<div class="project-navigation">
+  <div class="container">
+    <div class="project-navigation-inner">
+
+      {% if prev_project %}
+      <a href="/project/{{ prev_project.id }}" class="project-nav-card">
+        <span class="project-nav-label">← Previous Project</span>
+        <span class="project-nav-title">{{ prev_project.title }}</span>
+      </a>
+      {% endif %}
+
+      {% if next_project %}
+      <a href="/project/{{ next_project.id }}" class="project-nav-card project-nav-card--right">
+        <span class="project-nav-label">Next Project →</span>
+        <span class="project-nav-title">{{ next_project.title }}</span>
+      </a>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+  <!-- ============================================================
        Footer
        ============================================================ -->
   <footer class="footer">

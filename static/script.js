@@ -477,99 +477,72 @@ if (clearFiltersBtn) {
   // Form submission and API call
   // ----------------------------------------------------------
 
-  form.addEventListener("submit", function (evt) {
-    evt.preventDefault(); //stop the browser from reloading the page on form submit
-    clearAllErrors()
-    
-    if (skillsTextInput.value.trim()) {
-      addSkill(skillsTextInput.value);
-      skillsTextInput.value = "";
-      hideSuggestions();
-    }
+form.addEventListener("submit", function (evt) {
+  evt.preventDefault();
 
-    if (!validateForm()) return; //stop - anything missing/invalid
+  clearAllErrors();
 
-    setLoadingState(true);
+  if (skillsTextInput.value.trim()) {
+    addSkill(skillsTextInput.value);
+    skillsTextInput.value = "";
+    hideSuggestions();
+  }
 
-    // Allow browser to paint spinner before request starts
-    requestAnimationFrame(function () {
+  if (!validateForm()) return;
 
-      var payload = {
-        skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-        level: document.getElementById("level").value,
-        interest: document.getElementById("interest").value,
-        time: document.getElementById("time").value
-      };
+  setLoadingState(true);
 
-      fetch("/api/recommend", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      })
-        .then(function (res) {
-          return res.json();
-        })
-        .then(function (data) {
+  requestAnimationFrame(function () {
 
-          setLoadingState(false);
-
-          if (data.error) {
-            var generalErr = document.getElementById("form-error-general");
-
-            if (generalErr) {
-              generalErr.textContent = data.error;
-            }
-
-            return;
-          }
-
-          renderResults(data.projects || [], data.message);
-        })
-        .catch(function () {
-
-          setLoadingState(false);
-    //combine form values into an object to send to server/api
     var payload = {
-      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
       skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
       level: document.getElementById("level").value,
       interest: document.getElementById("interest").value,
       time: document.getElementById("time").value
     };
 
-    //post the data to backend api as JSON, then handle the response
     fetch("/api/recommend", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify(payload) //convert object to json string
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
     })
-      .then(function (res) { return res.json(); }) //parse the response as JSON
+      .then(function (res) {
+        return res.json();
+      })
       .then(function (data) {
+
         setLoadingState(false);
 
+        if (data.error) {
           var generalErr = document.getElementById("form-error-general");
 
           if (generalErr) {
-            generalErr.textContent =
-              "Something went wrong. Please try again.";
+            generalErr.textContent = data.error;
           }
-        });
-    });
-        if (data.error) {
-          var generalErr = document.getElementById("form-error-general");
-          if (generalErr) generalErr.textContent = data.error;
+
           return;
         }
+
         renderResults(data.projects || [], data.message);
       })
       .catch(function (err) {
-        // this runs if the network request itself fails 
+
         setLoadingState(false);
+
         var generalErr = document.getElementById("form-error-general");
-        if (generalErr) generalErr.textContent = "Something went wrong. Please try again.";
+
+        if (generalErr) {
+          generalErr.textContent =
+            "Something went wrong. Please try again.";
+        }
+
         console.error("API request failed:", err);
       });
+
   });
+});
 
   // Manages the loading state of the form and results section(whats visible or not)
   function setLoadingState(isLoading) {
@@ -602,108 +575,110 @@ if (clearFiltersBtn) {
 
   //takes the array of projects from the api and draws them on the page as cards
   //if array is empty it shows the "no results" message instead
-  function renderResults(projects, message) {
-    resultsSection.style.display = "block";
-    resultsLoadingEl.style.display = "none";
-    // Clear out any cards from a previous search before showing new ones
-    resultsGrid.innerHTML = "";
+ function renderResults(projects, message) {
 
-    if (!projects || projects.length === 0) {
-      resultsGrid.style.display     = "none";
-      resultsEmptyEl.style.display  = "block";
-      resultsGrid.style.display = "none";
-      resultsEmptyEl.style.display = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
-    if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
-      resultsGrid.style.display      = "none";
-      resultsEmptyEl.style.display   = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message; //if api sent back a message (e.g. "no projects found matching your criteria"), show that 
-      resultsSection.scrollIntoView({ behavior: "smooth" });
-      return;
+  resultsSection.style.display = "block";
+  resultsLoadingEl.style.display = "none";
+
+  // Clear previous cards
+  resultsGrid.innerHTML = "";
+
+  // No results
+  if (!projects || projects.length === 0) {
+
+    resultsGrid.style.display = "none";
+    resultsEmptyEl.style.display = "block";
+
+    if (message && emptyMessageEl) {
+      emptyMessageEl.textContent = message;
     }
 
-    resultsEmptyEl.style.display = "none";
-    resultsGrid.style.display = "grid";
-
-    //build a card for each project and add it to the grid
-    projects.forEach(function (project) {
-      resultsGrid.appendChild(buildProjectCard(project));
+    resultsSection.scrollIntoView({
+      behavior: "smooth"
     });
 
-    resultsSection.scrollIntoView({ behavior: "smooth" });
+    return;
   }
 
-  // builds one project card as a DOM element and returns it
-  // the card has title, short description, tags and link
-  function buildProjectCard(project) {
-    var card = document.createElement("div");
-    card.className = "project-card";
+  // Show results grid
+  resultsEmptyEl.style.display = "none";
+  resultsGrid.style.display = "grid";
 
-    // Title
-    var title = document.createElement("h3");
-    title.className = "project-card-title";
-    title.textContent = project.title;
+  // Render project cards
+  projects.forEach(function (project) {
+    resultsGrid.appendChild(buildProjectCard(project));
+  });
 
-    // Description (truncated for visual consistency)
-    var desc = document.createElement("p");
-    desc.className = "project-card-desc";
-    // Cut description to 120 chars so all cards stay the same height
-    desc.textContent = truncate(project.description, 120);
+  resultsSection.scrollIntoView({
+    behavior: "smooth"
+  });
+}
+function buildProjectCard(project) {
 
-    // Tags row
-    var tagsRow = document.createElement("div");
-    tagsRow.className = "project-card-tags";
+  var card = document.createElement("div");
+  card.className = "project-card";
 
-    // Show the first two skills as tags
-    (project.skills || []).slice(0, 2).forEach(function (skill) {
-      tagsRow.appendChild(createTag(skill, "skill"));
-    });
+  // Title
+  var title = document.createElement("h3");
+  title.className = "project-card-title";
+  title.textContent = project.title;
 
-    // Level tag (colour-coded via CSS class)
-    // Lowercase so it matches the CSS class names like "level beginner", "level advanced"
-    var levelClass = "level " + (project.level || "").toLowerCase();
-    tagsRow.appendChild(createTag(project.level, levelClass));
+  // Description
+  var desc = document.createElement("p");
+  desc.className = "project-card-desc";
+  desc.textContent = truncate(project.description, 120);
 
-    // Time tag
-    tagsRow.appendChild(createTag("Time: " + project.time, "time"));
+  // Tags row
+  var tagsRow = document.createElement("div");
+  tagsRow.className = "project-card-tags";
 
-    // Footer with view-details link
-    var footer = document.createElement("div");
-    footer.className = "project-card-footer";
+  // Skill tags
+  (project.skills || []).slice(0, 2).forEach(function (skill) {
+    tagsRow.appendChild(createTag(skill, "skill"));
+  });
 
-    var link = document.createElement("a");
-    link.className = "btn-details";
-    link.textContent = "View Full Project";
-    link.href = "/project/" + project.id; //each project has a unique id
+  // Level tag
+  var levelClass = "level " + (project.level || "").toLowerCase();
+  tagsRow.appendChild(createTag(project.level, levelClass));
 
-    footer.appendChild(link);
+  // Time tag
+  tagsRow.appendChild(createTag("Time: " + project.time, "time"));
 
-    // Assemble the card in order
-    card.appendChild(title);
-    card.appendChild(desc);
-    card.appendChild(tagsRow);
-    card.appendChild(footer);
+  // Footer
+  var footer = document.createElement("div");
+  footer.className = "project-card-footer";
 
-    return card;
-  }
+  // Link button
+  var link = document.createElement("a");
+  link.className = "btn-details";
+  link.textContent = "View Full Project";
+  link.href = "/project/" + project.id;
 
-  // helper to create a coloured tag element (used for skills, level, time tags on the cards)
-  function createTag(text, type) {
-    var span = document.createElement("span");
-    // The type becomes a BEM modifier so CSS can style each tag differently
-    span.className = "project-tag project-tag--" + type;
-    span.textContent = text;
-    return span;
-  }
+  footer.appendChild(link);
 
-  function truncate(text, maxLength) {
-    // Safety check — just return empty string if text is missing
-    if (!text) return "";
-    // Only add "..." if the text is actually longer than the limit
-    return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
-  }
+  // Assemble card
+  card.appendChild(title);
+  card.appendChild(desc);
+  card.appendChild(tagsRow);
+  card.appendChild(footer);
 
-} // end isIndexPage
+  return card;
+}
+function createTag(text, type) {
+  var span = document.createElement("span");
+  span.className = "project-tag project-tag--" + type;
+  span.textContent = text;
+  return span;
+}
+
+function truncate(text, maxLength) {
+  if (!text) return "";
+
+  return text.length > maxLength
+    ? text.slice(0, maxLength) + "..."
+    : text;
+}
+// end isIndexPage
 
 
 // ============================================================
@@ -954,4 +929,5 @@ function scrollToTop() {
 if (scrollTopBtn) {
     window.addEventListener('scroll', handleScroll);
     scrollTopBtn.addEventListener('click', scrollToTop);
+}
 }

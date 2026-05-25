@@ -75,10 +75,37 @@ def recommend():
 @main.route("/project/<int:project_id>")
 def project_detail(project_id):
     """Render the full detail page for a single project."""
+    
     project = find_project_by_id(project_id)
+
     if not project:
         abort(404)
-    return render_template("project.html", project=project)
+
+    projects = load_all_projects()
+
+    current_index = next(
+        (index for index, p in enumerate(projects) if p["id"] == project_id),
+        None
+    )
+
+    prev_project = (
+        projects[current_index - 1]
+        if current_index is not None and current_index > 0
+        else None
+    )
+
+    next_project = (
+        projects[current_index + 1]
+        if current_index is not None and current_index < len(projects) - 1
+        else None
+    )
+
+    return render_template(
+        "project.html",
+        project=project,
+        prev_project=prev_project,
+        next_project=next_project
+    )
 
 
 @main.route("/project/<int:project_id>/code")
