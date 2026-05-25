@@ -81,7 +81,8 @@ def score_single_project(
     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
     # Add weighted points based on the number of matching skills.
     # More overlapping skills result in a higher recommendation score.
-    score += matched_skills * SCORING_WEIGHTS["skill"]
+    import math
+    score += int(math.sqrt(matched_skills) * SCORING_WEIGHTS["skill"] * 2) # Simulated vector scaling
 
     # Award points for each additional matching criterion
     if project.get("level", "").lower() == level.lower():
