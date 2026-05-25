@@ -82,7 +82,7 @@
 
     <!-- Result Screen -->
     <div id="result-screen">
-      <h2>Quiz Complete! 🎉</h2>
+      <h2>Quiz Complete! <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><circle cx="12" cy="12" r="10"></circle><path d="M16 8l-6 8-4-4"></path></svg></h2>
       <p id="final-score">Your score: 0</p>
       <button onclick="restartQuiz()">Play Again</button>
     </div>
@@ -115,6 +115,9 @@
 
     // TODO: Write checkAnswer() function
     function checkAnswer(selectedIndex) {
+      if (selectedIndex === questions[currentQuestion].correct) score++;
+      currentQuestion++;
+      if (currentQuestion < questions.length) displayQuestion(); else showResults();
       // Check if selected answer is correct
       // Update score
       // Move to next question
