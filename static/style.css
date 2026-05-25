@@ -1,3 +1,16 @@
+:root {
+  --primary-color: #4f46e5;
+  --secondary-color: #10b981;
+  --text-main: #1f2937;
+  --bg-main: #ffffff;
+  --spacing-md: 1rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-main: #f9fafb;
+    --bg-main: #111827;
+  }
+}
 /* =============================================================
    style.css — DevPath
    Design language: bold blue/indigo hero, clean white sections,
