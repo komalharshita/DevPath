@@ -75,7 +75,7 @@ def score_single_project(
     score = 0
 
     # Compare user's skills against the project's required skills
-    project_skills = [s.lower() for s in project.get("skills", [])]
+    project_skills = [SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", [])]
     # Count how many user skills overlap with the
     # skills required by the current project.
     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
