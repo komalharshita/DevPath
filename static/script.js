@@ -238,15 +238,18 @@ if (clearFiltersBtn) {
       // Prevent the input blur handler from closing the menu before click runs.
       item.addEventListener("mousedown", function (evt) {
         evt.preventDefault();
+        selectSuggestion(skill);
+      });
+
+      // Handle touch devices to select immediately on touchstart without blur delay
+      item.addEventListener("touchstart", function (evt) {
+        evt.preventDefault();
+        selectSuggestion(skill);
       });
 
       item.addEventListener("mouseenter", function () {
         activeSuggestionIndex = index;
         renderActiveSuggestion();
-      });
-
-      item.addEventListener("click", function () {
-        selectSuggestion(skill);
       });
 
       suggestionsDiv.appendChild(item);
