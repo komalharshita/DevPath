@@ -524,6 +524,7 @@ if (clearFiltersBtn) {
           }
 
           renderResults(data.projects || [], data.message);
+          updateShareableURL(payload);
         })
         .catch(function () {
 
@@ -677,6 +678,91 @@ if (clearFiltersBtn) {
     // Only add "..." if the text is actually longer than the limit
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
   }
+
+
+  // --- Shareable URL helpers (Issue #137) ---
+
+  function updateShareableURL(payload) {
+    var params = new URLSearchParams();
+    if (payload.skills)   params.set("skills",   payload.skills);
+    if (payload.level)    params.set("level",     payload.level);
+    if (payload.interest) params.set("interest",  payload.interest);
+    if (payload.time)     params.set("time",      payload.time);
+    window.history.pushState(null, "", "?" + params.toString());
+    var row = document.getElementById("share-row");
+    if (row) row.style.display = "flex";
+  }
+
+  var copyLinkBtn = document.getElementById("copy-link-btn");
+  if (copyLinkBtn) {
+    copyLinkBtn.addEventListener("click", function () {
+      var url = window.location.href;
+      var original = copyLinkBtn.textContent;
+      function onCopied() {
+        copyLinkBtn.textContent = "Copied!";
+        setTimeout(function () { copyLinkBtn.textContent = original; }, 2000);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(onCopied).catch(function () {
+          fallbackCopyURL(url, onCopied);
+        });
+      } else {
+        fallbackCopyURL(url, onCopied);
+      }
+    });
+  }
+
+  function fallbackCopyURL(url, cb) {
+    var ta = document.createElement("textarea");
+    ta.value = url;
+    ta.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand("copy"); if (cb) cb(); } catch (e) { /* silent fail */ }
+    document.body.removeChild(ta);
+  }
+
+  (function loadFromURL() {
+    var params    = new URLSearchParams(window.location.search);
+    var pSkills   = params.get("skills");
+    var pLevel    = params.get("level");
+    var pInterest = params.get("interest");
+    var pTime     = params.get("time");
+
+    if (!pSkills || !pLevel || !pInterest || !pTime) return;
+
+    pSkills.split(",").forEach(function (s) { var t = s.trim(); if (t) addSkill(t); });
+
+    var levelEl    = document.getElementById("level");
+    var interestEl = document.getElementById("interest");
+    var timeEl     = document.getElementById("time");
+    if (levelEl)    levelEl.value    = pLevel;
+    if (interestEl) interestEl.value = pInterest;
+    if (timeEl)     timeEl.value     = pTime;
+
+    setLoadingState(true);
+    fetch("/api/recommend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        skills:   skillsHidden.value,
+        level:    pLevel,
+        interest: pInterest,
+        time:     pTime
+      })
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      setLoadingState(false);
+      if (!data.error) {
+        renderResults(data.projects || [], data.message);
+        var row = document.getElementById("share-row");
+        if (row) row.style.display = "flex";
+      }
+    })
+    .catch(function () { setLoadingState(false); });
+  })();
 
 } // end isIndexPage
 
