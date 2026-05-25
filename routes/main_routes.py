@@ -33,6 +33,17 @@ def health_check():
 
 @main.route("/api/recommend", methods=["POST"])
 def recommend():
+    from marshmallow import Schema, fields, ValidationError
+    class RecommendSchema(Schema):
+        skills = fields.Str(required=True)
+        level = fields.Str(required=True)
+        interest = fields.Str(required=True)
+        time = fields.Str(required=True)
+    try:
+        RecommendSchema().load(request.json)
+    except ValidationError as err:
+        return jsonify({'error': 'Invalid payload data', 'details': err.messages}), 400
+
     """
     Accept a JSON body with user inputs and return matching project recommendations.
 
