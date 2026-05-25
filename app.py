@@ -18,6 +18,16 @@ app = Flask(__name__)
 # Register all routes defined in the main Blueprint
 app.register_blueprint(main)
 
+@app.after_request
+def add_security_headers(response):
+    """Add basic security headers to all responses."""
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = (
+        "geolocation=(), microphone=(), camera=()"
+    )
+    return response
 
 # ---- Error handlers ----
 
