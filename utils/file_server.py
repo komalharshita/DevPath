@@ -47,3 +47,13 @@ def read_starter_code(project):
 def get_starter_code_dir():
     """Return the absolute path to the starter_code directory for use with send_from_directory."""
     return STARTER_CODE_DIR
+
+
+def stream_starter_code(project):
+    full_path = resolve_starter_file(project)
+    if not full_path: return None
+    def generate():
+        with open(full_path, 'rb') as f:
+            while chunk := f.read(4096):
+                yield chunk
+    return generate()
