@@ -9,6 +9,13 @@ from utils.recommender import get_recommendations, validate_recommendation_input
 from utils.data_loader import find_project_by_id, load_all_projects, get_project_stats
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
 import os
+from marshmallow import Schema, fields, ValidationError
+
+class RecommendSchema(Schema):
+    skills = fields.Str(required=True)
+    level = fields.Str(required=True)
+    interest = fields.Str(required=True)
+    time = fields.Str(required=True)
 
 # Create the Blueprint that app.py will register
 main = Blueprint("main", __name__)
@@ -33,17 +40,6 @@ def health_check():
 
 @main.route("/api/recommend", methods=["POST"])
 def recommend():
-    from marshmallow import Schema, fields, ValidationError
-    class RecommendSchema(Schema):
-        skills = fields.Str(required=True)
-        level = fields.Str(required=True)
-        interest = fields.Str(required=True)
-        time = fields.Str(required=True)
-    try:
-        RecommendSchema().load(request.json)
-    except ValidationError as err:
-        return jsonify({'error': 'Invalid payload data', 'details': err.messages}), 400
-
     """
     Accept a JSON body with user inputs and return matching project recommendations.
 
@@ -53,10 +49,15 @@ def recommend():
         interest (str) - Web | Data | Education | Automation | Games
         time     (str) - Low | Medium | High
     """
-    payload = request.get_json()
+    payload = request.get_json(silent=True)
 
     if not payload:
         return jsonify({"error": "Request body must be valid JSON."}), 400
+        
+    try:
+        RecommendSchema().load(payload)
+    except ValidationError as err:
+        return jsonify({'error': 'Invalid payload data', 'details': err.messages}), 400
 
     skills            = payload.get("skills", "").strip()
     level             = payload.get("level", "").strip()
