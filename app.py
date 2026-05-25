@@ -25,7 +25,9 @@ app.register_blueprint(main)
 
 @app.before_request
 def log_request():
-    logger.info(json.dumps({'path': request.path, 'method': request.method}))
+    if request.path.startswith("/static/") or request.path == "/favicon.ico":
+        return
+    logger.debug(json.dumps({'path': request.path, 'method': request.method}))
 
 @app.after_request
 def add_security_headers(response):
