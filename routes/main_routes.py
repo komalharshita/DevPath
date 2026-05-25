@@ -2,6 +2,7 @@
 # All application routes registered as a Flask Blueprint.
 # Each route is kept thin: it validates input, calls a utility function,
 # and returns a response. No business logic lives here.
+from flask import send_from_directory
 
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response
 
@@ -138,3 +139,4 @@ def sitemap():
 def robots():
     """Serve robots.txt from the static folder."""
     return send_from_directory("static", "robots.txt", mimetype="text/plain")
+

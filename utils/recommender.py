@@ -5,7 +5,7 @@
 from utils.data_loader import load_all_projects
 
 # Maximum number of recommendations returned to the user
-MAX_RESULTS = 3
+MAX_RESULTS = 10
 
 # Scoring weights used by the recommendation engine.
 # Higher weights mean that criterion has more influence

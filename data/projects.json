@@ -406,7 +406,36 @@
       "W3Schools JavaScript: https://www.w3schools.com/js"
     ],
     "starter_code": "starter_code/quiz_app.html"
-  }
+  },
+{
+  "id": 11,
+  "title": "ProfilePro README Generator",
+  "skills": ["Python", "Flask", "HTML"],
+  "level": "Intermediate",
+  "interest": "Web",
+  "time": "Medium",
+  "description": "A tool that generates professional README.md files using a structured form interface for open-source projects.",
+  "features": [
+    "Generate README.md automatically",
+    "Structured form input",
+    "Download generated README",
+    "Standardized documentation sections",
+    "Markdown formatting automation"
+  ],
+  "tech_stack": ["Python", "Flask", "HTML", "Markdown"],
+  "roadmap": [
+    "Step 1: Create README form",
+    "Step 2: Add project detail fields",
+    "Step 3: Generate markdown dynamically",
+    "Step 4: Add download functionality",
+    "Step 5: Improve formatting and validation"
+  ],
+  "resources": [
+    "https://www.markdownguide.org/",
+    "https://flask.palletsprojects.com/"
+  ],
+  "starter_code_file": "readme_generator.py"
+}
 ]
 
 
