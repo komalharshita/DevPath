@@ -78,25 +78,20 @@ def compute_skill_similarity(user_skills, project_skills):
       project_skills = ["python", "css", "html"]
       returns ~0.82 (high similarity)
     """
-    # If either has no skills return 0
     if not user_skills or not project_skills:
         return 0.0
 
-    # Convert skill lists to strings for TF-IDF
     user_text    = " ".join(user_skills)
     project_text = " ".join([s.lower() for s in project_skills])
 
-    # Vectorize both using TF-IDF
     vectorizer = TfidfVectorizer()
     try:
         tfidf_matrix = vectorizer.fit_transform([user_text, project_text])
     except ValueError:
         return 0.0
 
-    # Compute cosine similarity between user and project vectors
     similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])
 
-    # Returns a value between 0.0 and 1.0
     return float(similarity[0][0])
 
 
@@ -112,11 +107,20 @@ def score_single_project(
     SIMILARITY_SCALE converts cosine score to 0-10 range
     so it is comparable to bonus_score (max 5 points).
     """
+    # Compare time availability — only recommend projects within user's time budget
+    TIME_AVAILABILITY = ['low', 'medium', 'high']
+    time_availability_index = TIME_AVAILABILITY.index(time_availability.strip().lower())
+    valid_time = TIME_AVAILABILITY[:time_availability_index + 1]
+
+    if project.get("time", "").lower() not in valid_time:
+        return 0
+
     # Vector similarity-based skill score (between 0.0 and 1.0)
-    project_skills = project.get("skills", [])
+    project_skills = [SKILL_ALIASES.get(s.strip().lower(), s.strip().lower()) 
+                  for s in project.get("skills", [])]
     skill_score = compute_skill_similarity(user_skills, project_skills)
 
-    # Fixed points for other criteria
+    # Fixed bonus points for level, interest, time match
     bonus_score = 0
 
     if project.get("level", "").lower() == level.lower():
@@ -128,7 +132,7 @@ def score_single_project(
     if project.get("time", "").lower() == time_availability.lower():
         bonus_score += WEIGHT_TIME
 
-    # Combine: skill similarity (scaled) + bonus points
+    # Combine: skill similarity (scaled to 0–10) + bonus points (max 5)
     final_score = (skill_score * SIMILARITY_SCALE) + bonus_score
 
     return final_score
@@ -154,16 +158,11 @@ def get_recommendations(skills_string, level, interest, time_availability):
         score = score_single_project(
             project, user_skills, level, interest, time_availability
         )
-        # Ignore projects with a score of 0 since they
-        # have no meaningful overlap with the user's inputs.
         if score > 0:
             scored_projects.append({"project": project, "score": score})
 
-    # Sort projects in descending order so the
-    # most relevant recommendations appear first.
     scored_projects.sort(key=lambda item: item["score"], reverse=True)
 
-    # Return only the project dicts, not the score metadata
     return [item["project"] for item in scored_projects[:MAX_RESULTS]]
 
 
