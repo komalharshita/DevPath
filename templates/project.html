@@ -16,10 +16,9 @@
   <script>
     (function () {
       try {
+        /* Default to light mode; only honour a value the user explicitly saved */
         var saved = localStorage.getItem('devpath-theme');
-        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        var theme = saved || (prefersDark ? 'dark' : 'light');
-        document.documentElement.dataset.theme = theme;
+        document.documentElement.dataset.theme = saved || 'light';
       } catch (e) { /* localStorage blocked in some private modes */ }
     }());
   </script>
