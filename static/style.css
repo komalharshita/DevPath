@@ -2984,3 +2984,13 @@ select:focus {
   white-space: pre;
   color: #e6edf3;
 }
+/* Share row — shown after recommendations load (#137) */
+.share-row {
+  display: none;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.share-row--visible {
+  display: flex;
+}

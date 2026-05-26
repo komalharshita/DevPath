@@ -679,7 +679,7 @@ if (clearFiltersBtn) {
     if (payload.time)     params.set("time",      payload.time);
     window.history.pushState(null, "", "?" + params.toString());
     var row = document.getElementById("share-row");
-    if (row) row.style.display = "flex";
+    if (row) row.classList.add("share-row--visible");
   }
 
   var copyLinkBtn = document.getElementById("copy-link-btn");
@@ -747,7 +747,7 @@ if (clearFiltersBtn) {
       if (!data.error) {
         renderResults(data.projects || [], data.message);
         var row = document.getElementById("share-row");
-        if (row) row.style.display = "flex";
+        if (row) row.classList.add("share-row--visible");
       }
     })
     .catch(function () { setLoadingState(false); });
