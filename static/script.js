@@ -94,9 +94,11 @@ if (clearFiltersBtn) {
                 skillsTextInput.focus(); // Place cursor back on input
             }
             
-            // 4. Hide autocomplete suggestions if any are open
+            // 4. Hide autocomplete suggestions and skill gap section
             var suggestionsBox = document.getElementById("skills-suggestions");
             if (suggestionsBox) suggestionsBox.innerHTML = "";
+            var skillGapSection = document.getElementById("skill-gap-section");
+            if (skillGapSection) skillGapSection.style.display = "none";
 
             // 5. Reset quick-pick chip visual active states if they have any
             if (quickPickChips) {
@@ -524,18 +526,15 @@ if (clearFiltersBtn) {
           }
 
           renderResults(data.projects || [], data.message);
+          fetchSkillGap(payload);
         })
-        .catch(function () {
-
+        .catch(function (err) {
           setLoadingState(false);
-    //combine form values into an object to send to server/api
-    var payload = {
-      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level: document.getElementById("level").value,
-      interest: document.getElementById("interest").value,
-      time: document.getElementById("time").value
-    };  
+          var generalErr = document.getElementById("form-error-general");
+          if (generalErr) generalErr.textContent = "Something went wrong. Please try again.";
+          console.error("API request failed:", err);
+        });
+    });
   });
 
   // Manages the loading state of the form and results section(whats visible or not)
@@ -570,21 +569,13 @@ if (clearFiltersBtn) {
   function renderResults(projects, message) {
     resultsSection.style.display = "block";
     resultsLoadingEl.style.display = "none";
-    // Clear out any cards from a previous search before showing new ones
     resultsGrid.innerHTML = "";
 
     if (!projects || projects.length === 0) {
-      resultsGrid.style.display     = "none";
-      resultsEmptyEl.style.display  = "block";
-      resultsGrid.style.display = "none";
-      resultsEmptyEl.style.display = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
-    if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
       resultsGrid.style.display    = "none";
       resultsEmptyEl.style.display = "block";
 
-      // Show a friendly custom message when the user selected an interest
-      var selectedInterest = document.getElementById("interest")?.value;
+      var selectedInterest = document.getElementById("interest") && document.getElementById("interest").value;
       if (selectedInterest) {
         emptyMessageEl.textContent = "No projects are currently available for this interest. Please check back later or try a different area.";
       } else if (message) {
@@ -600,7 +591,6 @@ if (clearFiltersBtn) {
     resultsEmptyEl.style.display = "none";
     resultsGrid.style.display = "grid";
 
-    //build a card for each project and add it to the grid
     projects.forEach(function (project) {
       resultsGrid.appendChild(buildProjectCard(project));
     });
@@ -676,6 +666,104 @@ if (clearFiltersBtn) {
     if (!text) return "";
     // Only add "..." if the text is actually longer than the limit
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
+  }
+
+
+  // ----------------------------------------------------------
+  // Skill Gap Analyzer (Issue #138)
+  // ----------------------------------------------------------
+
+  function fetchSkillGap(payload) {
+    fetch("/api/skill-gap", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (!data.error && data.gaps && data.gaps.length > 0) {
+          renderSkillGap(data.gaps, payload.interest);
+        }
+      })
+      .catch(function () {});
+  }
+
+  function renderSkillGap(gaps, interest) {
+    var section = document.getElementById("skill-gap-section");
+    var list    = document.getElementById("skill-gap-list");
+    if (!section || !list) return;
+
+    var projectGaps  = gaps.filter(function (g) { return !g.trending; });
+    var trendingGaps = gaps.filter(function (g) { return g.trending; });
+
+    list.innerHTML = "";
+
+    // Render each project-based gap as an expandable row
+    projectGaps.forEach(function (gap) {
+      var wrapper = document.createElement("div");
+      wrapper.className = "skill-gap-item";
+      wrapper.setAttribute("role", "button");
+      wrapper.setAttribute("tabindex", "0");
+      wrapper.setAttribute("aria-expanded", "false");
+
+      var header = document.createElement("div");
+      header.className = "skill-gap-header";
+      header.innerHTML =
+        "<span class='skill-gap-arrow'>→</span>" +
+        "<span class='skill-gap-label'><strong>" + gap.skill + "</strong>" +
+        " — unlocks <span class='skill-gap-count'>" + gap.unlocks + "</span>" +
+        " more project" + (gap.unlocks === 1 ? "" : "s") + "</span>" +
+        "<span class='skill-gap-chevron'>▾</span>";
+
+      var dropdown = document.createElement("div");
+      dropdown.className = "skill-gap-dropdown";
+      (gap.projects || []).forEach(function (proj) {
+        var link = document.createElement("a");
+        link.href = "/project/" + proj.id;
+        link.className = "skill-gap-project-link";
+        link.textContent = proj.title;
+        dropdown.appendChild(link);
+      });
+
+      wrapper.appendChild(header);
+      wrapper.appendChild(dropdown);
+      wrapper.addEventListener("click", function () {
+        var isOpen = wrapper.getAttribute("aria-expanded") === "true";
+        wrapper.setAttribute("aria-expanded", isOpen ? "false" : "true");
+        dropdown.style.display = isOpen ? "none" : "flex";
+      });
+
+      list.appendChild(wrapper);
+    });
+
+    // Render all trending skills as one combined card
+    if (trendingGaps.length > 0) {
+      var label = interest
+        ? "Trending in " + interest.charAt(0).toUpperCase() + interest.slice(1)
+        : "Trending Skills";
+
+      var card = document.createElement("div");
+      card.className = "skill-gap-trending-card";
+
+      var cardTitle = document.createElement("div");
+      cardTitle.className = "skill-gap-trending-card-title";
+      cardTitle.textContent = label;
+      card.appendChild(cardTitle);
+
+      var tagsWrap = document.createElement("div");
+      tagsWrap.className = "skill-gap-trending-tags";
+      trendingGaps.forEach(function (gap) {
+        var tag = document.createElement("span");
+        tag.className = "skill-gap-trending-tag";
+        tag.textContent = gap.skill;
+        tagsWrap.appendChild(tag);
+      });
+      card.appendChild(tagsWrap);
+      list.appendChild(card);
+    }
+
+    // Show the section but do NOT scroll — renderResults already scrolled to results
+    section.style.display = "block";
   }
 
 } // end isIndexPage

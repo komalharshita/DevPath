@@ -5,7 +5,7 @@
 
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response
 
-from utils.recommender import get_recommendations, validate_recommendation_inputs
+from utils.recommender import get_recommendations, validate_recommendation_inputs, get_skill_gap
 from utils.data_loader import find_project_by_id, load_all_projects, get_project_stats
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
 import os
@@ -89,6 +89,31 @@ def recommend():
         }), 200
 
     return jsonify({"projects": results}), 200
+
+
+@main.route("/api/skill-gap", methods=["POST"])
+def skill_gap():
+    """
+    Return skills that would unlock additional project matches for the user.
+
+    Expected JSON fields: same as /api/recommend (skills, level, interest, time).
+    Returns: {"gaps": [{"skill": "React", "unlocks": 4}, ...]}
+    """
+    payload = request.get_json()
+    if not payload:
+        return jsonify({"error": "Request body must be valid JSON."}), 400
+
+    skills            = payload.get("skills", "").strip()
+    level             = payload.get("level", "").strip()
+    interest          = payload.get("interest", "").strip()
+    time_availability = payload.get("time", "").strip()
+
+    errors = validate_recommendation_inputs(skills, level, interest, time_availability)
+    if errors:
+        return jsonify({"error": errors[0]}), 400
+
+    gaps = get_skill_gap(skills, level, interest, time_availability)
+    return jsonify({"gaps": gaps}), 200
 
 
 @main.route("/project/<int:project_id>")
