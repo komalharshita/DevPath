@@ -67,10 +67,15 @@ def score_single_project(
 
     Returns an integer score (0 means no match at all).
     """
+    # Compare time availability, return results with the same time availibity or lower.
+    TIME_AVAILABILITY = ['low', 'medium', 'high']
+    time_availability_index =   TIME_AVAILABILITY.index(time_availability.strip().lower())
+    valid_time = TIME_AVAILABILITY[ : time_availability_index + 1 ]
+    
     score = 0
 
     # Compare user's skills against the project's required skills
-    project_skills = [s.lower() for s in project.get("skills", [])]
+    project_skills = [SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", [])]
     # Count how many user skills overlap with the
     # skills required by the current project.
     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
@@ -88,7 +93,9 @@ def score_single_project(
     if project.get("time", "").lower() == time_availability.lower():
         score += SCORING_WEIGHTS["time"]
 
-    return score
+    if project.get("time", "").lower() in valid_time :
+        return score
+    return 0
 
 
 def get_recommendations(skills_string, level, interest, time_availability):
