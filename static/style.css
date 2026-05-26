@@ -1498,6 +1498,19 @@ label {
   transform: translateY(-50%) rotate(180deg);
 }
 
+/* Accessibility: hide element visually but keep it available for assistive technologies */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
 /* Custom Select Dropdown UI */
 .custom-select {
   position: relative;
@@ -1518,6 +1531,14 @@ label {
   overflow: hidden;
   text-overflow: ellipsis;
   padding-right: 30px;
+  text-align: left; /* ensures alignment for button triggers */
+  display: block; /* buttons behave as blocks */
+}
+.custom-select-trigger:focus-visible {
+  outline: none;
+  border-color: var(--indigo-500);
+  box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.25);
+  background: var(--white);
 }
 .custom-select.open .custom-select-trigger,
 .custom-select-trigger:hover {
@@ -1542,6 +1563,11 @@ label {
   max-height: 250px;
   overflow-y: auto;
 }
+.custom-select.open-up .custom-select-options {
+  top: auto;
+  bottom: calc(100% + 4px);
+  box-shadow: 0 -8px 24px rgba(79, 110, 247, 0.15);
+}
 .custom-select.open .custom-select-options {
   display: block;
 }
@@ -1556,10 +1582,12 @@ label {
 .custom-option:last-child {
   border-bottom: none;
 }
-.custom-option:hover {
+.custom-option:hover,
+.custom-option.highlighted {
   background: var(--indigo-50);
   color: var(--indigo-700);
   font-weight: 500;
+  outline: none;
 }
 .custom-option.selected {
   background: var(--indigo-100);

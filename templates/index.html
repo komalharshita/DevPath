@@ -422,19 +422,19 @@
             <!-- Level + Interest in a row -->
             <div class="form-row">
               <div class="form-group">
-                <label for="level">Experience Level</label>
+                <label for="level" id="level-label">Experience Level</label>
                 <div class="select-wrap custom-select">
-                  <select id="level" name="level" style="display: none;">
+                  <select id="level" name="level" class="visually-hidden" tabindex="-1" aria-hidden="true">
                     <option value="" disabled selected>Select level</option>
                     <option value="Beginner">Beginner</option>
                     <option value="Intermediate">Intermediate</option>
                     <option value="Advanced">Advanced</option>
                   </select>
-                  <div class="custom-select-trigger">Select level</div>
-                  <div class="custom-select-options">
-                    <div class="custom-option" data-value="Beginner">Beginner</div>
-                    <div class="custom-option" data-value="Intermediate">Intermediate</div>
-                    <div class="custom-option" data-value="Advanced">Advanced</div>
+                  <button type="button" class="custom-select-trigger" id="level-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="level-options" aria-labelledby="level-label level-trigger">Select level</button>
+                  <div class="custom-select-options" id="level-options" role="listbox" aria-labelledby="level-label" tabindex="-1">
+                    <div class="custom-option" role="option" data-value="Beginner" id="level-opt-beginner" aria-selected="false">Beginner</div>
+                    <div class="custom-option" role="option" data-value="Intermediate" id="level-opt-intermediate" aria-selected="false">Intermediate</div>
+                    <div class="custom-option" role="option" data-value="Advanced" id="level-opt-advanced" aria-selected="false">Advanced</div>
                   </div>
                 </div>
                 <span class="form-hint">
@@ -444,7 +444,7 @@
               </div>
 
               <div class="form-group">
-                <label for="interest">
+                <label for="interest" id="interest-label">
                   Area of Interest
                   <span class="tooltip"
                     title="Choose the type of projects you enjoy building or want to learn more about.">
@@ -452,7 +452,7 @@
                   </span>
                 </label>
                 <div class="select-wrap custom-select">
-                  <select id="interest" name="interest" style="display: none;">
+                  <select id="interest" name="interest" class="visually-hidden" tabindex="-1" aria-hidden="true">
                     <option value="" disabled selected>Select interest</option>
                     <option value="Web">Web Development</option>
                     <option value="Data">Data and Analytics</option>
@@ -464,13 +464,17 @@
                     <option value="Mobile">Mobile Development</option>
                     <option value="Machine Learning/AI">Machine Learning/AI</option>
                   </select>
-                  <div class="custom-select-trigger">Select interest</div>
-                  <div class="custom-select-options">
-                    <div class="custom-option" data-value="Web">Web Development</div>
-                    <div class="custom-option" data-value="Data">Data and Analytics</div>
-                    <div class="custom-option" data-value="Education">Education Tools</div>
-                    <div class="custom-option" data-value="Automation">Automation</div>
-                    <div class="custom-option" data-value="Games">Games</div>
+                  <button type="button" class="custom-select-trigger" id="interest-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="interest-options" aria-labelledby="interest-label interest-trigger">Select interest</button>
+                  <div class="custom-select-options" id="interest-options" role="listbox" aria-labelledby="interest-label" tabindex="-1">
+                    <div class="custom-option" role="option" data-value="Web" id="interest-opt-web" aria-selected="false">Web Development</div>
+                    <div class="custom-option" role="option" data-value="Data" id="interest-opt-data" aria-selected="false">Data and Analytics</div>
+                    <div class="custom-option" role="option" data-value="Education" id="interest-opt-education" aria-selected="false">Education Tools</div>
+                    <div class="custom-option" role="option" data-value="Automation" id="interest-opt-automation" aria-selected="false">Automation</div>
+                    <div class="custom-option" role="option" data-value="Games" id="interest-opt-games" aria-selected="false">Games</div>
+                    <div class="custom-option" role="option" data-value="Cybersecurity" id="interest-opt-cybersecurity" aria-selected="false">CyberSecurity/Ethical Hacking</div>
+                    <div class="custom-option" role="option" data-value="Devops" id="interest-opt-devops" aria-selected="false">Devops/Cloud Computing</div>
+                    <div class="custom-option" role="option" data-value="Mobile" id="interest-opt-mobile" aria-selected="false">Mobile Development</div>
+                    <div class="custom-option" role="option" data-value="Machine Learning/AI" id="interest-opt-ml-ai" aria-selected="false">Machine Learning/AI</div>
                   </div>
                 </div>
              
@@ -484,7 +488,7 @@
 
         <!-- Time availability -->
         <div class="form-group">
-          <label for="time">
+          <label for="time" id="time-label">
             Time Availability
             <span class="tooltip"
               title="Estimate how much time you can realistically dedicate to building the project.">
@@ -492,17 +496,17 @@
             </span>
           </label>
           <div class="select-wrap custom-select">
-            <select id="time" name="time" style="display: none;">
+            <select id="time" name="time" class="visually-hidden" tabindex="-1" aria-hidden="true">
               <option value="" disabled selected>How much time can you commit?</option>
               <option value="Low">Low — a few hours total</option>
               <option value="Medium">Medium — across a weekend</option>
               <option value="High">High — a week or more</option>
             </select>
-            <div class="custom-select-trigger">How much time can you commit?</div>
-            <div class="custom-select-options">
-              <div class="custom-option" data-value="Low">Low — a few hours total</div>
-              <div class="custom-option" data-value="Medium">Medium — across a weekend</div>
-              <div class="custom-option" data-value="High">High — a week or more</div>
+            <button type="button" class="custom-select-trigger" id="time-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="time-options" aria-labelledby="time-label time-trigger">How much time can you commit?</button>
+            <div class="custom-select-options" id="time-options" role="listbox" aria-labelledby="time-label" tabindex="-1">
+              <div class="custom-option" role="option" data-value="Low" id="time-opt-low" aria-selected="false">Low — a few hours total</div>
+              <div class="custom-option" role="option" data-value="Medium" id="time-opt-medium" aria-selected="false">Medium — across a weekend</div>
+              <div class="custom-option" role="option" data-value="High" id="time-opt-high" aria-selected="false">High — a week or more</div>
             </div>
           </div>
           <span class="form-hint">

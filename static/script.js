@@ -104,6 +104,28 @@ if (isIndexPage) {
             chip.classList.remove("active", "selected");
           });
         }
+
+        // 6. Reset custom dropdown triggers and option classes
+        if (customSelects) {
+          customSelects.forEach(function (customSelect) {
+            var trigger = customSelect.querySelector(".custom-select-trigger");
+            var customOptions = customSelect.querySelectorAll(".custom-option");
+            var nativeSelect = customSelect.querySelector("select");
+            if (trigger && nativeSelect) {
+              nativeSelect.value = "";
+              var defaultOpt = nativeSelect.querySelector("option[disabled]");
+              trigger.textContent = defaultOpt ? defaultOpt.textContent : "Select option";
+              trigger.style.color = ""; // Restore default color placeholder
+              customSelect.classList.remove("open", "open-up");
+              trigger.setAttribute("aria-expanded", "false");
+              trigger.removeAttribute("aria-activedescendant");
+              customOptions.forEach(function (opt) {
+                opt.classList.remove("selected", "highlighted");
+                opt.setAttribute("aria-selected", "false");
+              });
+            }
+          });
+        }
       }
     });
   }
@@ -678,68 +700,230 @@ if (isIndexPage) {
 
     if (!trigger || !nativeSelect) return;
 
-    // Sync visual trigger with initial native select value (if prefilled)
-    if (nativeSelect.value) {
-      customOptions.forEach(function (opt) {
-        if (opt.getAttribute("data-value") === nativeSelect.value) {
-          trigger.textContent = opt.textContent;
-          trigger.style.color = "var(--gray-900)";
-          opt.classList.add("selected");
-        }
-      });
+    var highlightedIndex = -1;
+
+    // Helper to position dropdown (open up if not enough space below)
+    function adjustDropdownPosition() {
+      var rect = customSelect.getBoundingClientRect();
+      var spaceBelow = window.innerHeight - rect.bottom;
+      var spaceAbove = rect.top;
+      var dropdownHeight = 250; // max-height is 250px in CSS
+
+      if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+        customSelect.classList.add("open-up");
+      } else {
+        customSelect.classList.remove("open-up");
+      }
     }
 
-    // Open/close menu when trigger is clicked
+    // Sync visual trigger with initial native select value (if prefilled)
+    function syncInitialValue() {
+      if (nativeSelect.value) {
+        customOptions.forEach(function (opt) {
+          if (opt.getAttribute("data-value") === nativeSelect.value) {
+            trigger.textContent = opt.textContent;
+            trigger.style.color = "var(--gray-900)";
+            opt.classList.add("selected");
+            opt.setAttribute("aria-selected", "true");
+          } else {
+            opt.classList.remove("selected");
+            opt.setAttribute("aria-selected", "false");
+          }
+        });
+      }
+    }
+    syncInitialValue();
+
+    function openDropdown() {
+      // Close all other open dropdowns first
+      document.querySelectorAll(".custom-select").forEach(function (el) {
+        if (el !== customSelect) {
+          el.classList.remove("open", "open-up");
+          var otherTrigger = el.querySelector(".custom-select-trigger");
+          if (otherTrigger) {
+            otherTrigger.setAttribute("aria-expanded", "false");
+            otherTrigger.removeAttribute("aria-activedescendant");
+          }
+        }
+      });
+
+      adjustDropdownPosition();
+      customSelect.classList.add("open");
+      trigger.setAttribute("aria-expanded", "true");
+
+      // Find current selected index to highlight by default
+      var selectedIdx = -1;
+      customOptions.forEach(function (opt, idx) {
+        if (opt.classList.contains("selected")) {
+          selectedIdx = idx;
+        }
+      });
+
+      highlightOption(selectedIdx >= 0 ? selectedIdx : 0);
+    }
+
+    function closeDropdown() {
+      customSelect.classList.remove("open", "open-up");
+      trigger.setAttribute("aria-expanded", "false");
+      trigger.removeAttribute("aria-activedescendant");
+      removeHighlight();
+    }
+
+    function highlightOption(index) {
+      removeHighlight();
+      if (index < 0 || index >= customOptions.length) return;
+
+      highlightedIndex = index;
+      var option = customOptions[index];
+      option.classList.add("highlighted");
+      trigger.setAttribute("aria-activedescendant", option.id);
+
+      // Scroll into view if needed
+      if (optionsContainer) {
+        var containerHeight = optionsContainer.clientHeight;
+        var containerScrollTop = optionsContainer.scrollTop;
+        var optionTop = option.offsetTop;
+        var optionHeight = option.clientHeight;
+
+        if (optionTop < containerScrollTop) {
+          optionsContainer.scrollTop = optionTop;
+        } else if (optionTop + optionHeight > containerScrollTop + containerHeight) {
+          optionsContainer.scrollTop = optionTop + optionHeight - containerHeight;
+        }
+      }
+    }
+
+    function removeHighlight() {
+      customOptions.forEach(function (opt) {
+        opt.classList.remove("highlighted");
+      });
+      highlightedIndex = -1;
+    }
+
+    function selectOption(index) {
+      if (index < 0 || index >= customOptions.length) return;
+      var option = customOptions[index];
+      var value = option.getAttribute("data-value");
+      var text = option.textContent;
+
+      trigger.textContent = text;
+      trigger.style.color = "var(--gray-900)";
+
+      customOptions.forEach(function (opt) {
+        opt.classList.remove("selected");
+        opt.setAttribute("aria-selected", "false");
+      });
+      option.classList.add("selected");
+      option.setAttribute("aria-selected", "true");
+
+      nativeSelect.value = value;
+      nativeSelect.dispatchEvent(new Event("change"));
+
+      if (typeof clearFieldError === "function") {
+        clearFieldError(nativeSelect.id + "-error");
+      }
+
+      closeDropdown();
+      trigger.focus();
+    }
+
+    // Click handler for toggle
     trigger.addEventListener("click", function (e) {
       e.stopPropagation();
       var isOpen = customSelect.classList.contains("open");
-
-      // Close all other open dropdowns first
-      document.querySelectorAll(".custom-select").forEach(function (el) {
-        el.classList.remove("open");
-      });
-
-      if (!isOpen) {
-        customSelect.classList.add("open");
+      if (isOpen) {
+        closeDropdown();
+      } else {
+        openDropdown();
       }
     });
 
-    // Handle option selection
-    customOptions.forEach(function (option) {
+    // Option mouseenter and click handlers
+    customOptions.forEach(function (option, index) {
+      option.addEventListener("mouseenter", function () {
+        highlightOption(index);
+      });
+
       option.addEventListener("click", function (e) {
         e.stopPropagation();
-        var value = this.getAttribute("data-value");
-        var text = this.textContent;
-
-        // Update visual trigger text
-        trigger.textContent = text;
-        trigger.style.color = "var(--gray-900)";
-
-        // Remove selected class from all and add to clicked
-        customOptions.forEach(function (opt) { opt.classList.remove("selected"); });
-        this.classList.add("selected");
-
-        // Update native select
-        nativeSelect.value = value;
-        // Trigger change event for any validation logic
-        nativeSelect.dispatchEvent(new Event("change"));
-
-        // Remove error messages immediately if present
-        if (typeof clearFieldError === "function") {
-          clearFieldError(nativeSelect.id + "-error");
-        }
-
-        // Close menu
-        customSelect.classList.remove("open");
+        selectOption(index);
       });
+    });
+
+    // Keyboard navigation
+    trigger.addEventListener("keydown", function (e) {
+      var isOpen = customSelect.classList.contains("open");
+
+      switch (e.key) {
+        case "ArrowDown":
+          e.preventDefault();
+          if (!isOpen) {
+            openDropdown();
+          } else {
+            var nextIdx = (highlightedIndex + 1) % customOptions.length;
+            highlightOption(nextIdx);
+          }
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          if (!isOpen) {
+            openDropdown();
+            highlightOption(customOptions.length - 1);
+          } else {
+            var prevIdx = highlightedIndex <= 0 ? customOptions.length - 1 : highlightedIndex - 1;
+            highlightOption(prevIdx);
+          }
+          break;
+        case "Enter":
+        case " ":
+          e.preventDefault();
+          if (!isOpen) {
+            openDropdown();
+          } else {
+            if (highlightedIndex >= 0) {
+              selectOption(highlightedIndex);
+            }
+          }
+          break;
+        case "Escape":
+          if (isOpen) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeDropdown();
+            trigger.focus();
+          }
+          break;
+        case "Tab":
+          if (isOpen) {
+            closeDropdown();
+          }
+          break;
+        case "Home":
+          if (isOpen) {
+            e.preventDefault();
+            highlightOption(0);
+          }
+          break;
+        case "End":
+          if (isOpen) {
+            e.preventDefault();
+            highlightOption(customOptions.length - 1);
+          }
+          break;
+      }
     });
   });
 
   // Close custom dropdowns when clicking outside
   document.addEventListener("click", function (e) {
     document.querySelectorAll(".custom-select").forEach(function (customSelect) {
+      var trigger = customSelect.querySelector(".custom-select-trigger");
       if (!customSelect.contains(e.target)) {
-        customSelect.classList.remove("open");
+        customSelect.classList.remove("open", "open-up");
+        if (trigger) {
+          trigger.setAttribute("aria-expanded", "false");
+          trigger.removeAttribute("aria-activedescendant");
+        }
       }
     });
   });
