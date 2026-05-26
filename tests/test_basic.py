@@ -127,6 +127,25 @@ def test_score_single_project_no_match():
     assert score == 0, f"Expected 0 but got {score}"
 
 
+def test_score_single_project_alias_matching():
+    """Project skills should be alias-resolved so 'JS' in a project matches 'javascript' from the user."""
+    project = {
+        "skills": ["JS"],
+        "level": "Beginner",
+        "interest": "Web",
+        "time": "Low"
+    }
+    score = score_single_project(
+        project,
+        user_skills=["javascript"],
+        level="Beginner",
+        interest="Web",
+        time_availability="Low"
+    )
+    # 1 skill match (3) + level (2) + interest (2) + time (1) = 8
+    assert score == 8, f"Expected 8 but got {score}"
+
+
 def test_get_recommendations_returns_results():
     """Python + Beginner + Data + Low should always return at least one result."""
     results = get_recommendations("Python", "Beginner", "Data", "Low")
@@ -206,6 +225,22 @@ def test_home_route():
     response = client.get("/")
     assert response.status_code == 200
 
+def test_security_headers_present():
+    """Security headers should be included in all responses."""
+    client = get_client()
+    response = client.get("/")
+
+    assert response.headers["X-Frame-Options"] == "DENY"
+    assert response.headers["X-Content-Type-Options"] == "nosniff"
+    assert (
+        response.headers["Referrer-Policy"]
+        == "strict-origin-when-cross-origin"
+    )
+    assert (
+        response.headers["Permissions-Policy"]
+        == "geolocation=(), microphone=(), camera=()"
+    )
+
 
 def test_recommend_api_valid():
     client = get_client()
@@ -219,6 +254,22 @@ def test_recommend_api_valid():
     data = response.get_json()
     assert "projects" in data
     assert len(data["projects"]) > 0
+
+
+def test_recommend_api_interest_not_available():
+    """The API should return no projects for blocked interest categories."""
+    client = get_client()
+    response = client.post("/api/recommend", json={
+        "skills": "Python, JavaScript",
+        "level": "Beginner",
+        "interest": "Machine Learning/AI",
+        "time": "Low"
+    })
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["projects"] == []
+    assert "message" in data
+    assert "no projects are currently available" in data["message"].lower()
 
 
 def test_recommend_api_missing_field():
@@ -296,6 +347,73 @@ def test_scoring_weights_has_all_keys():
     """Verify SCORING_WEIGHTS contains exactly the four expected keys."""
     expected_keys = {"skill", "level", "interest", "time"}
     assert set(SCORING_WEIGHTS.keys()) == expected_keys
+
+
+# ============================================================
+# Sitemap and robots.txt tests
+# ============================================================
+
+def test_sitemap_returns_200():
+    """The /sitemap.xml route must return HTTP 200."""
+    client = get_client()
+    response = client.get("/sitemap.xml")
+    assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+
+
+def test_sitemap_content_type():
+    """The /sitemap.xml route must return XML content type."""
+    client = get_client()
+    response = client.get("/sitemap.xml")
+    assert "application/xml" in response.content_type, (
+        f"Expected application/xml, got {response.content_type}"
+    )
+
+
+def test_sitemap_contains_homepage():
+    """The sitemap must include the homepage URL."""
+    client = get_client()
+    response = client.get("/sitemap.xml")
+    assert b"<loc>" in response.data, "Expected <loc> tags in sitemap"
+    assert b"</urlset>" in response.data, "Expected closing </urlset> tag"
+
+
+def test_sitemap_contains_all_project_ids():
+    """The sitemap must include a URL for every project in the dataset."""
+    client = get_client()
+    response = client.get("/sitemap.xml")
+    xml = response.data.decode("utf-8")
+
+    projects = load_all_projects()
+    for project in projects:
+        expected = f"/project/{project['id']}"
+        assert expected in xml, (
+            f"Sitemap missing URL for project id={project['id']}"
+        )
+
+
+def test_robots_txt_returns_200():
+    """The /robots.txt route must return HTTP 200."""
+    client = get_client()
+    response = client.get("/robots.txt")
+    assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+
+
+def test_robots_txt_references_sitemap():
+    """robots.txt must contain the Sitemap directive."""
+    client = get_client()
+    response = client.get("/robots.txt")
+    assert b"Sitemap:" in response.data, "robots.txt must contain a Sitemap: directive"
+    assert b"sitemap.xml" in response.data, "robots.txt must reference sitemap.xml"
+
+def test_project_links_have_noopener():
+    client = app.test_client()
+
+    response = client.get("/project/1")
+
+    assert response.status_code == 200
+    assert b'target="_blank"' in response.data
+    assert b'rel="noopener noreferrer"' in response.data
+
 
 
 # ============================================================
