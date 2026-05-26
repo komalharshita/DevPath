@@ -1013,7 +1013,7 @@ html[data-entry-anim="true"] .form-card form > .btn-submit { animation-delay: 39
   display: flex;
   align-items: center;
   width: max-content;
-  gap: 18px;
+  gap: 0;
   animation: skill-strip-marquee 30s linear infinite;
   will-change: transform;
 }
@@ -1072,7 +1072,7 @@ html[data-entry-anim="true"] .form-card form > .btn-submit { animation-delay: 39
   }
 
   .skill-strip-track {
-    gap: 14px;
+    gap: 0;
     animation-duration: 36s;
   }
 
@@ -1099,6 +1099,25 @@ html[data-entry-anim="true"] .form-card form > .btn-submit { animation-delay: 39
 
   .skill-strip-marquee {
     width: 100%;
+  }
+}
+
+@keyframes skill-strip-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skill-strip-track {
+    animation: none !important;
+    transform: none !important;
+  }
+  .skill-strip-track [data-marquee-clone="true"] {
+    display: none !important;
   }
 }
 
@@ -1331,6 +1350,7 @@ label {
   border-color: var(--indigo-500);
   box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.12);
   background: var(--white);
+  z-index: 1000;
 }
 
 /* An added skill chip inside the wrap */
@@ -1339,6 +1359,17 @@ label {
   flex-wrap: wrap;
   gap: 6px;
   align-items: center;
+}
+
+@keyframes chip-appear {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .skill-chip-selected {
@@ -1352,6 +1383,7 @@ label {
   border: 1px solid rgba(79, 110, 247, 0.2);
   border-radius: var(--r-full);
   padding: 3px 10px 3px 12px;
+  animation: chip-appear 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .skill-chip-remove {
@@ -1392,14 +1424,12 @@ label {
 /*suggestions dropdown*/
 .skills-suggestions {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 4px);
   left: 0;
   right: 0;
   background: var(--white);
-  border: 1.5px solid var(--indigo-200, #c7d2fe);
-  border-top: none;
-  border-radius: 0 0 var(--r-sm) var(--r-sm);
-  margin-top: -1px;
+  border: 1.5px solid var(--indigo-200);
+  border-radius: var(--r-sm);
   max-height: 280px;
   overflow-y: auto;
   z-index: 1000;
@@ -1420,11 +1450,10 @@ label {
   border-bottom: none;
 }
 
-.suggestion-item:hover,
 .suggestion-item--active {
   background: var(--indigo-50);
   color: var(--indigo-700);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* Scrollbar styling for suggestions dropdown */
@@ -1516,6 +1545,22 @@ label {
   position: relative;
   user-select: none;
 }
+.custom-select.open,
+.form-row.has-open-select,
+.form-group.has-open-select {
+  position: relative;
+  z-index: 10; /* Raises open select wrappers and their parent rows/groups above subsequent fields */
+}
+
+/* Modern CSS fallback: automatically elevate parents if supported by the browser */
+.form-row:has(.custom-select.open),
+.form-group:has(.custom-select.open),
+.form-group:has(.skill-input-wrap:focus-within),
+.form-group:has(.skills-suggestions:not(:empty)) {
+  position: relative;
+  z-index: 10;
+}
+
 .custom-select-trigger {
   width: 100%;
   padding: 12px 16px;
@@ -1582,7 +1627,6 @@ label {
 .custom-option:last-child {
   border-bottom: none;
 }
-.custom-option:hover,
 .custom-option.highlighted {
   background: var(--indigo-50);
   color: var(--indigo-700);

@@ -95,8 +95,9 @@ if (isIndexPage) {
         }
 
         // 4. Hide autocomplete suggestions if any are open
-        var suggestionsBox = document.getElementById("skills-suggestions");
-        if (suggestionsBox) suggestionsBox.innerHTML = "";
+        if (typeof hideSuggestions === "function") {
+          hideSuggestions();
+        }
 
         // 5. Reset quick-pick chip visual active states if they have any
         if (quickPickChips) {
@@ -180,6 +181,10 @@ if (isIndexPage) {
 
   if (suggestionsDiv) {
     suggestionsDiv.setAttribute("role", "listbox");
+    // Prevent clicking inside the suggestions box (scrollbar, background, items) from blurring the input field
+    suggestionsDiv.addEventListener("mousedown", function (evt) {
+      evt.preventDefault();
+    });
   }
 
   initSkillStripMarquee();
@@ -216,19 +221,44 @@ if (isIndexPage) {
 
   function renderActiveSuggestion() {
     if (!suggestionsDiv) return;
+    var activeItem = null;
     suggestionsDiv.querySelectorAll(".suggestion-item").forEach(function (item, index) {
       var isActive = index === activeSuggestionIndex;
       item.classList.toggle("suggestion-item--active", isActive);
       item.setAttribute("aria-selected", isActive ? "true" : "false");
+      if (isActive) {
+        activeItem = item;
+      }
     });
+
+    if (activeItem) {
+      // Keep input's ARIA descendant pointing to highlighted item
+      skillsTextInput.setAttribute("aria-activedescendant", activeItem.id);
+
+      var containerHeight = suggestionsDiv.clientHeight;
+      var containerScrollTop = suggestionsDiv.scrollTop;
+      var itemTop = activeItem.offsetTop;
+      var itemHeight = activeItem.clientHeight;
+
+      if (itemTop < containerScrollTop) {
+        suggestionsDiv.scrollTop = itemTop;
+      } else if (itemTop + itemHeight > containerScrollTop + containerHeight) {
+        suggestionsDiv.scrollTop = itemTop + itemHeight - containerHeight;
+      }
+    } else {
+      skillsTextInput.removeAttribute("aria-activedescendant");
+    }
   }
 
   function hideSuggestions() {
     visibleSuggestions = [];
     activeSuggestionIndex = -1;
+    skillsTextInput.removeAttribute("aria-activedescendant");
     if (suggestionsDiv) {
       suggestionsDiv.style.display = "none";
       suggestionsDiv.innerHTML = "";
+      var group = suggestionsDiv.closest(".form-group");
+      if (group) group.classList.remove("has-open-select");
     }
     syncSuggestionsA11yState();
   }
@@ -262,9 +292,11 @@ if (isIndexPage) {
         evt.preventDefault();
       });
 
-      item.addEventListener("mouseenter", function () {
-        activeSuggestionIndex = index;
-        renderActiveSuggestion();
+      item.addEventListener("mousemove", function () {
+        if (activeSuggestionIndex !== index) {
+          activeSuggestionIndex = index;
+          renderActiveSuggestion();
+        }
       });
 
       item.addEventListener("click", function () {
@@ -274,6 +306,8 @@ if (isIndexPage) {
       suggestionsDiv.appendChild(item);
     });
     suggestionsDiv.style.display = "block";
+    var group = suggestionsDiv.closest(".form-group");
+    if (group) group.classList.add("has-open-select");
     syncSuggestionsA11yState();
   }
 
@@ -306,7 +340,19 @@ if (isIndexPage) {
     }
 
     if (evt.key === "Escape") {
+      if (visibleSuggestions.length > 0) {
+        evt.stopPropagation();
+      }
       hideSuggestions();
+      return;
+    }
+
+    if (evt.key === "Backspace" && skillsTextInput.value === "") {
+      if (selectedSkills.length > 0) {
+        var lastSkill = selectedSkills[selectedSkills.length - 1];
+        removeSkill(lastSkill);
+        skillsTextInput.focus();
+      }
       return;
     }
 
@@ -359,8 +405,16 @@ if (isIndexPage) {
   });
 
   // Hide suggestions when input loses focus
+  // Use rAF to check where focus actually went — if it stayed inside
+  // the skill wrapper (e.g. scrollbar click, chip remove button), keep open.
   skillsTextInput.addEventListener("blur", function () {
-    setTimeout(function () { hideSuggestions(); }, 150);
+    requestAnimationFrame(function () {
+      var stillInside = skillWrap && skillWrap.contains(document.activeElement);
+      var inSuggestions = suggestionsDiv && suggestionsDiv.contains(document.activeElement);
+      if (!stillInside && !inSuggestions) {
+        hideSuggestions();
+      }
+    });
   });
 
   if (skillWrap) {
@@ -408,8 +462,8 @@ if (isIndexPage) {
   // recreate the selected skills chips based on the current array(selectedSkills)
   // called every time we add or remove a skill
   function renderSelectedChips() {
-    // Wipe out old chips first so we don't end up with duplicates in the UI
-    chipsSelectedEl.innerHTML = "";
+    // Build all chips off-DOM first, then swap in one shot to prevent layout thrashing
+    var fragment = document.createDocumentFragment();
     selectedSkills.forEach(function (skill) {
       // Create a new chip element for each selected skill
       var chipEl = document.createElement("span");
@@ -426,11 +480,14 @@ if (isIndexPage) {
         // Stop click from bubbling up to the chip wrap's click listener
         e.stopPropagation();
         removeSkill(skill);
+        skillsTextInput.focus();
       });
 
       chipEl.appendChild(removeBtn); // put x button inside the chip
-      chipsSelectedEl.appendChild(chipEl); //add chip to page
+      fragment.appendChild(chipEl);
     });
+    chipsSelectedEl.innerHTML = "";
+    chipsSelectedEl.appendChild(fragment);
   }
 
   function syncSkillsHiddenInput() {
@@ -747,9 +804,20 @@ if (isIndexPage) {
         }
       });
 
+      // Clear all parent elevated stacking classes
+      document.querySelectorAll(".form-group, .form-row").forEach(function (el) {
+        el.classList.remove("has-open-select");
+      });
+
       adjustDropdownPosition();
       customSelect.classList.add("open");
       trigger.setAttribute("aria-expanded", "true");
+
+      // Elevate parent containers
+      var group = customSelect.closest(".form-group");
+      var row = customSelect.closest(".form-row");
+      if (group) group.classList.add("has-open-select");
+      if (row) row.classList.add("has-open-select");
 
       // Find current selected index to highlight by default
       var selectedIdx = -1;
@@ -767,6 +835,11 @@ if (isIndexPage) {
       trigger.setAttribute("aria-expanded", "false");
       trigger.removeAttribute("aria-activedescendant");
       removeHighlight();
+
+      var group = customSelect.closest(".form-group");
+      var row = customSelect.closest(".form-row");
+      if (group) group.classList.remove("has-open-select");
+      if (row) row.classList.remove("has-open-select");
     }
 
     function highlightOption(index) {
@@ -838,10 +911,14 @@ if (isIndexPage) {
       }
     });
 
-    // Option mouseenter and click handlers
+    // Option mouse and click handlers
+    // Use mousemove instead of mouseenter so that keyboard scrolling doesn't
+    // fight with a static mouse pointer sitting over an option.
     customOptions.forEach(function (option, index) {
-      option.addEventListener("mouseenter", function () {
-        highlightOption(index);
+      option.addEventListener("mousemove", function () {
+        if (highlightedIndex !== index) {
+          highlightOption(index);
+        }
       });
 
       option.addEventListener("click", function (e) {
@@ -917,13 +994,23 @@ if (isIndexPage) {
   // Close custom dropdowns when clicking outside
   document.addEventListener("click", function (e) {
     document.querySelectorAll(".custom-select").forEach(function (customSelect) {
-      var trigger = customSelect.querySelector(".custom-select-trigger");
-      if (!customSelect.contains(e.target)) {
+      if (!customSelect.contains(e.target) && customSelect.classList.contains("open")) {
+        // Use the same cleanup logic as closeDropdown()
         customSelect.classList.remove("open", "open-up");
+        var trigger = customSelect.querySelector(".custom-select-trigger");
         if (trigger) {
           trigger.setAttribute("aria-expanded", "false");
           trigger.removeAttribute("aria-activedescendant");
         }
+        // Clean up parent z-index elevation
+        var group = customSelect.closest(".form-group");
+        var row = customSelect.closest(".form-row");
+        if (group) group.classList.remove("has-open-select");
+        if (row) row.classList.remove("has-open-select");
+        // Remove highlight state
+        customSelect.querySelectorAll(".custom-option").forEach(function (opt) {
+          opt.classList.remove("highlighted");
+        });
       }
     });
   });
