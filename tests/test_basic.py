@@ -296,7 +296,25 @@ def test_scoring_weights_has_all_keys():
     """Verify SCORING_WEIGHTS contains exactly the four expected keys."""
     expected_keys = {"skill", "level", "interest", "time"}
     assert set(SCORING_WEIGHTS.keys()) == expected_keys
+def test_sanitize_input_strips_script_tags():
+    """sanitize_input should remove script tags from input."""
+    from routes.main_routes import sanitize_input
+    assert sanitize_input("<script>alert(1)</script>") == ""
 
+def test_sanitize_input_strips_nested_tags():
+    """sanitize_input should remove nested HTML tags."""
+    from routes.main_routes import sanitize_input
+    assert sanitize_input("<b><i>hello</i></b>") == "hello"
+
+def test_sanitize_input_empty_value():
+    """sanitize_input should handle empty strings."""
+    from routes.main_routes import sanitize_input
+    assert sanitize_input("") == ""
+
+def test_sanitize_input_plain_text():
+    """sanitize_input should leave plain text unchanged."""
+    from routes.main_routes import sanitize_input
+    assert sanitize_input("Python") == "Python"
 
 # ============================================================
 # Run tests directly (no pytest required)
