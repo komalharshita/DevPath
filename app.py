@@ -37,11 +37,6 @@ def method_not_allowed(error):
     """Render a friendly 405 page when the wrong HTTP method is used."""
     return render_template("405.html"), 405
 
-@app.errorhandler(403)
-def forbidden(error):
-    """Render a friendly 403 page when access is denied."""
-    return render_template("403.html"), 403
-
 
 if __name__ == "__main__":
     # debug=True is only for local development.
