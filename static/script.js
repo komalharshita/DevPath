@@ -28,7 +28,7 @@ var errorMsg = document.getElementById('github-modal-error');
 // ============================================================
 (function initMobileNav() {
   var toggle = document.getElementById("nav-mobile-toggle"); //hamburger button
-  var menu   = document.getElementById("nav-mobile-menu"); //dropdown menu 
+  var menu = document.getElementById("nav-mobile-menu"); //dropdown menu 
 
   // Nothing to do if the nav isn't on this page, just bail out
   if (!toggle || !menu) return;
@@ -42,9 +42,9 @@ var errorMsg = document.getElementById('github-modal-error');
   });
 
   // Close menu when any mobile link is clicked
-  menu.querySelectorAll(".nav-mobile-link").forEach(function (link) { 
-    link.addEventListener("click", function () { 
-      menu.classList.remove("open"); 
+  menu.querySelectorAll(".nav-mobile-link").forEach(function (link) {
+    link.addEventListener("click", function () {
+      menu.classList.remove("open");
       toggle.classList.remove("open");
     });
   });
@@ -58,55 +58,55 @@ if (isIndexPage) {
 
   // DOM references
   // grabbing all the elements we'll need so we're not calling getElementById over and over again throughout the code
-  var form              = document.getElementById("recommend-form");
-  var submitBtn         = document.getElementById("submit-btn");
-  var btnLabel          = document.getElementById("btn-label"); // "get recommendations" text 
-  var btnLoading        = document.getElementById("btn-loading"); // spinner icon inside the button 
-  var resultsSection    = document.getElementById("results-section"); 
-  var resultsGrid       = document.getElementById("results-grid"); 
-  var resultsLoadingEl  = document.getElementById("results-loading"); // "Loading..." text in the results 
-  var resultsEmptyEl    = document.getElementById("results-empty"); 
-  var emptyMessageEl    = document.getElementById("empty-message"); 
-  var skillsHidden      = document.getElementById("skills"); // the hidden input that holds skills list
-  var skillsTextInput   = document.getElementById("skills-input"); //visible text box in which user types skills
-  var chipsSelectedEl   = document.getElementById("skill-chips-selected"); //selected skills tags container
-  var quickPickChips    = document.querySelectorAll(".skill-chip"); // predefined skills user can click
+  var form = document.getElementById("recommend-form");
+  var submitBtn = document.getElementById("submit-btn");
+  var btnLabel = document.getElementById("btn-label"); // "get recommendations" text 
+  var btnLoading = document.getElementById("btn-loading"); // spinner icon inside the button 
+  var resultsSection = document.getElementById("results-section");
+  var resultsGrid = document.getElementById("results-grid");
+  var resultsLoadingEl = document.getElementById("results-loading"); // "Loading..." text in the results 
+  var resultsEmptyEl = document.getElementById("results-empty");
+  var emptyMessageEl = document.getElementById("empty-message");
+  var skillsHidden = document.getElementById("skills"); // the hidden input that holds skills list
+  var skillsTextInput = document.getElementById("skills-input"); //visible text box in which user types skills
+  var chipsSelectedEl = document.getElementById("skill-chips-selected"); //selected skills tags container
+  var quickPickChips = document.querySelectorAll(".skill-chip"); // predefined skills user can click
 
   // Tracks currently selected skills to prevent duplicates
   var selectedSkills = [];
   // Clear Filters Button Functionality
-var clearFiltersBtn = document.getElementById("clear-filters-btn");
-if (clearFiltersBtn) {
-    clearFiltersBtn.addEventListener("click", function() {
-        var recommendForm = document.getElementById("recommend-form");
-        if (recommendForm) {
-            // 1. Reset standard form dropdowns and fields
-            recommendForm.reset();
-            
-            // 2. Clear out the internal JavaScript array tracker completely
-            selectedSkills = [];
-            
-            // 3. Clear the hidden inputs and visual chips using the file's own variables
-            if (skillsHidden) skillsHidden.value = "";
-            if (chipsSelectedEl) chipsSelectedEl.innerHTML = "";
-            if (skillsTextInput) {
-                skillsTextInput.value = "";
-                skillsTextInput.focus(); // Place cursor back on input
-            }
-            
-            // 4. Hide autocomplete suggestions if any are open
-            var suggestionsBox = document.getElementById("skills-suggestions");
-            if (suggestionsBox) suggestionsBox.innerHTML = "";
+  var clearFiltersBtn = document.getElementById("clear-filters-btn");
+  if (clearFiltersBtn) {
+    clearFiltersBtn.addEventListener("click", function () {
+      var recommendForm = document.getElementById("recommend-form");
+      if (recommendForm) {
+        // 1. Reset standard form dropdowns and fields
+        recommendForm.reset();
 
-            // 5. Reset quick-pick chip visual active states if they have any
-            if (quickPickChips) {
-                quickPickChips.forEach(function(chip) {
-                    chip.classList.remove("active", "selected");
-                });
-            }
+        // 2. Clear out the internal JavaScript array tracker completely
+        selectedSkills = [];
+
+        // 3. Clear the hidden inputs and visual chips using the file's own variables
+        if (skillsHidden) skillsHidden.value = "";
+        if (chipsSelectedEl) chipsSelectedEl.innerHTML = "";
+        if (skillsTextInput) {
+          skillsTextInput.value = "";
+          skillsTextInput.focus(); // Place cursor back on input
         }
+
+        // 4. Hide autocomplete suggestions if any are open
+        var suggestionsBox = document.getElementById("skills-suggestions");
+        if (suggestionsBox) suggestionsBox.innerHTML = "";
+
+        // 5. Reset quick-pick chip visual active states if they have any
+        if (quickPickChips) {
+          quickPickChips.forEach(function (chip) {
+            chip.classList.remove("active", "selected");
+          });
+        }
+      }
     });
-}
+  }
 
 
   // ----------------------------------------------------------
@@ -399,7 +399,7 @@ if (clearFiltersBtn) {
       removeBtn.type = "button";
       removeBtn.className = "skill-chip-remove";
       removeBtn.innerHTML = "&times;"; //'x' symbol
-      removeBtn.setAttribute("aria-label", "Remove " + skill); 
+      removeBtn.setAttribute("aria-label", "Remove " + skill);
       removeBtn.addEventListener("click", function (e) {
         // Stop click from bubbling up to the chip wrap's click listener
         e.stopPropagation();
@@ -412,7 +412,7 @@ if (clearFiltersBtn) {
   }
 
   function syncSkillsHiddenInput() {
-    if (!skillsHidden){
+    if (!skillsHidden) {
       var skillsHidden = document.getElementById("skills");
     }
     // Keep the hidden <input> in sync for form serialisation
@@ -480,7 +480,7 @@ if (clearFiltersBtn) {
   form.addEventListener("submit", function (evt) {
     evt.preventDefault(); //stop the browser from reloading the page on form submit
     clearAllErrors()
-    
+
     if (skillsTextInput.value.trim()) {
       addSkill(skillsTextInput.value);
       skillsTextInput.value = "";
@@ -538,8 +538,6 @@ if (clearFiltersBtn) {
     submitBtn.setAttribute("aria-busy", isLoading);
     btnLabel.style.display = isLoading ? "none" : "inline";
     btnLoading.style.display = isLoading ? "inline-flex" : "none";
-    btnLabel.style.display = isLoading ? "none" : "inline";
-    btnLoading.style.display = isLoading ? "inline" : "none";
 
     if (isLoading) {
       // Show the results section with only the loading indicator visible
@@ -550,8 +548,8 @@ if (clearFiltersBtn) {
       // Scroll down so the user can see the spinner without manually scrolling
       resultsSection.scrollIntoView({ behavior: "smooth" });
     } else {
-      resultsLoadingEl.style.display  = "none";
-      resultsGrid.style.display       = "grid"; //switch back to gird layout 
+      resultsLoadingEl.style.display = "none";
+      resultsGrid.style.display = "grid"; //switch back to gird layout 
     }
   }
 
@@ -569,9 +567,19 @@ if (clearFiltersBtn) {
     resultsGrid.innerHTML = "";
 
     if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
-      resultsGrid.style.display      = "none";
-      resultsEmptyEl.style.display   = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message; //if api sent back a message (e.g. "no projects found matching your criteria"), show that 
+      resultsGrid.style.display = "none";
+      resultsEmptyEl.style.display = "block";
+
+      // Show a friendly custom message when the user selected an interest
+      var selectedInterest = document.getElementById("interest")?.value;
+      if (selectedInterest) {
+        emptyMessageEl.textContent = "No projects are currently available for this interest. Please check back later or try a different area.";
+      } else if (message) {
+        emptyMessageEl.textContent = message;
+      } else {
+        emptyMessageEl.textContent = "Try adjusting your skills or choosing a different interest area.";
+      }
+
       resultsSection.scrollIntoView({ behavior: "smooth" });
       return;
     }
@@ -608,8 +616,8 @@ if (clearFiltersBtn) {
     var tagsRow = document.createElement("div");
     tagsRow.className = "project-card-tags";
 
-    // Show the first two skills as tags
-    (project.skills || []).slice(0, 2).forEach(function (skill) {
+    // Show all project skills as tags so users can see the full match
+    (project.skills || []).forEach(function (skill) {
       tagsRow.appendChild(createTag(skill, "skill"));
     });
 
@@ -661,8 +669,8 @@ if (clearFiltersBtn) {
   // Custom Dropdowns
   // ----------------------------------------------------------
   var customSelects = document.querySelectorAll(".custom-select");
-  
-  customSelects.forEach(function(customSelect) {
+
+  customSelects.forEach(function (customSelect) {
     var trigger = customSelect.querySelector(".custom-select-trigger");
     var optionsContainer = customSelect.querySelector(".custom-select-options");
     var customOptions = customSelect.querySelectorAll(".custom-option");
@@ -672,7 +680,7 @@ if (clearFiltersBtn) {
 
     // Sync visual trigger with initial native select value (if prefilled)
     if (nativeSelect.value) {
-      customOptions.forEach(function(opt) {
+      customOptions.forEach(function (opt) {
         if (opt.getAttribute("data-value") === nativeSelect.value) {
           trigger.textContent = opt.textContent;
           trigger.style.color = "var(--gray-900)";
@@ -682,12 +690,12 @@ if (clearFiltersBtn) {
     }
 
     // Open/close menu when trigger is clicked
-    trigger.addEventListener("click", function(e) {
+    trigger.addEventListener("click", function (e) {
       e.stopPropagation();
       var isOpen = customSelect.classList.contains("open");
-      
+
       // Close all other open dropdowns first
-      document.querySelectorAll(".custom-select").forEach(function(el) {
+      document.querySelectorAll(".custom-select").forEach(function (el) {
         el.classList.remove("open");
       });
 
@@ -697,8 +705,8 @@ if (clearFiltersBtn) {
     });
 
     // Handle option selection
-    customOptions.forEach(function(option) {
-      option.addEventListener("click", function(e) {
+    customOptions.forEach(function (option) {
+      option.addEventListener("click", function (e) {
         e.stopPropagation();
         var value = this.getAttribute("data-value");
         var text = this.textContent;
@@ -708,14 +716,14 @@ if (clearFiltersBtn) {
         trigger.style.color = "var(--gray-900)";
 
         // Remove selected class from all and add to clicked
-        customOptions.forEach(function(opt) { opt.classList.remove("selected"); });
+        customOptions.forEach(function (opt) { opt.classList.remove("selected"); });
         this.classList.add("selected");
 
         // Update native select
         nativeSelect.value = value;
         // Trigger change event for any validation logic
         nativeSelect.dispatchEvent(new Event("change"));
-        
+
         // Remove error messages immediately if present
         if (typeof clearFieldError === "function") {
           clearFieldError(nativeSelect.id + "-error");
@@ -728,8 +736,8 @@ if (clearFiltersBtn) {
   });
 
   // Close custom dropdowns when clicking outside
-  document.addEventListener("click", function(e) {
-    document.querySelectorAll(".custom-select").forEach(function(customSelect) {
+  document.addEventListener("click", function (e) {
+    document.querySelectorAll(".custom-select").forEach(function (customSelect) {
       if (!customSelect.contains(e.target)) {
         customSelect.classList.remove("open");
       }
@@ -744,13 +752,13 @@ if (clearFiltersBtn) {
 // ============================================================
 if (isDetailPage) {
 
-  var codePanel         = document.getElementById("code-panel"); // sliding panel that shows the starter code "
-  var codePanelOverlay  = document.getElementById("code-panel-overlay"); // background overlay 
-  var codeContentEl     = document.getElementById("code-content"); // <pre> element inside the panel where the code will be inserted
+  var codePanel = document.getElementById("code-panel"); // sliding panel that shows the starter code "
+  var codePanelOverlay = document.getElementById("code-panel-overlay"); // background overlay 
+  var codeContentEl = document.getElementById("code-content"); // <pre> element inside the panel where the code will be inserted
   var codePanelFilename = document.getElementById("code-panel-filename"); // filename display
-  var btnViewCode       = document.getElementById("btn-view-code"); // button to open the code panel on desktop
-  var btnViewCodeSm     = document.getElementById("btn-view-code-sm"); // button to open the code panel on mobile (could be the same button with different styling, but we have two here for simplicity)
-  var btnClosePanel     = document.getElementById("code-panel-close"); // button inside the panel to close it
+  var btnViewCode = document.getElementById("btn-view-code"); // button to open the code panel on desktop
+  var btnViewCodeSm = document.getElementById("btn-view-code-sm"); // button to open the code panel on mobile (could be the same button with different styling, but we have two here for simplicity)
+  var btnClosePanel = document.getElementById("code-panel-close"); // button inside the panel to close it
 
   // Cache flag so code is only fetched once per page load
   var codeFetched = false;
@@ -824,16 +832,16 @@ if (isDetailPage) {
   // ----------------------------------------------------------
   // Copy Code button
   // ----------------------------------------------------------
-  var btnCopyCode  = document.getElementById("btn-copy-code");
-  var copyToast    = document.getElementById("copy-toast"); //popup msg when copied 
-  var toastTimeout = null; 
+  var btnCopyCode = document.getElementById("btn-copy-code");
+  var copyToast = document.getElementById("copy-toast"); //popup msg when copied 
+  var toastTimeout = null;
 
   //shows the "copied to clipboard" state on the button and the toast message, then resets after a short delay
   function showCopySuccess() {
     if (!btnCopyCode) return;
 
     // Swap icons on the button(copy and checkmark icons)
-    var copyIcon  = btnCopyCode.querySelector(".copy-icon");
+    var copyIcon = btnCopyCode.querySelector(".copy-icon");
     var checkIcon = btnCopyCode.querySelector(".check-icon");
     var btnLabel = btnCopyCode.querySelector(".copy-btn-label");
 
@@ -900,63 +908,63 @@ if (isDetailPage) {
 } // end isDetailPage
 
 if (
-    openModalBtn &&
-    closeModalBtn &&
-    modal &&
-    githubInput &&
-    fetchBtn &&
-    errorMsg
+  openModalBtn &&
+  closeModalBtn &&
+  modal &&
+  githubInput &&
+  fetchBtn &&
+  errorMsg
 ) {
-// 1. Open Github Input Modal
+  // 1. Open Github Input Modal
   openModalBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      modal.classList.add('active');
-      githubInput.focus();
+    e.preventDefault();
+    modal.classList.add('active');
+    githubInput.focus();
   });
 
   // 2. Close Github Input Modal
   const closeGithubModal = () => {
-      modal.classList.remove('active');
-      githubInput.value = '';
-      errorMsg.textContent = '';
+    modal.classList.remove('active');
+    githubInput.value = '';
+    errorMsg.textContent = '';
   };
 
   closeModalBtn.addEventListener('click', closeGithubModal);
 
   // Close on clicking outside the card
   modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeGithubModal();
+    if (e.target === modal) closeGithubModal();
   });
 
   // 3. Fetch Skills Logic
   fetchBtn.addEventListener('click', async () => {
-      const username = githubInput.value.trim();
-      if (!username) return;
+    const username = githubInput.value.trim();
+    if (!username) return;
 
-      fetchBtn.disabled = true;
-      fetchBtn.textContent = 'Syncing...';
+    fetchBtn.disabled = true;
+    fetchBtn.textContent = 'Syncing...';
 
-      try {
-          const response = await fetch(`https://api.github.com/users/${username}/repos`);
-          if (!response.ok) throw new Error();
-          
-          const repos = await response.json();
-          const langs = [...new Set(repos.map(r => r.language).filter(Boolean))];
+    try {
+      const response = await fetch(`https://api.github.com/users/${username}/repos`);
+      if (!response.ok) throw new Error();
 
-          if (langs.length > 0) {
-              langs.forEach(lang => {
-                  if (typeof addSkill === 'function') addSkill(lang);
-              });
-              closeGithubModal();
-          } else {
-              errorMsg.textContent = "No public languages found.";
-          }
-      } catch (err) {
-          errorMsg.textContent = err.message ?? "Failed to fetch skills";
-      } finally {
-          fetchBtn.disabled = false;
-          fetchBtn.textContent = 'Fetch Skills';
+      const repos = await response.json();
+      const langs = [...new Set(repos.map(r => r.language).filter(Boolean))];
+
+      if (langs.length > 0) {
+        langs.forEach(lang => {
+          if (typeof addSkill === 'function') addSkill(lang);
+        });
+        closeGithubModal();
+      } else {
+        errorMsg.textContent = "No public languages found.";
       }
+    } catch (err) {
+      errorMsg.textContent = err.message ?? "Failed to fetch skills";
+    } finally {
+      fetchBtn.disabled = false;
+      fetchBtn.textContent = 'Fetch Skills';
+    }
   });
 }
 
@@ -985,6 +993,6 @@ function scrollToTop() {
 
 /* Only wire up listeners if the button exists on this page */
 if (scrollTopBtn) {
-    window.addEventListener('scroll', handleScroll);
-    scrollTopBtn.addEventListener('click', scrollToTop);
+  window.addEventListener('scroll', handleScroll);
+  scrollTopBtn.addEventListener('click', scrollToTop);
 }
