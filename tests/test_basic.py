@@ -380,6 +380,54 @@ def test_project_links_have_noopener():
     assert b'rel="noopener noreferrer"' in response.data
 
 
+def test_structured_logging():
+    import io
+    import json
+    import logging
+    
+    # Capture logs using a StringIO stream
+    log_capture = io.StringIO()
+    handler = logging.StreamHandler(log_capture)
+    
+    # Configure it with our JsonFormatter
+    from utils.logging_config import JsonFormatter
+    handler.setFormatter(JsonFormatter())
+    
+    root_logger = logging.getLogger()
+    root_logger.addHandler(handler)
+    
+    client = get_client()
+    response = client.get("/")
+    assert response.status_code == 200
+    
+    # Remove our test handler to clean up
+    root_logger.removeHandler(handler)
+    
+    # Parse the captured logs
+    log_output = log_capture.getvalue().strip()
+    assert log_output != "", "Expected log output to be captured"
+    
+    # Verify that the completion log exists and has correct JSON attributes
+    found_completion_log = False
+    for line in log_output.split("\n"):
+        if not line.strip():
+            continue
+        try:
+            log_data = json.loads(line)
+            if log_data.get("message") == "request_completed":
+                found_completion_log = True
+                assert "timestamp" in log_data
+                assert "level" in log_data
+                assert "logger" in log_data
+                assert log_data["method"] == "GET"
+                assert log_data["path"] == "/"
+                assert log_data["status"] == 200
+                assert isinstance(log_data["duration_ms"], (int, float))
+        except json.JSONDecodeError:
+            pass
+            
+    assert found_completion_log, "Should have logged request completion in JSON format"
+
 
 # ============================================================
 # Run tests directly (no pytest required)

@@ -1,7 +1,9 @@
 import logging
 import json
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+import time
+from flask import Flask, render_template, request, g
+from routes.main_routes import main
+from utils.logging_config import setup_logging
 
 # app.py
 # Application entry point for DevPath.
@@ -15,19 +17,40 @@ logger = logging.getLogger(__name__)
 # Business logic, recommendation scoring, and data loading all live in
 # the utils/ and routes/ packages, not here.
 
-from flask import Flask, render_template, request
-from routes.main_routes import main
-
 app = Flask(__name__)
+
+# Initialize application-wide JSON logging
+setup_logging(app)
+logger = logging.getLogger(__name__)
 
 # Register all routes defined in the main Blueprint
 app.register_blueprint(main)
 
 @app.before_request
-def log_request():
+def start_timer():
+    """Record start time for computing request latency."""
+    g.start_time = time.time()
+
+@app.after_request
+def log_request_completed(response):
+    """Log completed request with JSON structured metadata."""
     if request.path.startswith("/static/") or request.path == "/favicon.ico":
-        return
-    logger.debug(json.dumps({'path': request.path, 'method': request.method}))
+        return response
+        
+    duration_ms = 0.0
+    if hasattr(g, 'start_time'):
+        duration_ms = (time.time() - g.start_time) * 1000.0
+        
+    logger.info(
+        "request_completed",
+        extra={
+            "method": request.method,
+            "path": request.path,
+            "status": response.status_code,
+            "duration_ms": round(duration_ms, 2)
+        }
+    )
+    return response
 
 @app.after_request
 def add_security_headers(response):
