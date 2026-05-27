@@ -10,10 +10,12 @@
 # Business logic, recommendation scoring, and data loading all live in
 # the utils/ and routes/ packages, not here.
 
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from routes.main_routes import main
+import os
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", os.urandom(24).hex())
 
 # Register all routes defined in the main Blueprint
 app.register_blueprint(main)
@@ -27,6 +29,15 @@ def add_security_headers(response):
     response.headers["Permissions-Policy"] = (
         "geolocation=(), microphone=(), camera=()"
     )
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self' https://fonts.googleapis.com; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+        "font-src 'self' https://fonts.gstatic.com; "
+        "img-src 'self' data:; "
+        "connect-src 'self' https://api.github.com; "
+        "frame-ancestors 'none'"
+    )
     return response
 
 # ---- Error handlers ----
@@ -39,7 +50,9 @@ def page_not_found(error):
 
 @app.errorhandler(500)
 def internal_server_error(error):
-    """Render a friendly 500 page for unexpected server errors."""
+    """Render a friendly 500 page for unexpected server errors.
+    Never expose the original exception or file paths.
+    """
     return render_template("500.html"), 500
 
 @app.errorhandler(405)
@@ -54,6 +67,5 @@ def forbidden(error):
 
 
 if __name__ == "__main__":
-    # debug=True is only for local development.
-    # Never run with debug=True in a production deployment.
-    app.run(debug=True)
+    debug = os.environ.get("FLASK_DEBUG", "0") == "1"
+    app.run(debug=debug)

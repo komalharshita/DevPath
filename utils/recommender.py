@@ -69,7 +69,10 @@ def score_single_project(
     """
     # Compare time availability, return results with the same time availibity or lower.
     TIME_AVAILABILITY = ['low', 'medium', 'high']
-    time_availability_index =   TIME_AVAILABILITY.index(time_availability.strip().lower())
+    try:
+        time_availability_index = TIME_AVAILABILITY.index(time_availability.strip().lower())
+    except (ValueError, AttributeError):
+        return 0
     valid_time = TIME_AVAILABILITY[ : time_availability_index + 1 ]
     
     score = 0

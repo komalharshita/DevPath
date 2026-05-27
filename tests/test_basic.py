@@ -158,11 +158,29 @@ def test_get_recommendations_max_three():
     assert len(results) <= 3, f"Expected at most 3 results, got {len(results)}"
 
 
-def test_get_recommendations_no_match_returns_empty():
-    """A very unlikely skill/interest combo should return an empty list."""
-    results = get_recommendations("Rust", "Advanced", "Games", "High")
-    # Rust and Games are not in the dataset so this should be empty or minimal
+def test_get_recommendations_returns_list():
+    """The engine should always return a list."""
+    results = get_recommendations("Python", "Beginner", "Data", "Low")
     assert isinstance(results, list)
+
+
+def test_score_single_project_no_match_at_all():
+    """A project with no overlap should score zero, even when time is in valid range."""
+    project = {
+        "skills": ["Python"],
+        "level": "Beginner",
+        "interest": "Web",
+        "time": "Low"
+    }
+    score = score_single_project(
+        project,
+        user_skills=["Rust"],
+        level="Intermediate",
+        interest="Games",
+        time_availability="High"
+    )
+    # 0 skill match (0) + no level (0) + no interest (0) + no time match (0) = 0
+    assert score == 0, f"Expected 0 but got {score}"
 
 
 def test_get_recommendations_result_format():
@@ -240,6 +258,7 @@ def test_security_headers_present():
         response.headers["Permissions-Policy"]
         == "geolocation=(), microphone=(), camera=()"
     )
+    assert "Content-Security-Policy" in response.headers
 
 
 def test_recommend_api_valid():
@@ -256,20 +275,19 @@ def test_recommend_api_valid():
     assert len(data["projects"]) > 0
 
 
-def test_recommend_api_interest_not_available():
-    """The API should return no projects for blocked interest categories."""
+def test_recommend_api_returns_valid_response():
+    """The API should return a valid response with projects key."""
     client = get_client()
     response = client.post("/api/recommend", json={
-        "skills": "Python, JavaScript",
+        "skills": "Python",
         "level": "Beginner",
-        "interest": "Machine Learning/AI",
+        "interest": "Data",
         "time": "Low"
     })
     assert response.status_code == 200
     data = response.get_json()
-    assert data["projects"] == []
-    assert "message" in data
-    assert "no projects are currently available" in data["message"].lower()
+    assert "projects" in data
+    assert len(data["projects"]) > 0
 
 
 def test_recommend_api_missing_field():

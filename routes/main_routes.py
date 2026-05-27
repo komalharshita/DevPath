@@ -10,19 +10,6 @@ from utils.data_loader import find_project_by_id, load_all_projects, get_project
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
 import os
 
-# Interest categories that currently have no project recommendations available
-NO_PROJECT_INTERESTS = {
-    "machine learning/ai",
-    "devops",
-    "mobile",
-    "artificial intelligence",
-    "cloud computing",
-    "mobile app development",
-}
-
-def interest_has_no_projects(interest):
-    return interest and interest.strip().lower() in NO_PROJECT_INTERESTS
-
 # Create the Blueprint that app.py will register
 main = Blueprint("main", __name__)
 
@@ -71,13 +58,13 @@ def recommend():
         # Return only the first error to keep the UI message clean
         return jsonify({"error": errors[0]}), 400
 
-    if interest_has_no_projects(interest):
+    try:
+        results = get_recommendations(skills, level, interest, time_availability)
+    except Exception:
         return jsonify({
             "projects": [],
-            "message": "No projects are currently available for this interest area. Please check back later."
-        }), 200
-
-    results = get_recommendations(skills, level, interest, time_availability)
+            "message": "An unexpected error occurred. Please try again."
+        }), 500
 
     if not results:
         return jsonify({

@@ -412,12 +412,9 @@ if (clearFiltersBtn) {
   }
 
   function syncSkillsHiddenInput() {
-    if (!skillsHidden){
-      var skillsHidden = document.getElementById("skills");
-    }
-    // Keep the hidden <input> in sync for form serialisation
-    // The API expects a comma-separated string, so join the array that way
-    skillsHidden.value = selectedSkills.join(", ");
+    var hiddenInput = skillsHidden || document.getElementById("skills");
+    if (!hiddenInput) return;
+    hiddenInput.value = selectedSkills.join(", ");
   }
 
   updateQuickPickState();
@@ -526,17 +523,12 @@ if (clearFiltersBtn) {
           renderResults(data.projects || [], data.message);
         })
         .catch(function () {
-
           setLoadingState(false);
-    //combine form values into an object to send to server/api
-    var payload = {
-      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level: document.getElementById("level").value,
-      interest: document.getElementById("interest").value,
-      time: document.getElementById("time").value
-    };  
-  });
+          var generalErr = document.getElementById("form-error-general");
+          if (generalErr) {
+            generalErr.textContent = "Something went wrong. Please try again.";
+          }
+        });
 
   // Manages the loading state of the form and results section(whats visible or not)
   function setLoadingState(isLoading) {
@@ -570,28 +562,13 @@ if (clearFiltersBtn) {
   function renderResults(projects, message) {
     resultsSection.style.display = "block";
     resultsLoadingEl.style.display = "none";
-    // Clear out any cards from a previous search before showing new ones
     resultsGrid.innerHTML = "";
 
     if (!projects || projects.length === 0) {
-      resultsGrid.style.display     = "none";
-      resultsEmptyEl.style.display  = "block";
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
-    if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
-      resultsGrid.style.display    = "none";
-      resultsEmptyEl.style.display = "block";
 
-      // Show a friendly custom message when the user selected an interest
-      var selectedInterest = document.getElementById("interest")?.value;
-      if (selectedInterest) {
-        emptyMessageEl.textContent = "No projects are currently available for this interest. Please check back later or try a different area.";
-      } else if (message) {
-        emptyMessageEl.textContent = message;
-      } else {
-        emptyMessageEl.textContent = "Try adjusting your skills or choosing a different interest area.";
-      }
+      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
 
       resultsSection.scrollIntoView({ behavior: "smooth" });
       return;
@@ -600,7 +577,6 @@ if (clearFiltersBtn) {
     resultsEmptyEl.style.display = "none";
     resultsGrid.style.display = "grid";
 
-    //build a card for each project and add it to the grid
     projects.forEach(function (project) {
       resultsGrid.appendChild(buildProjectCard(project));
     });
@@ -879,14 +855,38 @@ if (
       fetchBtn.textContent = 'Syncing...';
 
       try {
-          const response = await fetch(`https://api.github.com/users/${username}/repos`);
-          if (!response.ok) throw new Error();
-          
-          const repos = await response.json();
-          const langs = [...new Set(repos.map(r => r.language).filter(Boolean))];
+          // Paginate through all repos
+          const allLangs = new Set();
+          let page = 1;
+          let hasMore = true;
 
-          if (langs.length > 0) {
-              langs.forEach(lang => {
+          while (hasMore) {
+              const response = await fetch(
+                  `https://api.github.com/users/${username}/repos?per_page=100&page=${page}`
+              );
+              if (!response.ok) throw new Error('Failed to fetch repos');
+
+              const repos = await response.json();
+              if (repos.length === 0) {
+                  hasMore = false;
+                  break;
+              }
+
+              // Collect primary languages from each repo
+              repos.forEach(r => {
+                  if (r.language) allLangs.add(r.language);
+              });
+
+              // Check if there are more pages
+              const linkHeader = response.headers.get('Link');
+              if (!linkHeader || !linkHeader.includes('rel="next"')) {
+                  hasMore = false;
+              }
+              page++;
+          }
+
+          if (allLangs.size > 0) {
+              allLangs.forEach(lang => {
                   if (typeof addSkill === 'function') addSkill(lang);
               });
               closeGithubModal();
