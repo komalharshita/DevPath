@@ -180,6 +180,7 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
 - Use 2-space indentation
 - Every `<section>` must have a comment header explaining its purpose
 - All images must have an `alt` attribute
+- Use `loading="lazy"` on `<img>` tags by default; omit it only for images critical to the initial render (for example, a hero photo above the fold)
 - Use semantic elements: `<nav>`, `<section>`, `<footer>`, `<article>`
 - Keep inline styles out of templates — use CSS classes instead
 
@@ -207,6 +208,13 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
 - Do not use markdown formatting inside JSON string values
 
 ---
+
+### External Links
+
+- External URLs added to `projects.json` are rendered using `target="_blank"`
+- Only include trustworthy, safe, and relevant links
+- Avoid shortened or obfuscated URLs
+- Verify that all links are accessible before submitting a PR
 
 ## Commit Message Format
 
@@ -260,6 +268,7 @@ If you add a new feature, add at least one corresponding test in `tests/test_bas
 - Your branch is up to date with the upstream `main` branch
 - Your code follows the style rules above
 - You have removed all debug `print()` statements and commented-out code
+- Update `CHANGELOG.md` for any user-facing or documentation-related changes
 
 ### Steps
 

@@ -221,11 +221,47 @@
     }
     .detail-sub { font-size: 0.78rem; color: #9ca3af; margin-top: 2px; }
 
-    /* ---- Responsive ---- */
-    @media (max-width: 480px) {
-      .card { padding: 26px 20px; }
-      .temp-value { font-size: 2.8rem; }
-    }
+    .card,
+.detail-card,
+button,
+input {
+  transition: all 0.25s ease;
+}
+
+   /*responsive*/
+    @media (max-width: 600px) {
+
+  .search-row {
+    flex-direction: column;
+  }
+
+  .search-btn {
+    width: 100%;
+  }
+
+  .temp-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .city-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .weather-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .card {
+  padding: 24px 18px;
+}
+}
   </style>
 </head>
 <body>
@@ -261,7 +297,7 @@
     </div>
 
     <div class="temp-row">
-      <img class="weather-icon" id="weather-icon" src="" alt="weather icon" />
+      <img class="weather-icon" id="weather-icon" src="" alt="weather icon" loading="lazy" />
       <div>
         <span class="temp-value" id="temp-value"></span>
         <span class="temp-unit" id="temp-unit">C</span>
@@ -331,6 +367,28 @@
   // ---------------------------------------------------------------------------
   function searchWeather() {
     // --- Write your code here ---
+    var city = document.getElementById("city-input").value.trim();
+
+  if (city === "") {
+    showError("Please enter a city name.");
+    return;
+  }
+
+  var statusMsg = document.getElementById("status-msg");
+  statusMsg.textContent = "Searching for " + city + "...";
+  statusMsg.className = "message info";
+
+  document.getElementById("search-btn").disabled = true;
+
+  var url =
+    API_BASE +
+    "?q=" +
+    encodeURIComponent(city) +
+    "&appid=" +
+    API_KEY +
+    "&units=metric";
+
+  fetchWeather(url);
 
   }
 
@@ -348,8 +406,23 @@
   //   5. On network error (.catch): call showError("Network error. Check your connection.").
   //   6. Always re-enable the search button when done (success or error).
   // ---------------------------------------------------------------------------
-  function fetchWeather(url) {
+  async function fetchWeather(url) {
     // --- Write your code here ---
+     try {
+    var response = await fetch(url);
+    var data = await response.json();
+
+    if (data.cod !== 200) {
+      showError(data.message);
+      return;
+    }
+
+    displayWeather(data);
+  } catch (error) {
+    showError("Network error. Check your connection.");
+  } finally {
+    document.getElementById("search-btn").disabled = false;
+  }
 
   }
 
@@ -390,6 +463,54 @@
   // ---------------------------------------------------------------------------
   function displayWeather(data) {
     // --- Write your code here ---
+    currentTempC = data.main.temp;
+  currentFeelsLikeC = data.main.feels_like;
+  currentUnit = "C";
+
+  document.getElementById("city-name").textContent = data.name;
+
+  document.getElementById("city-date").textContent =
+    new Date().toLocaleDateString();
+
+  document.getElementById("temp-value").textContent =
+    Math.round(currentTempC);
+
+  document.getElementById("temp-unit").textContent = "C";
+
+  document.getElementById("weather-icon").src =
+    "https://openweathermap.org/img/wn/" +
+    data.weather[0].icon +
+    "@2x.png";
+
+  document.getElementById("weather-desc").textContent =
+    data.weather[0].description;
+
+  document.getElementById("feels-like").textContent =
+    Math.round(data.main.feels_like) + " C";
+
+  document.getElementById("humidity").textContent =
+    data.main.humidity + "%";
+
+  document.getElementById("wind-speed").textContent =
+    data.wind.speed + " m/s";
+
+  document.getElementById("wind-direction").textContent =
+    getWindDirection(data.wind.deg);
+
+  document.getElementById("conditions-main").textContent =
+    data.weather[0].main;
+
+  document.getElementById("conditions-desc").textContent =
+    data.weather[0].description;
+
+  document.getElementById("toggle-btn").textContent =
+    "Switch to Fahrenheit";
+
+  document.getElementById("weather-result").style.display = "block";
+
+  document.getElementById("status-msg").textContent = "";
+
+  document.getElementById("weather-icon").alt =data.weather[0].description;
 
   }
 
@@ -419,6 +540,34 @@
   // ---------------------------------------------------------------------------
   function toggleUnit() {
     // --- Write your code here ---
+    if (currentTempC === null) return;
+
+  var tempValue = document.getElementById("temp-value");
+  var tempUnit = document.getElementById("temp-unit");
+  var feelsLike = document.getElementById("feels-like");
+  var toggleBtn = document.getElementById("toggle-btn");
+
+  if (currentUnit === "C") {
+    var tempF = (currentTempC * 9/5) + 32;
+    var feelsF = (currentFeelsLikeC * 9/5) + 32;
+
+    tempValue.textContent = Math.round(tempF);
+    tempUnit.textContent = "F";
+    feelsLike.textContent = Math.round(feelsF) + " F";
+
+    toggleBtn.textContent = "Switch to Celsius";
+
+    currentUnit = "F";
+  } else {
+    tempValue.textContent = Math.round(currentTempC);
+    tempUnit.textContent = "C";
+    feelsLike.textContent =
+      Math.round(currentFeelsLikeC) + " C";
+
+    toggleBtn.textContent = "Switch to Fahrenheit";
+
+    currentUnit = "C";
+  }
 
   }
 
@@ -441,8 +590,24 @@
   // ---------------------------------------------------------------------------
   function getWindDirection(degrees) {
     // --- Write your code here ---
-
-    return degrees + " deg";  // Replace this line with the real implementation
+    if (degrees >= 337.5 || degrees < 22.5) {
+    return "North";
+  } else if (degrees < 67.5) {
+    return "Northeast";
+  } else if (degrees < 112.5) {
+    return "East";
+  } else if (degrees < 157.5) {
+    return "Southeast";
+  } else if (degrees < 202.5) {
+    return "South";
+  } else if (degrees < 247.5) {
+    return "Southwest";
+  } else if (degrees < 292.5) {
+    return "West";
+  } else {
+    return "Northwest";
+  }
+ 
   }
 
 
@@ -464,3 +629,4 @@
 </script>
 </body>
 </html>
+

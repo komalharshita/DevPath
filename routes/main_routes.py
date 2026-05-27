@@ -3,11 +3,25 @@
 # Each route is kept thin: it validates input, calls a utility function,
 # and returns a response. No business logic lives here.
 
-from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort
+from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
-from utils.data_loader import find_project_by_id
+from utils.data_loader import find_project_by_id, load_all_projects, get_project_stats
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
+import os
+
+# Interest categories that currently have no project recommendations available
+NO_PROJECT_INTERESTS = {
+    "machine learning/ai",
+    "devops",
+    "mobile",
+    "artificial intelligence",
+    "cloud computing",
+    "mobile app development",
+}
+
+def interest_has_no_projects(interest):
+    return interest and interest.strip().lower() in NO_PROJECT_INTERESTS
 
 # Create the Blueprint that app.py will register
 main = Blueprint("main", __name__)
@@ -15,8 +29,19 @@ main = Blueprint("main", __name__)
 
 @main.route("/")
 def index():
-    """Render the homepage with the skill input form."""
-    return render_template("index.html")
+    """Render the homepage with the skill input form and dynamic stats."""
+    stats = get_project_stats()
+    return render_template("index.html", stats=stats)
+
+@main.route("/health")
+def health_check():
+    """
+    Returns server status. Useful for uptime monitors and Docker health checks.
+    """
+    return jsonify({
+        "status": "ok",
+        "version": os.getenv("APP_VERSION", "1.0.0")
+    }), 200
 
 
 @main.route("/api/recommend", methods=["POST"])
@@ -45,6 +70,12 @@ def recommend():
     if errors:
         # Return only the first error to keep the UI message clean
         return jsonify({"error": errors[0]}), 400
+
+    if interest_has_no_projects(interest):
+        return jsonify({
+            "projects": [],
+            "message": "No projects are currently available for this interest area. Please check back later."
+        }), 200
 
     results = get_recommendations(skills, level, interest, time_availability)
 
@@ -103,3 +134,28 @@ def download_code(project_id):
 def robots():
     from flask import current_app
     return send_from_directory(current_app.static_folder, "robots.txt")
+
+  
+@main.route("/sitemap.xml")
+def sitemap():
+    """
+    Generate and return a sitemap.xml for search engine indexing.
+    Includes the homepage and all individual project detail pages.
+    """
+    base = request.host_url.rstrip("/")
+    projects = load_all_projects()
+
+    urls = [f"<url><loc>{base}/</loc></url>"]
+    for p in projects:
+        urls.append(f"<url><loc>{base}/project/{p['id']}</loc></url>")
+
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{''.join(urls)}
+</urlset>"""
+
+    response = make_response(xml)
+    response.headers["Content-Type"] = "application/xml"
+    return response
+
+
