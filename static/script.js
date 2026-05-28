@@ -551,8 +551,6 @@ form.addEventListener("submit", function (evt) {
     submitBtn.setAttribute("aria-busy", isLoading);
     btnLabel.style.display = isLoading ? "none" : "inline";
     btnLoading.style.display = isLoading ? "inline-flex" : "none";
-    btnLabel.style.display = isLoading ? "none" : "inline";
-    btnLoading.style.display = isLoading ? "inline" : "none";
 
     if (isLoading) {
       // Show the results section with only the loading indicator visible
