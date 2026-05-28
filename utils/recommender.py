@@ -67,34 +67,50 @@ def score_single_project(
 
     Returns an integer score (0 means no match at all).
     """
-    # Compare time availability, return results with the same time availibity or lower.
-    TIME_AVAILABILITY = ['low', 'medium', 'high']
-    time_availability_index =   TIME_AVAILABILITY.index(time_availability.strip().lower())
-    valid_time = TIME_AVAILABILITY[ : time_availability_index + 1 ]
-    
+    # Compare time availability, return results with the same time availability or lower.
+    TIME_AVAILABILITY = ["low", "medium", "high"]
+
+    # Normalize and validate the user's time availability input
+    try:
+        time_availability_index = TIME_AVAILABILITY.index(
+            time_availability.strip().lower()
+        )
+    except (ValueError, AttributeError):
+        return 0
+
+    valid_time = TIME_AVAILABILITY[: time_availability_index + 1]
+
     score = 0
 
     # Compare user's skills against the project's required skills
-    project_skills = [SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", [])]
-    # Count how many user skills overlap with the
-    # skills required by the current project.
+    project_skills = [
+        SKILL_ALIASES.get(s.lower(), s.lower())
+        for s in project.get("skills", [])
+    ]
+
+    # Count how many user skills overlap with the skills required by the project
     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
-    # Add weighted points based on the number of matching skills.
-    # More overlapping skills result in a higher recommendation score.
     score += matched_skills * SCORING_WEIGHTS["skill"]
 
-    # Award points for each additional matching criterion
-    if project.get("level", "").lower() == level.lower():
-        score += SCORING_WEIGHTS["level"]
+    # Award points for level and interest matches (if provided)
+    try:
+        if project.get("level", "").lower() == level.lower():
+            score += SCORING_WEIGHTS["level"]
 
-    if project.get("interest", "").lower() == interest.lower():
-        score += SCORING_WEIGHTS["interest"]
+        if project.get("interest", "").lower() == interest.lower():
+            score += SCORING_WEIGHTS["interest"]
+    except AttributeError:
+        # If level/interest are not strings, skip those matches
+        pass
 
-    if project.get("time", "").lower() == time_availability.lower():
+    project_time = project.get("time", "").lower()
+    if project_time == time_availability.strip().lower():
         score += SCORING_WEIGHTS["time"]
 
-    if project.get("time", "").lower() in valid_time :
+    # Only return projects whose required time is within the user's availability
+    if project_time in valid_time:
         return score
+
     return 0
 
 
