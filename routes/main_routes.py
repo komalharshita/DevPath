@@ -3,12 +3,19 @@
 # Each route is kept thin: it validates input, calls a utility function,
 # and returns a response. No business logic lives here.
 
+import json
+
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
 from utils.data_loader import find_project_by_id, get_project_stats
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
 import os
+from groq import Groq
+from dotenv import load_dotenv
+
+load_dotenv()
+groq_client = Groq(api_key=os.environ["GROQ_API_KEY"])
 
 # Create the Blueprint that app.py will register
 main = Blueprint("main", __name__)
@@ -31,46 +38,52 @@ def health_check():
     }), 200
 
 
+
 @main.route("/api/recommend", methods=["POST"])
 def recommend():
-    """
-    Accept a JSON body with user inputs and return matching project recommendations.
+    try:
+        data = request.json or {}
+        skills = data.get("skills", "")
+        level = data.get("level", "")
+        interest = data.get("interest", "")
+        time = data.get("time", "")
 
-    Expected JSON fields:
-        skills   (str) - comma-separated list of skills
-        level    (str) - Beginner | Intermediate | Advanced
-        interest (str) - Web | Data | Education | Automation | Games
-        time     (str) - Low | Medium | High
-    """
-    payload = request.get_json()
+        prompt = f"""Generate 3 UNIQUE coding projects.
+Return ONLY a raw JSON array like this:
+[
+  {{
+    "id": 1,
+    "title": "Project name",
+    "description": "What it does",
+    "skills": ["skill1", "skill2"],
+    "level": "{level}",
+    "time": "{time}"
+  }}
+]
 
-    if not payload:
-        return jsonify({"error": "Request body must be valid JSON."}), 400
+Skills: {skills}
+Level: {level}
+Interest: {interest}
+Time: {time}"""
 
-    skills            = payload.get("skills", "").strip()
-    level             = payload.get("level", "").strip()
-    interest          = payload.get("interest", "").strip()
-    time_availability = payload.get("time", "").strip()
+        response = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",  # ye use karo
+            messages=[{"role": "user", "content": prompt}]
+        )
+        raw = response.choices[0].message.content.strip()
+        raw = raw.replace("```json", "").replace("```", "").strip()
+        projects = json.loads(raw)
 
-    # Validate before running the recommendation engine
-    errors = validate_recommendation_inputs(skills, level, interest, time_availability)
-    if errors:
-        # Return only the first error to keep the UI message clean
-        return jsonify({"error": errors[0]}), 400
+        return jsonify({"projects": projects, "source": "ai"})
 
-    results = get_recommendations(skills, level, interest, time_availability)
-
-    if not results:
+    except Exception as e:
+        results = get_recommendations(skills, level, interest, time)
         return jsonify({
-            "projects": [],
-            "message": (
-                "No projects matched your inputs. "
-                "Try different skills or broaden your interest area."
-            )
-        }), 200
-
-    return jsonify({"projects": results}), 200
-
+            "projects": results,
+            "source": "stored",
+            "error": str(e)
+        })
+    
 
 @main.route("/project/<int:project_id>")
 def project_detail(project_id):

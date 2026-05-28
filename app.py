@@ -10,8 +10,11 @@
 # Business logic, recommendation scoring, and data loading all live in
 # the utils/ and routes/ packages, not here.
 
+import os
+
 from flask import Flask, render_template
 from routes.main_routes import main
+
 
 app = Flask(__name__)
 

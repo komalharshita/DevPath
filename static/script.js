@@ -589,6 +589,11 @@ if (isIndexPage) {
     link.href = "/project/" + project.id; //each project has a unique id
 
     footer.appendChild(link);
+    
+
+// Add starter code block
+var codeBlock = document.createElement("pre");
+codeBlock.textContent = project.code || "";
 
     // Assemble the card in order
     card.appendChild(title);
