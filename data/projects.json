@@ -310,6 +310,56 @@
       "Real Python API guide: https://realpython.com/api-integration-in-python/"
     ],
     "starter_code": "starter_code/api_data_pipeline.py"
+  },
+  {
+  "id": 11,
+  "title": "AI Resume Analyzer",
+  "skills": [
+    "Python",
+    "Flask",
+    "HTML",
+    "CSS",
+    "JavaScript"
+  ],
+  "level": "Intermediate",
+  "interest": "Data",
+  "time": "High",
+  "description": "A Flask web app that compares a resume against a job description using TF-IDF similarity and keyword extraction. Users upload a PDF or paste text, and the app returns a match score, a list of missing keywords, and actionable feedback — with no external AI API required.",
+  "features": [
+    "Upload a resume as PDF or paste plain text",
+    "Paste any job description for comparison",
+    "TF-IDF cosine similarity match score (0–100%)",
+    "Missing skills and keyword gap analysis",
+    "Actionable written feedback based on score",
+    "Single-page interface with interactive feedback display"
+  ],
+  "tech_stack": [
+    "Python",
+    "Flask",
+    "PyPDF2",
+    "scikit-learn",
+    "HTML",
+    "CSS",
+    "JavaScript"
+  ],
+  "roadmap": [
+    "Step 1: Run the server and verify the upload form renders",
+    "Step 2: Complete extract_text_from_pdf() using PyPDF2",
+    "Step 3: Complete clean_text() to normalise punctuation and whitespace",
+    "Step 4: Complete extract_keywords() to remove stopwords and count frequency",
+    "Step 5: Complete calculate_similarity() with TF-IDF and cosine distance",
+    "Step 6: Complete find_missing_skills() by comparing two keyword sets",
+    "Step 7: Complete generate_feedback() to produce written suggestions",
+    "Step 8: Wire everything together inside the /analyze Flask route",
+    "Step 9: Test with a real resume PDF and a real job posting"
+  ],
+  "resources": [
+    "PyPDF2 documentation: https://pypdf2.readthedocs.io/",
+    "scikit-learn TF-IDF guide: https://scikit-learn.org/stable/modules/feature_extraction.html#tfidf-term-weighting",
+    "Cosine similarity explained: https://www.machinelearningplus.com/nlp/cosine-similarity",
+    "Flask quickstart: https://flask.palletsprojects.com/quickstart"
+  ],
+  "starter_code": "starter_code/ai_resume_analyzer.py"
   }
 
   ,

@@ -438,6 +438,7 @@ if (isIndexPage) {
         .catch(function (err) {
           setLoadingState(false);
 
+
           var generalErr = document.getElementById("form-error-general");
           if (generalErr) {
             generalErr.textContent = "Something went wrong. Please try again.";
@@ -446,14 +447,30 @@ if (isIndexPage) {
           console.error("API request failed:", err);
         });
     });
+
+    //combine form values into an object to send to server/api
+    var payload = {
+      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
+      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
+      level: document.getElementById("level").value,
+      interest: document.getElementById("interest").value,
+      time: document.getElementById("time").value
+    };  
+
   });
 
   function setLoadingState(isLoading) {
     submitBtn.disabled = isLoading;
+
     submitBtn.setAttribute("aria-busy", isLoading ? "true" : "false");
 
     btnLabel.style.display = isLoading ? "none" : "inline";
     btnLoading.style.display = isLoading ? "inline" : "none";
+
+    submitBtn.setAttribute("aria-busy", isLoading);
+    btnLabel.style.display = isLoading ? "none" : "inline";
+    btnLoading.style.display = isLoading ? "inline-flex" : "none";
+
 
     if (isLoading) {
       resultsSection.style.display = "block";
@@ -475,8 +492,24 @@ if (isIndexPage) {
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "block";
 
+
       if (message && emptyMessageEl) {
         emptyMessageEl.textContent = message;
+
+      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
+    if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
+      resultsGrid.style.display    = "none";
+      resultsEmptyEl.style.display = "block";
+
+      // Show a friendly custom message when the user selected an interest
+      var selectedInterest = document.getElementById("interest")?.value;
+      if (selectedInterest) {
+        emptyMessageEl.textContent = "No projects are currently available for this interest. Please check back later or try a different area.";
+      } else if (message) {
+        emptyMessageEl.textContent = message;
+      } else {
+        emptyMessageEl.textContent = "Try adjusting your skills or choosing a different interest area.";
+
       }
 
       resultsSection.scrollIntoView({ behavior: "smooth" });
@@ -508,7 +541,11 @@ if (isIndexPage) {
     var tagsRow = document.createElement("div");
     tagsRow.className = "project-card-tags";
 
+
     (project.skills || []).slice(0, 2).forEach(function (skill) {
+
+    // Show all project skills as tags so users can see the full match
+    (project.skills || []).forEach(function (skill) {
       tagsRow.appendChild(createTag(skill, "skill"));
     });
 
