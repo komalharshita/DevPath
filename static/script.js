@@ -526,16 +526,13 @@ if (clearFiltersBtn) {
           renderResults(data.projects || [], data.message);
         })
         .catch(function () {
-
           setLoadingState(false);
-    //combine form values into an object to send to server/api
-    var payload = {
-      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level: document.getElementById("level").value,
-      interest: document.getElementById("interest").value,
-      time: document.getElementById("time").value
-    };  
+          var generalErr = document.getElementById("form-error-general");
+          if (generalErr) {
+            generalErr.textContent = "An error occurred while fetching recommendations. Please try again.";
+          }
+        });
+    });
   });
 
   // Manages the loading state of the form and results section(whats visible or not)
@@ -574,23 +571,16 @@ if (clearFiltersBtn) {
     resultsGrid.innerHTML = "";
 
     if (!projects || projects.length === 0) {
-      resultsGrid.style.display     = "none";
-      resultsEmptyEl.style.display  = "block";
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
-    if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
-      resultsGrid.style.display    = "none";
-      resultsEmptyEl.style.display = "block";
 
-      // Show a friendly custom message when the user selected an interest
       var selectedInterest = document.getElementById("interest")?.value;
-      if (selectedInterest) {
-        emptyMessageEl.textContent = "No projects are currently available for this interest. Please check back later or try a different area.";
+      if (selectedInterest && !message) {
+        if (emptyMessageEl) emptyMessageEl.textContent = "No projects are currently available for this interest. Please check back later or try a different area.";
       } else if (message) {
-        emptyMessageEl.textContent = message;
+        if (emptyMessageEl) emptyMessageEl.textContent = message;
       } else {
-        emptyMessageEl.textContent = "Try adjusting your skills or choosing a different interest area.";
+        if (emptyMessageEl) emptyMessageEl.textContent = "Try adjusting your skills or choosing a different interest area.";
       }
 
       resultsSection.scrollIntoView({ behavior: "smooth" });
