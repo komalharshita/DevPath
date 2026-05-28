@@ -410,6 +410,7 @@
               <button type="button" class="skill-chip" data-skill="Webpack">Webpack</button>
             </div>
 
+
             <!-- Level + Interest in a row -->
             <div class="form-row">
               <div class="form-group">
@@ -584,6 +585,15 @@
       </div>
     </div>
   </section>
+  <!-- Back to top button (appears after scrolling) -->
+<div class="back-to-top">
+  <button id="scrollBtn">
+    <img 
+      src="{{ url_for('static', filename='Back-to-top.png') }}" 
+      alt="Back to Top"
+    >
+  </button>
+</div>
 
   <!-- ============================================================
        Footer
@@ -683,6 +693,7 @@
 .btn-clear:hover {
     background-color: #e5e7eb;
 }
+
 </style>
 
 

@@ -23,6 +23,35 @@ var githubInput = document.getElementById('github-username');
 var errorMsg = document.getElementById('github-modal-error');
 
 
+/* ---- Scroll-to-top button ---- */
+
+var scrollBtn = document.querySelector(".back-to-top");
+
+if (scrollBtn) {
+
+  // Show the button after scrolling down 300px
+  window.addEventListener("scroll", function () {
+
+    if (window.scrollY > 300) {
+      scrollBtn.style.display = "block";
+    } else {
+      scrollBtn.style.display = "none";
+    }
+
+  });
+
+  scrollBtn.addEventListener("click", function () {
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+  });
+
+}
+
+
 // ============================================================
 // Mobile navigation toggle (runs on all pages)
 // ============================================================
@@ -525,17 +554,21 @@ if (clearFiltersBtn) {
 
           renderResults(data.projects || [], data.message);
         })
-        .catch(function () {
+                .catch(function () {
 
           setLoadingState(false);
-    //combine form values into an object to send to server/api
-    var payload = {
-      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level: document.getElementById("level").value,
-      interest: document.getElementById("interest").value,
-      time: document.getElementById("time").value
-    };  
+
+          var generalErr = document.getElementById("form-error-general");
+
+          if (generalErr) {
+            generalErr.textContent =
+              "Something went wrong. Please try again.";
+          }
+
+        });
+
+    });
+
   });
 
   // Manages the loading state of the form and results section(whats visible or not)
@@ -573,12 +606,7 @@ if (clearFiltersBtn) {
     // Clear out any cards from a previous search before showing new ones
     resultsGrid.innerHTML = "";
 
-    if (!projects || projects.length === 0) {
-      resultsGrid.style.display     = "none";
-      resultsEmptyEl.style.display  = "block";
-      resultsGrid.style.display = "none";
-      resultsEmptyEl.style.display = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
+
     if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
       resultsGrid.style.display    = "none";
       resultsEmptyEl.style.display = "block";
@@ -902,31 +930,3 @@ if (
   });
 }
 
-/* ---- Scroll-to-top button ---- */
-
-/* Show the button only when the user has scrolled more than 300px */
-var SCROLL_THRESHOLD = 300;
-
-/* Get the button element; guard against pages that do not have it */
-var scrollTopBtn = document.getElementById('scroll-top-btn');
-
-/* Add or remove the .visible class based on scroll position */
-function handleScroll() {
-  if (!scrollTopBtn) return;
-  if (window.pageYOffset > SCROLL_THRESHOLD) {
-    scrollTopBtn.classList.add('visible');
-  } else {
-    scrollTopBtn.classList.remove('visible');
-  }
-}
-
-/* Smooth-scroll to the very top of the page */
-function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-/* Only wire up listeners if the button exists on this page */
-if (scrollTopBtn) {
-    window.addEventListener('scroll', handleScroll);
-    scrollTopBtn.addEventListener('click', scrollToTop);
-}
