@@ -69,3 +69,4 @@ var skills = [
     {id: "responsive-design", label: "Responsive Design"},
     {id: "api-design", label: "API Design"},
 ];
+

@@ -12,11 +12,13 @@
 
 from flask import Flask, render_template
 from routes.main_routes import main
+import os
 
 app = Flask(__name__)
-
+app.secret_key = os.getenv("SECRET_KEY", "fallback-dev-key") 
 # Register all routes defined in the main Blueprint
 app.register_blueprint(main)
+
 
 @app.after_request
 def add_security_headers(response):

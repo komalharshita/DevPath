@@ -11,6 +11,13 @@
 // ============================================================
 // Detect which page we are on
 // ============================================================
+// ── GitHub Modal ─────────────────────────────────────────────
+function handleGithubImport() {
+  document.getElementById("github-modal-overlay").style.display = "flex";
+  document.getElementById("github-username").focus();
+  document.getElementById("github-modal-error").textContent = "";
+  document.getElementById("github-username").value = "";
+}
 // !! trick turns the DOM result into a simple true/false
 var isIndexPage = !!document.getElementById("recommend-form");
 // PROJECT_ID is set by the server only on detail pages, so if it's missing we're elsewhere
@@ -50,11 +57,12 @@ var errorMsg = document.getElementById('github-modal-error');
   });
 })();
 
+// ✅ Put this near the top, before isIndexPage block
 
 // ============================================================
 // INDEX PAGE
 // ============================================================
-if (isIndexPage) {
+
 
   // DOM references
   // grabbing all the elements we'll need so we're not calling getElementById over and over again throughout the code
@@ -537,7 +545,7 @@ if (clearFiltersBtn) {
       time: document.getElementById("time").value
     };  
   });
-
+});
   // Manages the loading state of the form and results section(whats visible or not)
   function setLoadingState(isLoading) {
     // Disable the button so the user can't accidentally submit twice
@@ -841,67 +849,7 @@ if (isDetailPage) {
   }
 } // end isDetailPage
 
-if (
-    openModalBtn &&
-    closeModalBtn &&
-    modal &&
-    githubInput &&
-    fetchBtn &&
-    errorMsg
-) {
-// 1. Open Github Input Modal
-  openModalBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      modal.classList.add('active');
-      githubInput.focus();
-  });
-
-  // 2. Close Github Input Modal
-  const closeGithubModal = () => {
-      modal.classList.remove('active');
-      githubInput.value = '';
-      errorMsg.textContent = '';
-  };
-
-  closeModalBtn.addEventListener('click', closeGithubModal);
-
-  // Close on clicking outside the card
-  modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeGithubModal();
-  });
-
-  // 3. Fetch Skills Logic
-  fetchBtn.addEventListener('click', async () => {
-      const username = githubInput.value.trim();
-      if (!username) return;
-
-      fetchBtn.disabled = true;
-      fetchBtn.textContent = 'Syncing...';
-
-      try {
-          const response = await fetch(`https://api.github.com/users/${username}/repos`);
-          if (!response.ok) throw new Error();
-          
-          const repos = await response.json();
-          const langs = [...new Set(repos.map(r => r.language).filter(Boolean))];
-
-          if (langs.length > 0) {
-              langs.forEach(lang => {
-                  if (typeof addSkill === 'function') addSkill(lang);
-              });
-              closeGithubModal();
-          } else {
-              errorMsg.textContent = "No public languages found.";
-          }
-      } catch (err) {
-          errorMsg.textContent = err.message ?? "Failed to fetch skills";
-      } finally {
-          fetchBtn.disabled = false;
-          fetchBtn.textContent = 'Fetch Skills';
-      }
-  });
-}
-
+});
 /* ---- Scroll-to-top button ---- */
 
 /* Show the button only when the user has scrolled more than 300px */
@@ -929,4 +877,109 @@ function scrollToTop() {
 if (scrollTopBtn) {
     window.addEventListener('scroll', handleScroll);
     scrollTopBtn.addEventListener('click', scrollToTop);
+}
+
+// ── GitHub Modal ─────────────────────────────────────────────
+if (isIndexPage) {
+  function handleGithubImport() {
+    const overlay = document.getElementById("github-modal-overlay");
+    overlay.style.display = "flex";
+    document.getElementById("github-username").focus();
+    document.getElementById("github-modal-error").textContent = "";
+    document.getElementById("github-username").value = "";
+  }
+
+  // Close modal
+  document.getElementById("btn-close-github").addEventListener("click", () => {
+    document.getElementById("github-modal-overlay").style.display = "none";
+  });
+
+  // Close on overlay background click
+  document.getElementById("github-modal-overlay").addEventListener("click", (e) => {
+    if (e.target === document.getElementById("github-modal-overlay")) {
+      document.getElementById("github-modal-overlay").style.display = "none";
+    }
+  });
+
+  // Fetch skills from GitHub public API
+  document.getElementById("btn-fetch-github").addEventListener("click", async () => {
+    const username = document.getElementById("github-username").value.trim();
+    const errorEl = document.getElementById("github-modal-error");
+    const btn = document.getElementById("btn-fetch-github");
+
+    if (!username) {
+      errorEl.textContent = "Please enter a GitHub username.";
+      return;
+    }
+
+    errorEl.textContent = "";
+    btn.textContent = "Fetching...";
+    btn.disabled = true;
+
+    try {
+      // Fetch top repos sorted by stars
+      const reposRes = await fetch(
+        `https://api.github.com/users/${username}/repos?sort=stars&per_page=10`
+      );
+
+      if (!reposRes.ok) {
+        errorEl.textContent = "GitHub user not found. Check the username.";
+        return;
+      }
+
+      const repos = await reposRes.json();
+
+      // Collect all languages from each repo
+      const languageSet = new Set();
+
+      await Promise.all(repos.map(async (repo) => {
+        if (repo.language) languageSet.add(repo.language);
+
+        // Fetch detailed language breakdown
+        const langRes = await fetch(repo.languages_url);
+        if (langRes.ok) {
+          const langs = await langRes.json();
+          Object.keys(langs).forEach(l => languageSet.add(l));
+        }
+      }));
+
+      if (languageSet.size === 0) {
+        errorEl.textContent = "No languages found in this user's repositories.";
+        return;
+      }
+
+      // Autofill into the skills chip system
+      languageSet.forEach(skill => addSkill(skill));
+
+      // Close modal
+      document.getElementById("github-modal-overlay").style.display = "none";
+
+      // Show toast
+      showToast(`✅ ${languageSet.size} skills imported from GitHub!`);
+
+      // Scroll to skills input
+      document.getElementById("skills-input").scrollIntoView({ behavior: "smooth", block: "center" });
+
+    } catch (err) {
+      errorEl.textContent = "Something went wrong. Please try again.";
+    } finally {
+      btn.textContent = "Fetch Skills";
+      btn.disabled = false;
+    }
+  });
+}
+// ── Toast Notification ───────────────────────────────────────
+
+// ✅ Place this at the very bottom, outside everything
+function showToast(message) {
+  const toast = document.createElement("div");
+  toast.textContent = message;
+  toast.style.cssText = `
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #1f2937; color: #fff; padding: 12px 24px;
+    border-radius: 8px; font-size: 14px; z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
 }

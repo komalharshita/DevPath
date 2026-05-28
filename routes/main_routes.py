@@ -3,12 +3,25 @@
 # Each route is kept thin: it validates input, calls a utility function,
 # and returns a response. No business logic lives here.
 
-from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response
+from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response , redirect , session  , current_app
+from dotenv import load_dotenv
+import requests
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
 from utils.data_loader import find_project_by_id, load_all_projects, get_project_stats
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
 import os
+# Point explicitly to the parent directory where the .env file actually lives
+base_dir = os.path.abspath(os.path.dirname(__file__))
+# Moving up one directory level to DevPath
+root_dir = os.path.dirname(base_dir) 
+dotenv_path = os.path.join(root_dir, '.env')
+load_dotenv(dotenv_path=dotenv_path)
+
+
+# 3. Add this debug print right here to verify it during startup
+
+
 
 # Interest categories that currently have no project recommendations available
 NO_PROJECT_INTERESTS = {
@@ -25,6 +38,8 @@ def interest_has_no_projects(interest):
 
 # Create the Blueprint that app.py will register
 main = Blueprint("main", __name__)
+
+
 
 
 @main.route("/")
@@ -157,3 +172,88 @@ def sitemap():
 def robots():
     """Serve robots.txt from the static folder."""
     return send_from_directory("static", "robots.txt", mimetype="text/plain")
+
+@main.route("/api/auth/github")
+def github_auth():
+    github_url = (
+        "https://github.com/login/oauth/authorize"
+        f"?client_id={os.getenv('GITHUB_CLIENT_ID')}"
+        "&scope=repo read:user"
+        f"&redirect_uri={os.getenv('GITHUB_REDIRECT_URI')}"
+    )
+    return redirect(github_url)
+@main.route("/auth/github/callback")
+def github_callback():
+    code = request.args.get("code")
+
+    token_res = requests.post(
+        "https://github.com/login/oauth/access_token",
+        headers={"Accept": "application/json"},
+        data={
+            "client_id": os.getenv("GITHUB_CLIENT_ID"),
+            "client_secret": os.getenv("GITHUB_CLIENT_SECRET"),
+            "code": code,
+        },
+    )
+
+    token_data = token_res.json()
+    access_token = token_data.get("access_token")
+    print(access_token)
+    if not access_token:
+        return redirect("http://localhost:5000/dashboard?github=failed")
+
+    # This will now succeed because app.secret_key is set correctly at boot time
+    session["github_token"] = access_token
+
+    return redirect("/?github=success")
+@main.route("/api/github/repos")
+def github_repos():
+    token = session.get("github_token")
+    if not token:
+        return {"error": "GitHub not connected"}, 401
+
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Fetch all repos
+    repos_res = requests.get("https://api.github.com/user/repos", headers=headers)
+    repos = repos_res.json()
+
+    # Collect languages from each repo
+    skills = set()
+    for repo in repos:
+        # Primary language
+        if repo.get("language"):
+            skills.add(repo["language"])
+
+        # Fetch detailed languages breakdown per repo
+        lang_res = requests.get(repo["languages_url"], headers=headers)
+        if lang_res.status_code == 200:
+            skills.update(lang_res.json().keys())
+
+        # Fetch topics/tags on the repo
+        topics_res = requests.get(
+            f"https://api.github.com/repos/{repo['full_name']}/topics",
+            headers={**headers, "Accept": "application/vnd.github.mercy-preview+json"}
+        )
+        if topics_res.status_code == 200:
+            skills.update(topics_res.json().get("names", []))
+
+    return jsonify({"skills": list(skills)}), 200
+
+@main.route("/api/github/import", methods=["POST"])
+def import_repo():
+    token = session.get("github_token")
+    repo_full_name = request.json.get("repo")  # example: "username/project"
+
+    if not token:
+        return {"error": "GitHub not connected"}, 401
+
+    repo_res = requests.get(
+        f"https://api.github.com/repos/{repo_full_name}",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    return {
+        "message": "Repository imported successfully",
+        "repo": repo_res.json()
+    }
