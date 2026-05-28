@@ -12,6 +12,7 @@
 
 import sys
 import os
+import py_compile
 
 # Allow imports from the project root when running tests directly
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -54,6 +55,16 @@ def test_each_project_has_required_fields():
     for project in load_all_projects():
         for field in required:
             assert field in project, f"Project '{project.get('title')}' is missing field: {field}"
+
+
+def test_python_starter_code_files_compile():
+    """Python starter files must be syntactically valid for users to run."""
+    starter_code_dir = os.path.join(os.path.dirname(__file__), "..", "starter_code")
+
+    for filename in os.listdir(starter_code_dir):
+        if filename.endswith(".py"):
+            path = os.path.join(starter_code_dir, filename)
+            py_compile.compile(path, doraise=True)
 
 
 def test_find_project_by_id_found():
