@@ -28,6 +28,31 @@ SKILL_ALIASES = {
     "c++": "cpp",
     "web dev": "javascript"
 }
+VALID_LEVELS = {
+    "beginner",
+    "intermediate",
+    "advanced"
+}
+
+VALID_TIME = {
+    "low",
+    "medium",
+    "high"
+}
+
+VALID_INTERESTS = {
+    "web",
+    "data",
+    "education",
+    "automation",
+    "games",
+    "machine learning/ai",
+    "devops",
+    "mobile",
+    "artificial intelligence",
+    "cloud computing",
+    "mobile app development",
+}
 
 
 def parse_skills(skills_string):
@@ -133,7 +158,7 @@ def get_recommendations(skills_string, level, interest, time_availability):
 
 def validate_recommendation_inputs(skills, level, interest, time_availability):
     """
-    Validate all four required fields.
+    Validate all recommendation inputs.
     Returns a list of error strings. An empty list means all inputs are valid.
     """
     errors = []
@@ -143,11 +168,26 @@ def validate_recommendation_inputs(skills, level, interest, time_availability):
 
     if not level or not level.strip():
         errors.append("Please select an experience level.")
+    elif level.strip().lower() not in VALID_LEVELS:
+        errors.append(
+            "Invalid experience level. "
+            "Choose Beginner, Intermediate, or Advanced."
+        )
 
     if not interest or not interest.strip():
         errors.append("Please select an area of interest.")
+    elif interest.strip().lower() not in VALID_INTERESTS:
+        errors.append(
+            "Invalid interest. "
+            "Choose a supported interest area."
+        )
 
     if not time_availability or not time_availability.strip():
         errors.append("Please select your time availability.")
+    elif time_availability.strip().lower() not in VALID_TIME:
+        errors.append(
+            "Invalid time availability. "
+            "Choose Low, Medium, or High."
+        )
 
     return errors

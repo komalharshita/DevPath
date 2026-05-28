@@ -182,6 +182,38 @@ def test_validate_all_valid():
     errors = validate_recommendation_inputs("Python", "Beginner", "Web", "Low")
     assert errors == [], f"Unexpected errors: {errors}"
 
+def test_validate_invalid_level():
+    """Invalid level should return an error."""
+    errors = validate_recommendation_inputs(
+        "Python",
+        "Expert",
+        "Web",
+        "Low"
+    )
+    assert any("Invalid experience level" in e for e in errors)
+
+
+def test_validate_invalid_interest():
+    """Invalid interest should return an error."""
+    errors = validate_recommendation_inputs(
+        "Python",
+        "Beginner",
+        "Blockchain",
+        "Low"
+    )
+    assert any("Invalid interest" in e for e in errors)
+
+
+def test_validate_invalid_time():
+    """Invalid time should return an error."""
+    errors = validate_recommendation_inputs(
+        "Python",
+        "Beginner",
+        "Web",
+        "Very High"
+    )
+    assert any("Invalid time availability" in e for e in errors)
+
 
 def test_validate_missing_skills():
     """An empty skills field must produce an error."""
@@ -284,6 +316,20 @@ def test_recommend_api_missing_field():
     assert response.status_code in (400, 415)
     assert "error" in response.get_json()
 
+def test_recommend_api_invalid_level():
+    """API should return 400 for invalid experience level."""
+    client = get_client()
+
+    response = client.post("/api/recommend", json={
+        "skills": "Python",
+        "level": "Expert",
+        "interest": "Data",
+        "time": "Low"
+    })
+
+    assert response.status_code == 400
+    assert "error" in response.get_json()
+    
 
 def test_recommend_api_empty_body():
     """The API should return 400 when the body is not valid JSON."""
