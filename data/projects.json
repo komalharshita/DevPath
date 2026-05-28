@@ -273,6 +273,189 @@
       "MDN HTML Forms: https://developer.mozilla.org/en-US/docs/Learn/Forms"
     ],
     "starter_code": "starter_code/survey_form/index.html"
+  },
+  {
+    "id":10,
+    "title": "API ETL Pipeline",
+    "skills": ["Python","pandas","requests"],
+    "level": "Intermediate",
+    "interest": "Data",
+    "time": "Medium",
+    "description": "Enter a public API URL to fetch data and automatically transform it into a structured CSV dataset.",
+    "features": [
+      "Fetch data from public APIs",
+      "handle missing values",
+      "Normalize nested JSON",
+      "Generate summary statistics",
+      "Export the processed CSV for any other Analytics projects"
+    ],
+    "tech_stack": ["Python", "pandas","requests","JSON"],
+    "roadmap": [
+      "Step 1:  Install required modules via pip",
+      "Step 2:  Find a public API key for this project",
+      "Step 3:  Fetch the data from the API using requests",
+      "Step 4:  Validate the response you just fetched From the API",
+      "Step 5:  Normalize the nested JSON data by flattening it",
+      "Step 6:  Use the fetched data to build a pandas dataframe",
+      "Step 7:  Handle missing values or duplicate values",
+      "Step 8:  Export the cleaned dataset to CSV format",
+      "Step 9:  Generate a summary for the newly created CSV dataset",
+      "Step 10: Test the file with at least two different public APIs"
+    ],
+    "resources": [
+      "pandas docs: https://pandas.pydata.org/docs",
+      "requests docs: https://requests.readthedocs.io/en/latest/",
+      "JSON handling in Python: https://docs.python.org/3/library/json.html",
+      "REST API tutorial: https://restfulapi.net/",
+      "Real Python API guide: https://realpython.com/api-integration-in-python/"
+    ],
+    "starter_code": "starter_code/api_data_pipeline.py"
+  },
+  {
+  "id": 11,
+  "title": "AI Resume Analyzer",
+  "skills": [
+    "Python",
+    "Flask",
+    "HTML",
+    "CSS",
+    "JavaScript"
+  ],
+  "level": "Intermediate",
+  "interest": "Data",
+  "time": "High",
+  "description": "A Flask web app that compares a resume against a job description using TF-IDF similarity and keyword extraction. Users upload a PDF or paste text, and the app returns a match score, a list of missing keywords, and actionable feedback — with no external AI API required.",
+  "features": [
+    "Upload a resume as PDF or paste plain text",
+    "Paste any job description for comparison",
+    "TF-IDF cosine similarity match score (0–100%)",
+    "Missing skills and keyword gap analysis",
+    "Actionable written feedback based on score",
+    "Single-page interface with interactive feedback display"
+  ],
+  "tech_stack": [
+    "Python",
+    "Flask",
+    "PyPDF2",
+    "scikit-learn",
+    "HTML",
+    "CSS",
+    "JavaScript"
+  ],
+  "roadmap": [
+    "Step 1: Run the server and verify the upload form renders",
+    "Step 2: Complete extract_text_from_pdf() using PyPDF2",
+    "Step 3: Complete clean_text() to normalise punctuation and whitespace",
+    "Step 4: Complete extract_keywords() to remove stopwords and count frequency",
+    "Step 5: Complete calculate_similarity() with TF-IDF and cosine distance",
+    "Step 6: Complete find_missing_skills() by comparing two keyword sets",
+    "Step 7: Complete generate_feedback() to produce written suggestions",
+    "Step 8: Wire everything together inside the /analyze Flask route",
+    "Step 9: Test with a real resume PDF and a real job posting"
+  ],
+  "resources": [
+    "PyPDF2 documentation: https://pypdf2.readthedocs.io/",
+    "scikit-learn TF-IDF guide: https://scikit-learn.org/stable/modules/feature_extraction.html#tfidf-term-weighting",
+    "Cosine similarity explained: https://www.machinelearningplus.com/nlp/cosine-similarity",
+    "Flask quickstart: https://flask.palletsprojects.com/quickstart"
+  ],
+  "starter_code": "starter_code/ai_resume_analyzer.py"
+  }
+
+  ,
+  {
+    "id": 8,
+    "title": "Number Guessing Game",
+    "skills": ["Python"],
+    "level": "Beginner",
+    "interest": "Games",
+    "time": "Low",
+    "description": "A fun command-line game where the computer picks a random number and the user tries to guess it. Great for learning loops, conditionals, and user input handling.",
+    "features": [
+      "Generate random number between 1 and 100",
+      "Give hints: too high or too low",
+      "Count number of attempts",
+      "Show final score at the end"
+    ],
+    "tech_stack": ["Python", "random module"],
+    "roadmap": [
+      "Step 1: Set up the Python file and import random module",
+      "Step 2: Generate a random number using random.randint()",
+      "Step 3: Write a loop to take user input",
+      "Step 4: Compare guess with the number",
+      "Step 5: Give hints if guess is too high or too low",
+      "Step 6: Count the number of attempts",
+      "Step 7: Display win message with attempt count"
+    ],
+    "resources": [
+      "Python random module: https://docs.python.org/3/library/random.html",
+      "W3Schools Python: https://www.w3schools.com/python",
+      "Real Python: https://realpython.com"
+    ],
+    "starter_code": "starter_code/number_guessing.py"
+  },
+  {
+    "id": 9,
+    "title": "Simple Email Automation",
+    "skills": ["Python"],
+    "level": "Beginner",
+    "interest": "Automation",
+    "time": "Low",
+    "description": "A Python script that sends automated emails using the smtplib library. Learn how to automate repetitive tasks and work with Python standard libraries.",
+    "features": [
+      "Compose and send emails via Python",
+      "Send to multiple recipients",
+      "Add subject and body text",
+      "Read recipient list from a text file"
+    ],
+    "tech_stack": ["Python", "smtplib", "email module"],
+    "roadmap": [
+      "Step 1: Set up Python file and import smtplib",
+      "Step 2: Configure sender email and password",
+      "Step 3: Write the email composition function",
+      "Step 4: Connect to Gmail SMTP server",
+      "Step 5: Send email to one recipient and test",
+      "Step 6: Read recipient list from a text file",
+      "Step 7: Loop through recipients and send to all"
+    ],
+    "resources": [
+      "Python smtplib docs: https://docs.python.org/3/library/smtplib.html",
+      "Real Python email guide: https://realpython.com/python-send-email",
+      "Gmail SMTP settings: https://support.google.com/mail"
+    ],
+    "starter_code": "starter_code/email_automation.py"
+  },
+  {
+    "id": 10,
+    "title": "Quiz App",
+    "skills": ["HTML", "CSS", "JavaScript"],
+    "level": "Beginner",
+    "interest": "Games",
+    "time": "Low",
+    "description": "A browser-based quiz app with multiple choice questions, a score counter, and a results screen. Perfect for practising DOM manipulation and event handling in JavaScript.",
+    "features": [
+      "Display one question at a time",
+      "Four multiple choice options per question",
+      "Show correct or incorrect feedback instantly",
+      "Display final score on results screen"
+    ],
+    "tech_stack": ["HTML", "CSS", "JavaScript"],
+    "roadmap": [
+      "Step 1: Create HTML structure for question and options",
+      "Step 2: Style the quiz card with CSS",
+      "Step 3: Store questions as a JavaScript array of objects",
+      "Step 4: Write a function to display each question",
+      "Step 5: Add click event listeners to option buttons",
+      "Step 6: Check the selected answer and update score",
+      "Step 7: Move to the next question automatically",
+      "Step 8: Show the results screen with final score"
+    ],
+    "resources": [
+      "MDN DOM guide: https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model",
+      "JavaScript events: https://javascript.info/events",
+      "W3Schools JavaScript: https://www.w3schools.com/js"
+    ],
+    "starter_code": "starter_code/quiz_app.html"
   }
 ]
 

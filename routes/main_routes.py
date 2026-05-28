@@ -8,7 +8,7 @@ import json
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
-from utils.data_loader import find_project_by_id, get_project_stats
+from utils.data_loader import find_project_by_id, load_all_projects, get_project_stats
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
 import os
 from groq import Groq
@@ -16,6 +16,19 @@ from dotenv import load_dotenv
 
 load_dotenv()
 groq_client = Groq(api_key=os.environ["GROQ_API_KEY"])
+
+# Interest categories that currently have no project recommendations available
+NO_PROJECT_INTERESTS = {
+    "machine learning/ai",
+    "devops",
+    "mobile",
+    "artificial intelligence",
+    "cloud computing",
+    "mobile app development",
+}
+
+def interest_has_no_projects(interest):
+    return interest and interest.strip().lower() in NO_PROJECT_INTERESTS
 
 # Create the Blueprint that app.py will register
 main = Blueprint("main", __name__)
@@ -122,3 +135,32 @@ def download_code(project_id):
     import os
     filename = os.path.basename(full_path)
     return send_from_directory(get_starter_code_dir(), filename, as_attachment=True)
+
+
+@main.route("/sitemap.xml")
+def sitemap():
+    """
+    Generate and return a sitemap.xml for search engine indexing.
+    Includes the homepage and all individual project detail pages.
+    """
+    base = request.host_url.rstrip("/")
+    projects = load_all_projects()
+
+    urls = [f"<url><loc>{base}/</loc></url>"]
+    for p in projects:
+        urls.append(f"<url><loc>{base}/project/{p['id']}</loc></url>")
+
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{''.join(urls)}
+</urlset>"""
+
+    response = make_response(xml)
+    response.headers["Content-Type"] = "application/xml"
+    return response
+
+
+@main.route("/robots.txt")
+def robots():
+    """Serve robots.txt from the static folder."""
+    return send_from_directory("static", "robots.txt", mimetype="text/plain")
