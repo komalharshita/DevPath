@@ -17,6 +17,16 @@
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="{{ project.title }} — DevPath" />
   <meta name="twitter:description" content="{{ project.description[:155] }}" />
+  <script>
+    (function () {
+      var storedTheme = null;
+      try {
+        storedTheme = localStorage.getItem("devpath-theme");
+      } catch (error) {}
+      var systemPrefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.setAttribute("data-theme", storedTheme || (systemPrefersDark ? "dark" : "light"));
+    })();
+  </script>
   <link rel="stylesheet" href="/static/style.css" />
   <link
     href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
@@ -34,6 +44,28 @@
       <div class="nav-links">
         <a href="/" class="nav-link">Back to Search</a>
         <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-link nav-link-gh">GitHub</a>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" aria-pressed="false">
+          <span class="theme-toggle-icon theme-toggle-icon--sun" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2" />
+              <path d="M12 20v2" />
+              <path d="m4.93 4.93 1.41 1.41" />
+              <path d="m17.66 17.66 1.41 1.41" />
+              <path d="M2 12h2" />
+              <path d="M20 12h2" />
+              <path d="m6.34 17.66-1.41 1.41" />
+              <path d="m19.07 4.93-1.41 1.41" />
+            </svg>
+          </span>
+          <span class="theme-toggle-icon theme-toggle-icon--moon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.99 12.56A8.99 8.99 0 1 1 11.44 3a7 7 0 0 0 9.55 9.56Z" />
+            </svg>
+          </span>
+        </button>
       </div>
     </div>
   </nav>
