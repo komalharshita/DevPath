@@ -18,6 +18,16 @@ app = Flask(__name__)
 # Register all routes defined in the main Blueprint
 app.register_blueprint(main)
 
+@app.after_request
+def add_security_headers(response):
+    """Add basic security headers to all responses."""
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = (
+        "geolocation=(), microphone=(), camera=()"
+    )
+    return response
 
 # ---- Error handlers ----
 
@@ -36,6 +46,11 @@ def internal_server_error(error):
 def method_not_allowed(error):
     """Render a friendly 405 page when the wrong HTTP method is used."""
     return render_template("405.html"), 405
+
+@app.errorhandler(403)
+def forbidden(error):
+    """Render a friendly 403 page when access is denied."""
+    return render_template("403.html"), 403
 
 
 if __name__ == "__main__":
