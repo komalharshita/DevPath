@@ -12,11 +12,16 @@
 
 from flask import Flask, render_template
 from routes.main_routes import main
+from utils.data_loader import validate_interest_coverage
 
 app = Flask(__name__)
 
 # Register all routes defined in the main Blueprint
 app.register_blueprint(main)
+
+# Log warnings for dropdown interests with zero projects
+validate_interest_coverage()
+
 
 @app.after_request
 def add_security_headers(response):
@@ -24,12 +29,12 @@ def add_security_headers(response):
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-    response.headers["Permissions-Policy"] = (
-        "geolocation=(), microphone=(), camera=()"
-    )
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
     return response
 
+
 # ---- Error handlers ----
+
 
 @app.errorhandler(404)
 def page_not_found(error):
@@ -42,10 +47,12 @@ def internal_server_error(error):
     """Render a friendly 500 page for unexpected server errors."""
     return render_template("500.html"), 500
 
+
 @app.errorhandler(405)
 def method_not_allowed(error):
     """Render a friendly 405 page when the wrong HTTP method is used."""
     return render_template("405.html"), 405
+
 
 @app.errorhandler(403)
 def forbidden(error):

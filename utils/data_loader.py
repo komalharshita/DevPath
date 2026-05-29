@@ -2,7 +2,10 @@
 # Handles all reading and lookup of project data from the JSON file.
 
 import json
+import logging
 import os
+
+logger = logging.getLogger(__name__)
 
 # Build the path to projects.json relative to this file's location
 DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "projects.json")
@@ -23,6 +26,7 @@ def find_project_by_id(project_id):
         if project.get("id") == project_id:
             return project
     return None
+
 
 def get_project_stats():
     """
@@ -45,8 +49,9 @@ def get_project_stats():
     return {
         "total_projects": total_projects,
         "unique_skills": unique_skills,
-        "beginner_friendly": beginner_friendly
+        "beginner_friendly": beginner_friendly,
     }
+
 
 # Cache for loaded projects
 _projects_cache = None
@@ -56,3 +61,39 @@ def clear_cache():
     """Reset the in-memory project cache."""
     global _projects_cache
     _projects_cache = None
+
+
+# Interests available in the UI dropdown (must match templates/index.html option values)
+_DROPDOWN_INTERESTS = {
+    "web",
+    "data",
+    "education",
+    "automation",
+    "games",
+    "cybersecurity",
+    "devops",
+    "mobile",
+    "machine learning/ai",
+}
+
+
+def validate_interest_coverage():
+    """
+    Log warnings for dropdown interests that have zero projects in the dataset.
+    Called at startup so developers know when new categories need projects.
+    """
+    projects = load_all_projects()
+    interest_counts = {}
+    for p in projects:
+        interest = p.get("interest", "").strip().lower()
+        if interest:
+            interest_counts[interest] = interest_counts.get(interest, 0) + 1
+
+    empty_interests = _DROPDOWN_INTERESTS - set(interest_counts.keys())
+    for interest in sorted(empty_interests):
+        logger.warning(
+            "Interest '%s' appears in the UI dropdown but has zero projects",
+            interest,
+        )
+
+    return empty_interests
