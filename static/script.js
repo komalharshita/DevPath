@@ -1,13 +1,4 @@
 // script.js — DevPath client-side logic
-//
-// Responsibilities:
-//   - Mobile navigation toggle
-//   - Skill chip manager (add/remove skills)
-//   - Form validation with per-field error messages
-//   - Recommendation API call and loading states
-//   - Result card rendering
-//   - Code viewer panel (detail page)
-
 var isIndexPage = !!document.getElementById("recommend-form");
 var isDetailPage = typeof PROJECT_ID !== "undefined";
 var modal = document.getElementById('github-modal-overlay');
@@ -378,12 +369,23 @@ if (isIndexPage) {
     if (!projects || projects.length === 0) {
       resultsGrid.style.display = "none";
       if (resultsEmptyEl) resultsEmptyEl.style.display = "block"; 
+
+      var selectedInterest = document.getElementById("interest")?.value;
+      let baseMessage = "No projects match your current inputs.";
+      
+      if (selectedInterest) {
+        baseMessage = "No projects are currently available for this interest. Please check back later or try a different area.";
+      } else if (message) {
+        baseMessage = message;
+      }
+
       if (emptyMessageEl) {
         emptyMessageEl.innerHTML = `
-          ${message || "No projects match your current inputs."}<br><br>
+          ${baseMessage}<br><br>
           <strong>Try adding popular alternative skills</strong> like Python, JavaScript, HTML, or CSS to see more matching repositories!
         `;
       }
+      
       resultsSection.scrollIntoView({ behavior: "smooth" });
       return;
     }
