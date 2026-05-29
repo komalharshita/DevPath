@@ -525,18 +525,18 @@ if (clearFiltersBtn) {
 
           renderResults(data.projects || [], data.message);
         })
-        .catch(function () {
+        .catch(function (err) {
+    setLoadingState(false);
 
-          setLoadingState(false);
-    //combine form values into an object to send to server/api
-    var payload = {
-      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level: document.getElementById("level").value,
-      interest: document.getElementById("interest").value,
-      time: document.getElementById("time").value
-    };  
-  });
+    var generalErr = document.getElementById("form-error-general");
+
+    if (generalErr) {
+        generalErr.textContent =
+            err.message || "Failed to fetch project recommendations.";
+    }
+});
+});
+});
 
   // Manages the loading state of the form and results section(whats visible or not)
   function setLoadingState(isLoading) {
@@ -573,12 +573,7 @@ if (clearFiltersBtn) {
     // Clear out any cards from a previous search before showing new ones
     resultsGrid.innerHTML = "";
 
-    if (!projects || projects.length === 0) {
-      resultsGrid.style.display     = "none";
-      resultsEmptyEl.style.display  = "block";
-      resultsGrid.style.display = "none";
-      resultsEmptyEl.style.display = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
+    
     if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
       resultsGrid.style.display    = "none";
       resultsEmptyEl.style.display = "block";
@@ -901,9 +896,7 @@ if (
       }
   });
 }
-
 /* ---- Scroll-to-top button ---- */
-
 /* Show the button only when the user has scrolled more than 300px */
 var SCROLL_THRESHOLD = 300;
 
@@ -919,12 +912,10 @@ function handleScroll() {
     scrollTopBtn.classList.remove('visible');
   }
 }
-
 /* Smooth-scroll to the very top of the page */
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
 /* Only wire up listeners if the button exists on this page */
 if (scrollTopBtn) {
     window.addEventListener('scroll', handleScroll);
