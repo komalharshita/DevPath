@@ -30,6 +30,7 @@ from app import app, internal_server_error
 # Test setup
 # ============================================================
 
+
 def setup_module():
     """Clear the data cache before running the test suite to ensure clean state."""
     clear_cache()
@@ -38,6 +39,7 @@ def setup_module():
 # ============================================================
 # Data loader tests
 # ============================================================
+
 
 def test_projects_json_loads():
     """The data file must exist and contain at least one project."""
@@ -48,12 +50,25 @@ def test_projects_json_loads():
 
 def test_each_project_has_required_fields():
     """Every project must have the fields the UI depends on."""
-    required = ["id", "title", "skills", "level", "interest", "time",
-                "description", "features", "tech_stack", "roadmap",
-                "resources", "starter_code"]
+    required = [
+        "id",
+        "title",
+        "skills",
+        "level",
+        "interest",
+        "time",
+        "description",
+        "features",
+        "tech_stack",
+        "roadmap",
+        "resources",
+        "starter_code",
+    ]
     for project in load_all_projects():
         for field in required:
-            assert field in project, f"Project '{project.get('title')}' is missing field: {field}"
+            assert field in project, (
+                f"Project '{project.get('title')}' is missing field: {field}"
+            )
 
 
 def test_find_project_by_id_found():
@@ -72,6 +87,7 @@ def test_find_project_by_id_missing():
 # ============================================================
 # Recommender utility tests
 # ============================================================
+
 
 def test_parse_skills_basic():
     """parse_skills should split on commas and lowercase each entry."""
@@ -96,14 +112,14 @@ def test_score_single_project_full_match():
         "skills": ["Python"],
         "level": "Beginner",
         "interest": "Data",
-        "time": "Low"
+        "time": "Low",
     }
     score = score_single_project(
         project,
         user_skills=["python"],
         level="Beginner",
         interest="Data",
-        time_availability="Low"
+        time_availability="Low",
     )
     # 1 skill match (3) + level (2) + interest (2) + time (1) = 8
     assert score == 8, f"Expected 8 but got {score}"
@@ -115,32 +131,27 @@ def test_score_single_project_no_match():
         "skills": ["Rust"],
         "level": "Advanced",
         "interest": "Games",
-        "time": "High"
+        "time": "High",
     }
     score = score_single_project(
         project,
         user_skills=["python"],
         level="Beginner",
         interest="Data",
-        time_availability="Low"
+        time_availability="Low",
     )
     assert score == 0, f"Expected 0 but got {score}"
 
 
 def test_score_single_project_alias_matching():
     """Project skills should be alias-resolved so 'JS' in a project matches 'javascript' from the user."""
-    project = {
-        "skills": ["JS"],
-        "level": "Beginner",
-        "interest": "Web",
-        "time": "Low"
-    }
+    project = {"skills": ["JS"], "level": "Beginner", "interest": "Web", "time": "Low"}
     score = score_single_project(
         project,
         user_skills=["javascript"],
         level="Beginner",
         interest="Web",
-        time_availability="Low"
+        time_availability="Low",
     )
     # 1 skill match (3) + level (2) + interest (2) + time (1) = 8
     assert score == 8, f"Expected 8 but got {score}"
@@ -176,6 +187,7 @@ def test_get_recommendations_result_format():
 # ============================================================
 # Input validation tests
 # ============================================================
+
 
 def test_validate_all_valid():
     """No errors should be returned when all fields are provided."""
@@ -214,6 +226,7 @@ def test_validate_all_missing():
 # HTTP route tests (using Flask test client)
 # ============================================================
 
+
 def get_client():
     """Return a Flask test client with testing mode enabled."""
     app.config["TESTING"] = True
@@ -225,6 +238,7 @@ def test_home_route():
     response = client.get("/")
     assert response.status_code == 200
 
+
 def test_security_headers_present():
     """Security headers should be included in all responses."""
     client = get_client()
@@ -232,10 +246,7 @@ def test_security_headers_present():
 
     assert response.headers["X-Frame-Options"] == "DENY"
     assert response.headers["X-Content-Type-Options"] == "nosniff"
-    assert (
-        response.headers["Referrer-Policy"]
-        == "strict-origin-when-cross-origin"
-    )
+    assert response.headers["Referrer-Policy"] == "strict-origin-when-cross-origin"
     assert (
         response.headers["Permissions-Policy"]
         == "geolocation=(), microphone=(), camera=()"
@@ -244,43 +255,78 @@ def test_security_headers_present():
 
 def test_recommend_api_valid():
     client = get_client()
-    response = client.post("/api/recommend", json={
-        "skills": "Python",
-        "level": "Beginner",
-        "interest": "Data",
-        "time": "Low"
-    })
+    response = client.post(
+        "/api/recommend",
+        json={
+            "skills": "Python",
+            "level": "Beginner",
+            "interest": "Data",
+            "time": "Low",
+        },
+    )
     assert response.status_code == 200
     data = response.get_json()
     assert "projects" in data
     assert len(data["projects"]) > 0
 
 
-def test_recommend_api_interest_not_available():
-    """The API should return no projects for blocked interest categories."""
+def test_recommend_api_all_interests_reach_recommender():
+    """All interest categories should reach the recommender (no hardcoded bypass)."""
     client = get_client()
-    response = client.post("/api/recommend", json={
-        "skills": "Python, JavaScript",
-        "level": "Beginner",
-        "interest": "Machine Learning/AI",
-        "time": "Low"
-    })
+    response = client.post(
+        "/api/recommend",
+        json={
+            "skills": "Python, JavaScript",
+            "level": "Beginner",
+            "interest": "Machine Learning/AI",
+            "time": "Low",
+        },
+    )
     assert response.status_code == 200
     data = response.get_json()
-    assert data["projects"] == []
-    assert "message" in data
-    assert "no projects are currently available" in data["message"].lower()
+    assert "projects" in data
+    assert isinstance(data["projects"], list)
+
+
+def test_recommend_api_no_hardcoded_bypass():
+    """Previously blocked interests must reach the scoring engine, not return a canned response."""
+    client = get_client()
+    blocked_interests = [
+        "Machine Learning/AI",
+        "DevOps",
+        "Mobile",
+        "Artificial Intelligence",
+        "Cloud Computing",
+        "Mobile App Development",
+    ]
+    for interest in blocked_interests:
+        response = client.post(
+            "/api/recommend",
+            json={
+                "skills": "Python",
+                "level": "Beginner",
+                "interest": interest,
+                "time": "Low",
+            },
+        )
+        assert response.status_code == 200
+        data = response.get_json()
+        assert "projects" in data
+        assert isinstance(data["projects"], list)
+        assert (
+            "no projects are currently available" not in data.get("message", "").lower()
+        ), (
+            f"Interest '{interest}' returned hardcoded bypass message instead of running recommender"
+        )
 
 
 def test_recommend_api_missing_field():
     """The API should return 400 when a required field is missing."""
     client = get_client()
-    response = client.post("/api/recommend", json={
-        "skills": "",
-        "level": "Beginner",
-        "interest": "Data",
-        "time": "Low"
-    })
+    response = client.post(
+        "/api/recommend",
+        json={"skills": "", "level": "Beginner", "interest": "Data", "time": "Low"},
+    )
     assert response.status_code in (400, 415)
     assert "error" in response.get_json()
 
@@ -288,9 +334,7 @@ def test_recommend_api_missing_field():
 def test_recommend_api_empty_body():
     """The API should return 400 when the body is not valid JSON."""
     client = get_client()
-    response = client.post("/api/recommend",
-                           data="not json",
-                           content_type="text/plain")
+    response = client.post("/api/recommend", data="not json", content_type="text/plain")
     assert response.status_code in (400, 415)
 
 
@@ -330,7 +374,8 @@ def test_download_code_found():
     client = get_client()
     response = client.get("/project/1/download")
     assert response.status_code == 200
-    
+
+
 def test_health_check():
     client = get_client()
     response = client.get("/health")
@@ -343,6 +388,7 @@ def test_health_check():
 
 from utils.recommender import SCORING_WEIGHTS
 
+
 def test_scoring_weights_has_all_keys():
     """Verify SCORING_WEIGHTS contains exactly the four expected keys."""
     expected_keys = {"skill", "level", "interest", "time"}
@@ -352,6 +398,7 @@ def test_scoring_weights_has_all_keys():
 # ============================================================
 # Sitemap and robots.txt tests
 # ============================================================
+
 
 def test_sitemap_returns_200():
     """The /sitemap.xml route must return HTTP 200."""
@@ -386,9 +433,7 @@ def test_sitemap_contains_all_project_ids():
     projects = load_all_projects()
     for project in projects:
         expected = f"/project/{project['id']}"
-        assert expected in xml, (
-            f"Sitemap missing URL for project id={project['id']}"
-        )
+        assert expected in xml, f"Sitemap missing URL for project id={project['id']}"
 
 
 def test_robots_txt_returns_200():
@@ -405,6 +450,7 @@ def test_robots_txt_references_sitemap():
     assert b"Sitemap:" in response.data, "robots.txt must contain a Sitemap: directive"
     assert b"sitemap.xml" in response.data, "robots.txt must reference sitemap.xml"
 
+
 def test_project_links_have_noopener():
     client = app.test_client()
 
@@ -413,7 +459,6 @@ def test_project_links_have_noopener():
     assert response.status_code == 200
     assert b'target="_blank"' in response.data
     assert b'rel="noopener noreferrer"' in response.data
-
 
 
 # ============================================================
