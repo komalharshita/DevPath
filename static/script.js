@@ -72,38 +72,29 @@ if (isIndexPage) {
   var chipsSelectedEl   = document.getElementById("skill-chips-selected"); //selected skills tags container
   var quickPickChips    = document.querySelectorAll(".skill-chip"); // predefined skills user can click
 
-  // Tracks currently selected skills to prevent duplicates
   var selectedSkills = [];
-  // Clear Filters Button Functionality
+
 var clearFiltersBtn = document.getElementById("clear-filters-btn");
 if (clearFiltersBtn) {
     clearFiltersBtn.addEventListener("click", function() {
         var recommendForm = document.getElementById("recommend-form");
         if (recommendForm) {
-            // 1. Reset standard form dropdowns and fields
             recommendForm.reset();
-            
-            // 2. Clear out the internal JavaScript array tracker completely
             selectedSkills = [];
-            
-            // 3. Clear the hidden inputs and visual chips using the file's own variables
             if (skillsHidden) skillsHidden.value = "";
             if (chipsSelectedEl) chipsSelectedEl.innerHTML = "";
             if (skillsTextInput) {
                 skillsTextInput.value = "";
-                skillsTextInput.focus(); // Place cursor back on input
+                skillsTextInput.focus();
             }
-            
-            // 4. Hide autocomplete suggestions if any are open
             var suggestionsBox = document.getElementById("skills-suggestions");
             if (suggestionsBox) suggestionsBox.innerHTML = "";
-
-            // 5. Reset quick-pick chip visual active states if they have any
             if (quickPickChips) {
                 quickPickChips.forEach(function(chip) {
                     chip.classList.remove("active", "selected");
                 });
             }
+            if (resultsSection) resultsSection.style.display = "none";
         }
     });
 }
@@ -413,10 +404,8 @@ if (clearFiltersBtn) {
 
   function syncSkillsHiddenInput() {
     if (!skillsHidden){
-      var skillsHidden = document.getElementById("skills");
+      skillsHidden = document.getElementById("skills");
     }
-    // Keep the hidden <input> in sync for form serialisation
-    // The API expects a comma-separated string, so join the array that way
     skillsHidden.value = selectedSkills.join(", ");
   }
 
@@ -478,20 +467,19 @@ if (clearFiltersBtn) {
   // ----------------------------------------------------------
 
   form.addEventListener("submit", function (evt) {
-    evt.preventDefault(); //stop the browser from reloading the page on form submit
+    evt.preventDefault();
     clearAllErrors()
-    
+
     if (skillsTextInput.value.trim()) {
       addSkill(skillsTextInput.value);
       skillsTextInput.value = "";
       hideSuggestions();
     }
 
-    if (!validateForm()) return; //stop - anything missing/invalid
+    if (!validateForm()) return;
 
     setLoadingState(true);
 
-    // Allow browser to paint spinner before request starts
     requestAnimationFrame(function () {
 
       var payload = {
@@ -510,80 +498,55 @@ if (clearFiltersBtn) {
           return res.json();
         })
         .then(function (data) {
-
           setLoadingState(false);
 
           if (data.error) {
             var generalErr = document.getElementById("form-error-general");
-
             if (generalErr) {
               generalErr.textContent = data.error;
             }
-
             return;
           }
 
           renderResults(data.projects || [], data.message);
         })
         .catch(function () {
-
           setLoadingState(false);
-    //combine form values into an object to send to server/api
-    var payload = {
-      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level: document.getElementById("level").value,
-      interest: document.getElementById("interest").value,
-      time: document.getElementById("time").value
-    };  
+          var generalErr = document.getElementById("form-error-general");
+          if (generalErr) {
+            generalErr.textContent = "Something went wrong. Please check your connection and try again.";
+          }
+        });
+    });
   });
 
-  // Manages the loading state of the form and results section(whats visible or not)
   function setLoadingState(isLoading) {
-    // Disable the button so the user can't accidentally submit twice
     submitBtn.disabled = isLoading;
     submitBtn.setAttribute("aria-busy", isLoading);
     btnLabel.style.display = isLoading ? "none" : "inline";
     btnLoading.style.display = isLoading ? "inline-flex" : "none";
 
     if (isLoading) {
-      // Show the results section with only the loading indicator visible
       resultsSection.style.display = "block";
       resultsLoadingEl.style.display = "block";
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "none";
-      // Scroll down so the user can see the spinner without manually scrolling
       resultsSection.scrollIntoView({ behavior: "smooth" });
     } else {
       resultsLoadingEl.style.display  = "none";
-      resultsGrid.style.display       = "grid"; //switch back to gird layout 
+      resultsGrid.style.display       = "grid";
     }
   }
 
-
-  // ----------------------------------------------------------
-  // Render result cards
-  // ----------------------------------------------------------
-
-  //takes the array of projects from the api and draws them on the page as cards
-  //if array is empty it shows the "no results" message instead
   function renderResults(projects, message) {
     resultsSection.style.display = "block";
     resultsLoadingEl.style.display = "none";
-    // Clear out any cards from a previous search before showing new ones
     resultsGrid.innerHTML = "";
 
     if (!projects || projects.length === 0) {
-      resultsGrid.style.display     = "none";
-      resultsEmptyEl.style.display  = "block";
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
-    if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
-      resultsGrid.style.display    = "none";
-      resultsEmptyEl.style.display = "block";
 
-      // Show a friendly custom message when the user selected an interest
       var selectedInterest = document.getElementById("interest")?.value;
       if (selectedInterest) {
         emptyMessageEl.textContent = "No projects are currently available for this interest. Please check back later or try a different area.";
@@ -600,7 +563,6 @@ if (clearFiltersBtn) {
     resultsEmptyEl.style.display = "none";
     resultsGrid.style.display = "grid";
 
-    //build a card for each project and add it to the grid
     projects.forEach(function (project) {
       resultsGrid.appendChild(buildProjectCard(project));
     });
@@ -879,7 +841,7 @@ if (
       fetchBtn.textContent = 'Syncing...';
 
       try {
-          const response = await fetch(`https://api.github.com/users/${username}/repos`);
+          const response = await fetch(`https://api.github.com/users/${username}/repos?sort=stars&direction=desc&per_page=10`);
           if (!response.ok) throw new Error();
           
           const repos = await response.json();
