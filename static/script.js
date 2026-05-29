@@ -60,6 +60,7 @@ if (isIndexPage) {
   var resultsLoadingEl = document.getElementById("results-loading");
   var resultsEmptyEl = document.getElementById("results-empty");
   var emptyMessageEl = document.getElementById("empty-message");
+  var searchContainer = document.getElementById("results-search-container");
   var skillsHidden = document.getElementById("skills");
   var skillsTextInput = document.getElementById("skills-input");
   var chipsSelectedEl = document.getElementById("skill-chips-selected");
@@ -67,6 +68,7 @@ if (isIndexPage) {
 
   // Tracks currently selected skills to prevent duplicates
   var selectedSkills = [];
+  var currentProjects = [];
 
 
   // ----------------------------------------------------------
@@ -479,6 +481,8 @@ if (isIndexPage) {
 
   function renderResults(projects, message) {
     resultsSection.style.display = "block";
+    searchContainer.style.display = projects.length ? "block" : "none";
+    currentProjects = projects;
     resultsLoadingEl.style.display = "none";
     // Clear out any cards from a previous search before showing new ones
     resultsGrid.innerHTML = "";
@@ -566,6 +570,38 @@ if (isIndexPage) {
     // Only add "..." if the text is actually longer than the limit
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
   }
+
+  // ----------------------------------------------------------
+// Project title search
+// ----------------------------------------------------------
+
+var projectSearch = document.getElementById("project-search");
+
+if (projectSearch) {
+  projectSearch.addEventListener("input", function () {
+
+    var searchValue = projectSearch.value.toLowerCase();
+
+    var filteredProjects = currentProjects.filter(function (project) {
+      return project.title.toLowerCase().includes(searchValue);
+    });
+
+    resultsGrid.innerHTML = "";
+
+    if (filteredProjects.length === 0) {
+      resultsGrid.innerHTML = `
+        <div class="empty-search-message">
+          No matching projects found.
+        </div>
+      `;
+      return;
+    }
+
+    filteredProjects.forEach(function (project) {
+      resultsGrid.appendChild(buildProjectCard(project));
+    });
+  });
+}
 
 } // end isIndexPage
 

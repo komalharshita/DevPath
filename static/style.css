@@ -1969,3 +1969,23 @@ select:focus {
 #scroll-top-btn.visible {
     display: flex;
 }
+
+.results-search-container {
+  margin-bottom: 20px;
+}
+
+#project-search {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.empty-search-message {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 20px;
+  font-size: 1rem;
+  color: #9ca3af;
+}
