@@ -2374,12 +2374,13 @@ select:focus {
   text-decoration: none;
 }
 
-/* ---- Code Panel (slide-up) -------------------------------- */
+/* ---- Code Panel (centered popup modal) -------------------- */
 .code-panel-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(10, 15, 80, 0.6);
+  background: rgba(10, 15, 80, 0.65);
+  backdrop-filter: blur(4px);
   z-index: 300;
 }
 
@@ -2389,22 +2390,27 @@ select:focus {
 
 .code-panel {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 72vh;
+  top: 50%;
+  left: 50%;
+  width: min(920px, calc(100vw - 32px));
+  height: min(80vh, 720px);
   background: #0d1117;
-  border-radius: var(--r-lg) var(--r-lg) 0 0;
-  box-shadow: 0 -8px 48px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--r-lg);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
   z-index: 301;
   display: flex;
   flex-direction: column;
-  transform: translateY(100%);
-  transition: transform 0.3s ease;
+  transform: translate(-50%, -50%) scale(0.94);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.25s ease, opacity 0.25s ease;
 }
 
 .code-panel.active {
-  transform: translateY(0);
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .code-panel-header {
@@ -2680,7 +2686,8 @@ select:focus {
   }
 
   .code-panel {
-    height: 82vh;
+    width: calc(100vw - 24px);
+    height: min(88vh, 720px);
   }
 
   .footer-inner {

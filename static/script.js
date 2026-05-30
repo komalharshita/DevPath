@@ -478,22 +478,20 @@ if (clearFiltersBtn) {
   // ----------------------------------------------------------
 
   form.addEventListener("submit", function (evt) {
-    evt.preventDefault(); //stop the browser from reloading the page on form submit
-    clearAllErrors()
-    
+    evt.preventDefault();
+    clearAllErrors();
+
     if (skillsTextInput.value.trim()) {
       addSkill(skillsTextInput.value);
       skillsTextInput.value = "";
       hideSuggestions();
     }
 
-    if (!validateForm()) return; //stop - anything missing/invalid
+    if (!validateForm()) return;
 
     setLoadingState(true);
 
-    // Allow browser to paint spinner before request starts
     requestAnimationFrame(function () {
-
       var payload = {
         skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
         level: document.getElementById("level").value,
@@ -506,57 +504,44 @@ if (clearFiltersBtn) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       })
-        .then(function (res) {
-          return res.json();
-        })
+        .then(function (res) { return res.json(); })
         .then(function (data) {
-
           setLoadingState(false);
 
           if (data.error) {
             var generalErr = document.getElementById("form-error-general");
-
-            if (generalErr) {
-              generalErr.textContent = data.error;
-            }
-
+            if (generalErr) generalErr.textContent = data.error;
             return;
           }
 
           renderResults(data.projects || [], data.message);
         })
         .catch(function () {
-
           setLoadingState(false);
-    //combine form values into an object to send to server/api
-    var payload = {
-      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level: document.getElementById("level").value,
-      interest: document.getElementById("interest").value,
-      time: document.getElementById("time").value
-    };  
+          var generalErr = document.getElementById("form-error-general");
+          if (generalErr) {
+            generalErr.textContent = "Something went wrong. Please try again.";
+          }
+        });
+    });
   });
 
-  // Manages the loading state of the form and results section(whats visible or not)
+  // Manages the loading state of the form and results section
   function setLoadingState(isLoading) {
-    // Disable the button so the user can't accidentally submit twice
     submitBtn.disabled = isLoading;
     submitBtn.setAttribute("aria-busy", isLoading);
     btnLabel.style.display = isLoading ? "none" : "inline";
     btnLoading.style.display = isLoading ? "inline-flex" : "none";
 
     if (isLoading) {
-      // Show the results section with only the loading indicator visible
       resultsSection.style.display = "block";
       resultsLoadingEl.style.display = "block";
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "none";
-      // Scroll down so the user can see the spinner without manually scrolling
       resultsSection.scrollIntoView({ behavior: "smooth" });
     } else {
-      resultsLoadingEl.style.display  = "none";
-      resultsGrid.style.display       = "grid"; //switch back to gird layout 
+      resultsLoadingEl.style.display = "none";
+      resultsGrid.style.display = "grid";
     }
   }
 
@@ -565,25 +550,15 @@ if (clearFiltersBtn) {
   // Render result cards
   // ----------------------------------------------------------
 
-  //takes the array of projects from the api and draws them on the page as cards
-  //if array is empty it shows the "no results" message instead
   function renderResults(projects, message) {
     resultsSection.style.display = "block";
     resultsLoadingEl.style.display = "none";
-    // Clear out any cards from a previous search before showing new ones
     resultsGrid.innerHTML = "";
 
     if (!projects || projects.length === 0) {
-      resultsGrid.style.display     = "none";
-      resultsEmptyEl.style.display  = "block";
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
-    if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
-      resultsGrid.style.display    = "none";
-      resultsEmptyEl.style.display = "block";
 
-      // Show a friendly custom message when the user selected an interest
       var selectedInterest = document.getElementById("interest")?.value;
       if (selectedInterest) {
         emptyMessageEl.textContent = "No projects are currently available for this interest. Please check back later or try a different area.";
@@ -600,7 +575,6 @@ if (clearFiltersBtn) {
     resultsEmptyEl.style.display = "none";
     resultsGrid.style.display = "grid";
 
-    //build a card for each project and add it to the grid
     projects.forEach(function (project) {
       resultsGrid.appendChild(buildProjectCard(project));
     });
@@ -682,6 +656,30 @@ if (clearFiltersBtn) {
 
 
 // ============================================================
+// Code viewer helpers (detail page)
+// ============================================================
+function renderCodeWithLineNumbers(code) {
+  var lines = (code || "").split("\n");
+  return lines.map(function (line, index) {
+    var row = document.createElement("div");
+    row.className = "code-line";
+
+    var lineNum = document.createElement("span");
+    lineNum.className = "line-number";
+    lineNum.textContent = String(index + 1);
+
+    var lineContent = document.createElement("span");
+    lineContent.className = "line-content";
+    lineContent.textContent = line;
+
+    row.appendChild(lineNum);
+    row.appendChild(lineContent);
+    return row;
+  });
+}
+
+
+// ============================================================
 // DETAIL PAGE
 // ============================================================
 if (isDetailPage) {
@@ -726,7 +724,12 @@ if (isDetailPage) {
     if (codeContentEl) codeContentEl.textContent = "Loading starter code...";
 
     fetch("/project/" + PROJECT_ID + "/code")
-      .then(function (res) { return res.json(); })
+      .then(function (res) {
+        return res.json().then(function (data) {
+          if (!res.ok) throw new Error(data.error || "Failed to load starter code.");
+          return data;
+        });
+      })
       .then(function (data) {
         if (data.error) {
           if (codeContentEl) codeContentEl.textContent = "Error: " + data.error;
@@ -742,9 +745,11 @@ if (isDetailPage) {
         // Mark as fetched so we don't hit the API again on the next open
         codeFetched = true;
       })
-      .catch(function () {
+      .catch(function (err) {
         if (codeContentEl) {
-          codeContentEl.textContent = "Could not load starter code. Try downloading it instead.";
+          codeContentEl.textContent = err && err.message
+            ? "Error: " + err.message
+            : "Could not load starter code. Try downloading it instead.";
         }
       });
   }
