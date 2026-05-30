@@ -13,6 +13,7 @@
 import sys
 import os
 import py_compile
+import tempfile
 
 # Allow imports from the project root when running tests directly
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -61,10 +62,15 @@ def test_python_starter_code_files_compile():
     """Python starter files must be syntactically valid for users to run."""
     starter_code_dir = os.path.join(os.path.dirname(__file__), "..", "starter_code")
 
-    for filename in os.listdir(starter_code_dir):
-        if filename.endswith(".py"):
-            path = os.path.join(starter_code_dir, filename)
-            py_compile.compile(path, doraise=True)
+    with tempfile.TemporaryDirectory() as bytecode_dir:
+        for root, _, files in os.walk(starter_code_dir):
+            for filename in sorted(files):
+                if filename.endswith(".py"):
+                    path = os.path.join(root, filename)
+                    relative_path = os.path.relpath(path, starter_code_dir)
+                    cfile = os.path.join(bytecode_dir, f"{relative_path}c")
+                    os.makedirs(os.path.dirname(cfile), exist_ok=True)
+                    py_compile.compile(path, doraise=True, cfile=cfile)
 
 
 def test_find_project_by_id_found():
