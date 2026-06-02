@@ -150,16 +150,18 @@ git clone https://github.com/komalharshita/devpath.git
 cd devpath
 python -m venv venv
 source venv/bin/activate          # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-python app.py
+
+# Shortcuts using the Makefile
+make install                      # Installs dependencies
+make run                          # Starts the development server
 ```
 
 **http://127.0.0.1:5000** — that is the entire setup.
 
 ```bash
-# Verify everything works
-python tests/test_basic.py
-# 27 passed, 0 failed out of 27 tests
+# Verify everything works using the Makefile shortcut
+make test
+# 29 passed, 0 failed out of 29 tests
 ```
 
 ---

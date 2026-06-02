@@ -94,7 +94,7 @@ Functions:
 Scoring weights are named module-level constants:
 
 ```python
-WEIGHT_SKILL    = 3   # Points per matching skill
+WEIGHT_SKILL    = 3   # Points per matching skill (scaled by coverage ratio)
 WEIGHT_LEVEL    = 2   # Points for matching experience level
 WEIGHT_INTEREST = 2   # Points for matching interest area
 WEIGHT_TIME     = 1   # Points for matching time availability
@@ -141,7 +141,8 @@ cause a path traversal vulnerability.
    5b. load_all_projects() reads data/projects.json (7 projects)
    |
    5c. For each project, score_single_project() computes:
-       - Skill matches   x3 points each
+       - Skill coverage score: matched * 3 * (matched / total_project_skills)
+         A user covering 1 of 2 required skills scores less than one covering both.
        - Level match     +2 points
        - Interest match  +2 points
        - Time match      +1 point

@@ -18,6 +18,21 @@
     })();
   </script>
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+  <!--
+    Anti-FOUC theme script — MUST come before the stylesheet.
+    Reads localStorage synchronously and sets html[data-theme] so the
+    browser applies the correct CSS variables on the very first paint.
+    Falls back to the OS prefers-color-scheme if no preference is saved.
+  -->
+  <script>
+    (function () {
+      try {
+        /* Default to light mode; only honour a value the user explicitly saved */
+        var saved = localStorage.getItem('devpath-theme');
+        document.documentElement.dataset.theme = saved || 'light';
+      } catch (e) { /* localStorage blocked in some private modes */ }
+    }());
+  </script>
   <link rel="stylesheet" href="/static/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 </head>
@@ -26,7 +41,7 @@
   <!-- ============================================================
        Navigation
        ============================================================ -->
-  <nav class="navbar" id="navbar">
+  <nav class="navbar" id="navbar" aria-label="Main navigation">
     <div class="nav-inner">
       <a href="/" class="nav-logo">Dev<span class="nav-logo-accent">Path</span></a>
       <div class="nav-links">
@@ -50,7 +65,10 @@
 </button>
       </div>
       <!-- Mobile hamburger toggle -->
-      <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation">
+      <button class="nav-mobile-toggle" id="nav-mobile-toggle"
+              aria-label="Toggle navigation"
+              aria-expanded="false"
+              aria-controls="nav-mobile-menu">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -369,7 +387,7 @@
 
       <div class="form-card-outer">
         <div class="form-card" id="form-section">
-          <form id="recommend-form" novalidate>
+          <form id="recommend-form" novalidate onsubmit="event.preventDefault()">
             <div class="form-group">
               <div class="form-label-row" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
                 <label for="skills-input">
@@ -392,8 +410,8 @@
                 <div class="skill-chips-selected" id="skill-chips-selected"></div>
                 <input
                   type="text"
-                  id="skills-input" 
-                  placeholder="Type a skill and press Enter..."
+                  id="skills-input"
+                  placeholder="Type a skill..."
                   autocomplete="off"
                   aria-haspopup="listbox"
                   aria-expanded="false"
@@ -525,8 +543,8 @@
           <div class="form-error-msg" id="time-error"></div>
         </div>
 
-        <!-- General error (shown above the button) -->
-        <p class="form-error-general" id="form-error-general"></p>
+            <!-- General error (shown above the button) -->
+            <p class="form-error-general" id="form-error-general"></p>
 
         <!-- Submit button -->
         <div class="form-actions">
@@ -549,18 +567,19 @@
   <!-- ============================================================
        Results Section
        ============================================================ -->
-  <section class="results-section" id="results-section" style="display:none;">
+  <!-- aria-live="polite" announces newly injected results to screen readers -->
+  <section class="results-section" id="results-section" style="display:none;" aria-live="polite" aria-atomic="false">
     <div class="container">
       <div class="section-eyebrow">Your Matches</div>
       <h2 class="section-title">Recommended Projects</h2>
       <p class="section-sub" id="results-subtitle">Based on your inputs, here are your top matches.</p>
 
       <!-- Loading state -->
-      <div id="results-loading" style="display:none;">
-        <div class="loading-box">
-          <div class="loading-dots"><span></span><span></span><span></span></div>
-          <p>Finding the best projects for you...</p>
-        </div>
+      <div id="results-loading" aria-live="polite" aria-atomic="true" style="display:none;">
+       <div class="loading-box">
+        <div class="loading-dots"><span></span><span></span><span></span></div>
+        <p>Finding the best projects for you...</p>
+       </div>
       </div>
 
       <!-- Empty / no-match state -->
