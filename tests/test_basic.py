@@ -13,6 +13,8 @@
 import sys
 import os
 
+import pytest
+
 # Allow imports from the project root when running tests directly
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -22,6 +24,9 @@ from utils.recommender import (
     validate_recommendation_inputs,
     parse_skills,
     score_single_project,
+    WEIGHT_LEVEL,
+    WEIGHT_INTEREST,
+    WEIGHT_TIME,
 )
 from app import app, internal_server_error
 
@@ -106,7 +111,71 @@ def test_score_single_project_full_match():
         time_availability="Low"
     )
     # 1 skill match (3) + level (2) + interest (2) + time (1) = 8
-    assert score == 8, f"Expected 8 but got {score}"
+    assert score == pytest.approx(8), f"Expected 8 but got {score}"
+# --------------
+def test_score_single_project_partial_skill_coverage():
+    """Matching 1 of 2 required skills should score less than matching both."""
+    project = {
+        "skills": ["Python", "Flask"],
+        "level": "Beginner",
+        "interest": "Data",
+        "time": "Low"
+    }
+    # User knows only Python (1 of 2)
+    score_partial = score_single_project(
+        project,
+        user_skills=["python"],
+        level="Beginner",
+        interest="Data",
+        time_availability="Low"
+    )
+    # User knows both Python and Flask (2 of 2)
+    score_full = score_single_project(
+        project,
+        user_skills=["python", "flask"],
+        level="Beginner",
+        interest="Data",
+        time_availability="Low"
+    )
+    assert score_partial < score_full, (
+        f"Partial match ({score_partial}) should score less than full match ({score_full})"
+    )
+
+
+def test_score_coverage_ratio_exact_values():
+    """Verify the coverage-weighted formula produces the correct numeric result."""
+    project = {"skills": ["Python", "Flask"], "level": "Beginner", "interest": "Data", "time": "Low"}
+
+    # 1 of 2 skills matched: coverage = 0.5, score = 1 * 3 * 0.5 = 1.5
+    score = score_single_project(project, ["python"], "Advanced", "Games", "High")
+    assert score == pytest.approx(1.5), f"Expected 1.5 but got {score}"
+
+    # 2 of 2 skills matched: coverage = 1.0, score = 2 * 3 * 1.0 = 6.0
+    score = score_single_project(project, ["python", "flask"], "Advanced", "Games", "High")
+    assert score == pytest.approx(6.0), f"Expected 6.0 but got {score}"
+
+
+def test_score_no_project_skills_does_not_crash():
+    """A project with an empty skills list should not raise ZeroDivisionError."""
+    project = {"skills": [], "level": "Beginner", "interest": "Data", "time": "Low"}
+    score = score_single_project(project, ["python"], "Beginner", "Data", "Low")
+    # Skill score is 0, but other criteria still score
+    assert score == pytest.approx(WEIGHT_LEVEL + WEIGHT_INTEREST + WEIGHT_TIME)  # 2+2+1 = 5
+
+
+def test_score_three_skills_partial_coverage():
+    """Matching 2 of 3 skills should produce a score between 0-skill and 3-skill matches."""
+    project = {"skills": ["Python", "Flask", "SQL"], "level": "Beginner", "interest": "Data", "time": "Low"}
+
+    score_0 = score_single_project(project, ["rust"],               "Advanced", "Games", "High")
+    score_2 = score_single_project(project, ["python", "flask"],    "Advanced", "Games", "High")
+    score_3 = score_single_project(project, ["python", "flask", "sql"], "Advanced", "Games", "High")
+
+    assert score_0 == pytest.approx(0)
+    assert score_0 < score_2 < score_3, (
+        f"Expected 0 < {score_2} < {score_3}"
+    )
+# --------------
 
 
 def test_score_single_project_no_match():
@@ -124,7 +193,26 @@ def test_score_single_project_no_match():
         interest="Data",
         time_availability="Low"
     )
-    assert score == 0, f"Expected 0 but got {score}"
+    assert score == pytest.approx(0), f"Expected 0 but got {score}"
+
+
+def test_score_single_project_alias_matching():
+    """Project skills should be alias-resolved so 'JS' in a project matches 'javascript' from the user."""
+    project = {
+        "skills": ["JS"],
+        "level": "Beginner",
+        "interest": "Web",
+        "time": "Low"
+    }
+    score = score_single_project(
+        project,
+        user_skills=["javascript"],
+        level="Beginner",
+        interest="Web",
+        time_availability="Low"
+    )
+    # 1 skill match (3) + level (2) + interest (2) + time (1) = 8
+    assert score == 8, f"Expected 8 but got {score}"
 
 
 def test_get_recommendations_returns_results():
@@ -206,6 +294,22 @@ def test_home_route():
     response = client.get("/")
     assert response.status_code == 200
 
+def test_security_headers_present():
+    """Security headers should be included in all responses."""
+    client = get_client()
+    response = client.get("/")
+
+    assert response.headers["X-Frame-Options"] == "DENY"
+    assert response.headers["X-Content-Type-Options"] == "nosniff"
+    assert (
+        response.headers["Referrer-Policy"]
+        == "strict-origin-when-cross-origin"
+    )
+    assert (
+        response.headers["Permissions-Policy"]
+        == "geolocation=(), microphone=(), camera=()"
+    )
+
 
 def test_recommend_api_valid():
     client = get_client()
@@ -219,6 +323,22 @@ def test_recommend_api_valid():
     data = response.get_json()
     assert "projects" in data
     assert len(data["projects"]) > 0
+
+
+def test_recommend_api_interest_not_available():
+    """The API should return no projects for blocked interest categories."""
+    client = get_client()
+    response = client.post("/api/recommend", json={
+        "skills": "Python, JavaScript",
+        "level": "Beginner",
+        "interest": "Machine Learning/AI",
+        "time": "Low"
+    })
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["projects"] == []
+    assert "message" in data
+    assert "no projects are currently available" in data["message"].lower()
 
 
 def test_recommend_api_missing_field():
@@ -296,6 +416,73 @@ def test_scoring_weights_has_all_keys():
     """Verify SCORING_WEIGHTS contains exactly the four expected keys."""
     expected_keys = {"skill", "level", "interest", "time"}
     assert set(SCORING_WEIGHTS.keys()) == expected_keys
+
+
+# ============================================================
+# Sitemap and robots.txt tests
+# ============================================================
+
+def test_sitemap_returns_200():
+    """The /sitemap.xml route must return HTTP 200."""
+    client = get_client()
+    response = client.get("/sitemap.xml")
+    assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+
+
+def test_sitemap_content_type():
+    """The /sitemap.xml route must return XML content type."""
+    client = get_client()
+    response = client.get("/sitemap.xml")
+    assert "application/xml" in response.content_type, (
+        f"Expected application/xml, got {response.content_type}"
+    )
+
+
+def test_sitemap_contains_homepage():
+    """The sitemap must include the homepage URL."""
+    client = get_client()
+    response = client.get("/sitemap.xml")
+    assert b"<loc>" in response.data, "Expected <loc> tags in sitemap"
+    assert b"</urlset>" in response.data, "Expected closing </urlset> tag"
+
+
+def test_sitemap_contains_all_project_ids():
+    """The sitemap must include a URL for every project in the dataset."""
+    client = get_client()
+    response = client.get("/sitemap.xml")
+    xml = response.data.decode("utf-8")
+
+    projects = load_all_projects()
+    for project in projects:
+        expected = f"/project/{project['id']}"
+        assert expected in xml, (
+            f"Sitemap missing URL for project id={project['id']}"
+        )
+
+
+def test_robots_txt_returns_200():
+    """The /robots.txt route must return HTTP 200."""
+    client = get_client()
+    response = client.get("/robots.txt")
+    assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+
+
+def test_robots_txt_references_sitemap():
+    """robots.txt must contain the Sitemap directive."""
+    client = get_client()
+    response = client.get("/robots.txt")
+    assert b"Sitemap:" in response.data, "robots.txt must contain a Sitemap: directive"
+    assert b"sitemap.xml" in response.data, "robots.txt must reference sitemap.xml"
+
+def test_project_links_have_noopener():
+    client = app.test_client()
+
+    response = client.get("/project/1")
+
+    assert response.status_code == 200
+    assert b'target="_blank"' in response.data
+    assert b'rel="noopener noreferrer"' in response.data
+
 
 
 # ============================================================

@@ -1,6 +1,7 @@
 // script.js — DevPath client-side logic
 //
 // Responsibilities:
+//   - Theme initialisation (dark / light) with localStorage persistence
 //   - Mobile navigation toggle
 //   - Skill chip manager (add/remove skills)
 //   - Form validation with per-field error messages
@@ -8,9 +9,112 @@
 //   - Result card rendering
 //   - Code viewer panel (detail page)
 
+
+// ============================================================
+// THEME ENGINE
+// ============================================================
+// The theme system works in three parts:
+//
+//  Part A — Anti-FOUC inline script (in <head> of each template):
+//    Sets html[data-theme] synchronously before the stylesheet is
+//    evaluated, so the browser paints the correct colours on frame 1.
+//
+//  Part B — initTheme() (runs immediately below):
+//    Syncs the toggle button aria-pressed + aria-label with the
+//    already-applied theme. Adds the "theme-ready" class on the
+//    next animation frame so CSS transitions become active only
+//    AFTER the initial paint (preventing a colour transition flash
+//    when the page first loads).
+//
+//  Part C — applyTheme(theme) (called on button click):
+//    The single source of truth for all theme changes. Updates
+//    data-theme, localStorage, aria-pressed, aria-label, and an
+//    aria-live region so screen readers announce the change.
+// ============================================================
+
+(function () {
+
+  // ---- Part B: sync button state once DOM is ready ----------
+  function initTheme() {
+    var html  = document.documentElement;
+    var theme = html.dataset.theme || "light";
+
+    // Sync every toggle button on the page (desktop + mobile versions)
+    document.querySelectorAll(".theme-toggle").forEach(function (btn) {
+      var isDark = theme === "dark";
+      // aria-pressed = true when dark mode is ON
+      btn.setAttribute("aria-pressed", isDark ? "true" : "false");
+      // aria-label describes what clicking WILL do (not what IS active),
+      // which is the recommended accessible pattern for toggle buttons.
+      btn.setAttribute("aria-label",
+        isDark ? "Switch to light mode" : "Switch to dark mode"
+      );
+    });
+
+    // Add .theme-ready on the NEXT frame so CSS transitions are
+    // suppressed during the initial render (avoids colour flash).
+    requestAnimationFrame(function () {
+      html.classList.add("theme-ready");
+    });
+  }
+
+  // ---- Part C: apply a theme change -------------------------
+  function applyTheme(theme) {
+    var html   = document.documentElement;
+    var isDark = theme === "dark";
+
+    // 1. Apply via data attribute — CSS [data-theme="dark"] picks this up
+    html.dataset.theme = theme;
+
+    // 2. Persist the user's choice across sessions
+    try { localStorage.setItem("devpath-theme", theme); } catch (e) { /* private browsing may block */ }
+
+    // 3. Update every toggle button's accessible state
+    document.querySelectorAll(".theme-toggle").forEach(function (btn) {
+      btn.setAttribute("aria-pressed", isDark ? "true" : "false");
+      btn.setAttribute("aria-label",
+        isDark ? "Switch to light mode" : "Switch to dark mode"
+      );
+    });
+
+    // 4. Announce the change to screen readers via a visually-hidden
+    //    aria-live="polite" region injected once into the DOM.
+    var liveRegion = document.getElementById("theme-announce");
+    if (!liveRegion) {
+      liveRegion = document.createElement("span");
+      liveRegion.id = "theme-announce";
+      // Visually hidden but readable by screen readers
+      liveRegion.setAttribute("role", "status");
+      liveRegion.setAttribute("aria-live", "polite");
+      liveRegion.style.cssText =
+        "position:absolute;width:1px;height:1px;padding:0;overflow:hidden;" +
+        "clip:rect(0,0,0,0);white-space:nowrap;border:0;";
+      document.body.appendChild(liveRegion);
+    }
+    liveRegion.textContent = isDark ? "Dark mode enabled." : "Light mode enabled.";
+  }
+
+
+  document.addEventListener("click", function (evt) {
+    var btn = evt.target.closest(".theme-toggle");
+    if (!btn) return;
+    var current = document.documentElement.dataset.theme || "light";
+    applyTheme(current === "dark" ? "light" : "dark");
+  });
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initTheme);
+  } else {
+    initTheme();
+  }
+
+}());
+
+
 // ============================================================
 // Detect which page we are on
 // ============================================================
+var isIndexPage  = !!document.getElementById("recommend-form");
 // !! trick turns the DOM result into a simple true/false
 var isIndexPage = !!document.getElementById("recommend-form");
 // PROJECT_ID is set by the server only on detail pages, so if it's missing we're elsewhere
@@ -28,7 +132,7 @@ var errorMsg = document.getElementById('github-modal-error');
 // ============================================================
 (function initMobileNav() {
   var toggle = document.getElementById("nav-mobile-toggle"); //hamburger button
-  var menu   = document.getElementById("nav-mobile-menu"); //dropdown menu 
+  var menu     = document.getElementById("nav-mobile-menu"); //dropdown menu 
 
   // Nothing to do if the nav isn't on this page, just bail out
   if (!toggle || !menu) return;
@@ -37,6 +141,8 @@ var errorMsg = document.getElementById('github-modal-error');
     // classList.toggle returns true if class was added, false if removed
     var isOpen = menu.classList.toggle("open");
     toggle.classList.toggle("open", isOpen);
+    // aria-expanded reflects whether the controlled menu is expanded
+    toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
     // Keep aria-expanded in sync so screen readers know if menu is open or closed
     toggle.setAttribute("aria-expanded", isOpen);
   });
@@ -46,6 +152,8 @@ var errorMsg = document.getElementById('github-modal-error');
     link.addEventListener("click", function () { 
       menu.classList.remove("open"); 
       toggle.classList.remove("open");
+      // FIX: reset aria-expanded when menu closes via link click
+      toggle.setAttribute("aria-expanded", "false");
     });
   });
 })();
@@ -135,18 +243,32 @@ if (clearFiltersBtn) {
   var visibleSuggestions = [];
   var activeSuggestionIndex = -1;
 
+  // Capture Enter key at the form level to avoid accidental submits
+  // when the skills input is focused (some browsers can still submit).
+  if (form && skillsTextInput) {
+    form.addEventListener("keydown", function (evt) {
+      if (evt.key === "Enter" && document.activeElement === skillsTextInput) {
+        // Run in capture-phase to intercept before other handlers
+        evt.preventDefault();
+        evt.stopPropagation();
+
+        if (activeSuggestionIndex >= 0 && visibleSuggestions[activeSuggestionIndex]) {
+          selectSuggestion(visibleSuggestions[activeSuggestionIndex]);
+          return;
+        }
+
+        if (skillsTextInput.value && skillsTextInput.value.trim()) {
+          addSkill(skillsTextInput.value);
+          skillsTextInput.value = "";
+        }
+        hideSuggestions();
+      }
+    }, true);
+  }
+
   function initSkillStripMarquee() {
     var marquee = document.querySelector(".skill-strip-marquee");
-    var track = marquee && marquee.querySelector(".skill-strip-track");
-
-    if (!marquee || !track || track.querySelector(".skill-strip-items[data-marquee-clone='true']")) {
-      return;
-    }
-
-    var clone = track.querySelector(".skill-strip-items").cloneNode(true);
-    clone.setAttribute("aria-hidden", "true");
-    clone.setAttribute("data-marquee-clone", "true");
-    track.appendChild(clone);
+    if (!marquee) return;
   }
 
   availableSkills = availableSkills.filter(function (skill, index, list) {
@@ -370,6 +492,18 @@ if (clearFiltersBtn) {
     updateQuickPickState();
     // Once a skill is added, remove the "please add a skill" error if it was showing
     clearFieldError("skills-error");
+    // Ensure the corresponding quick-pick chip is visually active immediately
+    try {
+      var quickChip = document.querySelector('.skill-chip[data-skill="' + skill + '"]');
+      if (quickChip) {
+        quickChip.classList.add('active', 'selected');
+        quickChip.setAttribute('aria-pressed', 'true');
+      }
+    } catch (e) {
+      // ignore DOM errors
+    }
+    // Keep focus in the input so user can continue typing
+    if (skillsTextInput) skillsTextInput.focus();
   }
 
   // remove a skill from the list and update the UI accordingly
@@ -381,6 +515,16 @@ if (clearFiltersBtn) {
     renderSelectedChips();
     syncSkillsHiddenInput();
     updateQuickPickState();
+    // Also clear the visual active state on the quick-pick chip if present
+    try {
+      var quickChip = document.querySelector('.skill-chip[data-skill="' + skill + '"]');
+      if (quickChip) {
+        quickChip.classList.remove('active', 'selected');
+        quickChip.setAttribute('aria-pressed', 'false');
+      }
+    } catch (e) {
+      // ignore DOM errors
+    }
   }
 
   // recreate the selected skills chips based on the current array(selectedSkills)
@@ -526,49 +670,10 @@ if (clearFiltersBtn) {
           renderResults(data.projects || [], data.message);
         })
         .catch(function () {
-
           setLoadingState(false);
-    //combine form values into an object to send to server/api
-    var payload = {
-      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level: document.getElementById("level").value,
-      interest: document.getElementById("interest").value,
-      time: document.getElementById("time").value
-    };
-
-    //post the data to backend api as JSON, then handle the response
-    fetch("/api/recommend", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify(payload) //convert object to json string
-    })
-      .then(function (res) { return res.json(); }) //parse the response as JSON
-      .then(function (data) {
-        setLoadingState(false);
-
-          var generalErr = document.getElementById("form-error-general");
-
-          if (generalErr) {
-            generalErr.textContent =
-              "Something went wrong. Please try again.";
-          }
+          showError("A network error occurred. Please try again.");
         });
     });
-        if (data.error) {
-          var generalErr = document.getElementById("form-error-general");
-          if (generalErr) generalErr.textContent = data.error;
-          return;
-        }
-        renderResults(data.projects || [], data.message);
-      })
-      .catch(function (err) {
-        // this runs if the network request itself fails 
-        setLoadingState(false);
-        var generalErr = document.getElementById("form-error-general");
-        if (generalErr) generalErr.textContent = "Something went wrong. Please try again.";
-        console.error("API request failed:", err);
-      });
   });
 
   // Manages the loading state of the form and results section(whats visible or not)
@@ -578,8 +683,6 @@ if (clearFiltersBtn) {
     submitBtn.setAttribute("aria-busy", isLoading);
     btnLabel.style.display = isLoading ? "none" : "inline";
     btnLoading.style.display = isLoading ? "inline-flex" : "none";
-    btnLabel.style.display = isLoading ? "none" : "inline";
-    btnLoading.style.display = isLoading ? "inline" : "none";
 
     if (isLoading) {
       // Show the results section with only the loading indicator visible
@@ -608,16 +711,20 @@ if (clearFiltersBtn) {
     // Clear out any cards from a previous search before showing new ones
     resultsGrid.innerHTML = "";
 
-    if (!projects || projects.length === 0) {
-      resultsGrid.style.display     = "none";
-      resultsEmptyEl.style.display  = "block";
-      resultsGrid.style.display = "none";
-      resultsEmptyEl.style.display = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
     if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
-      resultsGrid.style.display      = "none";
-      resultsEmptyEl.style.display   = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message; //if api sent back a message (e.g. "no projects found matching your criteria"), show that 
+      resultsGrid.style.display    = "none";
+      resultsEmptyEl.style.display = "block";
+
+      // Show a friendly custom message when the user selected an interest
+      var selectedInterest = document.getElementById("interest")?.value;
+      if (selectedInterest) {
+        emptyMessageEl.textContent = "No projects are currently available for this interest. Please check back later or try a different area.";
+      } else if (message) {
+        emptyMessageEl.textContent = message;
+      } else {
+        emptyMessageEl.textContent = "Try adjusting your skills or choosing a different interest area.";
+      }
+
       resultsSection.scrollIntoView({ behavior: "smooth" });
       return;
     }
@@ -654,8 +761,8 @@ if (clearFiltersBtn) {
     var tagsRow = document.createElement("div");
     tagsRow.className = "project-card-tags";
 
-    // Show the first two skills as tags
-    (project.skills || []).slice(0, 2).forEach(function (skill) {
+    // Show all project skills as tags so users can see the full match
+    (project.skills || []).forEach(function (skill) {
       tagsRow.appendChild(createTag(skill, "skill"));
     });
 
@@ -925,7 +1032,7 @@ if (
           fetchBtn.textContent = 'Fetch Skills';
       }
   });
-}
+} // end github modal handlers
 
 /* ---- Scroll-to-top button ---- */
 

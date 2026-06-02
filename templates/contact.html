@@ -1,151 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Contact Us - DevPath</title>
-
-  <link rel="stylesheet" href="/static/style.css">
-
-  <style>
-
-    .contact-section {
-      padding: 120px 20px 80px;
-      min-height: 100vh;
-
-      background:
-        linear-gradient(
-          to bottom right,
-          #f8fafc,
-          #eef2ff
-        );
-    }
-
-    .contact-container {
-      max-width: 1100px;
-      margin: auto;
-    }
-
-    .contact-header {
-      text-align: center;
-      margin-bottom: 60px;
-    }
-
-    .contact-header h1 {
-      font-size: 3rem;
-      margin-bottom: 16px;
-      color: #111827;
-    }
-
-    .contact-header p {
-      color: #6b7280;
-      font-size: 1.1rem;
-      max-width: 700px;
-      margin: auto;
-      line-height: 1.7;
-    }
-
-    .contact-grid {
-      display: grid;
-      grid-template-columns:
-        repeat(auto-fit, minmax(280px, 1fr));
-
-      gap: 24px;
-    }
-
-    .contact-card {
-      background: white;
-
-      padding: 32px;
-
-      border-radius: 24px;
-
-      box-shadow:
-        0 10px 30px rgba(0,0,0,0.08);
-
-      transition:
-        transform 0.3s ease,
-        box-shadow 0.3s ease;
-    }
-
-    .contact-card:hover {
-      transform: translateY(-6px);
-
-      box-shadow:
-        0 20px 40px rgba(0,0,0,0.12);
-    }
-
-    .contact-icon {
-      width: 60px;
-      height: 60px;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      border-radius: 16px;
-
-      background: #eef2ff;
-
-      margin-bottom: 20px;
-
-      font-size: 28px;
-    }
-
-    .contact-card h3 {
-      margin-bottom: 14px;
-      color: #111827;
-    }
-
-    .contact-card p {
-      color: #6b7280;
-      line-height: 1.6;
-      margin-bottom: 20px;
-    }
-
-    .contact-btn {
-      display: inline-block;
-
-      padding: 12px 20px;
-
-      background: #4f46e5;
-      color: white;
-
-      border-radius: 12px;
-
-      text-decoration: none;
-
-      transition:
-        background 0.3s ease,
-        transform 0.3s ease;
-    }
-
-    .contact-btn:hover {
-      background: #4338ca;
-      transform: translateY(-2px);
-    }
-
-    @media (max-width: 768px) {
-
-      .contact-header h1 {
-        font-size: 2.2rem;
-      }
-
-      .contact-section {
-        padding-top: 100px;
-      }
-
-    }
-
-  </style>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="DevPath recommends real coding projects based on your skills, level, and interests — with full roadmaps and starter code." />
+  <title>Contact Us — DevPath</title>
+  <script>
+    document.documentElement.setAttribute("data-entry-anim", "true");
+  </script>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+  <!--
+    Anti-FOUC theme script — MUST come before the stylesheet.
+    Reads localStorage synchronously and sets html[data-theme] so the
+    browser applies the correct CSS variables on the very first paint.
+    Falls back to the OS prefers-color-scheme if no preference is saved.
+  -->
+  <script>
+    (function () {
+      try {
+        /* Default to light mode; only honour a value the user explicitly saved */
+        var saved = localStorage.getItem('devpath-theme');
+        document.documentElement.dataset.theme = saved || 'light';
+      } catch (e) { /* localStorage blocked in some private modes */ }
+    }());
+  </script>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 </head>
-
 <body>
-
-  <section class="contact-section">
+<!-- ============================================================
+       Navigation
+       ============================================================ -->
+  <nav class="navbar" id="navbar" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">Dev<span class="nav-logo-accent">Path</span></a>
+      <div class="nav-links">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/contact" class="nav-link">Contact</a>
+        <a href="/#how-it-works" class="nav-link">How It Works</a>
+        <a href="/#features" class="nav-link">Features</a>
+        <a href="/#find-project" class="nav-link">Find Project</a>
+        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-btn-outline">GitHub</a>
+        <!-- Dark/light mode toggle — aria-pressed and aria-label are set
+             dynamically by initTheme() in script.js on every page load -->
+        <button class="theme-toggle" id="theme-toggle-desktop"
+                aria-pressed="false"
+                aria-label="Switch to dark mode">
+          <!-- Moon icon: shown in light mode (clicking switches to dark) -->
+          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <!-- Sun icon: shown in dark mode (clicking switches to light) -->
+          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+      </div>
+      <!-- Mobile hamburger toggle -->
+      <button class="nav-mobile-toggle" id="nav-mobile-toggle"
+              aria-label="Toggle navigation"
+              aria-expanded="false"
+              aria-controls="nav-mobile-menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <!-- Mobile menu — includes upstream's #home link and HEAD's theme toggle + accessibility attrs -->
+    <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
+      <a href="/" class="nav-mobile-link" role="menuitem">Home</a>
+      <a href="/contact" class="nav-mobile-link" role="menuitem">Contact</a>
+      <a href="/#how-it-works" class="nav-mobile-link" role="menuitem">How It Works</a>
+      <a href="/#features" class="nav-mobile-link" role="menuitem">Features</a>
+      <a href="/#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
+      <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-mobile-link" role="menuitem">GitHub</a>
+      <!-- Theme toggle in mobile menu — same .theme-toggle class so
+           the JS engine updates both this and the desktop button together -->
+      <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile"
+              style="background:none;border:none;text-align:left;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;padding:10px 0;font-size:0.95rem;font-weight:500;color:rgba(255,255,255,0.8);"
+              aria-pressed="false"
+              aria-label="Switch to dark mode"
+              role="menuitem">
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <span class="theme-toggle-label">Dark Mode</span>
+      </button>
+    </div>
+  </nav>
+<section class="contact-section">
 
     <div class="contact-container">
 
@@ -177,7 +148,7 @@
 
           <a
             href="https://github.com/komalharshita/DevPath"
-            target="_blank"
+            target="_blank" rel="noopener noreferrer"
             class="contact-btn"
           >
             Visit GitHub
@@ -200,7 +171,7 @@
 
           <a
             href="https://github.com/komalharshita/DevPath/issues"
-            target="_blank"
+            target="_blank" rel="noopener noreferrer"
             class="contact-btn"
           >
             Open Issues
@@ -223,7 +194,7 @@
 
           <a
             href="https://github.com/komalharshita/DevPath"
-            target="_blank"
+            target="_blank" rel="noopener noreferrer"
             class="contact-btn"
           >
             Join Community
@@ -236,7 +207,57 @@
     </div>
 
   </section>
+<!-- ============================================================
+       Footer
+       ============================================================ -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-col footer-col--brand">
+        <span class="footer-logo">Dev<span class="footer-logo-accent">Path</span></span>
+        <p class="footer-tagline">Open source. Built for learners, by learners.</p>
+        <p class="footer-tagline">Helping developers find meaningful projects to build their skills.</p>
+      </div>
 
+      <div class="footer-col">
+        <h4 class="footer-col-title">Quick Links</h4>
+        <ul class="footer-links-list">
+          <li><a href="/#home">Home</a></li>
+          <li><a href="/#how-it-works">How It Works</a></li>
+          <li><a href="/#features">Features</a></li>
+          <li><a href="/#find-project">Find Project</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4 class="footer-col-title">Resources</h4>
+        <ul class="footer-links-list">
+          <li><a href="/project/1">Sample Project</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing Guide</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath/issues" target="_blank" rel="noopener noreferrer">Report an Issue</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4 class="footer-col-title">About Us</h4>
+        <ul class="footer-links-list">
+          <li><a href="/contact">Contact Us</a></li>
+          <li><a href="/#our-story">Our Story</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">Open Source</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">License</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>DevPath is open source. Licensed under the MIT License.</p>
+      <div class="footer-bottom-links">
+        <a href="/#our-story">About Us</a>
+        <a href="https://github.com/komalharshita/DevPath/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Project License</a>
+      </div>
+    </div>
+  </footer>
+<script src="/static/data/skills.js"></script>
+  <script src="/static/script.js"></script>
 </body>
-
 </html>
