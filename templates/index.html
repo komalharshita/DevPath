@@ -11,21 +11,7 @@
     document.documentElement.setAttribute("data-entry-anim", "true");
   </script>
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
-  <!--
-    Anti-FOUC theme script — MUST come before the stylesheet.
-    Reads localStorage synchronously and sets html[data-theme] so the
-    browser applies the correct CSS variables on the very first paint.
-    Falls back to the OS prefers-color-scheme if no preference is saved.
-  -->
-  <script>
-    (function () {
-      try {
-        /* Default to light mode; only honour a value the user explicitly saved */
-        var saved = localStorage.getItem('devpath-theme');
-        document.documentElement.dataset.theme = saved || 'light';
-      } catch (e) { /* localStorage blocked in some private modes */ }
-    }());
-  </script>
+  {% include 'partials/theme_head.html' %}
   <link rel="stylesheet" href="/static/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 </head>
@@ -73,6 +59,7 @@
           </svg>
         </button>
       </div>
+      {% include 'partials/theme_toggle.html' %}
       <!-- Mobile hamburger toggle -->
       <button class="nav-mobile-toggle" id="nav-mobile-toggle"
               aria-label="Toggle navigation"
@@ -406,10 +393,19 @@
               <div class="form-label-row" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
                 <label for="skills-input">
                   Your Skills
-                  <span class="tooltip"
-                    title="Add technologies, programming languages, or tools you know like Python, React, Git, SQL, etc.">
+                  <button
+                    type="button"
+                    class="tooltip"
+                    aria-label="Skills help"
+                    aria-describedby="skills-tooltip">
                     ⓘ
-                  </span>
+                    <span
+                      id="skills-tooltip"
+                      class="tooltip-text"
+                      role="tooltip">
+                      Add technologies, programming languages, or tools you know like Python, React, Git, SQL, etc.
+                    </span>
+                  </button>
                 </label>
                 
                 <!-- Inline GitHub Trigger -->
@@ -422,21 +418,7 @@
               </div>
               <div class="skill-input-wrap" id="skill-input-wrap">
                 <div class="skill-chips-selected" id="skill-chips-selected"></div>
-               
-                <input
-                  type="text"
-                  id="skills-input" 
-                  placeholder="Type a skill and press Enter..."
-                  autocomplete="off" 
-                <input
-                  type="text"
-                  id="skills-input"
-                  placeholder="Type a skill..."
-                  autocomplete="off"
-                  aria-haspopup="listbox"
-                  aria-expanded="false"
-                  aria-controls="skills-suggestions"
-                />
+                <input type="text" id="skills-input" placeholder="Type a skill and press Enter..." autocomplete="off" />
                 <div id="skills-suggestions" class="skills-suggestions"></div>
               </div>
               <!-- Hidden field holds the final comma-separated value -->
@@ -490,7 +472,6 @@
               <button type="button" class="skill-chip" data-skill="pytest">pytest</button>
               <button type="button" class="skill-chip" data-skill="Webpack">Webpack</button>
             </div>
-
             <!-- Level + Interest in a row -->
             <div class="form-row">
               <div class="form-group">
@@ -512,10 +493,19 @@
               <div class="form-group">
                 <label for="interest">
                   Area of Interest
-                  <span class="tooltip"
-                    title="Choose the type of projects you enjoy building or want to learn more about.">
+                 <button
+                    type="button"
+                    class="tooltip"
+                    aria-label="Interest help"
+                    aria-describedby="interest-tooltip">
                     ⓘ
-                  </span>
+                    <span
+                      id="interest-tooltip"
+                      class="tooltip-text"
+                      role="tooltip">
+                      Choose the type of projects you enjoy building or want to learn more about.
+                    </span>
+                  </button>
                 </label>
                 <div class="select-wrap">
                   <select id="interest" name="interest">
@@ -544,10 +534,19 @@
         <div class="form-group">
           <label for="time">
             Time Availability
-            <span class="tooltip"
-              title="Estimate how much time you can realistically dedicate to building the project.">
+            <button
+              type="button"
+              class="tooltip"
+              aria-label="Time availability help"
+              aria-describedby="time-tooltip">
               ⓘ
-            </span>
+              <span
+                id="time-tooltip"
+                class="tooltip-text"
+                role="tooltip">
+                Estimate how much time you can realistically dedicate to building the project.
+              </span>
+            </button>
           </label>
           <div class="select-wrap">
             <select id="time" name="time">
