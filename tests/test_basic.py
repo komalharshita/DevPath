@@ -13,6 +13,8 @@
 import sys
 import os
 
+import pytest
+
 # Allow imports from the project root when running tests directly
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -22,6 +24,9 @@ from utils.recommender import (
     validate_recommendation_inputs,
     parse_skills,
     score_single_project,
+    WEIGHT_LEVEL,
+    WEIGHT_INTEREST,
+    WEIGHT_TIME,
 )
 from app import app, internal_server_error
 
@@ -106,7 +111,71 @@ def test_score_single_project_full_match():
         time_availability="Low"
     )
     # 1 skill match (3) + level (2) + interest (2) + time (1) = 8
-    assert score == 8, f"Expected 8 but got {score}"
+    assert score == pytest.approx(8), f"Expected 8 but got {score}"
+# --------------
+def test_score_single_project_partial_skill_coverage():
+    """Matching 1 of 2 required skills should score less than matching both."""
+    project = {
+        "skills": ["Python", "Flask"],
+        "level": "Beginner",
+        "interest": "Data",
+        "time": "Low"
+    }
+    # User knows only Python (1 of 2)
+    score_partial = score_single_project(
+        project,
+        user_skills=["python"],
+        level="Beginner",
+        interest="Data",
+        time_availability="Low"
+    )
+    # User knows both Python and Flask (2 of 2)
+    score_full = score_single_project(
+        project,
+        user_skills=["python", "flask"],
+        level="Beginner",
+        interest="Data",
+        time_availability="Low"
+    )
+    assert score_partial < score_full, (
+        f"Partial match ({score_partial}) should score less than full match ({score_full})"
+    )
+
+
+def test_score_coverage_ratio_exact_values():
+    """Verify the coverage-weighted formula produces the correct numeric result."""
+    project = {"skills": ["Python", "Flask"], "level": "Beginner", "interest": "Data", "time": "Low"}
+
+    # 1 of 2 skills matched: coverage = 0.5, score = 1 * 3 * 0.5 = 1.5
+    score = score_single_project(project, ["python"], "Advanced", "Games", "High")
+    assert score == pytest.approx(1.5), f"Expected 1.5 but got {score}"
+
+    # 2 of 2 skills matched: coverage = 1.0, score = 2 * 3 * 1.0 = 6.0
+    score = score_single_project(project, ["python", "flask"], "Advanced", "Games", "High")
+    assert score == pytest.approx(6.0), f"Expected 6.0 but got {score}"
+
+
+def test_score_no_project_skills_does_not_crash():
+    """A project with an empty skills list should not raise ZeroDivisionError."""
+    project = {"skills": [], "level": "Beginner", "interest": "Data", "time": "Low"}
+    score = score_single_project(project, ["python"], "Beginner", "Data", "Low")
+    # Skill score is 0, but other criteria still score
+    assert score == pytest.approx(WEIGHT_LEVEL + WEIGHT_INTEREST + WEIGHT_TIME)  # 2+2+1 = 5
+
+
+def test_score_three_skills_partial_coverage():
+    """Matching 2 of 3 skills should produce a score between 0-skill and 3-skill matches."""
+    project = {"skills": ["Python", "Flask", "SQL"], "level": "Beginner", "interest": "Data", "time": "Low"}
+
+    score_0 = score_single_project(project, ["rust"],               "Advanced", "Games", "High")
+    score_2 = score_single_project(project, ["python", "flask"],    "Advanced", "Games", "High")
+    score_3 = score_single_project(project, ["python", "flask", "sql"], "Advanced", "Games", "High")
+
+    assert score_0 == pytest.approx(0)
+    assert score_0 < score_2 < score_3, (
+        f"Expected 0 < {score_2} < {score_3}"
+    )
+# --------------
 
 
 def test_score_single_project_no_match():
@@ -124,7 +193,7 @@ def test_score_single_project_no_match():
         interest="Data",
         time_availability="Low"
     )
-    assert score == 0, f"Expected 0 but got {score}"
+    assert score == pytest.approx(0), f"Expected 0 but got {score}"
 
 
 def test_score_single_project_alias_matching():
@@ -285,6 +354,34 @@ def test_recommend_api_missing_field():
     assert "error" in response.get_json()
 
 
+def test_recommend_api_null_field():
+    """The API should return 400 when a field is explicitly set to null."""
+    client = get_client()
+    response = client.post("/api/recommend", json={
+        "skills": None,
+        "level": "Beginner",
+        "interest": "Web",
+        "time": "Low"
+    })
+    assert response.status_code == 400
+    data = response.get_json()
+    assert "error" in data
+
+
+def test_recommend_api_non_string_field():
+    """The API should return 400 when a field is a non-string type (e.g. a list)."""
+    client = get_client()
+    response = client.post("/api/recommend", json={
+        "skills": ["Python", "HTML"],
+        "level": "Beginner",
+        "interest": "Web",
+        "time": "Low"
+    })
+    assert response.status_code == 400
+    data = response.get_json()
+    assert "error" in data
+
+
 def test_recommend_api_empty_body():
     """The API should return 400 when the body is not valid JSON."""
     client = get_client()
@@ -330,6 +427,31 @@ def test_download_code_found():
     client = get_client()
     response = client.get("/project/1/download")
     assert response.status_code == 200
+
+
+def test_view_code_nested_path():
+    """Project 9 has a nested starter_code path; /code should still return 200."""
+    client = get_client()
+    response = client.get("/project/9/code")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "code" in data
+    assert "filename" in data
+    assert len(data["code"]) > 0
+
+
+def test_download_code_nested_path():
+    """Project 9 has a nested starter_code path; /download should still return 200."""
+    client = get_client()
+    response = client.get("/project/9/download")
+    assert response.status_code == 200
+
+
+def test_resolve_starter_file_path_traversal():
+    """resolve_starter_file must return None for path traversal attempts."""
+    from utils.file_server import resolve_starter_file
+    malicious = {"starter_code": "starter_code/../../routes/main_routes.py"}
+    assert resolve_starter_file(malicious) is None
     
 def test_health_check():
     client = get_client()

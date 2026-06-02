@@ -11,6 +11,7 @@
     document.documentElement.setAttribute("data-entry-anim", "true");
   </script>
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+  {% include 'partials/theme_head.html' %}
   <link rel="stylesheet" href="/static/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 </head>
@@ -19,7 +20,7 @@
   <!-- ============================================================
        Navigation
        ============================================================ -->
-  <nav class="navbar" id="navbar">
+  <nav class="navbar" id="navbar" aria-label="Main navigation">
     <div class="nav-inner">
       <a href="/" class="nav-logo">Dev<span class="nav-logo-accent">Path</span></a>
       <div class="nav-links">
@@ -28,19 +29,78 @@
         <a href="#features" class="nav-link">Features</a>
         <a href="#find-project" class="nav-link">Find Project</a>
         <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-btn-outline">GitHub</a>
+        <!-- Dark/light mode toggle — aria-pressed and aria-label are set
+             dynamically by initTheme() in script.js on every page load -->
+        <button class="theme-toggle" id="theme-toggle-desktop"
+                aria-pressed="false"
+                aria-label="Switch to dark mode">
+          <!-- Moon icon: shown in light mode (clicking switches to dark) -->
+          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <!-- Sun icon: shown in dark mode (clicking switches to light) -->
+          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
       </div>
+      {% include 'partials/theme_toggle.html' %}
       <!-- Mobile hamburger toggle -->
-      <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation">
+      <button class="nav-mobile-toggle" id="nav-mobile-toggle"
+              aria-label="Toggle navigation"
+              aria-expanded="false"
+              aria-controls="nav-mobile-menu">
         <span></span><span></span><span></span>
       </button>
     </div>
-    <!-- Mobile menu -->
-    <div class="nav-mobile-menu" id="nav-mobile-menu">
-      <a href="#home" class="nav-mobile-link">Home</a>
-      <a href="#how-it-works" class="nav-mobile-link">How It Works</a>
-      <a href="#features" class="nav-mobile-link">Features</a>
-      <a href="#find-project" class="nav-mobile-link">Find Project</a>
-      <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-mobile-link">GitHub</a>
+    <!-- Mobile menu — includes upstream's #home link and HEAD's theme toggle + accessibility attrs -->
+    <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
+      <a href="#home" class="nav-mobile-link" role="menuitem">Home</a>
+      <a href="#how-it-works" class="nav-mobile-link" role="menuitem">How It Works</a>
+      <a href="#features" class="nav-mobile-link" role="menuitem">Features</a>
+      <a href="#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
+      <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-mobile-link" role="menuitem">GitHub</a>
+      <!-- Theme toggle in mobile menu — same .theme-toggle class so
+           the JS engine updates both this and the desktop button together -->
+      <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile"
+              style="background:none;border:none;text-align:left;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;padding:10px 0;font-size:0.95rem;font-weight:500;color:rgba(255,255,255,0.8);"
+              aria-pressed="false"
+              aria-label="Switch to dark mode"
+              role="menuitem">
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <span class="theme-toggle-label">Dark Mode</span>
+      </button>
     </div>
   </nav>
 
@@ -326,15 +386,24 @@
 
       <div class="form-card-outer">
         <div class="form-card" id="form-section">
-          <form id="recommend-form" novalidate>
+          <form id="recommend-form" novalidate onsubmit="event.preventDefault()">
             <div class="form-group">
               <div class="form-label-row" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
                 <label for="skills-input">
                   Your Skills
-                  <span class="tooltip"
-                    title="Add technologies, programming languages, or tools you know like Python, React, Git, SQL, etc.">
+                  <button
+                    type="button"
+                    class="tooltip"
+                    aria-label="Skills help"
+                    aria-describedby="skills-tooltip">
                     ⓘ
-                  </span>
+                    <span
+                      id="skills-tooltip"
+                      class="tooltip-text"
+                      role="tooltip">
+                      Add technologies, programming languages, or tools you know like Python, React, Git, SQL, etc.
+                    </span>
+                  </button>
                 </label>
                 
                 <!-- Inline GitHub Trigger -->
@@ -347,15 +416,7 @@
               </div>
               <div class="skill-input-wrap" id="skill-input-wrap">
                 <div class="skill-chips-selected" id="skill-chips-selected"></div>
-                <input
-                  type="text"
-                  id="skills-input" 
-                  placeholder="Type a skill and press Enter..."
-                  autocomplete="off"
-                  aria-haspopup="listbox"
-                  aria-expanded="false"
-                  aria-controls="skills-suggestions"
-                />
+                <input type="text" id="skills-input" placeholder="Type a skill and press Enter..." autocomplete="off" />
                 <div id="skills-suggestions" class="skills-suggestions"></div>
               </div>
               <!-- Hidden field holds the final comma-separated value -->
@@ -409,7 +470,6 @@
               <button type="button" class="skill-chip" data-skill="pytest">pytest</button>
               <button type="button" class="skill-chip" data-skill="Webpack">Webpack</button>
             </div>
-
             <!-- Level + Interest in a row -->
             <div class="form-row">
               <div class="form-group">
@@ -431,10 +491,19 @@
               <div class="form-group">
                 <label for="interest">
                   Area of Interest
-                  <span class="tooltip"
-                    title="Choose the type of projects you enjoy building or want to learn more about.">
+                 <button
+                    type="button"
+                    class="tooltip"
+                    aria-label="Interest help"
+                    aria-describedby="interest-tooltip">
                     ⓘ
-                  </span>
+                    <span
+                      id="interest-tooltip"
+                      class="tooltip-text"
+                      role="tooltip">
+                      Choose the type of projects you enjoy building or want to learn more about.
+                    </span>
+                  </button>
                 </label>
                 <div class="select-wrap">
                   <select id="interest" name="interest">
@@ -463,10 +532,19 @@
         <div class="form-group">
           <label for="time">
             Time Availability
-            <span class="tooltip"
-              title="Estimate how much time you can realistically dedicate to building the project.">
+            <button
+              type="button"
+              class="tooltip"
+              aria-label="Time availability help"
+              aria-describedby="time-tooltip">
               ⓘ
-            </span>
+              <span
+                id="time-tooltip"
+                class="tooltip-text"
+                role="tooltip">
+                Estimate how much time you can realistically dedicate to building the project.
+              </span>
+            </button>
           </label>
           <div class="select-wrap">
             <select id="time" name="time">
@@ -482,8 +560,8 @@
           <div class="form-error-msg" id="time-error"></div>
         </div>
 
-        <!-- General error (shown above the button) -->
-        <p class="form-error-general" id="form-error-general"></p>
+            <!-- General error (shown above the button) -->
+            <p class="form-error-general" id="form-error-general"></p>
 
         <!-- Submit button -->
         <div class="form-actions">
@@ -506,18 +584,19 @@
   <!-- ============================================================
        Results Section
        ============================================================ -->
-  <section class="results-section" id="results-section" style="display:none;">
+  <!-- aria-live="polite" announces newly injected results to screen readers -->
+  <section class="results-section" id="results-section" style="display:none;" aria-live="polite" aria-atomic="false">
     <div class="container">
       <div class="section-eyebrow">Your Matches</div>
       <h2 class="section-title">Recommended Projects</h2>
       <p class="section-sub" id="results-subtitle">Based on your inputs, here are your top matches.</p>
 
       <!-- Loading state -->
-      <div id="results-loading" style="display:none;">
-        <div class="loading-box">
-          <div class="loading-dots"><span></span><span></span><span></span></div>
-          <p>Finding the best projects for you...</p>
-        </div>
+      <div id="results-loading" aria-live="polite" aria-atomic="true" style="display:none;">
+       <div class="loading-box">
+        <div class="loading-dots"><span></span><span></span><span></span></div>
+        <p>Finding the best projects for you...</p>
+       </div>
       </div>
 
       <!-- Empty / no-match state -->
@@ -685,7 +764,7 @@
 }
 </style>
 
-
+  <button id="scroll-top-btn" aria-label="Back to top" title="Back to top">↑</button>
 
     <script src="/static/data/skills.js"></script>
   <script src="/static/script.js"></script>
