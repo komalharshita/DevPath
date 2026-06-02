@@ -2984,3 +2984,204 @@ select:focus {
   white-space: pre;
   color: #e6edf3;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.theme-toggle {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.25s ease;
+}
+
+.theme-toggle:hover {
+  background: rgba(255,255,255,0.18);
+  transform: translateY(-2px);
+}
+
+/* ============================================================
+   WORKING DARK MODE
+============================================================ */
+
+[data-theme="dark"] body {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .navbar,
+[data-theme="dark"] .hero,
+[data-theme="dark"] .stats-section,
+[data-theme="dark"] .features-section,
+[data-theme="dark"] .how-section,
+[data-theme="dark"] .form-section,
+[data-theme="dark"] .results-section,
+[data-theme="dark"] .cta-section,
+[data-theme="dark"] .footer,
+[data-theme="dark"] .skill-strip {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .feature-card,
+[data-theme="dark"] .form-card,
+[data-theme="dark"] .project-card,
+[data-theme="dark"] .step-card,
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .hero-visual-main,
+[data-theme="dark"] .hero-visual-card {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] p,
+[data-theme="dark"] span,
+[data-theme="dark"] a,
+[data-theme="dark"] label {
+  color: #f8fafc !important;
+}
+
+/* ============================================================
+   Form Dark Mode Fixes
+============================================================ */
+
+[data-theme="dark"] .recommendation-form,
+[data-theme="dark"] .recommendation-card,
+[data-theme="dark"] .input-group,
+[data-theme="dark"] .select-wrapper,
+[data-theme="dark"] .skill-input-wrapper {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  border: 1px solid #334155 !important;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .skill-chip,
+[data-theme="dark"] .skill-tag,
+[data-theme="dark"] .ss-item {
+  background: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .recommendation-section,
+[data-theme="dark"] .form-container {
+  background: #0f172a !important;
+}
+
+/* ============================================================
+   Final Dark Mode Cleanup
+============================================================ */
+
+[data-theme="dark"] button,
+[data-theme="dark"] .btn,
+[data-theme="dark"] .btn-secondary,
+[data-theme="dark"] .clear-btn,
+[data-theme="dark"] .github-import-btn {
+  background: #334155 !important;
+  color: #f8fafc !important;
+  border-color: #475569 !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  border: 1px solid #475569 !important;
+}
+
+[data-theme="dark"] .skills-container,
+[data-theme="dark"] .skills-list,
+[data-theme="dark"] .skill-suggestions {
+  background: transparent !important;
+}
+
+[data-theme="dark"] .form-card *,
+[data-theme="dark"] .recommendation-form * {
+  border-color: #475569;
+}
+
+[data-theme="dark"] {
+  background: #020617;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] body {
+  background: #020617;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .form-section,
+[data-theme="dark"] .results-section,
+[data-theme="dark"] .how-section,
+[data-theme="dark"] .features-section {
+  background: #020617;
+}
+
+[data-theme="dark"] .form-card {
+  background: #1e293b;
+  border: 1px solid #475569;
+}
+
+[data-theme="dark"] .skill-input-wrap,
+[data-theme="dark"] input,
+[data-theme="dark"] select {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #475569 !important;
+}
+
+[data-theme="dark"] input::placeholder {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] label,
+[data-theme="dark"] .form-hint,
+[data-theme="dark"] .section-title,
+[data-theme="dark"] .section-sub {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .skill-chip {
+  background: #334155;
+  color: #f8fafc;
+  border-color: #64748b;
+}
+
+[data-theme="dark"] .project-card,
+[data-theme="dark"] .feature-card,
+[data-theme="dark"] .step-card,
+[data-theme="dark"] .stat-card {
+  background: #1e293b;
+  color: #f8fafc;
+  border-color: #475569;
+}

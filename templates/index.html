@@ -28,6 +28,14 @@
         <a href="#features" class="nav-link">Features</a>
         <a href="#find-project" class="nav-link">Find Project</a>
         <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-btn-outline">GitHub</a>
+        <button
+        id="theme-toggle"
+        class="theme-toggle"
+        aria-label="Toggle dark mode"
+        aria-pressed="false"
+        >
+        🌙
+      </button>
       </div>
       <!-- Mobile hamburger toggle -->
       <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation">
@@ -698,6 +706,38 @@
 
     <script src="/static/data/skills.js"></script>
   <script src="/static/script.js"></script>
+  <script>
+(function () {
+  const themeToggle = document.getElementById("theme-toggle");
+
+  if (!themeToggle) return;
+
+  const savedTheme = localStorage.getItem("theme");
+
+  if (savedTheme === "dark") {
+    document.documentElement.setAttribute("data-theme", "dark");
+    themeToggle.textContent = "☀️";
+    themeToggle.setAttribute("aria-pressed", "true");
+  }
+
+  themeToggle.addEventListener("click", function () {
+    const isDark =
+      document.documentElement.getAttribute("data-theme") === "dark";
+
+    if (isDark) {
+      document.documentElement.removeAttribute("data-theme");
+      localStorage.setItem("theme", "light");
+      themeToggle.textContent = "🌙";
+      themeToggle.setAttribute("aria-pressed", "false");
+    } else {
+      document.documentElement.setAttribute("data-theme", "dark");
+      localStorage.setItem("theme", "dark");
+      themeToggle.textContent = "☀️";
+      themeToggle.setAttribute("aria-pressed", "true");
+    }
+  });
+})();
+</script>
 </body>
 
 </html>
