@@ -310,9 +310,57 @@
       "Real Python API guide: https://realpython.com/api-integration-in-python/"
     ],
     "starter_code": "starter_code/api_data_pipeline.py"
-  }
-
-  ,
+  },
+  {
+  "id": 11,
+  "title": "AI Resume Analyzer",
+  "skills": [
+    "Python",
+    "Flask",
+    "HTML",
+    "CSS",
+    "JavaScript"
+  ],
+  "level": "Intermediate",
+  "interest": "Data",
+  "time": "High",
+  "description": "A Flask web app that compares a resume against a job description using TF-IDF similarity and keyword extraction. Users upload a PDF or paste text, and the app returns a match score, a list of missing keywords, and actionable feedback — with no external AI API required.",
+  "features": [
+    "Upload a resume as PDF or paste plain text",
+    "Paste any job description for comparison",
+    "TF-IDF cosine similarity match score (0–100%)",
+    "Missing skills and keyword gap analysis",
+    "Actionable written feedback based on score",
+    "Single-page interface with interactive feedback display"
+  ],
+  "tech_stack": [
+    "Python",
+    "Flask",
+    "PyPDF2",
+    "scikit-learn",
+    "HTML",
+    "CSS",
+    "JavaScript"
+  ],
+  "roadmap": [
+    "Step 1: Run the server and verify the upload form renders",
+    "Step 2: Complete extract_text_from_pdf() using PyPDF2",
+    "Step 3: Complete clean_text() to normalise punctuation and whitespace",
+    "Step 4: Complete extract_keywords() to remove stopwords and count frequency",
+    "Step 5: Complete calculate_similarity() with TF-IDF and cosine distance",
+    "Step 6: Complete find_missing_skills() by comparing two keyword sets",
+    "Step 7: Complete generate_feedback() to produce written suggestions",
+    "Step 8: Wire everything together inside the /analyze Flask route",
+    "Step 9: Test with a real resume PDF and a real job posting"
+  ],
+  "resources": [
+    "PyPDF2 documentation: https://pypdf2.readthedocs.io/",
+    "scikit-learn TF-IDF guide: https://scikit-learn.org/stable/modules/feature_extraction.html#tfidf-term-weighting",
+    "Cosine similarity explained: https://www.machinelearningplus.com/nlp/cosine-similarity",
+    "Flask quickstart: https://flask.palletsprojects.com/quickstart"
+  ],
+  "starter_code": "starter_code/ai_resume_analyzer.py"
+  },
   {
     "id": 8,
     "title": "Number Guessing Game",
@@ -406,8 +454,102 @@
       "W3Schools JavaScript: https://www.w3schools.com/js"
     ],
     "starter_code": "starter_code/quiz_app.html"
+  },
+  {
+    "id":12,
+    "title": "Movie Recommendation System",
+    "skills": ["Python"],
+    "level": "Intermediate",
+    "interest": "Data",
+    "time": "High",
+    "description": "A recommendation system that suggests movies to users based on ratings and similarity scores. An intermediate project for learning similarity scoring, pandas data handling, and basic recommendation logic.",
+    "features": [
+      "Recommend movies based on user preferences",
+      "Find similar movies using similarity metrics",
+      "Load and process movie datasets",
+      "Display top recommended movies"
+    ],
+    "tech_stack": ["Python", "pandas", "scikit-learn", "NumPy"],
+    "roadmap": [
+      "Step 1: Download and inspect a movie ratings dataset",
+      "Step 2: Load the dataset using pandas",
+      "Step 3: Clean and preprocess missing data",
+      "Step 4: Organize movie features into a pandas DataFrame",
+      "Step 5: Compare movies using cosine similarity",
+      "Step 6: Build the recommendation function",
+      "Step 7: Display top movie recommendations to the user",
+      "Step 8: Test the recommendation system with sample inputs"
+    ],
+    "resources": [
+      "pandas documentation: https://pandas.pydata.org/docs",
+      "scikit-learn user guide: https://scikit-learn.org/stable/user_guide.html",
+      "MovieLens dataset: https://grouplens.org/datasets/movielens",
+      "Cosine Similarity: https://naomy-gomes.medium.com/the-cosine-similarity-and-its-use-in-recommendation-systems-cb2ebd811ce1"
+    ],
+    "starter_code": "starter_code/movie_recommender.py"
+  }, 
+  {
+    "id": 13,
+    "title": "Sentiment Analysis Web App",
+    "skills": ["Python", "HTML", "CSS"],
+    "level": "Intermediate",
+    "interest": "Data",
+    "time": "High",
+    "description": "A web application that predicts whether user entered text has positive, negative, or neutral sentiment. Great for learning text preprocessing and basic sentiment prediction.",
+    "features": [
+      "Analyze sentiment from user input text",
+      "Display sentiment prediction results",
+      "Preprocess text using NLP techniques",
+      "Deploy the model with a simple web interface"
+    ],
+    "tech_stack": ["Python", "Flask", "scikit-learn", "HTML", "CSS"],
+    "roadmap": [
+      "Step 1: Collect or download a sentiment dataset",
+      "Step 2: Preprocess text data by cleaning and tokenizing",
+      "Step 3: Convert text into numerical features",
+      "Step 4: Build a simple sentiment prediction model",
+      "Step 5: Test predictions with sample text inputs",
+      "Step 6: Build a Flask app for user interaction",
+      "Step 7: Connect the trained model to the web app",
+      "Step 8: Test the application with sample text inputs"
+    ],
+    "resources": [
+      "Flask documentation: https://flask.palletsprojects.com",
+      "scikit-learn text tutorial: https://scikit-learn.org/stable/",
+      "NLTK documentation: https://www.nltk.org",
+      "Tokenization: https://www.geeksforgeeks.org/nlp/nlp-how-tokenizing-text-sentence-words-works/"
+    ],
+    "starter_code": "starter_code/sentiment_app.py"
+  }
+  ,
+  {
+    "id": 9,
+    "title": "Sunrise Grand Hotel Management System",
+    "skills": ["Python"],
+    "level": "Medium",
+    "interest": "Business Logic",
+    "time": "Medium",
+    "description": "A robust CLI application to manage a 40-room inventory with tiered pricing, guest booking logic, and automatic billing calculation.",
+    "features": [
+      "Dynamic 40-room inventory across 4 luxury categories",
+      "Real-time availability filtering and room status tracking",
+      "Booking engine with 10-digit contact validation",
+      "Automatic stay duration and total price calculation",
+      "Cancellation logic and detailed guest lookup"
+    ],
+    "tech_stack": ["Python", "Dictionaries", "Input Validation"],
+    "roadmap": [
+      "Step 1: Initialize the 40-room inventory with tiered pricing",
+      "Step 2: Implement availability display and category filtering",
+      "Step 3: Build the booking engine with contact validation",
+      "Step 4: Create the cancellation and guest detail lookup logic",
+      "Step 5: Wrap all logic in a persistent main menu loop"
+    ],
+    "resources": [
+      "Python Dictionaries: https://docs.python.org/3/tutorial/datastructures.html#dictionaries",
+      "Python Input Validation: https://realpython.com/python-input-output/",
+      "Menu-driven CLI logic: https://www.geeksforgeeks.org/how-to-create-a-menu-driven-program-in-python/"
+    ],
+    "starter_code": "starter_code/hotel_management.py"
   }
 ]
-
-
-
