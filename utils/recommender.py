@@ -30,52 +30,25 @@ SKILL_ALIASES = {
 }
 
 
-def parse_skills(skills_data):
+def parse_skills(skills_string):
     """
-    Convert raw skills data into a deduplicated, normalized list.
-    Supports both legacy comma-separated strings and newer JSON array formats
-    (including objects with proficiency levels).
+    Convert a raw comma-separated skills string into
+    a normalized lowercase list.
+
+    Example:
+    "JS, HTML5, CSS3" -> ["javascript", "html", "css"]
     """
-    import json
-    raw_skills = []
 
-    # Attempt to parse as JSON first to support newer structured formats
-    try:
-        if isinstance(skills_data, str) and skills_data.strip().startswith('['):
-            data = json.loads(skills_data)
-            if isinstance(data, list):
-                for item in data:
-                    if isinstance(item, str):
-                        raw_skills.append(item)
-                    elif isinstance(item, dict):
-                        # Extract skill name from objects (e.g., {"name": "Python", "level": "Expert"})
-                        name = item.get("name") or item.get("skill")
-                        if name:
-                            raw_skills.append(str(name))
-        else:
-            # Fallback to legacy comma-separated string format
-            raw_skills = [s.strip() for s in skills_data.split(",") if s.strip()]
-    except (json.JSONDecodeError, AttributeError):
-        # If JSON parsing fails or data is not a string, try basic split if possible
-        if isinstance(skills_data, str):
-            raw_skills = [s.strip() for s in skills_data.split(",") if s.strip()]
+    raw_skills = [
+        s.strip().lower()
+        for s in skills_string.split(",")
+        if s.strip()
+    ]
 
-    normalized_skills = []
-    seen_skills = set()
-
-    for rs in raw_skills:
-        # Normalize each skill name (case-insensitive deduplication)
-        skill_norm = rs.strip().lower()
-        if not skill_norm:
-            continue
-
-        # Resolve aliases (e.g., "js" -> "javascript")
-        canonical = SKILL_ALIASES.get(skill_norm, skill_norm)
-
-        # Check tracking set before adding to the final list
-        if canonical not in seen_skills:
-            normalized_skills.append(canonical)
-            seen_skills.add(canonical)
+    normalized_skills = [
+        SKILL_ALIASES.get(skill, skill)
+        for skill in raw_skills
+    ]
 
     return normalized_skills
 
