@@ -2787,6 +2787,111 @@ select:focus {
   line-height: 1.5;
 }
 
+/* ---- Light theme overrides ---- */
+[data-theme="light"] {
+  --indigo-900: #1a2280;
+  --text-heading: #0f1560;
+  --text-body: #374151;
+  --text-light: #6b7280;
+  --border: #d1d5db;
+  --white: #ffffff;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+}
+
+[data-theme="light"] body {
+  background: #f9fafb;
+  color: #374151;
+}
+
+[data-theme="light"] .stat-card,
+[data-theme="light"] .step-card,
+[data-theme="light"] .form-card,
+[data-theme="light"] .project-card,
+[data-theme="light"] .detail-section,
+[data-theme="light"] .sidebar-card {
+  background: #ffffff;
+  border-color: #d1d5db;
+}
+
+[data-theme="light"] .how-section,
+[data-theme="light"] .form-section {
+  background: #ffffff;
+}
+
+[data-theme="light"] .features-section {
+  background: #f3f4f6;
+}
+
+[data-theme="light"] .results-section {
+  background: #eef1ff;
+}
+
+[data-theme="light"] select,
+[data-theme="light"] .skill-input-wrap {
+  background: #f9fafb;
+  color: #111827;
+  border-color: #d1d5db;
+}
+
+[data-theme="light"] .skill-strip-inner {
+  background: rgba(255,255,255,0.9);
+}
+
+[data-theme="light"] .ss-item {
+  background: #ffffff;
+  color: #374151;
+}
+
+/* ---- Theme toggle button ---- */
+.theme-toggle {
+  background: rgba(255,255,255,0.1);
+  border: 1.5px solid rgba(255,255,255,0.28);
+  border-radius: var(--r-full);
+  padding: 6px 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: background var(--t), border-color var(--t);
+  color: var(--white);
+}
+
+.theme-toggle:hover {
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(255,255,255,0.45);
+}
+
+/* ---- Scroll navigation button ---- */
+.scroll-nav-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--indigo-700);
+  color: var(--white);
+  font-size: 1.25rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: opacity 0.3s ease, transform 0.2s ease;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scroll-nav-btn:hover {
+  transform: translateY(-3px);
+  opacity: 0.9;
+}
+
+@media (max-width: 640px) {
+  .scroll-nav-btn { bottom: 1.25rem; right: 1.25rem; }
+  .theme-toggle { padding: 5px 8px; font-size: 0.9rem; }
+}
+
 /* ---- Scroll-to-top button ---- */
 /* Fixed button that appears after user scrolls 300px down the project detail page */
 

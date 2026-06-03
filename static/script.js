@@ -927,31 +927,60 @@ if (
   });
 }
 
-/* ---- Scroll-to-top button ---- */
+/* ---- Theme Toggle ---- */
+(function initThemeToggle() {
+  var btn = document.getElementById('theme-toggle');
+  if (!btn) return;
 
-/* Show the button only when the user has scrolled more than 300px */
-var SCROLL_THRESHOLD = 300;
-
-/* Get the button element; guard against pages that do not have it */
-var scrollTopBtn = document.getElementById('scroll-top-btn');
-
-/* Add or remove the .visible class based on scroll position */
-function handleScroll() {
-  if (!scrollTopBtn) return;
-  if (window.pageYOffset > SCROLL_THRESHOLD) {
-    scrollTopBtn.classList.add('visible');
-  } else {
-    scrollTopBtn.classList.remove('visible');
+  var saved = localStorage.getItem('devpath-theme');
+  if (saved === 'light') {
+    document.body.setAttribute('data-theme', 'light');
+    btn.textContent = '\u2600\uFE0F';
   }
-}
 
-/* Smooth-scroll to the very top of the page */
-function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+  btn.addEventListener('click', function () {
+    var isLight = document.body.getAttribute('data-theme') === 'light';
+    if (isLight) {
+      document.body.removeAttribute('data-theme');
+      btn.textContent = '\uD83C\uDF19';
+      localStorage.setItem('devpath-theme', 'dark');
+    } else {
+      document.body.setAttribute('data-theme', 'light');
+      btn.textContent = '\u2600\uFE0F';
+      localStorage.setItem('devpath-theme', 'light');
+    }
+  });
+})();
 
-/* Only wire up listeners if the button exists on this page */
-if (scrollTopBtn) {
-    window.addEventListener('scroll', handleScroll);
-    scrollTopBtn.addEventListener('click', scrollToTop);
-}
+/* ---- Scroll Navigation Button ---- */
+(function initScrollNav() {
+  var btn = document.getElementById('scroll-nav-btn');
+  if (!btn) return;
+
+  var THRESHOLD = 200;
+  var atBottom = false;
+
+  function update() {
+    var scrolled = window.pageYOffset || document.documentElement.scrollTop;
+    if (scrolled < THRESHOLD) {
+      btn.style.display = 'none';
+      return;
+    }
+    btn.style.display = 'flex';
+    var maxScroll = document.body.scrollHeight - window.innerHeight;
+    atBottom = scrolled >= maxScroll - 50;
+    btn.textContent = atBottom ? '\u2B06' : '\u2B07';
+    btn.setAttribute('aria-label', atBottom ? 'Scroll to top' : 'Scroll to bottom');
+  }
+
+  btn.addEventListener('click', function () {
+    if (atBottom) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+  });
+
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+})();
