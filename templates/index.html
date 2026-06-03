@@ -347,15 +347,22 @@
               </div>
               <div class="skill-input-wrap" id="skill-input-wrap">
                 <div class="skill-chips-selected" id="skill-chips-selected"></div>
-                <input
-                  type="text"
-                  id="skills-input" 
-                  placeholder="Type a skill and press Enter..."
-                  autocomplete="off"
-                  aria-haspopup="listbox"
-                  aria-expanded="false"
-                  aria-controls="skills-suggestions"
-                />
+                <div class="skill-input-row">
+                  <input
+                    type="text"
+                    id="skills-input" 
+                    placeholder="Type a skill..."
+                    autocomplete="off"
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                    aria-controls="skills-suggestions"
+                  />
+                  <select id="skill-proficiency" class="skill-proficiency-select" title="Skill proficiency level">
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate" selected>Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                  </select>
+                </div>
                 <div id="skills-suggestions" class="skills-suggestions"></div>
               </div>
               <!-- Hidden field holds the final comma-separated value -->

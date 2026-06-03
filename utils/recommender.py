@@ -32,13 +32,30 @@ SKILL_ALIASES = {
 
 def parse_skills(skills_string):
     """
-    Convert a raw comma-separated skills string into
-    a normalized lowercase list.
+    Convert a raw skills input into a list of skill objects.
+    Supports both new JSON format and legacy comma-separated strings.
 
-    Example:
-    "JS, HTML5, CSS3" -> ["javascript", "html", "css"]
+    New format: '[{"name": "Python", "level": "Advanced"}]'
+    Legacy format: "Python, JavaScript"
     """
+    import json
+    
+    # Try parsing as JSON first (new format)
+    try:
+        data = json.loads(skills_string)
+        if isinstance(data, list):
+            return [
+                {
+                    "name": SKILL_ALIASES.get(s["name"].strip().lower(), s["name"].strip().lower()),
+                    "level": s.get("level", "Intermediate")
+                }
+                for s in data
+                if s.get("name")
+            ]
+    except (json.JSONDecodeError, TypeError, KeyError):
+        pass
 
+    # Fallback to legacy comma-separated string
     raw_skills = [
         s.strip().lower()
         for s in skills_string.split(",")
@@ -46,7 +63,7 @@ def parse_skills(skills_string):
     ]
 
     normalized_skills = [
-        SKILL_ALIASES.get(skill, skill)
+        {"name": SKILL_ALIASES.get(skill, skill), "level": "Intermediate"}
         for skill in raw_skills
     ]
 
@@ -59,29 +76,42 @@ def score_single_project(
     """
     Calculate a numeric relevance score for one project.
 
-    Each matching criterion adds points:
-      - Each matching skill:  +3
-      - Level match:          +2
+    user_skills is a list of dicts: [{"name": "python", "level": "Advanced"}, ...]
+
+    Scoring:
+      - Base skill match:     +3
+      - Proficiency bonus:    +2 (matches project level) or +1 (near match)
+      - Experience match:     +2 (user overall level match)
       - Interest match:       +2
       - Time match:           +1
-
-    Returns an integer score (0 means no match at all).
     """
     # Compare time availability, return results with the same time availibity or lower.
     TIME_AVAILABILITY = ['low', 'medium', 'high']
-    time_availability_index =   TIME_AVAILABILITY.index(time_availability.strip().lower())
+    time_availability_index = TIME_AVAILABILITY.index(time_availability.strip().lower())
     valid_time = TIME_AVAILABILITY[ : time_availability_index + 1 ]
     
     score = 0
 
-    # Compare user's skills against the project's required skills
+    # Project skills for matching
     project_skills = [SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", [])]
-    # Count how many user skills overlap with the
-    # skills required by the current project.
-    matched_skills = sum(1 for skill in user_skills if skill in project_skills)
-    # Add weighted points based on the number of matching skills.
-    # More overlapping skills result in a higher recommendation score.
-    score += matched_skills * SCORING_WEIGHTS["skill"]
+    project_level = project.get("level", "Intermediate").lower()
+
+    # Match each user skill
+    for u_skill in user_skills:
+        u_name = u_skill["name"]
+        u_prof = u_skill["level"].lower()
+        
+        if u_name in project_skills:
+            # Base match
+            score += SCORING_WEIGHTS["skill"]
+            
+            # Proficiency steering
+            # Reward matching the user's specific skill proficiency with the project complexity
+            if u_prof == project_level:
+                score += 2 # Perfect alignment
+            elif (u_prof == "advanced" and project_level == "intermediate") or \
+                 (u_prof == "intermediate" and project_level == "beginner"):
+                score += 1 # Overqualified/Growth alignment
 
     # Award points for each additional matching criterion
     if project.get("level", "").lower() == level.lower():
