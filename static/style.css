@@ -1318,36 +1318,19 @@ label {
   flex-wrap: wrap;
   gap: 6px;
   align-items: center;
-  margin-bottom: 4px;
 }
 
 .skill-chip-selected {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background-color: var(--indigo-50);
-  color: var(--indigo-700);
-  padding: 4px 10px;
-  border-radius: var(--r-xs);
-  font-size: 0.85rem;
-  font-weight: 500;
-  border: 1px solid var(--indigo-100);
-  transition: all var(--t);
-}
-
-.skill-chip-selected .proficiency-tag {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  opacity: 0.7;
-  background-color: var(--indigo-100);
-  padding: 1px 4px;
-  border-radius: 3px;
+  gap: 5px;
+  font-size: 0.8rem;
   font-weight: 600;
-}
-
-.skill-chip-selected .skill-name {
-  white-space: nowrap;
+  color: var(--indigo-700);
+  background: var(--indigo-100);
+  border: 1px solid rgba(79, 110, 247, 0.2);
+  border-radius: var(--r-full);
+  padding: 3px 10px 3px 12px;
 }
 
 .skill-chip-remove {
@@ -1355,7 +1338,7 @@ label {
   border: none;
   cursor: pointer;
   color: var(--indigo-500);
-  font-size: 1.1rem;
+  font-size: 1rem;
   line-height: 1;
   padding: 0;
   display: flex;
@@ -1368,34 +1351,10 @@ label {
 }
 
 /* Text input inside the skill wrap */
-.skill-input-row {
-  display: flex;
-  gap: 8px;
-  width: 100%;
-}
-
-.skill-proficiency-select {
-  width: auto !important;
-  min-width: 120px;
-  padding: 0 12px !important;
-  height: 40px;
-  border-radius: var(--r-xs);
-  border: 1px solid var(--border);
-  background-color: var(--white);
-  color: var(--text-body);
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: border-color var(--t);
-  outline: none;
-  appearance: auto !important;
-}
-
 .skill-input-wrap input[type="text"] {
-  border: 1px solid var(--border) !important;
-  background: var(--white) !important;
-  border-radius: var(--r-xs);
-  padding: 8px 12px !important;
+  border: none;
+  background: transparent;
+  padding: 4px 6px;
   flex: 1;
   min-width: 140px;
   box-shadow: none;
@@ -1406,18 +1365,8 @@ label {
 
 .skill-input-wrap input[type="text"]:focus {
   outline: none;
-  border-color: var(--indigo-500) !important;
+  box-shadow: none;
 }
-
-@media (max-width: 600px) {
-  .skill-input-row {
-    flex-direction: column;
-  }
-  .skill-proficiency-select {
-    width: 100% !important;
-  }
-}
-
 
 /*suggestions dropdown*/
 .skills-suggestions {
