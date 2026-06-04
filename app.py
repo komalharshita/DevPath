@@ -64,6 +64,6 @@ def forbidden(error):
 
 
 if __name__ == "__main__":
-    import os
-    debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() in ("true", "1")
-    app.run(debug=debug_mode)
+    # debug=True is only for local development.
+    # Never run with debug=True in a production deployment.
+    app.run(debug=True)
