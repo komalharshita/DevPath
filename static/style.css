@@ -1333,6 +1333,41 @@ label {
   padding: 3px 10px 3px 12px;
 }
 
+.skill-proficiency-badge {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--indigo-800);
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-right: 2px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.skill-proficiency-select {
+  border: none;
+  background: var(--indigo-50);
+  color: var(--indigo-700);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 24px 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 6px;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%233347e0' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition: background var(--t);
+}
+
+.skill-proficiency-select:hover {
+  background-color: var(--indigo-100);
+}
+
 .skill-chip-remove {
   background: none;
   border: none;

@@ -169,7 +169,7 @@ if (clearFiltersBtn) {
   function isSkillSelected(skill) {
     var normalizedSkill = normalizeSkill(skill);
     return selectedSkills.some(function (selectedSkill) {
-      return normalizeSkill(selectedSkill) === normalizedSkill;
+      return normalizeSkill(selectedSkill.name) === normalizedSkill;
     });
   }
 
@@ -306,9 +306,7 @@ if (clearFiltersBtn) {
   quickPickChips.forEach(function (chip) {
     chip.addEventListener("click", function () {
       var skill = chip.getAttribute("data-skill");
-      var isAlreadySelected = selectedSkills.some(function (s) {
-        return s.toLowerCase() === skill.toLowerCase();
-      });
+      var isAlreadySelected = isSkillSelected(skill);
 
       if (isAlreadySelected) {
         removeSkill(skill);
@@ -364,7 +362,10 @@ if (clearFiltersBtn) {
     // Block duplicate entries (case-insensitive)
     if (isSkillSelected(skill)) return;
 
-    selectedSkills.push(skill);
+    var proficiencySelect = document.getElementById("skill-proficiency");
+    var proficiency = proficiencySelect ? proficiencySelect.value : "Intermediate";
+
+    selectedSkills.push({ name: skill, level: proficiency });
     renderSelectedChips();
     syncSkillsHiddenInput();
     updateQuickPickState();
@@ -376,7 +377,7 @@ if (clearFiltersBtn) {
   function removeSkill(skill) {
     // Rebuild the array without the skill that was just removed
     selectedSkills = selectedSkills.filter(function (selectedSkill) {
-      return normalizeSkill(selectedSkill) !== normalizeSkill(skill);
+      return normalizeSkill(selectedSkill.name) !== normalizeSkill(skill);
     });
     renderSelectedChips();
     syncSkillsHiddenInput();
@@ -388,11 +389,22 @@ if (clearFiltersBtn) {
   function renderSelectedChips() {
     // Wipe out old chips first so we don't end up with duplicates in the UI
     chipsSelectedEl.innerHTML = "";
-    selectedSkills.forEach(function (skill) {
+    selectedSkills.forEach(function (skillObj) {
+      var skill = skillObj.name;
+      var level = skillObj.level;
+
       // Create a new chip element for each selected skill
       var chipEl = document.createElement("span");
       chipEl.className = "skill-chip-selected";
-      chipEl.textContent = skill;
+      
+      // Proficiency badge
+      var badge = document.createElement("span");
+      badge.className = "skill-proficiency-badge";
+      badge.textContent = level.substring(0, 3); // BEG, INT, ADV
+      chipEl.appendChild(badge);
+
+      var textNode = document.createTextNode(skill);
+      chipEl.appendChild(textNode);
 
       // Remove button for each chip (create lil "x" button)
       var removeBtn = document.createElement("button");
@@ -412,12 +424,11 @@ if (clearFiltersBtn) {
   }
 
   function syncSkillsHiddenInput() {
-    if (!skillsHidden){
-      var skillsHidden = document.getElementById("skills");
-    }
     // Keep the hidden <input> in sync for form serialisation
-    // The API expects a comma-separated string, so join the array that way
-    skillsHidden.value = selectedSkills.join(", ");
+    // Serialize as JSON string for the backend
+    if (skillsHidden) {
+      skillsHidden.value = JSON.stringify(selectedSkills);
+    }
   }
 
   updateQuickPickState();
@@ -525,17 +536,15 @@ if (clearFiltersBtn) {
 
           renderResults(data.projects || [], data.message);
         })
-        .catch(function () {
-
+        .catch(function (err) {
           setLoadingState(false);
-    //combine form values into an object to send to server/api
-    var payload = {
-      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level: document.getElementById("level").value,
-      interest: document.getElementById("interest").value,
-      time: document.getElementById("time").value
-    };  
+          var generalErr = document.getElementById("form-error-general");
+          if (generalErr) {
+            generalErr.textContent = "Something went wrong. Please try again.";
+          }
+          console.error("Recommendation error:", err);
+        });
+    });
   });
 
   // Manages the loading state of the form and results section(whats visible or not)
@@ -556,7 +565,6 @@ if (clearFiltersBtn) {
       resultsSection.scrollIntoView({ behavior: "smooth" });
     } else {
       resultsLoadingEl.style.display  = "none";
-      resultsGrid.style.display       = "grid"; //switch back to gird layout 
     }
   }
 
@@ -574,17 +582,11 @@ if (clearFiltersBtn) {
     resultsGrid.innerHTML = "";
 
     if (!projects || projects.length === 0) {
-      resultsGrid.style.display     = "none";
-      resultsEmptyEl.style.display  = "block";
       resultsGrid.style.display = "none";
-      resultsEmptyEl.style.display = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
-    if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
-      resultsGrid.style.display    = "none";
       resultsEmptyEl.style.display = "block";
 
       // Show a friendly custom message when the user selected an interest
-      var selectedInterest = document.getElementById("interest")?.value;
+      var selectedInterest = document.getElementById("interest") ? document.getElementById("interest").value : "";
       if (selectedInterest) {
         emptyMessageEl.textContent = "No projects are currently available for this interest. Please check back later or try a different area.";
       } else if (message) {
