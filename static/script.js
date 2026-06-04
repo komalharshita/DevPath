@@ -169,7 +169,7 @@ if (clearFiltersBtn) {
   function isSkillSelected(skill) {
     var normalizedSkill = normalizeSkill(skill);
     return selectedSkills.some(function (selectedSkill) {
-      return normalizeSkill(selectedSkill) === normalizedSkill;
+      return normalizeSkill(selectedSkill.name) === normalizedSkill;
     });
   }
 
@@ -306,9 +306,7 @@ if (clearFiltersBtn) {
   quickPickChips.forEach(function (chip) {
     chip.addEventListener("click", function () {
       var skill = chip.getAttribute("data-skill");
-      var isAlreadySelected = selectedSkills.some(function (s) {
-        return s.toLowerCase() === skill.toLowerCase();
-      });
+      var isAlreadySelected = isSkillSelected(skill);
 
       if (isAlreadySelected) {
         removeSkill(skill);
@@ -364,7 +362,10 @@ if (clearFiltersBtn) {
     // Block duplicate entries (case-insensitive)
     if (isSkillSelected(skill)) return;
 
-    selectedSkills.push(skill);
+    var proficiencySelect = document.getElementById("skill-proficiency");
+    var proficiency = proficiencySelect ? proficiencySelect.value : "Intermediate";
+
+    selectedSkills.push({ name: skill, level: proficiency });
     renderSelectedChips();
     syncSkillsHiddenInput();
     updateQuickPickState();
@@ -376,7 +377,7 @@ if (clearFiltersBtn) {
   function removeSkill(skill) {
     // Rebuild the array without the skill that was just removed
     selectedSkills = selectedSkills.filter(function (selectedSkill) {
-      return normalizeSkill(selectedSkill) !== normalizeSkill(skill);
+      return normalizeSkill(selectedSkill.name) !== normalizeSkill(skill);
     });
     renderSelectedChips();
     syncSkillsHiddenInput();
@@ -388,11 +389,22 @@ if (clearFiltersBtn) {
   function renderSelectedChips() {
     // Wipe out old chips first so we don't end up with duplicates in the UI
     chipsSelectedEl.innerHTML = "";
-    selectedSkills.forEach(function (skill) {
+    selectedSkills.forEach(function (skillObj) {
+      var skill = skillObj.name;
+      var level = skillObj.level;
+
       // Create a new chip element for each selected skill
       var chipEl = document.createElement("span");
       chipEl.className = "skill-chip-selected";
-      chipEl.textContent = skill;
+      
+      // Proficiency badge
+      var badge = document.createElement("span");
+      badge.className = "skill-proficiency-badge";
+      badge.textContent = level.substring(0, 3); // BEG, INT, ADV
+      chipEl.appendChild(badge);
+
+      var textNode = document.createTextNode(skill);
+      chipEl.appendChild(textNode);
 
       // Remove button for each chip (create lil "x" button)
       var removeBtn = document.createElement("button");
@@ -416,8 +428,8 @@ if (clearFiltersBtn) {
       var skillsHidden = document.getElementById("skills");
     }
     // Keep the hidden <input> in sync for form serialisation
-    // The API expects a comma-separated string, so join the array that way
-    skillsHidden.value = selectedSkills.join(", ");
+    // Serialize as JSON string for the backend
+    skillsHidden.value = JSON.stringify(selectedSkills);
   }
 
   updateQuickPickState();

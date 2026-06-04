@@ -347,10 +347,18 @@
               </div>
               <div class="skill-input-wrap" id="skill-input-wrap">
                 <div class="skill-chips-selected" id="skill-chips-selected"></div>
+                
+                <!-- Skill Proficiency Selector -->
+                <select id="skill-proficiency" class="skill-proficiency-select" aria-label="Skill Proficiency">
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate" selected>Intermediate</option>
+                  <option value="Advanced">Advanced</option>
+                </select>
+
                 <input
                   type="text"
                   id="skills-input" 
-                  placeholder="Type a skill and press Enter..."
+                  placeholder="Type a skill..."
                   autocomplete="off"
                   aria-haspopup="listbox"
                   aria-expanded="false"
