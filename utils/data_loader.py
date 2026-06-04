@@ -10,8 +10,11 @@ DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "projects.json
 
 def load_all_projects():
     """Read and return the full list of projects from the JSON file."""
-    with open(DATA_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+    global _projects_cache
+    if _projects_cache is None:
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            _projects_cache = json.load(f)
+    return _projects_cache
 
 
 def find_project_by_id(project_id):

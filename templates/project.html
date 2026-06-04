@@ -4,19 +4,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Page title uses the project title injected by Flask's Jinja2 template engine -->
-  
-  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
   <title>{{ project.title }} — {{ project.level }}{% if project.skills %} {{ project.skills[0] }}{% endif %} Project | DevPath</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+  {% include 'partials/theme_head.html' %}
   
+  <!-- Open Graph meta tags for social media sharing -->
   <meta property="og:title" content="{{ project.title }} — DevPath" />
   <meta property="og:description" content="{{ project.description[:155] }}" />
+  <meta property="og:image" content="{{ config.get_og_image_url() }}" />
+  <meta property="og:url" content="{{ config.get_base_url() }}/project/{{ project.id }}" />
   <meta property="og:type" content="article" />
-  <meta property="og:url" content="https://mydevpath-github.vercel.app/project/{{ project.id }}" />
-
-  <meta name="twitter:card" content="summary" />
+  <meta property="og:site_name" content="{{ config.SITE_NAME }}" />
+  
+  <!-- Twitter Card meta tags -->
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="{{ project.title }} — DevPath" />
   <meta name="twitter:description" content="{{ project.description[:155] }}" />
+  <meta name="twitter:image" content="{{ config.get_og_image_url() }}" />
   <link rel="stylesheet" href="/static/style.css" />
   <link
     href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
@@ -28,13 +32,53 @@
   <!-- ============================================================
        Navigation
        ============================================================ -->
-  <nav class="navbar">
+  <nav class="navbar" aria-label="Main navigation">
     <div class="nav-inner">
       <a href="/" class="nav-logo">DevPath</a>
       <div class="nav-links">
         <a href="/" class="nav-link">Back to Search</a>
         <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-link nav-link-gh">GitHub</a>
+        {% include 'partials/theme_toggle.html' %}
       </div>
+      <!-- Mobile hamburger — was missing from project.html entirely -->
+      <button class="nav-mobile-toggle" id="nav-mobile-toggle"
+              aria-label="Toggle navigation"
+              aria-expanded="false"
+              aria-controls="nav-mobile-menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <!-- Mobile menu for project detail page -->
+    <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
+      <a href="/" class="nav-mobile-link" role="menuitem">Back to Search</a>
+      <a href="https://github.com" target="_blank" rel="noopener noreferrer"
+         class="nav-mobile-link" role="menuitem">GitHub</a>
+      <!-- Theme toggle in mobile menu -->
+      <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile"
+              style="background:none;border:none;text-align:left;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;padding:10px 0;font-size:0.95rem;font-weight:500;color:rgba(255,255,255,0.8);"
+              aria-pressed="false"
+              aria-label="Switch to dark mode"
+              role="menuitem">
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <span class="theme-toggle-label">Dark Mode</span>
+      </button>
     </div>
   </nav>
 
@@ -127,6 +171,79 @@
           </section>
 
           <!-- Roadmap Section with visual timeline -->
+
+ <!-- Roadmap Section -->
+<section class="detail-section">
+
+    <!-- Header -->
+    <div class="detail-section-header">
+
+        <div class="detail-section-icon">
+            <svg width="18"
+                 height="18"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 stroke-linecap="round"
+                 stroke-linejoin="round">
+
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+
+            </svg>
+        </div>
+
+        <h2>Project Roadmap</h2>
+
+    </div>
+
+
+    <!-- Description -->
+    <p class="detail-section-sub">
+        Follow these steps in order.
+        Each one builds on the previous.
+    </p>
+
+
+   <!-- Progress -->
+<div class="roadmap-progress-wrap">
+
+    <div
+        class="roadmap-progress-bar"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+        aria-label="Roadmap completion progress"
+    >
+        <div id="roadmap-progress-fill"></div>
+    </div>
+
+    <span
+        id="roadmap-progress-text"
+        aria-live="polite"
+    >
+        0% completed
+    </span>
+
+</div>
+
+    <!-- Timeline -->
+    <ol class="roadmap-timeline" id="roadmap-list">
+
+        {% for step in project.roadmap %}
+
+        <li class="roadmap-step"
+            data-step="step-{{loop.index}}">
+
+            <!-- Marker -->
+            <div class="roadmap-marker">
+
+                <span class="roadmap-dot"></span>
+
+                <span class="roadmap-line"></span>
+
+
           <section class="detail-section">
             <div class="detail-section-header">
               <div class="detail-section-icon">
@@ -136,27 +253,45 @@
                 </svg>
               </div>
               <h2>Project Roadmap</h2>
-            </div>
-            <p class="detail-section-sub">Follow these steps in order. Each one builds on the previous.</p>
 
-            <!-- Vertical timeline list — each step is one milestone -->
-            <ol class="roadmap-timeline">
-              {% for step in project.roadmap %}
-              <li class="roadmap-step">
-                <div class="roadmap-marker">
-                  <span class="roadmap-dot"></span>
-                  <span class="roadmap-line"></span>
-                </div>
-                <div class="roadmap-content">
-                  <!-- Step number badge derived from loop index -->
-                  <span class="roadmap-step-num">Step {{ loop.index }}</span>
-                  <!-- Strip the "Step N:" prefix if present in the data -->
-                  <p class="roadmap-step-text">{{ step | replace("Step " + loop.index|string + ": ", "") }}</p>
-                </div>
-              </li>
-              {% endfor %}
-            </ol>
-          </section>
+            </div>
+
+
+            <!-- Content -->
+            <div class="roadmap-content">
+
+                <label class="roadmap-step-label">
+
+                    <input
+                        type="checkbox"
+                        class="roadmap-checkbox"
+                    >
+
+                    <div class="roadmap-text-wrap">
+
+                        <span class="roadmap-step-num">
+                            Step {{loop.index}}
+                        </span>
+
+                        <p class="roadmap-step-text">
+
+                            {{ step | replace("Step " ~ loop.index ~ ": ", "") }}
+
+                        </p>
+
+                    </div>
+
+                </label>
+
+            </div>
+
+        </li>
+
+        {% endfor %}
+
+    </ol>
+
+</section>
 
           <!-- Resources Section -->
           <section class="detail-section">

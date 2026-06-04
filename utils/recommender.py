@@ -17,6 +17,11 @@ SCORING_WEIGHTS = {
     "time":     1,
 }
 
+WEIGHT_SKILL = SCORING_WEIGHTS["skill"]
+WEIGHT_LEVEL = SCORING_WEIGHTS["level"]
+WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
+WEIGHT_TIME = SCORING_WEIGHTS["time"]
+
 
 # Common aliases and abbreviations for skills
 # This improves recommendation accuracy by normalizing user input
@@ -26,7 +31,7 @@ SKILL_ALIASES = {
     "html5": "html",
     "css3": "css",
     "c++": "cpp",
-    "web dev": "javascript"
+    "web dev": ["javascript", "html", "css"]
 }
 
 
@@ -45,14 +50,17 @@ def parse_skills(skills_string):
         if s.strip()
     ]
 
-    normalized_skills = [
-        SKILL_ALIASES.get(skill, skill)
-        for skill in raw_skills
-    ]
+    normalized_skills = []
+    for skill in raw_skills:
+        alias = SKILL_ALIASES.get(skill, skill)
+        if isinstance(alias, list):
+            normalized_skills.extend(alias)
+        else:
+            normalized_skills.append(alias)
 
     return normalized_skills
 
-
+# -------------
 def score_single_project(
         project, user_skills,
         level, interest, time_availability):
@@ -60,12 +68,16 @@ def score_single_project(
     Calculate a numeric relevance score for one project.
 
     Each matching criterion adds points:
-      - Each matching skill:  +3
+      - Skill coverage score: matched * WEIGHT_SKILL * coverage_ratio
       - Level match:          +2
       - Interest match:       +2
       - Time match:           +1
 
-    Returns an integer score (0 means no match at all).
+    coverage_ratio = matched_skills / total_project_skills
+    This means a user covering 1 of 2 required skills scores less
+    than a user covering both, even with the same raw match count.
+
+    Returns a float score (0 means no match at all).
     """
     # Compare time availability, return results with the same time availibity or lower.
     TIME_AVAILABILITY = ['low', 'medium', 'high']
@@ -79,9 +91,12 @@ def score_single_project(
     # Count how many user skills overlap with the
     # skills required by the current project.
     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
+    total_project_skills = len(project_skills)
+    coverage_ratio = matched_skills / total_project_skills if total_project_skills > 0 else 0.0
+
     # Add weighted points based on the number of matching skills.
-    # More overlapping skills result in a higher recommendation score.
-    score += matched_skills * SCORING_WEIGHTS["skill"]
+    # Skill coverage boosts score when more project skills are matched.
+    score += matched_skills * SCORING_WEIGHTS["skill"] * coverage_ratio
 
     # Award points for each additional matching criterion
     if project.get("level", "").lower() == level.lower():
@@ -97,7 +112,7 @@ def score_single_project(
         return score
     return 0
 
-
+# -----------
 def get_recommendations(skills_string, level, interest, time_availability):
     """
     Return the top N recommended projects for the given user inputs.
@@ -131,23 +146,29 @@ def get_recommendations(skills_string, level, interest, time_availability):
     return [item["project"] for item in scored_projects[:MAX_RESULTS]]
 
 
+VALID_LEVELS = ["beginner", "intermediate", "advanced"]
+VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
+
+
 def validate_recommendation_inputs(skills, level, interest, time_availability):
-    """
-    Validate all four required fields.
-    Returns a list of error strings. An empty list means all inputs are valid.
-    """
     errors = []
 
     if not skills or not skills.strip():
         errors.append("Please enter at least one skill.")
+    elif not parse_skills(skills):
+        errors.append("Please enter at least one valid skill.")
 
     if not level or not level.strip():
         errors.append("Please select an experience level.")
+    elif level.strip().lower() not in VALID_LEVELS:
+        errors.append("Invalid experience level. Choose Beginner, Intermediate, or Advanced.")
 
     if not interest or not interest.strip():
         errors.append("Please select an area of interest.")
 
     if not time_availability or not time_availability.strip():
         errors.append("Please select your time availability.")
+    elif time_availability.strip().lower() not in VALID_TIME_AVAILABILITY:
+        errors.append("Invalid time availability. Choose Low, Medium, or High.")
 
     return errors
