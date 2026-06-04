@@ -362,7 +362,7 @@
   "starter_code": "starter_code/ai_resume_analyzer.py"
   },
   {
-    "id": 8,
+    "id": 12,
     "title": "Number Guessing Game",
     "skills": ["Python"],
     "level": "Beginner",
@@ -393,7 +393,7 @@
     "starter_code": "starter_code/number_guessing.py"
   },
   {
-    "id": 9,
+    "id": 13,
     "title": "Simple Email Automation",
     "skills": ["Python"],
     "level": "Beginner",
@@ -424,7 +424,7 @@
     "starter_code": "starter_code/email_automation.py"
   },
   {
-    "id": 10,
+    "id": 14,
     "title": "Quiz App",
     "skills": ["HTML", "CSS", "JavaScript"],
     "level": "Beginner",
@@ -456,7 +456,7 @@
     "starter_code": "starter_code/quiz_app.html"
   },
   {
-    "id":12,
+    "id": 15,
     "title": "Movie Recommendation System",
     "skills": ["Python"],
     "level": "Intermediate",
@@ -489,7 +489,7 @@
     "starter_code": "starter_code/movie_recommender.py"
   }, 
   {
-    "id": 13,
+    "id": 16,
     "title": "Sentiment Analysis Web App",
     "skills": ["Python", "HTML", "CSS"],
     "level": "Intermediate",
@@ -520,5 +520,36 @@
       "Tokenization: https://www.geeksforgeeks.org/nlp/nlp-how-tokenizing-text-sentence-words-works/"
     ],
     "starter_code": "starter_code/sentiment_app.py"
+  }
+  ,
+  {
+    "id": 17,
+    "title": "Sunrise Grand Hotel Management System",
+    "skills": ["Python"],
+    "level": "Medium",
+    "interest": "Business Logic",
+    "time": "Medium",
+    "description": "A robust CLI application to manage a 40-room inventory with tiered pricing, guest booking logic, and automatic billing calculation.",
+    "features": [
+      "Dynamic 40-room inventory across 4 luxury categories",
+      "Real-time availability filtering and room status tracking",
+      "Booking engine with 10-digit contact validation",
+      "Automatic stay duration and total price calculation",
+      "Cancellation logic and detailed guest lookup"
+    ],
+    "tech_stack": ["Python", "Dictionaries", "Input Validation"],
+    "roadmap": [
+      "Step 1: Initialize the 40-room inventory with tiered pricing",
+      "Step 2: Implement availability display and category filtering",
+      "Step 3: Build the booking engine with contact validation",
+      "Step 4: Create the cancellation and guest detail lookup logic",
+      "Step 5: Wrap all logic in a persistent main menu loop"
+    ],
+    "resources": [
+      "Python Dictionaries: https://docs.python.org/3/tutorial/datastructures.html#dictionaries",
+      "Python Input Validation: https://realpython.com/python-input-output/",
+      "Menu-driven CLI logic: https://www.geeksforgeeks.org/how-to-create-a-menu-driven-program-in-python/"
+    ],
+    "starter_code": "starter_code/hotel_management.py"
   }
 ]

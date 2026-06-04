@@ -120,4 +120,3 @@ app.*.symbols
 # Python virtual environment
 venv/
 .venv/
-
