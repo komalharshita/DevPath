@@ -8,7 +8,6 @@ from flask import Blueprint, render_template, request, jsonify, send_from_direct
 from utils.recommender import get_recommendations, validate_recommendation_inputs
 from utils.data_loader import find_project_by_id, load_all_projects, get_project_stats
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
-from config import Config
 import os
 
 # Interest categories that currently have no project recommendations available
@@ -32,7 +31,7 @@ main = Blueprint("main", __name__)
 def index():
     """Render the homepage with the skill input form and dynamic stats."""
     stats = get_project_stats()
-    return render_template("index.html", stats=stats, config=Config)
+    return render_template("index.html", stats=stats)
 
 @main.route("/health")
 def health_check():
@@ -105,7 +104,7 @@ def project_detail(project_id):
     project = find_project_by_id(project_id)
     if not project:
         abort(404)
-    return render_template("project.html", project=project, config=Config)
+    return render_template("project.html", project=project)
 
 
 @main.route("/project/<int:project_id>/code")

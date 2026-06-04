@@ -12,7 +12,6 @@
 
 from flask import Flask, render_template
 from routes.main_routes import main
-from config import Config
 
 app = Flask(__name__)
 
@@ -35,23 +34,23 @@ def add_security_headers(response):
 @app.errorhandler(404)
 def page_not_found(error):
     """Render a friendly 404 page instead of the raw Flask error."""
-    return render_template("404.html", config=Config), 404
+    return render_template("404.html"), 404
 
 
 @app.errorhandler(500)
 def internal_server_error(error):
     """Render a friendly 500 page for unexpected server errors."""
-    return render_template("500.html", config=Config), 500
+    return render_template("500.html"), 500
 
 @app.errorhandler(405)
 def method_not_allowed(error):
     """Render a friendly 405 page when the wrong HTTP method is used."""
-    return render_template("405.html", config=Config), 405
+    return render_template("405.html"), 405
 
 @app.errorhandler(403)
 def forbidden(error):
     """Render a friendly 403 page when access is denied."""
-    return render_template("403.html", config=Config), 403
+    return render_template("403.html"), 403
 
 
 if __name__ == "__main__":

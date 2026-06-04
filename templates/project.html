@@ -7,20 +7,14 @@
   <title>{{ project.title }} — {{ project.level }}{% if project.skills %} {{ project.skills[0] }}{% endif %} Project | DevPath</title>
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
   {% include 'partials/theme_head.html' %}
-  
-  <!-- Open Graph meta tags for social media sharing -->
   <meta property="og:title" content="{{ project.title }} — DevPath" />
   <meta property="og:description" content="{{ project.description[:155] }}" />
-  <meta property="og:image" content="{{ config.get_og_image_url() }}" />
-  <meta property="og:url" content="{{ config.get_base_url() }}/project/{{ project.id }}" />
   <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="{{ config.SITE_NAME }}" />
-  
-  <!-- Twitter Card meta tags -->
-  <meta name="twitter:card" content="summary_large_image" />
+  <meta property="og:url" content="https://mydevpath-github.vercel.app/project/{{ project.id }}" />
+
+  <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="{{ project.title }} — DevPath" />
   <meta name="twitter:description" content="{{ project.description[:155] }}" />
-  <meta name="twitter:image" content="{{ config.get_og_image_url() }}" />
   <link rel="stylesheet" href="/static/style.css" />
   <link
     href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
