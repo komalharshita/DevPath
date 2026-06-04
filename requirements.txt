@@ -6,8 +6,9 @@
 # To also install test dependencies:
 #   pip install -r requirements.txt pytest
 
-# Web framework (only runtime dependency)
+# Web framework (runtime dependencies)
 Flask==3.0.3
+Flask-Limiter==3.7.0
 
 # Testing (optional but recommended for contributors)
 pytest==8.2.2

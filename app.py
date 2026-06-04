@@ -10,10 +10,15 @@
 # Business logic, recommendation scoring, and data loading all live in
 # the utils/ and routes/ packages, not here.
 
-from flask import Flask, render_template
-from routes.main_routes import main
+from flask import Flask, render_template, jsonify
+from config import Config
+from routes.main_routes import main, limiter
 
 app = Flask(__name__)
+app.config.from_object(Config)
+
+# Initialize Limiter with the app
+limiter.init_app(app)
 
 # Register all routes defined in the main Blueprint
 app.register_blueprint(main)
@@ -30,6 +35,11 @@ def add_security_headers(response):
     return response
 
 # ---- Error handlers ----
+
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    """Return a structured JSON error for rate limit breaches."""
+    return jsonify({"error": "Rate limit exceeded. Please try again later."}), 429
 
 @app.errorhandler(404)
 def page_not_found(error):

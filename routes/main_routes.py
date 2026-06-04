@@ -4,11 +4,20 @@
 # and returns a response. No business logic lives here.
 
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
 from utils.data_loader import find_project_by_id, load_all_projects, get_project_stats
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
 import os
+
+# Initialize Limiter
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=[lambda: os.environ.get("RECOMMENDER_RATE_LIMIT", "60 per minute")],
+    storage_uri="memory://",
+)
 
 # Interest categories that currently have no project recommendations available
 NO_PROJECT_INTERESTS = {
