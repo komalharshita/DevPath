@@ -787,6 +787,42 @@ if (isIndexPage) {
     return span;
   }
 
+  //takes the array of projects from the api and draws them on the page as cards
+  //if array is empty it shows the "no results" message instead
+  function renderResults(projects, message) {
+    resultsSection.style.display = "block";
+    resultsLoadingEl.style.display = "none";
+    // Clear out any cards from a previous search before showing new ones
+    resultsGrid.innerHTML = "";
+
+    if (!projects || projects.length === 0) {
+      resultsGrid.style.display = "none";
+      resultsEmptyEl.style.display = "block";
+
+      // Show a friendly custom message when the user selected an interest
+      var selectedInterest = document.getElementById("interest")?.value;
+      if (selectedInterest) {
+        emptyMessageEl.textContent = "No projects are currently available for this interest. Please check back later or try a different area.";
+      } else if (message) {
+        emptyMessageEl.textContent = message;
+      } else {
+        emptyMessageEl.textContent = "Try adjusting your skills or choosing a different interest area.";
+      }
+
+      resultsSection.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+
+    resultsEmptyEl.style.display = "none";
+    resultsGrid.style.display = "grid";
+
+    projects.forEach(function (project) {
+      resultsGrid.appendChild(buildProjectCard(project));
+    });
+
+    resultsSection.scrollIntoView({ behavior: "smooth" });
+  }
+
 
   function buildProjectCard(project) {
     var card = document.createElement("div");
@@ -943,11 +979,29 @@ if (isIndexPage) {
       // Show a loading message while we wait for the API response
       if (codeContentEl) codeContentEl.textContent = "Loading starter code...";
 
-
-  // ----------------------------------------------------------
-  // Copy Code button
-  // ----------------------------------------------------------
-  var btnCopyCode  = document.getElementById("btn-copy-code");
+      fetch("/project/" + PROJECT_ID + "/code")
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data.error) {
+            if (codeContentEl) codeContentEl.textContent = "Error: " + data.error;
+            return;
+          }
+          if (codePanelFilename) codePanelFilename.textContent = data.filename;
+          if (codeContentEl) {
+            codeContentEl.textContent = "";
+            renderCodeWithLineNumbers(data.code).forEach(function (row) {
+              codeContentEl.appendChild(row);
+            });
+          }
+          // Mark as fetched so we don't hit the API again on the next open
+          codeFetched = true;
+        })
+        .catch(function () {
+          if (codeContentEl) {
+            codeContentEl.textContent = "Could not load starter code. Try downloading it instead.";
+          }
+        });
+    }
 
    // ============================================================
 // ROADMAP PROGRESS TRACKER
@@ -1120,85 +1174,6 @@ roadmapCheckboxes.forEach(function(cb){
 // ------------------------------------------------------------
 
 updateRoadmapProgress();
-  var copyToast    = document.getElementById("copy-toast");
-  var toastTimeout = null;
-
-  var copyToast    = document.getElementById("copy-toast"); //popup msg when copied 
-  var toastTimeout = null; 
-
-
-  //shows the "copied to clipboard" state on the button and the toast message, then resets after a short delay
-  function showCopySuccess() {
-    if (!btnCopyCode) return;
-
-    // Swap icons on the button(copy and checkmark icons)
-    var copyIcon  = btnCopyCode.querySelector(".copy-icon");
-    var checkIcon = btnCopyCode.querySelector(".check-icon");
-    var btnLabel = btnCopyCode.querySelector(".copy-btn-label");
-
-    if (copyIcon) copyIcon.style.display = "none";
-    if (checkIcon) checkIcon.style.display = "inline";
-    if (btnLabel) btnLabel.textContent = "Copied!";
-    btnCopyCode.classList.add("copied");
-    // Disable button so user can't spam click it while toast is showing
-    btnCopyCode.disabled = true;
-
-    // Show toast
-    if (copyToast) {
-      copyToast.classList.add("show");
-    }
-
-    // Auto-reset after 2.5 s
-    // Clear any previous timeout first so timers don't stack up
-    clearTimeout(toastTimeout);
-    toastTimeout = setTimeout(function () {
-      if (copyIcon) copyIcon.style.display = "inline";
-      if (checkIcon) checkIcon.style.display = "none";
-      if (btnLabel) btnLabel.textContent = "Copy Code";
-      btnCopyCode.classList.remove("copied");
-      btnCopyCode.disabled = false;
-      if (copyToast) copyToast.classList.remove("show");
-    }, 2500);
-  }
-
-  if (btnCopyCode) {
-    btnCopyCode.addEventListener("click", function () {
-      var code = codeContentEl
-        ? Array.from(codeContentEl.querySelectorAll(".line-content"))
-          .map(function (el) { return el.textContent; })
-          .join("\n")
-        : "";
-      // Don't copy if the code hasn't loaded yet — just ignore the click
-      if (!code || code === "Loading..." || code === "Loading starter code...") return;
-
-      // Use Clipboard API with textarea fallback
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(code).then(showCopySuccess).catch(function () {
-          fallbackCopy(code); // clipboard api failed, try the old way
-
-      fetch("/project/" + PROJECT_ID + "/code")
-        .then(function (res) { return res.json(); })
-        .then(function (data) {
-          if (data.error) {
-            if (codeContentEl) codeContentEl.textContent = "Error: " + data.error;
-            return;
-          }
-          if (codePanelFilename) codePanelFilename.textContent = data.filename;
-          if (codeContentEl) {
-            codeContentEl.textContent = "";
-            renderCodeWithLineNumbers(data.code).forEach(function (row) {
-              codeContentEl.appendChild(row);
-            });
-          }
-          // Mark as fetched so we don't hit the API again on the next open
-          codeFetched = true;
-        })
-        .catch(function () {
-          if (codeContentEl) {
-            codeContentEl.textContent = "Could not load starter code. Try downloading it instead.";
-          }
-        });
-    }
 
     // Attach open/close handlers
     if (btnViewCode) btnViewCode.addEventListener("click", openCodePanel);
@@ -1324,14 +1299,31 @@ updateRoadmapProgress();
     // 3. Fetch Skills Logic
     fetchBtn.addEventListener('click', async () => {
       const username = githubInput.value.trim();
-      if (!username) return;
+
+      // Clear any previous error before validating / retrying
+      errorMsg.textContent = '';
+
+      if (!username) {
+        errorMsg.textContent = "Please enter a GitHub username";
+        githubInput.focus();
+        return;
+      }
 
       fetchBtn.disabled = true;
       fetchBtn.textContent = 'Syncing...';
 
       try {
         const response = await fetch(`https://api.github.com/users/${username}/repos`);
-        if (!response.ok) throw new Error();
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error("Username not found. Please check and try again.");
+          }
+          if (response.status === 403) {
+            throw new Error("GitHub rate limit reached. Please try again later.");
+          }
+          throw new Error("Failed to fetch skills. Please try again.");
+        }
 
         const repos = await response.json();
         const langs = [...new Set(repos.map(r => r.language).filter(Boolean))];
@@ -1345,7 +1337,7 @@ updateRoadmapProgress();
           errorMsg.textContent = "No public languages found.";
         }
       } catch (err) {
-        errorMsg.textContent = err.message ?? "Failed to fetch skills";
+        errorMsg.textContent = err.message || "Failed to fetch skills";
       } finally {
         fetchBtn.disabled = false;
         fetchBtn.textContent = 'Fetch Skills';
@@ -1401,5 +1393,5 @@ updateRoadmapProgress();
     });
     handleScroll();
   }
-}());
 
+})();

@@ -6,7 +6,7 @@
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
-from utils.data_loader import find_project_by_id, load_all_projects, get_project_stats
+from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
 from config import Config
 import os
@@ -32,7 +32,13 @@ main = Blueprint("main", __name__)
 def index():
     """Render the homepage with the skill input form and dynamic stats."""
     stats = get_project_stats()
-    return render_template("index.html", stats=stats, config=Config)
+    available_levels = get_available_levels()
+
+    return render_template("index.html", stats=stats, available_levels=available_levels, config=Config)
+
+@main.route("/contact")
+def contact():
+    return render_template("contact.html")
 
 @main.route("/health")
 def health_check():

@@ -18,7 +18,7 @@ import pytest
 # Allow imports from the project root when running tests directly
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from utils.data_loader import load_all_projects, find_project_by_id, clear_cache
+from utils.data_loader import load_all_projects, find_project_by_id, clear_cache, validate_projects
 from utils.recommender import (
     get_recommendations,
     validate_recommendation_inputs,
@@ -50,6 +50,107 @@ def test_projects_json_loads():
     assert isinstance(projects, list), "Expected a list of projects"
     assert len(projects) > 0, "Project list must not be empty"
 
+def test_duplicate_ids_detected():
+    projects = [
+        {
+            "id": 1,
+            "title": "Project A",
+            "skills": [],
+            "level": "Beginner",
+            "interest": "AI",
+            "time": "1 week",
+            "description": "desc",
+            "features": [],
+            "tech_stack": [],
+            "roadmap": [],
+            "resources": [],
+            "starter_code": "code"
+        },
+        {
+            "id": 1,
+            "title": "Project B",
+            "skills": [],
+            "level": "Beginner",
+            "interest": "AI",
+            "time": "1 week",
+            "description": "desc",
+            "features": [],
+            "tech_stack": [],
+            "roadmap": [],
+            "resources": [],
+            "starter_code": "code"
+        }
+    ]
+
+    with pytest.raises(ValueError):
+        validate_projects(projects)
+
+def test_duplicate_titles_detected():
+    projects = [
+        {
+            "id": 1,
+            "title": "AI Resume Builder",
+            "skills": [],
+            "level": "Beginner",
+            "interest": "AI",
+            "time": "1 week",
+            "description": "desc",
+            "features": [],
+            "tech_stack": [],
+            "roadmap": [],
+            "resources": [],
+            "starter_code": "code"
+        },
+        {
+            "id": 2,
+            "title": "ai resume builder",
+            "skills": [],
+            "level": "Beginner",
+            "interest": "AI",
+            "time": "1 week",
+            "description": "desc",
+            "features": [],
+            "tech_stack": [],
+            "roadmap": [],
+            "resources": [],
+            "starter_code": "code"
+        }
+    ]
+
+    with pytest.raises(ValueError):
+        validate_projects(projects)
+
+def test_empty_title_detected():
+    projects = [
+        {
+            "id": 1,
+            "title": "",
+            "skills": [],
+            "level": "Beginner",
+            "interest": "AI",
+            "time": "1 week",
+            "description": "desc",
+            "features": [],
+            "tech_stack": [],
+            "roadmap": [],
+            "resources": [],
+            "starter_code": "code"
+        }
+    ]
+
+    with pytest.raises(ValueError):
+        validate_projects(projects)
+
+def test_missing_required_field_detected():
+    projects = [
+        {
+            "id": 1,
+            "title": "Project A"
+        }
+    ]
+
+    with pytest.raises(ValueError):
+        validate_projects(projects)
 
 def test_each_project_has_required_fields():
     """Every project must have the fields the UI depends on."""
