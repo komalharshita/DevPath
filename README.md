@@ -150,16 +150,57 @@ git clone https://github.com/komalharshita/devpath.git
 cd devpath
 python -m venv venv
 source venv/bin/activate          # Windows: venv\Scripts\activate
+
+# Shortcuts using the Makefile
+make install                      # Installs dependencies
+make run                          # Starts the development server
+```
+
+---
+
+## Troubleshooting
+
+### Common Setup Issues
+
+#### Virtual environment activation not working on Windows
+
+Use:
+
+```bash
+venv\Scripts\activate
+```
+
+instead of:
+
+```bash
+source venv/bin/activate
+```
+
+#### ModuleNotFoundError
+
+Make sure all dependencies are installed:
+
+```bash
 pip install -r requirements.txt
+```
+
+#### Flask app not starting
+
+Verify that you are running:
+
+```bash
 python app.py
 ```
+
+from the project root directory.
+---
 
 **http://127.0.0.1:5000** — that is the entire setup.
 
 ```bash
-# Verify everything works
-python tests/test_basic.py
-# 27 passed, 0 failed out of 27 tests
+# Verify everything works using the Makefile shortcut
+make test
+# 29 passed, 0 failed out of 29 tests
 ```
 
 ---

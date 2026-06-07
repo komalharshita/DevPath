@@ -17,6 +17,20 @@ SCORING_WEIGHTS = {
     "time":     1,
 }
 
+WEIGHT_SKILL = SCORING_WEIGHTS["skill"]
+WEIGHT_LEVEL = SCORING_WEIGHTS["level"]
+WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
+WEIGHT_TIME = SCORING_WEIGHTS["time"]
+
+
+VALID_LEVELS = {"beginner", "intermediate", "advanced"}
+VALID_INTERESTS = {
+    "web", "data", "education", "automation", "games",
+    "cybersecurity", "devops", "mobile", "machine learning/ai",
+    "artificial intelligence", "cloud computing", "mobile app development",
+    "backend", "tools", "productivity", "business logic"
+}
+VALID_TIMES = {"low", "medium", "high"}
 
 # Common aliases and abbreviations for skills
 # This improves recommendation accuracy by normalizing user input
@@ -26,33 +40,52 @@ SKILL_ALIASES = {
     "html5": "html",
     "css3": "css",
     "c++": "cpp",
-    "web dev": "javascript"
+    "web dev": ["javascript", "html", "css"]
 }
 
 
 def parse_skills(skills_string):
     """
-    Convert a raw comma-separated skills string into
-    a normalized lowercase list.
+    Convert a skills string into a normalized lowercase list.
 
-    Example:
-    "JS, HTML5, CSS3" -> ["javascript", "html", "css"]
+    Accepts two formats:
+      1. JSON array (preferred): '["HTML, CSS", "JavaScript"]'
+         Handles skill names that contain commas without mis-splitting.
+      2. Comma-separated string (legacy fallback): "HTML, CSS, JavaScript"
+
+    Example:    
+    '["JS", "HTML5", "CSS3"]' -> ["javascript", "html", "css"]
     """
+    import json
 
-    raw_skills = [
-        s.strip().lower()
-        for s in skills_string.split(",")
-        if s.strip()
-    ]
+    # Skills are serialized as JSON arrays.
+    # Legacy comma-separated values remain supported for compatibility.
+    try:
+        # Preferred path: frontend sends a JSON-serialized array
+        parsed = json.loads(skills_string)
+        if isinstance(parsed, list):
+            raw_skills = [s.strip().lower() for s in parsed if isinstance(s, str) and s.strip()]
+        else:
+            raise ValueError("Parsed JSON is not a list")
+    except (json.JSONDecodeError, ValueError, TypeError):
+        # Fallback: handle plain comma-separated strings
+        raw_skills = [
+            s.strip().lower()
+            for s in skills_string.split(",")
+            if s.strip()
+        ]
 
-    normalized_skills = [
-        SKILL_ALIASES.get(skill, skill)
-        for skill in raw_skills
-    ]
+    normalized_skills = []
+    for skill in raw_skills:
+        alias = SKILL_ALIASES.get(skill, skill)
+        if isinstance(alias, list):
+            normalized_skills.extend(alias)
+        else:
+            normalized_skills.append(alias)
 
     return normalized_skills
 
-
+# -------------
 def score_single_project(
         project, user_skills,
         level, interest, time_availability):
@@ -60,23 +93,35 @@ def score_single_project(
     Calculate a numeric relevance score for one project.
 
     Each matching criterion adds points:
-      - Each matching skill:  +3
+      - Skill coverage score: matched * WEIGHT_SKILL * coverage_ratio
       - Level match:          +2
       - Interest match:       +2
       - Time match:           +1
 
-    Returns an integer score (0 means no match at all).
+    coverage_ratio = matched_skills / total_project_skills
+    This means a user covering 1 of 2 required skills scores less
+    than a user covering both, even with the same raw match count.
+
+    Returns a float score (0 means no match at all).
     """
+    # Compare time availability, return results with the same time availibity or lower.
+    TIME_AVAILABILITY = ['low', 'medium', 'high']
+    time_availability_index =   TIME_AVAILABILITY.index(time_availability.strip().lower())
+    valid_time = TIME_AVAILABILITY[ : time_availability_index + 1 ]
+    
     score = 0
 
     # Compare user's skills against the project's required skills
-    project_skills = [s.lower() for s in project.get("skills", [])]
+    project_skills = [SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", [])]
     # Count how many user skills overlap with the
     # skills required by the current project.
     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
+    total_project_skills = len(project_skills)
+    coverage_ratio = matched_skills / total_project_skills if total_project_skills > 0 else 0.0
+
     # Add weighted points based on the number of matching skills.
-    # More overlapping skills result in a higher recommendation score.
-    score += matched_skills * SCORING_WEIGHTS["skill"]
+    # Skill coverage boosts score when more project skills are matched.
+    score += matched_skills * SCORING_WEIGHTS["skill"] * coverage_ratio
 
     # Award points for each additional matching criterion
     if project.get("level", "").lower() == level.lower():
@@ -88,9 +133,11 @@ def score_single_project(
     if project.get("time", "").lower() == time_availability.lower():
         score += SCORING_WEIGHTS["time"]
 
-    return score
+    if project.get("time", "").lower() in valid_time :
+        return score
+    return 0
 
-
+# -----------
 def get_recommendations(skills_string, level, interest, time_availability):
     """
     Return the top N recommended projects for the given user inputs.
@@ -124,23 +171,29 @@ def get_recommendations(skills_string, level, interest, time_availability):
     return [item["project"] for item in scored_projects[:MAX_RESULTS]]
 
 
+VALID_LEVELS = ["beginner", "intermediate", "advanced"]
+VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
+
+
 def validate_recommendation_inputs(skills, level, interest, time_availability):
-    """
-    Validate all four required fields.
-    Returns a list of error strings. An empty list means all inputs are valid.
-    """
     errors = []
 
     if not skills or not skills.strip():
         errors.append("Please enter at least one skill.")
+    elif not parse_skills(skills):
+        errors.append("Please enter at least one valid skill.")
 
     if not level or not level.strip():
         errors.append("Please select an experience level.")
+    elif level.strip().lower() not in VALID_LEVELS:
+        errors.append("Invalid experience level. Choose Beginner, Intermediate, or Advanced.")
 
-    if not interest or not interest.strip():
-        errors.append("Please select an area of interest.")
+    if not interest or not isinstance(interest, str) or interest.strip().lower() not in VALID_INTERESTS:
+        errors.append("Please select a valid area of interest.")
 
     if not time_availability or not time_availability.strip():
         errors.append("Please select your time availability.")
+    elif time_availability.strip().lower() not in VALID_TIME_AVAILABILITY:
+        errors.append("Invalid time availability. Choose Low, Medium, or High.")
 
     return errors

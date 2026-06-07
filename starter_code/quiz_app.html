@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+
+    #quiz-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    #question-text {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+
+    .option-btn {
+      display: block;
+      width: 100%;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      font-size: 1rem;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .option-btn:hover {
+      background: #f0f0f0;
+    }
+
+    #score-display {
+      font-size: 1rem;
+      color: #555;
+      margin-top: 1rem;
+    }
+
+    #result-screen {
+      display: none;
+    }
+
+    /* TODO: Add styles for correct/incorrect feedback */
+    /* TODO: Add styles for result screen */
+  </style>
+</head>
+<body>
+
+  <div id="quiz-container">
+
+    <!-- Question Screen -->
+    <div id="question-screen">
+      <h2>Quiz App</h2>
+      <p id="question-text">Question goes here...</p>
+
+      <!-- Option Buttons -->
+      <button class="option-btn" onclick="checkAnswer(0)">Option A</button>
+      <button class="option-btn" onclick="checkAnswer(1)">Option B</button>
+      <button class="option-btn" onclick="checkAnswer(2)">Option C</button>
+      <button class="option-btn" onclick="checkAnswer(3)">Option D</button>
+
+      <p id="score-display">Score: 0</p>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="result-screen">
+      <h2>Quiz Complete! 🎉</h2>
+      <p id="final-score">Your score: 0</p>
+      <button onclick="restartQuiz()">Play Again</button>
+    </div>
+
+  </div>
+
+  <script>
+    // TODO: Add your questions here as an array of objects
+    var questions = [
+      {
+        question: "What does HTML stand for?",
+        options: [
+          "Hyper Text Markup Language",
+          "High Tech Modern Language",
+          "Hyper Transfer Markup Language",
+          "Home Tool Markup Language"
+        ],
+        correct: 0
+      }
+      // TODO: Add more questions here
+    ];
+
+    var currentQuestion = 0;
+    var score = 0;
+
+    // TODO: Write displayQuestion() function
+    function displayQuestion() {
+      // Show current question and options
+    }
+
+    // TODO: Write checkAnswer() function
+    function checkAnswer(selectedIndex) {
+      // Check if selected answer is correct
+      // Update score
+      // Move to next question
+    }
+
+    // TODO: Write showResults() function
+    function showResults() {
+      // Hide question screen
+      // Show result screen with final score
+    }
+
+    // TODO: Write restartQuiz() function
+    function restartQuiz() {
+      // Reset score and question index
+      // Show question screen again
+    }
+
+    // Start quiz
+    displayQuestion();
+  </script>
+
+</body>
+</html>
