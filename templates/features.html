@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Features | DevPath{% endblock %}
+
+{% block content %}
+<main class="flex-grow pt-32 pb-24 flex flex-col justify-center items-center">
+    <!-- Features Section -->
+    <section class="px-margin-desktop max-w-container-max w-full mb-16 animate-scale-up" id="features">
+        <div class="text-center mb-16">
+            <span class="inline-block px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm uppercase tracking-widest mb-6">What You Get</span>
+            <h1 class="font-display-lg mt-4 text-primary">Everything You Need <br/><span class="opacity-40">to Start Building</span></h1>
+            <p class="text-body-lg text-on-surface-variant mt-6 max-w-xl mx-auto">Every recommendation comes with practical resources — not just a project name.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="glass-card p-10 flex flex-col items-start hover:bg-surface-container-low">
+                <div class="w-16 h-16 rounded-[1.2rem] bg-surface-container-high flex items-center justify-center mb-10 text-primary shadow-sm">
+                    <span class="material-symbols-outlined text-[32px]">tune</span>
+                </div>
+                <h3 class="font-headline-md text-[24px] mb-4 text-primary">Personalized Matches</h3>
+                <p class="text-on-surface-variant leading-relaxed text-[15px]">Projects are scored against your exact skills, level, and interest — not pulled from a generic list.</p>
+            </div>
+            <div class="glass-card p-10 flex flex-col items-start hover:bg-surface-container-low">
+                <div class="w-16 h-16 rounded-[1.2rem] bg-surface-container-high flex items-center justify-center mb-10 text-primary shadow-sm">
+                    <span class="material-symbols-outlined text-[32px]">map</span>
+                </div>
+                <h3 class="font-headline-md text-[24px] mb-4 text-primary">Step-by-Step Roadmaps</h3>
+                <p class="text-on-surface-variant leading-relaxed text-[15px]">Each project includes a numbered roadmap so you always know what to build next, without guessing.</p>
+            </div>
+            <div class="glass-card p-10 flex flex-col items-start hover:bg-surface-container-low">
+                <div class="w-16 h-16 rounded-[1.2rem] bg-surface-container-high flex items-center justify-center mb-10 text-primary shadow-sm">
+                    <span class="material-symbols-outlined text-[32px]">code_blocks</span>
+                </div>
+                <h3 class="font-headline-md text-[24px] mb-4 text-primary">Starter Code Included</h3>
+                <p class="text-on-surface-variant leading-relaxed text-[15px]">Download a working template for every project. Skip the blank-page problem and start building immediately.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Story Section (Included in Features) -->
+    <section class="w-full py-24 mb-16 animate-fade-in-up" style="animation-delay: 0.2s" id="our-story">
+        <div class="px-margin-desktop max-w-container-max mx-auto text-center md:text-left grid grid-cols-1 md:grid-cols-12 gap-12 items-center bg-surface-container-low rounded-[40px] p-16 shadow-lg border border-outline/5">
+            <div class="md:col-span-5">
+                <span class="inline-block px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm uppercase tracking-widest mb-6">About Us</span>
+                <h2 class="font-display-lg text-primary mb-6">Our Story</h2>
+                <p class="text-body-lg text-on-surface-variant">DevPath was built to help learners move from scattered tutorials to projects with a clear path, practical code, and meaningful momentum.</p>
+            </div>
+            <div class="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="glass-card p-10 bg-background shadow-md">
+                    <h3 class="font-headline-md text-[20px] text-primary mb-4">Why it exists</h3>
+                    <p class="text-[15px] text-on-surface-variant leading-relaxed">Too many project ideas stop at the title. DevPath focuses on the next steps that make starting and finishing feel manageable.</p>
+                </div>
+                <div class="glass-card p-10 bg-background shadow-md">
+                    <h3 class="font-headline-md text-[20px] text-primary mb-4">What it leads to</h3>
+                    <p class="text-[15px] text-on-surface-variant leading-relaxed">A smoother path from curiosity to a finished project, with fewer dead ends and more confidence along the way.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="premium-next-btn-wrapper animate-fade-in-up" style="animation-delay: 0.4s">
+        <a href="/find-project" class="bg-primary text-on-primary px-12 py-5 rounded-full font-bold hover:scale-105 transition-transform duration-300 inline-flex items-center gap-3 shadow-2xl animate-bounce-slight uppercase tracking-widest text-sm">
+            Find Your Project <span class="material-symbols-outlined">arrow_forward</span>
+        </a>
+    </div>
+</main>
+{% endblock %}

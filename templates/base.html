@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>{% block title %}DevPath | Master Your Craft{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        :root {
+            /* Light Theme (Fitme Cream) */
+            --background: #f4f2ee;
+            --on-background: #111111;
+            --primary: #111111;
+            --on-primary: #ffffff;
+            --surface-container-low: #ffffff;
+            --surface-container-high: #eaeaeb;
+            --surface-container-highest: #e0e0e0;
+            --on-surface-variant: #555555;
+            --outline: transparent;
+            --error: #ba1a1a;
+            --card-shadow: 0 8px 30px rgba(0,0,0,0.04);
+            --card-bg: #ffffff;
+        }
+
+        .dark {
+            /* Dark Theme (Fitme Borderless Black) */
+            --background: #060606;
+            --on-background: #ffffff;
+            --primary: #ffffff;
+            --on-primary: #000000;
+            --surface-container-low: #111111;
+            --surface-container-high: #1a1a1a;
+            --surface-container-highest: #222222;
+            --on-surface-variant: #999999;
+            --outline: transparent;
+            --error: #ffb4ab;
+            --card-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            --card-bg: #111111;
+        }
+    </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "background": "var(--background)",
+                      "on-background": "var(--on-background)",
+                      "primary": "var(--primary)",
+                      "on-primary": "var(--on-primary)",
+                      "surface-container-low": "var(--surface-container-low)",
+                      "surface-container-high": "var(--surface-container-high)",
+                      "surface-container-highest": "var(--surface-container-highest)",
+                      "on-surface-variant": "var(--on-surface-variant)",
+                      "outline": "var(--outline)",
+                      "error": "var(--error)"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "1rem",
+                      "xl": "1.5rem",
+                      "2xl": "2rem",
+                      "3xl": "2.5rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "unit": "4px",
+                      "margin-desktop": "64px",
+                      "margin-mobile": "24px",
+                      "gutter": "24px",
+                      "container-max": "1200px"
+              },
+              "fontFamily": {
+                      "display-lg": ["Plus Jakarta Sans"],
+                      "headline-md": ["Plus Jakarta Sans"],
+                      "label-sm": ["JetBrains Mono"],
+                      "display-lg-mobile": ["Plus Jakarta Sans"],
+                      "body-lg": ["Plus Jakarta Sans"],
+                      "body-md": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "display-lg": ["64px", {"lineHeight": "1.05", "letterSpacing": "-0.03em", "fontWeight": "800"}],
+                      "headline-md": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-sm": ["13px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "display-lg-mobile": ["40px", {"lineHeight": "1.1", "letterSpacing": "-0.03em", "fontWeight": "800"}],
+                      "body-lg": ["20px", {"lineHeight": "1.5", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                      "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}]
+              },
+              "animation": {
+                      "fade-in-up": "fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+                      "bounce-slight": "bounceSlight 3s ease-in-out infinite",
+                      "scale-up": "scaleUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards"
+              },
+              "keyframes": {
+                      "fadeInUp": {
+                          "0%": { opacity: 0, transform: "translateY(30px) scale(0.98)" },
+                          "100%": { opacity: 1, transform: "translateY(0) scale(1)" }
+                      },
+                      "bounceSlight": {
+                          "0%, 100%": { transform: "translateY(0)" },
+                          "50%": { transform: "translateY(-8px)" }
+                      },
+                      "scaleUp": {
+                          "0%": { opacity: 0, transform: "scale(0.9)" },
+                          "100%": { opacity: 1, transform: "scale(1)" }
+                      }
+              }
+            },
+          },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        
+        /* Fitme Bento Box Cards */
+        .glass-card {
+            background: var(--card-bg);
+            border-radius: 2rem;
+            box-shadow: var(--card-shadow);
+            border: none;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .dark .glass-card:hover {
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+        }
+
+        .power-transition { transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1); }
+        
+        input::placeholder, textarea::placeholder { color: var(--on-surface-variant); opacity: 0.5; }
+        
+        /* Remove default select styling completely as we will use custom dropdowns */
+        select { appearance: none; -webkit-appearance: none; -moz-appearance: none; display: none; }
+        
+        /* Premium hide scrollbar */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col transition-colors duration-500 overflow-x-hidden antialiased selection:bg-primary selection:text-on-primary">
+
+<!-- Floating Pill Navbar -->
+<nav class="fixed top-6 left-1/2 -translate-x-1/2 w-[95%] max-w-container-max z-50 bg-background/80 backdrop-blur-2xl rounded-full py-4 px-8 shadow-2xl transition-colors duration-500 border border-outline/10">
+    <div class="flex items-center justify-between">
+        <a href="/" class="font-display-lg text-[24px] tracking-tighter text-primary power-transition hover:opacity-70">DevPath</a>
+        
+        <div class="hidden md:flex items-center gap-8 bg-surface-container-low/50 px-6 py-2 rounded-full backdrop-blur-md">
+            <a class="text-on-surface-variant hover:text-primary power-transition font-body-md text-sm font-semibold tracking-wide" href="/how-it-works">How It Works</a>
+            <a class="text-on-surface-variant hover:text-primary power-transition font-body-md text-sm font-semibold tracking-wide" href="/features">Features</a>
+            <a class="text-on-surface-variant hover:text-primary power-transition font-body-md text-sm font-semibold tracking-wide" href="/find-project">Find Project</a>
+        </div>
+
+        <div class="hidden md:flex items-center gap-4">
+            <a class="text-on-surface-variant hover:text-primary power-transition font-body-md text-sm font-semibold mr-2" href="/contact">Contact</a>
+            
+            <button class="theme-toggle flex items-center justify-center w-10 h-10 rounded-full bg-surface-container-low text-primary hover:bg-primary hover:text-on-primary power-transition shadow-sm" aria-label="Toggle Theme">
+                <span class="material-symbols-outlined dark:hidden text-[18px]">dark_mode</span>
+                <span class="material-symbols-outlined hidden dark:block text-[18px]">light_mode</span>
+            </button>
+        </div>
+
+        <!-- Mobile Toggle -->
+        <button class="md:hidden w-10 h-10 rounded-full bg-surface-container-low text-primary flex items-center justify-center power-transition hover:bg-primary hover:text-on-primary" id="nav-mobile-toggle">
+            <span class="material-symbols-outlined text-[20px]">menu</span>
+        </button>
+    </div>
+</nav>
+
+{% block content %}
+{% endblock %}
+
+<!-- Footer -->
+<footer class="w-full py-margin-desktop mt-auto border-t border-white/10 bg-background">
+    <div class="grid grid-cols-12 gap-gutter px-margin-desktop max-w-container-max mx-auto">
+        <div class="col-span-12 md:col-span-4">
+            <div class="font-display-lg-mobile text-display-lg-mobile text-primary mb-4">DevPath</div>
+            <p class="text-on-surface-variant font-label-sm text-label-sm">© 2024 DevPath. Engineered for clarity.</p>
+        </div>
+        <div class="col-span-6 md:col-span-2">
+            <h4 class="font-label-sm text-label-sm text-primary mb-6 uppercase tracking-widest">Resources</h4>
+            <ul class="flex flex-col gap-4">
+                <li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline decoration-from-center" href="#">Documentation</a></li>
+                <li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline decoration-from-center" href="https://github.com/komalharshita/DevPath">GitHub</a></li>
+            </ul>
+        </div>
+        <div class="col-span-6 md:col-span-2">
+            <h4 class="font-label-sm text-label-sm text-primary mb-6 uppercase tracking-widest">Legal</h4>
+            <ul class="flex flex-col gap-4">
+                <li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline decoration-from-center" href="#">Privacy</a></li>
+                <li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline decoration-from-center" href="#">Terms</a></li>
+            </ul>
+        </div>
+        <div class="col-span-12 md:col-span-4 md:text-right">
+            <p class="font-body-md text-on-surface-variant mb-6">Join the architectural elite.</p>
+            <div class="flex md:justify-end gap-4">
+                <span class="material-symbols-outlined cursor-pointer hover:text-primary power-transition">terminal</span>
+                <span class="material-symbols-outlined cursor-pointer hover:text-primary power-transition">hub</span>
+                <span class="material-symbols-outlined cursor-pointer hover:text-primary power-transition">code</span>
+            </div>
+        </div>
+    </div>
+</footer>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

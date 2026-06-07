@@ -1,97 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - DevPath</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends 'base.html' %}
 
-    <nav class="navbar">
-        <div class="nav-inner">
-            <a href="/" class="nav-logo">
-                Dev<span class="nav-logo-accent">Path</span>
-            </a>
+{% block title %}Contact | DevPath{% endblock %}
 
-            <div class="nav-links">
-                <a href="/" class="nav-link">Home</a>
-                <a href="/contact" class="nav-link">Contact Us</a>
-            </div>
+{% block content %}
+<main class="flex-grow pt-32 pb-24">
+    <!-- Contact Section -->
+    <section class="px-margin-desktop max-w-container-max w-full mb-24 animate-scale-up" id="contact">
+        <div class="text-center mb-16">
+            <span class="inline-block px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm uppercase tracking-widest mb-6">Get in Touch</span>
+            <h1 class="font-display-lg mt-4 text-primary">Let's Connect <br/><span class="opacity-40">and Collaborate</span></h1>
+            <p class="text-body-lg text-on-surface-variant mt-6 max-w-xl mx-auto">Have a question or want to work together? We'd love to hear from you.</p>
         </div>
-    </nav>
-
-    <section class="hero" style="min-height: 100vh; display:flex; align-items:center; justify-content:center; text-align:center;">
-        <div class="hero-content" style="max-width: 700px; width:100%;">
-            <div class="hero-badge">
-                Contact DevPath
-            </div>
-
-            <h1 class="hero-title" style="color: white;">
-                Get In Touch
-            </h1>
-            <p class="hero-subtitle" style="color: #d1d5db; margin-bottom: 2rem;">
-                Have questions, feedback, or suggestions?
-                We'd love to hear from you and improve DevPath together.
-            </p>
-
-            <div style="
-                background: rgba(255,255,255,0.06);
-                box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-                border: 1px solid rgba(255,255,255,0.1);
-                padding: 2rem;
-                border-radius: 16px;
-                max-width: 500px;
-                margin: 2rem auto 0;
-                transform: translateX(20px);
-                backdrop-filter: blur(10px);
-                text-align:center;
-            ">
-                <h3 style="color: white; margin-bottom: 1rem;">
-                    Contact Information
-                </h3>
-
-                <p style="color: #d1d5db; margin-bottom: 1rem;">
-                    📧 support@devpath.dev
-                </p>
-
-                <p style="color: #d1d5db; margin-bottom: 1rem;">
-                    🌐 GitHub Community Support
-                </p>
-
-                <p style="color: #d1d5db;">
-                    💡 Open to feedback, suggestions, and contributions
-                </p>
-            </div>
-
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
             
-
-            <div class="contact-info" style="margin-top: 3rem auto 0 auto;">
-                
-
-                
+            <!-- Contact Info Cards -->
+            <div class="flex flex-col gap-6">
+                <div class="glass-card p-10 flex flex-col items-start bg-surface-container-low shadow-lg border border-outline/5">
+                    <div class="w-14 h-14 bg-primary rounded-full flex items-center justify-center mb-6 text-on-primary font-bold shadow-md">
+                        <span class="material-symbols-outlined">mail</span>
+                    </div>
+                    <h3 class="font-headline-md text-[24px] mb-2 text-primary">Email Us</h3>
+                    <p class="text-on-surface-variant text-[15px] mb-4">For general inquiries and support.</p>
+                    <a href="mailto:hello@devpath.com" class="font-bold text-primary hover:underline">hello@devpath.com</a>
+                </div>
+                <div class="glass-card p-10 flex flex-col items-start bg-surface-container-low shadow-lg border border-outline/5">
+                    <div class="w-14 h-14 bg-primary rounded-full flex items-center justify-center mb-6 text-on-primary font-bold shadow-md">
+                        <span class="material-symbols-outlined">forum</span>
+                    </div>
+                    <h3 class="font-headline-md text-[24px] mb-2 text-primary">Community</h3>
+                    <p class="text-on-surface-variant text-[15px] mb-4">Join our Discord server to connect with other developers.</p>
+                    <a href="#" class="font-bold text-primary hover:underline">Join Discord &rarr;</a>
+                </div>
             </div>
 
-            <div style="margin-top: 2rem; display:flex; justify-content:center; align-items:center; gap:1.5rem; flex-wrap:wrap;">
-                <a href="https://github.com/komalharshita/DevPath"
-                   target="_blank"
-                   class="btn-primary">
-                    Visit GitHub Repository
-                </a>
-                <a href="/"
-                    class="btn-primary"
-                    style="
-                    text-decoration:none;
-                    background: rgba(255,255,255,0.08);
-                    border: 1px solid rgba(255,255,255,0.15);
-                    min-width: 220px;
-                    ">
-                        Back to Home
-                </a>
-                
+            <!-- Contact Form Card -->
+            <div class="glass-card p-12 shadow-xl border border-outline/5 bg-background">
+                <form id="contact-form" class="flex flex-col gap-6" onsubmit="event.preventDefault(); alert('Message Sent! (Demo)'); this.reset();">
+                    <div class="flex flex-col gap-2">
+                        <label class="font-label-sm uppercase tracking-widest text-primary ml-4">Name</label>
+                        <input type="text" required class="w-full bg-surface-container-high border-none rounded-full py-4 px-6 focus:outline-none focus:ring-2 focus:ring-primary transition-colors font-body-md text-primary" placeholder="Jane Doe">
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="font-label-sm uppercase tracking-widest text-primary ml-4">Email</label>
+                        <input type="email" required class="w-full bg-surface-container-high border-none rounded-full py-4 px-6 focus:outline-none focus:ring-2 focus:ring-primary transition-colors font-body-md text-primary" placeholder="jane@example.com">
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="font-label-sm uppercase tracking-widest text-primary ml-4">Message</label>
+                        <textarea required rows="4" class="w-full bg-surface-container-high border-none rounded-[2rem] py-4 px-6 focus:outline-none focus:ring-2 focus:ring-primary transition-colors font-body-md text-primary resize-none" placeholder="How can we help you?"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-primary text-on-primary py-5 rounded-full font-bold hover:scale-[1.02] transition-transform mt-4 shadow-lg text-[16px] flex items-center justify-center gap-2">
+                        Send Message <span class="material-symbols-outlined text-[20px]">send</span>
+                    </button>
+                </form>
             </div>
+
         </div>
     </section>
-
-</body>
-</html>
+</main>
+{% endblock %}

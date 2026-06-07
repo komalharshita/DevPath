@@ -28,11 +28,22 @@ main = Blueprint("main", __name__)
 
 @main.route("/")
 def index():
-    """Render the homepage with the skill input form and dynamic stats."""
+    """Render the homepage."""
     stats = get_project_stats()
-    available_levels = get_available_levels()
+    return render_template("index.html", stats=stats, config=Config)
 
-    return render_template("index.html", stats=stats, available_levels=available_levels, config=Config)
+@main.route("/how-it-works")
+def how_it_works():
+    return render_template("how_it_works.html", config=Config)
+
+@main.route("/features")
+def features():
+    return render_template("features.html", config=Config)
+
+@main.route("/find-project")
+def find_project():
+    available_levels = get_available_levels()
+    return render_template("find_project.html", available_levels=available_levels, config=Config)
 
 @main.route("/contact")
 def contact():
@@ -109,6 +120,21 @@ def project_detail(project_id):
     project = find_project_by_id(project_id)
     if not project:
         abort(404)
+        
+    # Convert resources list to dict if needed (since template expects .items())
+    if "resources" in project and isinstance(project["resources"], list):
+        parsed_resources = {}
+        for r in project["resources"]:
+            if isinstance(r, str) and ": http" in r:
+                title, link = r.split(": http", 1)
+                parsed_resources[title.strip()] = "http" + link.strip()
+            elif isinstance(r, str) and ": " in r:
+                title, link = r.split(": ", 1)
+                parsed_resources[title.strip()] = link.strip()
+            else:
+                parsed_resources[str(r)] = "#"
+        project["resources"] = parsed_resources
+
     return render_template("project.html", project=project, config=Config)
 
 

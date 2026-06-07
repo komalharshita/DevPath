@@ -1,404 +1,186 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ project.title }} — {{ project.level }}{% if project.skills %} {{ project.skills[0] }}{% endif %} Project | DevPath</title>
-  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
-  {% include 'partials/theme_head.html' %}
-  
-  <!-- Open Graph meta tags for social media sharing -->
-  <meta property="og:title" content="{{ project.title }} — DevPath" />
-  <meta property="og:description" content="{{ project.description[:155] }}" />
-  <meta property="og:image" content="{{ config.get_og_image_url() }}" />
-  <meta property="og:url" content="{{ config.get_base_url() }}/project/{{ project.id }}" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="{{ config.SITE_NAME }}" />
-  
-  <!-- Twitter Card meta tags -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="{{ project.title }} — DevPath" />
-  <meta name="twitter:description" content="{{ project.description[:155] }}" />
-  <meta name="twitter:image" content="{{ config.get_og_image_url() }}" />
-  <link rel="stylesheet" href="/static/style.css" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
-    rel="stylesheet" />
-</head>
+{% block title %}{{ project.title }} - DevPath Project Details{% endblock %}
 
-<body class="detail-page">
+{% block extra_css %}
+.underline-expand {
+    position: relative;
+}
+.underline-expand::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: -2px;
+    left: 50%;
+    background: #ffffff;
+    transition: all 0.250s cubic-bezier(0.25, 1, 0.5, 1);
+    transform: translateX(-50%);
+}
+.underline-expand:hover::after {
+    width: 100%;
+}
+.timeline-line {
+    background: linear-gradient(to bottom, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+}
+.magnetic-hover {
+    transition: transform 0.250s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.magnetic-hover:hover {
+    transform: scale(1.02);
+}
+{% endblock %}
 
-  <!-- ============================================================
-       Navigation
-       ============================================================ -->
-  <nav class="navbar" aria-label="Main navigation">
-    <div class="nav-inner">
-      <a href="/" class="nav-logo">DevPath</a>
-      <div class="nav-links">
-        <a href="/" class="nav-link">Back to Search</a>
-        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-link nav-link-gh">GitHub</a>
-        {% include 'partials/theme_toggle.html' %}
-      </div>
-      <!-- Mobile hamburger — was missing from project.html entirely -->
-      <button class="nav-mobile-toggle" id="nav-mobile-toggle"
-              aria-label="Toggle navigation"
-              aria-expanded="false"
-              aria-controls="nav-mobile-menu">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-    <!-- Mobile menu for project detail page -->
-    <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
-      <a href="/" class="nav-mobile-link" role="menuitem">Back to Search</a>
-      <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
-         class="nav-mobile-link" role="menuitem">GitHub</a>
-      <!-- Theme toggle in mobile menu -->
-      <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile"
-              style="background:none;border:none;text-align:left;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;padding:10px 0;font-size:0.95rem;font-weight:500;color:rgba(255,255,255,0.8);"
-              aria-pressed="false"
-              aria-label="Switch to dark mode"
-              role="menuitem">
-        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24"
-             fill="none" stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
-        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24"
-             fill="none" stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="5"/>
-          <line x1="12" y1="1" x2="12" y2="3"/>
-          <line x1="12" y1="21" x2="12" y2="23"/>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-          <line x1="1" y1="12" x2="3" y2="12"/>
-          <line x1="21" y1="12" x2="23" y2="12"/>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-        </svg>
-        <span class="theme-toggle-label">Dark Mode</span>
-      </button>
-    </div>
-  </nav>
+{% block content %}
+<main class="mt-24 mb-16 flex-grow">
+<!-- Hero Section -->
+    <section class="px-margin-desktop max-w-container-max mx-auto py-16 animate-scale-up">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center bg-surface-container-low rounded-[40px] p-12 shadow-2xl border border-outline/5 relative overflow-hidden">
+            <!-- Background Glow -->
+            <div class="absolute -right-20 -top-20 w-[400px] h-[400px] bg-primary/5 blur-[100px] rounded-full pointer-events-none"></div>
 
-  <!-- ============================================================
-       Project Hero Banner
-       ============================================================ -->
-  <div class="detail-hero">
-    <div class="container">
-      <!-- Breadcrumb trail -->
-      <nav class="breadcrumb" aria-label="breadcrumb">
-        <a href="/">Home</a>
-        <span class="breadcrumb-sep">&#8250;</span>
-        <span>{{ project.title }}</span>
-      </nav>
-
-      <div class="detail-hero-content">
-        <div class="detail-hero-left">
-          <h1 class="detail-title">{{ project.title }}</h1>
-          <!-- Difficulty, interest, and skill badges -->
-          <div class="badge-group">
-            <span class="badge badge--{{ project.level | lower }}">{{ project.level }}</span>
-            <span class="badge badge--{{ project.interest | lower }}">{{ project.interest }}</span>
-            {% for skill in project.skills %}
-            <span class="badge badge--{{ skill | lower }}">{{ skill }}</span>
-            {% endfor %}
-            <span class="badge badge--time">{{ project.time }} effort</span>
-          </div>
-          <p class="detail-description">{{ project.description }}</p>
-        </div>
-
-        <!-- Quick-action buttons in the hero -->
-        <div class="detail-hero-actions">
-          <a href="/project/{{ project.id }}/download" class="btn-download" aria-label="Download starter code file">
-            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            Download Starter Code
-          </a>
-          <button class="btn-view-code" id="btn-view-code" aria-label="Open inline code viewer">
-            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="16 18 22 12 16 6" />
-              <polyline points="8 6 2 12 8 18" />
-            </svg>
-            View Code
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ============================================================
-       Main Detail Content
-       ============================================================ -->
-  <div class="detail-body">
-    <div class="container">
-      <div class="detail-grid">
-
-        <!-- LEFT COLUMN: Features, Roadmap, Resources -->
-        <div class="detail-main">
-
-          <!-- Features Section -->
-          <section class="detail-section">
-            <div class="detail-section-header">
-              <div class="detail-section-icon">
-                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="9 11 12 14 22 4" />
-                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-                </svg>
-              </div>
-              <h2>Features</h2>
-            </div>
-            <ul class="feature-list">
-              {% for feature in project.features %}
-              <li class="feature-list-item">
-                <span class="feature-check">
-                  <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                </span>
-                {{ feature }}
-              </li>
-              {% endfor %}
-            </ul>
-          </section>
-
-          <!-- Roadmap Section -->
-          <section class="detail-section">
-            <div class="detail-section-header">
-              <div class="detail-section-icon">
-                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                </svg>
-              </div>
-              <h2>Project Roadmap</h2>
-            </div>
-
-            <p class="detail-section-sub">Follow these steps in order. Each one builds on the previous.</p>
-
-            <div class="roadmap-progress-wrap">
-              <div class="roadmap-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
-                aria-valuenow="0" aria-label="Roadmap completion progress">
-                <div id="roadmap-progress-fill"></div>
-              </div>
-              <span id="roadmap-progress-text" aria-live="polite">0% completed</span>
-            </div>
-
-            <ol class="roadmap-timeline" id="roadmap-list">
-              {% for step in project.roadmap %}
-              <li class="roadmap-step" data-step="step-{{ loop.index }}">
-                <div class="roadmap-marker">
-                  <span class="roadmap-dot"></span>
-                  <span class="roadmap-line"></span>
+            <div class="md:col-span-8 z-10">
+                <div class="flex flex-wrap gap-3 mb-8">
+                    <span class="px-4 py-1.5 rounded-full bg-surface-container-high font-label-sm text-primary uppercase tracking-widest shadow-sm">{{ project.level }}</span>
+                    <span class="px-4 py-1.5 rounded-full bg-surface-container-high font-label-sm text-primary uppercase tracking-widest shadow-sm">{{ project.interest }}</span>
+                    <span class="px-4 py-1.5 rounded-full bg-primary text-on-primary font-label-sm uppercase tracking-widest shadow-md">{{ project.time_required }} Hours</span>
                 </div>
-                <div class="roadmap-content">
-                  <label class="roadmap-step-label">
-                    <input type="checkbox" class="roadmap-checkbox">
-                    <div class="roadmap-text-wrap">
-                      <span class="roadmap-step-num">Step {{ loop.index }}</span>
-                      <p class="roadmap-step-text">{{ step | replace("Step " ~ loop.index ~ ": ", "") }}</p>
+                <h1 class="font-display-lg text-[48px] md:text-[64px] mb-6 leading-[1.1] text-primary">{{ project.title }}</h1>
+                <p class="font-body-lg text-on-surface-variant max-w-2xl text-[20px] leading-relaxed">
+                    {{ project.description }}
+                </p>
+            </div>
+            
+            <!-- Floating Tech Stack Preview -->
+            <div class="md:col-span-4 z-10 flex justify-center md:justify-end">
+                <div class="glass-card p-8 rounded-[32px] w-full max-w-[320px] border border-outline/10 bg-background/50 backdrop-blur-3xl transform rotate-3 hover:rotate-0 transition-transform duration-500 shadow-2xl">
+                    <h3 class="font-label-sm uppercase tracking-widest text-primary mb-6">Core Tech</h3>
+                    <div class="flex flex-wrap gap-2">
+                        {% for skill in project.skills %}
+                        <span class="px-3 py-1.5 bg-surface-container-high text-primary rounded-lg text-sm font-bold shadow-sm">{{ skill }}</span>
+                        {% endfor %}
                     </div>
-                  </label>
                 </div>
-              </li>
-              {% endfor %}
-            </ol>
-          </section>
-
-          <!-- Resources Section -->
-          <section class="detail-section">
-            <div class="detail-section-header">
-              <div class="detail-section-icon">
-                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                  <polyline points="15 3 21 3 21 9" />
-                  <line x1="10" y1="14" x2="21" y2="3" />
-                </svg>
-              </div>
-              <h2>Learning Resources</h2>
             </div>
-            <ul class="resource-list">
-              {% for resource in project.resources %}
-              <li class="resource-item">
-                <!-- Parse the "Label: URL" format stored in the data -->
-                {% set parts = resource.split(": http") %}
-                {% if parts|length > 1 %}
-                  <a href="http{{ parts[1] }}" target="_blank" rel="noopener noreferrer" class="resource-link">
-                    <span>{{ parts[0] }}</span>
-                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                      <polyline points="15 3 21 3 21 9" />
-                      <line x1="10" y1="14" x2="21" y2="3" />
-                    </svg>
-                  </a>
-                {% else %}
-                <span class="resource-plain">{{ resource }}</span>
-                {% endif %}
-              </li>
-              {% endfor %}
-            </ul>
-          </section>
-
         </div>
+    </section>
 
-        <!-- RIGHT COLUMN: Tech stack sidebar + starter code panel -->
-        <aside class="detail-sidebar">
+    <!-- Main Content Grid (Bento) -->
+    <section class="px-margin-desktop max-w-container-max mx-auto py-8 mb-24 animate-fade-in-up" style="animation-delay: 0.2s">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Left Column: Features & Resources -->
+            <div class="lg:col-span-5 space-y-8">
+                <!-- Features Card -->
+                <div class="glass-card p-10 rounded-[32px]">
+                    <div class="flex items-center gap-4 mb-8 text-primary">
+                        <div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center">
+                            <span class="material-symbols-outlined">star</span>
+                        </div>
+                        <h2 class="font-headline-md text-[24px]">What You'll Build</h2>
+                    </div>
+                    <ul class="space-y-4 text-[16px] text-on-surface-variant">
+                        {% for feature in project.features %}
+                        <li class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-primary text-[20px] mt-0.5">check_circle</span>
+                            <span class="leading-relaxed">{{ feature }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
 
-          <!-- Tech Stack card -->
-          <div class="sidebar-card">
-            <h3 class="sidebar-card-title">
-              <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                <line x1="8" y1="21" x2="16" y2="21" />
-                <line x1="12" y1="17" x2="12" y2="21" />
-              </svg>
-              Tech Stack
-            </h3>
-            <div class="tech-tags">
-              {% for tech in project.tech_stack %}
-              <span class="tech-tag">{{ tech }}</span>
-              {% endfor %}
+                <!-- Resources Card -->
+                <div class="glass-card p-10 rounded-[32px]">
+                    <div class="flex items-center gap-4 mb-8 text-primary">
+                        <div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center">
+                            <span class="material-symbols-outlined">library_books</span>
+                        </div>
+                        <h2 class="font-headline-md text-[24px]">Learning Resources</h2>
+                    </div>
+                    <ul class="space-y-4">
+                        {% for r_title, r_link in project.resources.items() %}
+                        <li>
+                            <a href="{{ r_link }}" target="_blank" class="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl hover:bg-surface-container-high transition-colors group">
+                                <span class="font-bold text-primary">{{ r_title }}</span>
+                                <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">open_in_new</span>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
-          </div>
 
-          <!-- Project stats card -->
-          <div class="sidebar-card">
-            <h3 class="sidebar-card-title">
-              <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <polyline points="12 6 12 12 16 14" />
-              </svg>
-              Project Details
-            </h3>
-            <ul class="stats-list">
-              <li>
-                <span class="stats-label">Difficulty</span>
-                <span class="stats-value stats-value--{{ project.level | lower }}">{{ project.level }}</span>
-              </li>
-              <li>
-                <span class="stats-label">Interest</span>
-                <span class="stats-value">{{ project.interest }}</span>
-              </li>
-              <li>
-                <span class="stats-label">Effort</span>
-                <span class="stats-value">{{ project.time }}</span>
-              </li>
-              <li>
-                <span class="stats-label">Roadmap Steps</span>
-                <span class="stats-value">{{ project.roadmap | length }} steps</span>
-              </li>
-            </ul>
-          </div>
+            <!-- Right Column: Roadmap & Starter Code -->
+            <div class="lg:col-span-7 space-y-8">
+                
+                <!-- Action Bar -->
+                <div class="glass-card p-8 rounded-[32px] bg-primary text-on-primary flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
+                    <div>
+                        <h2 class="font-headline-md text-[24px] mb-1">Ready to code?</h2>
+                        <p class="opacity-80 text-sm">Download the scaffolded template.</p>
+                    </div>
+                    <a href="/starter-code/{{ project.id }}" class="bg-on-primary text-primary px-8 py-4 rounded-full font-bold hover:scale-[1.05] transition-transform shadow-lg flex items-center gap-2">
+                        <span class="material-symbols-outlined">download</span> Download Starter Code
+                    </a>
+                </div>
 
-          <!-- Starter code actions card -->
-          <div class="sidebar-card sidebar-card--code">
-            <h3 class="sidebar-card-title">
-              <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="16 18 22 12 16 6" />
-                <polyline points="8 6 2 12 8 18" />
-              </svg>
-              Starter Code
-            </h3>
-            <p class="sidebar-card-desc">A working template to kick off this project without starting from scratch.</p>
-            <div class="sidebar-code-actions">
-              <button class="btn-view-code-sm" id="btn-view-code-sm">View Code</button>
-              <a href="/project/{{ project.id }}/download" class="btn-download-sm">Download</a>
+                <!-- Roadmap Card -->
+                <div class="glass-card p-12 rounded-[32px]">
+                    <div class="flex items-center gap-4 mb-10 text-primary">
+                        <div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center">
+                            <span class="material-symbols-outlined">route</span>
+                        </div>
+                        <h2 class="font-headline-md text-[24px]">Step-by-Step Roadmap</h2>
+                    </div>
+                    
+                    <div class="relative pl-6">
+                        <!-- Vertical line -->
+                        <div class="absolute left-0 top-4 bottom-4 w-1 bg-surface-container-high rounded-full"></div>
+                        
+                        <div class="space-y-12">
+                            {% for step in project.roadmap %}
+                            <div class="relative group">
+                                <div class="absolute -left-[30px] top-1 w-4 h-4 bg-surface-container-high border-[3px] border-background rounded-full transition-all duration-300 group-hover:bg-primary group-hover:scale-125 group-hover:shadow-[0_0_10px_var(--primary)] z-10"></div>
+                                <h3 class="font-bold text-[18px] text-primary mb-2 leading-tight">Step {{ loop.index }}</h3>
+                                <p class="text-on-surface-variant text-[16px] leading-relaxed">{{ step }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <!-- Completion Status -->
+                <div class="glass-card p-10 rounded-[32px] text-center">
+                    <h3 class="font-headline-md text-[24px] text-primary mb-4">Finished the project?</h3>
+                    <button class="bg-surface-container-high text-primary px-8 py-4 rounded-full font-bold hover:bg-primary hover:text-on-primary transition-colors duration-300 shadow-sm" onclick="alert('Progress saved!')">
+                        Mark as Completed
+                    </button>
+                </div>
+
             </div>
-            <button id="btn-mark-complete" class="btn-ghost btn-mark-complete" type="button">Mark Project Complete</button>
-          </div>
+        </div>
+    </section>
 
-        </aside>
-      </div>
-    </div>
-  </div>
+    <!-- required by base JS if applicable -->
+    <div style="display:none;" id="code-panel"></div>
+    <div style="display:none;" id="code-panel-overlay"></div>
+    <div style="display:none;" id="code-content"></div>
+    <div style="display:none;" id="code-panel-filename"></div>
+    <div style="display:none;" id="code-panel-close"></div>
+</main>
+{% endblock %}
 
-  <!-- ============================================================
-       Starter Code Viewer Panel (slides in from bottom)
-       ============================================================ -->
-  <div class="code-panel" id="code-panel">
-    <div class="code-panel-header">
-      <div class="code-panel-title">
-        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="16 18 22 12 16 6" />
-          <polyline points="8 6 2 12 8 18" />
-        </svg>
-        <span id="code-panel-filename">starter_code</span>
-      </div>
-      <div class="code-panel-actions">
-        <a href="/project/{{ project.id }}/download" class="code-panel-download">Download file</a>
-        <button class="btn-copy-code" id="btn-copy-code" aria-label="Copy code to clipboard">
-          <svg class="copy-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-          </svg>
-          <svg class="check-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-          <span class="copy-btn-label">Copy Code</span>
-        </button>
-        <button class="code-panel-close" id="code-panel-close">Close</button>
-      </div>
-    </div>
-    <!-- Code is injected here by script.js -->
-    <pre class="code-viewer" id="code-viewer"><code id="code-content" style="display:block">Loading...</code></pre>
-  </div>
-  <!-- Dark overlay behind the code panel -->
-  <div class="code-panel-overlay" id="code-panel-overlay"></div>
-
-  <!-- Copy success toast notification -->
-  <div class="copy-toast" id="copy-toast" role="status" aria-live="polite">
-    <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-    Copied to clipboard!
-  </div>
-
-  <div class="achievement-toast" id="achievement-toast" role="status" aria-live="polite"></div>
-
-  <!-- ============================================================
-       Footer
-       ============================================================ -->
-  <footer class="footer">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <span class="footer-logo">DevPath</span>
-        <p style="color: #D1D5DB;">
-          Open source. Built for learners, by learners.
-        </p>
-      </div>
-      <div class="footer-links">
-        <a href="/">Back to Search</a>
-        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">GitHub</a>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Scroll-to-top button -->
-  <button id="scroll-top-btn" aria-label="Back to top" title="Back to top">↑</button>
-
-  <!-- Pass project metadata to the JavaScript without hardcoding -->
-  <script>
-    var PROJECT_ID = {{ project.id | tojson }};
-    var PROJECT_TITLE = {{ project.title | tojson }};
-  </script>
-  <script src="/static/script.js"></script>
-</body>
-
-</html>
+{% block extra_js %}
+<script>
+    document.querySelectorAll('.magnetic-hover').forEach(button => {
+        button.addEventListener('mousemove', (e) => {
+            const rect = button.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            button.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px) scale(1.02)`;
+        });
+        button.addEventListener('mouseleave', () => {
+            button.style.transform = `translate(0px, 0px) scale(1)`;
+        });
+    });
+</script>
+{% endblock %}

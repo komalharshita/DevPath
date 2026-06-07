@@ -6,11 +6,15 @@
   function applyTheme(theme) {
     var isDark = theme === "dark";
     html.setAttribute("data-theme", theme);
+    if (isDark) {
+        html.classList.add("dark");
+    } else {
+        html.classList.remove("dark");
+    }
+    
     try {
       localStorage.setItem("theme", theme);
-    } catch (err) {
-      // Storage can be unavailable in private browsing.
-    }
+    } catch (err) {}
 
     document.querySelectorAll(".theme-toggle").forEach(function (button) {
       button.setAttribute("aria-pressed", isDark ? "true" : "false");
@@ -19,7 +23,7 @@
   }
 
   function initTheme() {
-    var theme = html.getAttribute("data-theme") || "light";
+    var theme = localStorage.getItem("theme") || "light";
     applyTheme(theme);
     requestAnimationFrame(function () {
       html.classList.add("theme-ready");
@@ -30,7 +34,7 @@
     var toggle = event.target.closest(".theme-toggle");
     if (!toggle) return;
     event.preventDefault();
-    var current = html.getAttribute("data-theme") || "light";
+    var current = html.classList.contains("dark") ? "dark" : "light";
     applyTheme(current === "dark" ? "light" : "dark");
   });
 

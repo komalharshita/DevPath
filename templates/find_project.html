@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+
+{% block title %}Find Project | DevPath{% endblock %}
+
+{% block content %}
+<main class="flex-grow pt-32 pb-24">
+    <!-- Search / Input Form -->
+    <section class="px-margin-desktop max-w-container-max mx-auto mb-24 animate-fade-in-up" id="find-project">
+        <div class="mb-12 text-center md:text-left">
+            <h1 class="font-headline-md text-[48px] mb-2 text-primary">Find Your Next Project</h1>
+            <p class="text-on-surface-variant text-lg">Fill in your details below and DevPath will match you to the most relevant projects.</p>
+        </div>
+
+        <div class="glass-card p-10 rounded-[24px] shadow-2xl animate-fade-in-up" style="animation-delay: 0.2s">
+            <form id="recommend-form" class="flex flex-col gap-6" novalidate onsubmit="event.preventDefault()">
+                
+                <!-- Github & Selected Chips -->
+                <div class="flex justify-between items-end mb-2">
+                    <label class="font-label-sm uppercase tracking-widest text-primary">Your Skills</label>
+                    <button type="button" id="btn-show-github" class="text-xs border border-outline/30 text-primary rounded-full px-4 py-2 hover:bg-surface-container-low transition-colors flex items-center gap-2 font-bold">
+                        <span class="material-symbols-outlined" style="font-size: 14px;">terminal</span> Import from GitHub
+                    </button>
+                </div>
+                <div id="skill-chips-selected" class="flex flex-wrap gap-2 mb-2"></div>
+
+                <!-- Main Input Row -->
+                <div class="flex flex-col md:flex-row items-stretch md:items-center gap-4 relative">
+                    
+                    <div class="flex-grow relative" id="skill-input-wrap">
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+                        
+                        <input id="skills-input" class="w-full bg-surface-container-high border border-outline/20 rounded-full py-4 pl-12 pr-4 focus:outline-none focus:border-primary transition-colors font-body-md text-body-md text-primary shadow-inner" placeholder="Type a skill and press Enter..." type="text" autocomplete="off" />
+                        
+                        <div id="skills-suggestions" class="absolute bg-surface-container-highest w-full mt-2 rounded-xl shadow-2xl z-20 border border-outline/20 overflow-hidden" style="display:none;"></div>
+                        <input type="hidden" id="skills" name="skills" />
+                    </div>
+                    
+                        <!-- Premium Custom Dropdowns -->
+                        <div class="relative w-full md:w-40 custom-dropdown" id="dropdown-level">
+                            <button type="button" class="dropdown-btn w-full bg-surface-container-high border-none rounded-full py-4 px-6 focus:outline-none focus:ring-2 focus:ring-primary transition-colors font-body-md text-primary cursor-pointer shadow-inner flex justify-between items-center group">
+                                <span class="dropdown-selected-text">Level</span>
+                                <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">expand_more</span>
+                            </button>
+                            <div class="dropdown-menu absolute top-full mt-2 w-full bg-surface-container-highest rounded-2xl shadow-2xl z-50 overflow-hidden opacity-0 pointer-events-none transform -translate-y-2 transition-all duration-300">
+                                <ul class="flex flex-col py-2">
+                                    {% for lvl in available_levels %}
+                                    <li class="px-6 py-3 hover:bg-primary hover:text-on-primary cursor-pointer transition-colors text-primary" data-value="{{ lvl }}">{{ lvl }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <select id="level" name="level" class="hidden">
+                                <option value="" disabled selected>Level</option>
+                                {% for lvl in available_levels %}
+                                <option value="{{ lvl }}">{{ lvl }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="relative w-full md:w-48 custom-dropdown" id="dropdown-interest">
+                            <button type="button" class="dropdown-btn w-full bg-surface-container-high border-none rounded-full py-4 px-6 focus:outline-none focus:ring-2 focus:ring-primary transition-colors font-body-md text-primary cursor-pointer shadow-inner flex justify-between items-center group">
+                                <span class="dropdown-selected-text">Interest</span>
+                                <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">expand_more</span>
+                            </button>
+                            <div class="dropdown-menu absolute top-full mt-2 w-full bg-surface-container-highest rounded-2xl shadow-2xl z-50 overflow-hidden opacity-0 pointer-events-none transform -translate-y-2 transition-all duration-300">
+                                <ul class="flex flex-col py-2 max-h-60 overflow-y-auto">
+                                    <li class="px-6 py-3 hover:bg-primary hover:text-on-primary cursor-pointer transition-colors text-primary" data-value="Web">Web Development</li>
+                                    <li class="px-6 py-3 hover:bg-primary hover:text-on-primary cursor-pointer transition-colors text-primary" data-value="Data">Data and Analytics</li>
+                                    <li class="px-6 py-3 hover:bg-primary hover:text-on-primary cursor-pointer transition-colors text-primary" data-value="Education">Education Tools</li>
+                                    <li class="px-6 py-3 hover:bg-primary hover:text-on-primary cursor-pointer transition-colors text-primary" data-value="Automation">Automation</li>
+                                    <li class="px-6 py-3 hover:bg-primary hover:text-on-primary cursor-pointer transition-colors text-primary" data-value="Games">Games</li>
+                                    <li class="px-6 py-3 hover:bg-primary hover:text-on-primary cursor-pointer transition-colors text-primary" data-value="Cybersecurity">CyberSecurity</li>
+                                    <li class="px-6 py-3 hover:bg-primary hover:text-on-primary cursor-pointer transition-colors text-primary" data-value="Devops">DevOps / Cloud</li>
+                                    <li class="px-6 py-3 hover:bg-primary hover:text-on-primary cursor-pointer transition-colors text-primary" data-value="Backend">Backend APIs</li>
+                                    <li class="px-6 py-3 hover:bg-primary hover:text-on-primary cursor-pointer transition-colors text-primary" data-value="Tools">Developer Tools</li>
+                                    <li class="px-6 py-3 hover:bg-primary hover:text-on-primary cursor-pointer transition-colors text-primary" data-value="Mobile">Mobile Development</li>
+                                    <li class="px-6 py-3 hover:bg-primary hover:text-on-primary cursor-pointer transition-colors text-primary" data-value="Machine Learning/AI">AI / ML</li>
+                                </ul>
+                            </div>
+                            <select id="interest" name="interest" class="hidden">
+                                <option value="" disabled selected>Interest</option>
+                                <option value="Web">Web Development</option>
+                                <option value="Data">Data and Analytics</option>
+                                <option value="Education">Education Tools</option>
+                                <option value="Automation">Automation</option>
+                                <option value="Games">Games</option>
+                                <option value="Cybersecurity">CyberSecurity</option>
+                                <option value="Devops">DevOps / Cloud</option>
+                                <option value="Backend">Backend APIs</option>
+                                <option value="Tools">Developer Tools</option>
+                                <option value="Mobile">Mobile Development</option>
+                                <option value="Machine Learning/AI">AI / ML</option>
+                            </select>
+                        </div>
+                        
+                        <div class="relative w-full md:w-40 hidden">
+                            <select id="time" name="time" class="hidden">
+                                <option value="" disabled selected>Time</option>
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="magnetic-wrap w-full md:w-auto mt-4 md:mt-0" id="search-btn-container">
+                        <button id="submit-btn" class="w-full md:w-auto bg-primary text-on-primary px-10 py-4 rounded-full font-bold power-transition active:scale-95 shadow-lg flex items-center justify-center gap-2" type="submit">
+                            <span class="material-symbols-outlined text-[18px]">travel_explore</span>
+                            <span id="btn-label">Find Projects</span>
+                            <span id="btn-loading" style="display:none;" class="flex items-center gap-2"><span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span> Finding...</span>
+                        </button>
+                    </div>
+                </div>
+                <p class="text-error mt-2 font-label-sm" id="form-error-general"></p>
+                <div class="flex gap-4">
+                    <span class="text-error text-sm" id="skills-error"></span>
+                    <span class="text-error text-sm" id="level-error"></span>
+                    <span class="text-error text-sm" id="interest-error"></span>
+                </div>
+                
+                <!-- Quick Picks -->
+                <div class="mt-8 border-t border-outline/10 pt-8">
+                    <p class="font-label-sm uppercase tracking-widest text-outline mb-4">Quick Picks</p>
+                    <div class="flex flex-wrap gap-2" id="skill-chips-available">
+                        <button type="button" class="skill-chip border border-outline/20 hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-full text-sm transition-colors shadow-sm" data-skill="Python">Python</button>
+                        <button type="button" class="skill-chip border border-outline/20 hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-full text-sm transition-colors shadow-sm" data-skill="JavaScript">JavaScript</button>
+                        <button type="button" class="skill-chip border border-outline/20 hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-full text-sm transition-colors shadow-sm" data-skill="React">React</button>
+                        <button type="button" class="skill-chip border border-outline/20 hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-full text-sm transition-colors shadow-sm" data-skill="Node.js">Node.js</button>
+                        <button type="button" class="skill-chip border border-outline/20 hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-full text-sm transition-colors shadow-sm" data-skill="SQL">SQL</button>
+                        <button type="button" class="skill-chip border border-outline/20 hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-full text-sm transition-colors shadow-sm" data-skill="HTML">HTML</button>
+                        <button type="button" class="skill-chip border border-outline/20 hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-full text-sm transition-colors shadow-sm" data-skill="CSS">CSS</button>
+                        <button type="button" class="skill-chip border border-outline/20 hover:bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-full text-sm transition-colors shadow-sm" data-skill="Docker">Docker</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Results Section (Injected by JS) -->
+    <section id="results-section" class="px-margin-desktop max-w-container-max mx-auto mb-32" style="display:none;">
+        <div class="flex justify-between items-end mb-12 border-b border-outline/20 pb-4">
+            <div>
+                <h2 class="font-headline-md text-headline-md mb-2 text-primary">Recommended for you</h2>
+                <p class="text-on-surface-variant">Based on your inputs</p>
+            </div>
+            <button id="clear-filters-btn" class="text-sm border border-outline/30 rounded-full px-4 py-2 hover:bg-surface-container-low transition-colors text-primary font-bold">Clear Form</button>
+        </div>
+        
+        <div id="results-loading" style="display:none;" class="text-center py-20">
+            <span class="material-symbols-outlined text-[48px] animate-spin text-primary opacity-50 mb-4">progress_activity</span>
+            <p class="text-primary font-bold">Finding the best projects for you...</p>
+        </div>
+        
+        <div id="results-empty" style="display:none;" class="text-center py-20 glass-card rounded-xl">
+            <span class="material-symbols-outlined text-[48px] text-primary opacity-50 mb-4">sentiment_dissatisfied</span>
+            <h3 class="font-headline-md text-primary mb-2">No Projects Found</h3>
+            <p id="empty-message" class="text-on-surface-variant">Try adjusting your skills or selecting a different interest area.</p>
+        </div>
+
+        <div id="results-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Cards go here via JS -->
+        </div>
+    </section>
+
+    <!-- Hidden Elements Required by JS -->
+    <div style="display:none;">
+        <button id="btn-mark-complete"></button>
+        <div id="achievement-toast" class="fixed bottom-4 right-4 bg-primary text-on-primary px-6 py-3 rounded-xl font-bold shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-50"></div>
+        
+        <!-- Modal Elements -->
+        <div id="github-modal-overlay" class="fixed inset-0 bg-background/80 backdrop-blur-md z-[100] hidden items-center justify-center p-4">
+            <div class="glass-card p-10 rounded-2xl w-full max-w-md relative shadow-2xl">
+                <button id="btn-close-github" class="absolute top-4 right-4 text-outline hover:text-primary material-symbols-outlined transition-colors">close</button>
+                <h3 class="text-2xl font-bold mb-4 text-primary">Import GitHub Skills</h3>
+                <p class="text-on-surface-variant text-sm mb-6">Enter your username to automatically import languages you've used.</p>
+                <input id="github-username" type="text" class="w-full bg-surface-container-high border border-outline/20 rounded-xl px-4 py-4 text-primary mb-4 focus:outline-none focus:border-primary shadow-inner" placeholder="e.g. komalharshita" />
+                <button id="btn-fetch-github" class="w-full bg-primary text-on-primary font-bold py-4 rounded-xl hover:scale-[1.02] transition-transform">Fetch Skills</button>
+                <p id="github-modal-error" class="text-error text-sm mt-4 text-center font-bold"></p>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Magnetic Button Effect
+    const btn = document.querySelector('#submit-btn');
+    const wrap = document.querySelector('#search-btn-container');
+
+    if (btn && wrap) {
+        const moveBtn = (e) => {
+            const rect = wrap.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            const distance = Math.sqrt(x*x + y*y);
+            const radius = 80;
+
+            if (distance < radius) {
+                btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+            } else {
+                btn.style.transform = `translate(0, 0)`;
+            }
+        };
+
+        const resetBtn = () => {
+            btn.style.transform = `translate(0, 0)`;
+        };
+
+        wrap.addEventListener('mousemove', moveBtn);
+        wrap.addEventListener('mouseleave', resetBtn);
+    }
+    
+    // Add missing CSS for JS-driven components
+    const style = document.createElement('style');
+    style.textContent = `
+        .skill-chip.active, .skill-chip.selected {
+            background-color: var(--primary);
+            color: var(--on-primary);
+            border-color: var(--primary);
+        }
+        .skill-chip-selected {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface-container-high);
+            border: 1px solid var(--outline);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .skill-chip-remove {
+            cursor: pointer;
+            color: var(--outline);
+            font-weight: bold;
+        }
+        .skill-chip-remove:hover { color: var(--error); }
+        .suggestion-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(128,128,128,0.1);
+            color: var(--primary);
+        }
+        .suggestion-item:last-child { border-bottom: none; }
+        .suggestion-item:hover, .suggestion-item--active {
+            background: var(--surface-container-low);
+            font-weight: bold;
+        }
+        
+        .project-card {
+            background: rgba(var(--background), 0.03);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--outline);
+            border-radius: 1.5rem;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .project-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .project-card-title { font-weight: bold; font-size: 1.5rem; color: var(--primary); }
+        .project-card-desc { color: var(--on-surface-variant); font-size: 0.95rem; line-height: 1.6; }
+        .project-card-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+        .project-tag { 
+            font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: bold;
+            padding: 6px 10px; border-radius: 6px; border: 1px solid var(--outline);
+            background: var(--surface-container-high); color: var(--primary);
+        }
+        .btn-details {
+            display: block; text-align: center; width: 100%;
+            padding: 14px; margin-top: 16px;
+            background: var(--primary); color: var(--on-primary); font-weight: bold; border-radius: 9999px;
+            transition: transform 0.2s ease;
+        }
+        .btn-details:hover { transform: scale(1.02); }
+        
+        .dropdown-menu.open {
+            opacity: 1; pointer-events: auto; transform: translateY(0);
+        }
+        
+        #github-modal-overlay.active { display: flex !important; }
+        #achievement-toast.show { transform: translateY(0); opacity: 1; }
+    `;
+    document.head.appendChild(style);
+
+    // Custom Dropdown Logic
+    document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+        const btn = dropdown.querySelector('.dropdown-btn');
+        const menu = dropdown.querySelector('.dropdown-menu');
+        const textSpan = dropdown.querySelector('.dropdown-selected-text');
+        const hiddenSelect = dropdown.querySelector('select');
+        const options = dropdown.querySelectorAll('.dropdown-menu li');
+
+        // Toggle menu
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // Close others
+            document.querySelectorAll('.dropdown-menu').forEach(m => {
+                if (m !== menu) m.classList.remove('open');
+            });
+            menu.classList.toggle('open');
+        });
+
+        // Select option
+        options.forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const val = opt.getAttribute('data-value');
+                const label = opt.textContent;
+                textSpan.textContent = label;
+                textSpan.style.fontWeight = 'bold';
+                hiddenSelect.value = val;
+                // Dispatch change event for other scripts to catch if needed
+                hiddenSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                menu.classList.remove('open');
+            });
+        });
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open'));
+    });
+</script>
+<script src="/static/script.js"></script>
+{% endblock %}
