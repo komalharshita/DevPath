@@ -262,11 +262,12 @@ def get_recommendations(skills_string, level, interest, time_availability):
             + SCORING_WEIGHTS["time"]                # +1 if time matches
         )
 
-        # Normalize: (raw ÷ max) × 10, rounded to 1 decimal  e.g. 7.5
+        # Normalize: map to 4.0-10.0 scale, rounded to 1 decimal
         if max_score > 0:
-            match_score = round((raw_score / max_score) * 10, 1)
+            match_score = round(4.0 + ((raw_score / max_score) * 6.0), 1)
+            match_score = min(max(match_score, 4.0), 10.0)
         else:
-            match_score = 0.0  # safety fallback
+            match_score = 4.0  # safety fallback
 
         # Use a shallow copy so we never mutate the shared in-memory cache
         project_with_score = dict(project)               # copy, not the original

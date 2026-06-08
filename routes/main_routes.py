@@ -125,7 +125,9 @@ def recommend():
 
     results = get_recommendations(skills, level, interest, time_availability)
 
-    if not results:
+    recommendations = results.get("recommendations", [])
+
+    if not recommendations:
         return jsonify({
             "projects": [],
             "message": (
@@ -134,7 +136,10 @@ def recommend():
             )
         }), 200
 
-    return jsonify({"projects": results}), 200
+    return jsonify({
+        "projects": recommendations, 
+        "related": results.get("related", [])
+    }), 200
 
 
 @main.route("/project/<int:project_id>")
