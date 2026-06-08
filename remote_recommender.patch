@@ -1,0 +1,1331 @@
+commit cb78c378f0c2dbc0a9bcf536b44671188f714774
+Merge: d7489a9 7fa73be
+Author: Parina Bhardwaj <parinabhardwaj1206@gmail.com>
+Date:   Mon Jun 8 13:29:51 2026 +0530
+
+    Merge branch 'main' into feat/project-clustering
+
+commit 26c4c1e8165a952b50945f18982a51d747510df2
+Merge: a50491f 33e577f
+Author: Komal Harshita <komal.sony234@gmail.com>
+Date:   Mon Jun 8 13:24:02 2026 +0530
+
+    Merge branch 'main' into fix/issue-6
+
+commit 1ba1e14995aec1a4633ee8b17ddf46be160b0fbd
+Author: Komal Harshita <komal.sony234@gmail.com>
+Date:   Fri Jun 5 17:44:31 2026 +0000
+
+    Refactor project templates and enhance starter code
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+index cb6e489..581a41a 100644
+--- a/utils/recommender.py
++++ b/utils/recommender.py
+@@ -27,7 +27,8 @@ VALID_LEVELS = {"beginner", "intermediate", "advanced"}
+ VALID_INTERESTS = {
+     "web", "data", "education", "automation", "games",
+     "cybersecurity", "devops", "mobile", "machine learning/ai",
+-    "artificial intelligence", "cloud computing", "mobile app development"
++    "artificial intelligence", "cloud computing", "mobile app development",
++    "backend", "tools", "productivity", "business logic"
+ }
+ VALID_TIMES = {"low", "medium", "high"}
+ 
+
+commit 64dd048d627a6885c552da3470d0313c546bc42b
+Merge: fd8a704 678b816
+Author: Komal Harshita <komal.sony234@gmail.com>
+Date:   Fri Jun 5 20:33:06 2026 +0530
+
+    Merge branch 'main' into fix/skill-json-serialization
+
+commit 64789db3424ed4de49a800b3b8dc1d25ba62bfb0
+Merge: 25259b9 592963e
+Author: Komal Harshita <komal.sony234@gmail.com>
+Date:   Fri Jun 5 20:19:19 2026 +0530
+
+    Merge branch 'main' into fix/recommendation-input-validation
+
+commit b37b56d6ad71c5983073663408b9309797ecd17f
+Merge: 5e339a6 d98d480
+Author: Komal Harshita <komal.sony234@gmail.com>
+Date:   Thu Jun 4 13:33:15 2026 +0530
+
+    Merge pull request #691 from Akshita-2307/fix/recommender-validation
+    
+    Add enum validation and case-insensitive matching to recommender
+
+commit 6b16bb633c316c9cf0659fb28d6314f365a5171f
+Merge: cce1033 4b6f887
+Author: Komal Harshita <komal.sony234@gmail.com>
+Date:   Tue Jun 2 19:26:19 2026 +0530
+
+    Merge pull request #430 from atul-upadhyay-7/fix/skill-alias-web-dev-expand
+    
+    fix: expand 'web dev' skill alias to match html/css in addition to javascript
+
+commit d98d4800dee590fa4cb58cf5544cf2a45a7e5f85
+Author: Akshita-2307 <akshita@example.com>
+Date:   Fri May 29 23:16:04 2026 +0530
+
+    Add enum validation, case-insensitive matching, and skill threshold (fixes #673, #552, #473)
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+index 8a53c64..7fc31be 100644
+--- a/utils/recommender.py
++++ b/utils/recommender.py
+@@ -131,23 +131,29 @@ def get_recommendations(skills_string, level, interest, time_availability):
+     return [item["project"] for item in scored_projects[:MAX_RESULTS]]
+ 
+ 
++VALID_LEVELS = ["beginner", "intermediate", "advanced"]
++VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
++
++
+ def validate_recommendation_inputs(skills, level, interest, time_availability):
+-    """
+-    Validate all four required fields.
+-    Returns a list of error strings. An empty list means all inputs are valid.
+-    """
+     errors = []
+ 
+     if not skills or not skills.strip():
+         errors.append("Please enter at least one skill.")
++    elif not parse_skills(skills):
++        errors.append("Please enter at least one valid skill.")
+ 
+     if not level or not level.strip():
+         errors.append("Please select an experience level.")
++    elif level.strip().lower() not in VALID_LEVELS:
++        errors.append("Invalid experience level. Choose Beginner, Intermediate, or Advanced.")
+ 
+     if not interest or not interest.strip():
+         errors.append("Please select an area of interest.")
+ 
+     if not time_availability or not time_availability.strip():
+         errors.append("Please select your time availability.")
++    elif time_availability.strip().lower() not in VALID_TIME_AVAILABILITY:
++        errors.append("Invalid time availability. Choose Low, Medium, or High.")
+ 
+     return errors
+
+commit 6f56344df8aae50f7a5cc7aebfa282d63f06f401
+Merge: d481158 81f6892
+Author: Pranav-IIITM <jogdandpranav2007@gmail.com>
+Date:   Fri May 29 16:17:35 2026 +0530
+
+    Merge branch 'main' into refactor/weighted-skill-coverage-scoring
+
+commit 25259b968f6e202ffe658232150899d5003fc1e2
+Author: TJP <69581225+JavaProgswing@users.noreply.github.com>
+Date:   Tue May 26 20:08:20 2026 +0530
+
+    fix: add strict enum and empty skill validation (#552)
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+index 8a53c64..b7e9d82 100644
+--- a/utils/recommender.py
++++ b/utils/recommender.py
+@@ -18,6 +18,14 @@ SCORING_WEIGHTS = {
+ }
+ 
+ 
++VALID_LEVELS = {"beginner", "intermediate", "advanced"}
++VALID_INTERESTS = {
++    "web", "data", "education", "automation", "games",
++    "cybersecurity", "devops", "mobile", "machine learning/ai",
++    "artificial intelligence", "cloud computing", "mobile app development"
++}
++VALID_TIMES = {"low", "medium", "high"}
++
+ # Common aliases and abbreviations for skills
+ # This improves recommendation accuracy by normalizing user input
+ SKILL_ALIASES = {
+@@ -138,16 +146,17 @@ def validate_recommendation_inputs(skills, level, interest, time_availability):
+     """
+     errors = []
+ 
+-    if not skills or not skills.strip():
+-        errors.append("Please enter at least one skill.")
++    parsed_skills = parse_skills(skills) if isinstance(skills, str) else []
++    if not parsed_skills:
++        errors.append("Please enter at least one valid skill.")
+ 
+-    if not level or not level.strip():
+-        errors.append("Please select an experience level.")
++    if not level or not isinstance(level, str) or level.strip().lower() not in VALID_LEVELS:
++        errors.append("Please select a valid experience level.")
+ 
+-    if not interest or not interest.strip():
+-        errors.append("Please select an area of interest.")
++    if not interest or not isinstance(interest, str) or interest.strip().lower() not in VALID_INTERESTS:
++        errors.append("Please select a valid area of interest.")
+ 
+-    if not time_availability or not time_availability.strip():
+-        errors.append("Please select your time availability.")
++    if not time_availability or not isinstance(time_availability, str) or time_availability.strip().lower() not in VALID_TIMES:
++        errors.append("Please select a valid time availability.")
+ 
+     return errors
+
+commit d7489a962cf2eb8d6197f9170b3f7bb7eaa52605
+Merge: a805dd1 568bdde
+Author: Parina Bhardwaj <parinabhardwaj1206@gmail.com>
+Date:   Tue May 26 01:32:20 2026 +0530
+
+    Merge branch 'main' into feat/project-clustering
+
+commit fd8a7044d5da0f0fe64c54b7910cf46e84990f4f
+Merge: 8019ea2 d592ada
+Author: jwalkorat <jwalkorat4@gmail.com>
+Date:   Mon May 25 22:50:33 2026 +0530
+
+    Merge branch 'main' into fix/skill-json-serialization
+
+commit 8019ea206c6bb1236b2187a91fdeecaf1e764156
+Author: jwalkorat <jwalkorat4@gmail.com>
+Date:   Mon May 25 22:49:26 2026 +0530
+
+    fix(skills): add parser tests and clean duplicate serialization logic
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+index e7434e3..39a2e74 100644
+--- a/utils/recommender.py
++++ b/utils/recommender.py
+@@ -44,6 +44,8 @@ def parse_skills(skills_string):
+     """
+     import json
+ 
++    # Skills are serialized as JSON arrays.
++    # Legacy comma-separated values remain supported for compatibility.
+     try:
+         # Preferred path: frontend sends a JSON-serialized array
+         parsed = json.loads(skills_string)
+
+commit d592ada49175fe05b0f8cf382a15d67035d3466b
+Merge: a122b1c 14a767e
+Author: Komal Harshita <komal.sony234@gmail.com>
+Date:   Mon May 25 22:44:37 2026 +0530
+
+    Merge pull request #306 from Abhiraj-Agarwal/fix/skill-alias-normalisation-project-side
+    
+    feat: implement project recommendation engine with scoring logic and …
+
+commit c417b3591f534843911e65fdfb49b259983bce5a
+Merge: 35f113b 2b7a2d5
+Author: jwalkorat <jwalkorat4@gmail.com>
+Date:   Mon May 25 22:41:06 2026 +0530
+
+    Merge branch 'main' into fix/skill-json-serialization
+
+commit a805dd1e2ebb8cdce83407d0d01809324e439f74
+Author: Parina Bhardwaj <parinabhardwaj1206@gmail.com>
+Date:   Mon May 25 15:34:12 2026 +0530
+
+    K clustering added
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+index c5a4f21..6170b97 100644
+--- a/utils/recommender.py
++++ b/utils/recommender.py
+@@ -1,12 +1,18 @@
+ # utils/recommender.py
+-# Contains all recommendation logic: scoring and filtering projects.
++# Contains all recommendation logic: scoring, filtering, and related projects.
+ # Kept separate from routing so it can be tested and extended independently.
+ 
++import json
++import os
++
+ from utils.data_loader import load_all_projects
+ 
+ # Maximum number of recommendations returned to the user
+ MAX_RESULTS = 3
+ 
++# Maximum number of "you might also like" projects returned alongside results
++MAX_RELATED = 3
++
+ # Scoring weights used by the recommendation engine.
+ # Higher weights mean that criterion has more influence
+ # on the final recommendation score.
+@@ -17,18 +23,29 @@ SCORING_WEIGHTS = {
+     "time":     1,
+ }
+ 
+-
+-# Common aliases and abbreviations for skills
+-# This improves recommendation accuracy by normalizing user input
++# Common aliases and abbreviations for skills.
++# This improves recommendation accuracy by normalizing user input.
+ SKILL_ALIASES = {
+-    "js": "javascript",
+-    "py": "python",
+-    "html5": "html",
+-    "css3": "css",
+-    "c++": "cpp",
+-    "web dev": "javascript"
++    "js":      "javascript",
++    "py":      "python",
++    "html5":   "html",
++    "css3":    "css",
++    "c++":     "cpp",
++    "web dev": "javascript",
+ }
+ 
++# Path to the precomputed cluster assignments.
++# Generated by: python scripts/cluster_projects.py
++_CLUSTERS_PATH = os.path.join(
++    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
++    "data",
++    "clusters.json",
++)
++
++
++# ---------------------------------------------------------------------------
++# Skill parsing
++# ---------------------------------------------------------------------------
+ 
+ def parse_skills(skills_string):
+     """
+@@ -36,99 +53,158 @@ def parse_skills(skills_string):
+     a normalized lowercase list.
+ 
+     Example:
+-    "JS, HTML5, CSS3" -> ["javascript", "html", "css"]
++        "JS, HTML5, CSS3" -> ["javascript", "html", "css"]
+     """
+-
+     raw_skills = [
+         s.strip().lower()
+         for s in skills_string.split(",")
+         if s.strip()
+     ]
++    return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
+ 
+-    normalized_skills = [
+-        SKILL_ALIASES.get(skill, skill)
+-        for skill in raw_skills
+-    ]
+-
+-    return normalized_skills
+ 
++# ---------------------------------------------------------------------------
++# Scoring
++# ---------------------------------------------------------------------------
+ 
+-def score_single_project(
+-        project, user_skills,
+-        level, interest, time_availability):
++def score_single_project(project, user_skills, level, interest, time_availability):
+     """
+     Calculate a numeric relevance score for one project.
+ 
+-    Each matching criterion adds points:
++    Scoring rules:
+       - Each matching skill:  +3
+       - Level match:          +2
+       - Interest match:       +2
+       - Time match:           +1
+ 
+-    Returns an integer score (0 means no match at all).
++    Time filtering: projects that require MORE time than the user has
++    available are excluded entirely (score returned as 0).
++
++    Returns an integer score (0 means no match or time mismatch).
+     """
+-    # Compare time availability, return results with the same time availibity or lower.
+-    TIME_AVAILABILITY = ['low', 'medium', 'high']
+-    time_availability_index =   TIME_AVAILABILITY.index(time_availability.strip().lower())
+-    valid_time = TIME_AVAILABILITY[ : time_availability_index + 1 ]
+-    
++    TIME_RANKS = ["low", "medium", "high"]
++
++    user_time    = time_availability.strip().lower()
++    project_time = project.get("time", "").strip().lower()
++
++    # If the project needs more time than the user has, exclude it.
++    if project_time not in TIME_RANKS or user_time not in TIME_RANKS:
++        return 0
++    if TIME_RANKS.index(project_time) > TIME_RANKS.index(user_time):
++        return 0
++
+     score = 0
+ 
+-    # Compare user's skills against the project's required skills
++    # Skills: count how many of the user's skills the project requires.
+     project_skills = [s.lower() for s in project.get("skills", [])]
+-    # Count how many user skills overlap with the
+-    # skills required by the current project.
+     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
+-    # Add weighted points based on the number of matching skills.
+-    # More overlapping skills result in a higher recommendation score.
+     score += matched_skills * SCORING_WEIGHTS["skill"]
+ 
+-    # Award points for each additional matching criterion
+     if project.get("level", "").lower() == level.lower():
+         score += SCORING_WEIGHTS["level"]
+ 
+     if project.get("interest", "").lower() == interest.lower():
+         score += SCORING_WEIGHTS["interest"]
+ 
+-    if project.get("time", "").lower() == time_availability.lower():
++    if project_time == user_time:
+         score += SCORING_WEIGHTS["time"]
+ 
+-    if project.get("time", "").lower() in valid_time :
+-        return score
+-    return 0
++    return score
++
++
++# ---------------------------------------------------------------------------
++# Clustering helpers
++# ---------------------------------------------------------------------------
++
++def _load_clusters():
++    """
++    Load clusters.json if it exists.
++
++    Returns the parsed dict, or None if the file is missing or unreadable.
++    A missing file is a soft failure — the recommender still works,
++    it just won't return related projects.
++    """
++    if not os.path.exists(_CLUSTERS_PATH):
++        return None
++    try:
++        with open(_CLUSTERS_PATH, "r", encoding="utf-8") as f:
++            return json.load(f)
++    except (json.JSONDecodeError, OSError):
++        return None
++
++
++def _get_related(recommended_ids, all_projects, cluster_data):
++    """
++    Find projects in the same cluster(s) as the recommended projects,
++    excluding the ones already recommended.
++
++    Returns up to MAX_RELATED project dicts.
++    """
++    clusters = cluster_data.get("clusters", {})  # {str(pid): cid}
++    members  = cluster_data.get("members",  {})  # {str(cid): [pid, ...]}
++
++    # Collect which clusters the recommended projects belong to.
++    relevant_cluster_ids = set()
++    for pid in recommended_ids:
++        cid = clusters.get(str(pid))
++        if cid is not None:
++            relevant_cluster_ids.add(str(cid))
+ 
++    if not relevant_cluster_ids:
++        return []
++
++    # Gather candidate IDs from those clusters, excluding already recommended.
++    candidate_ids = []
++    for cid in relevant_cluster_ids:
++        for pid in members.get(cid, []):
++            if pid not in recommended_ids and pid not in candidate_ids:
++                candidate_ids.append(pid)
++
++    id_to_project = {p["id"]: p for p in all_projects}
++    related = [id_to_project[pid] for pid in candidate_ids if pid in id_to_project]
++    return related[:MAX_RELATED]
++
++
++# ---------------------------------------------------------------------------
++# Public API
++# ---------------------------------------------------------------------------
+ 
+ def get_recommendations(skills_string, level, interest, time_availability):
+     """
+-    Return the top N recommended projects for the given user inputs.
+-
+-    Steps:
+-      1. Parse the raw skills input into a list.
+-      2. Score every project in the dataset.
+-      3. Drop projects with a score of zero (no overlap at all).
+-      4. Sort by score descending.
+-      5. Return the top MAX_RESULTS projects.
++    Return the top N recommended projects for the given user inputs,
++    along with related projects from the same cluster.
++
++    Return shape:
++        {
++            "recommendations": [ <project>, ... ],  # up to MAX_RESULTS
++            "related":         [ <project>, ... ],  # up to MAX_RELATED
++        }
++
++    The "related" list is empty when clusters.json does not exist yet.
++    Run scripts/cluster_projects.py to generate it.
+     """
+-    user_skills = parse_skills(skills_string)
++    user_skills  = parse_skills(skills_string)
+     all_projects = load_all_projects()
+ 
+-    scored_projects = []
+-
++    scored = []
+     for project in all_projects:
+         score = score_single_project(
+             project, user_skills, level, interest, time_availability
+         )
+-        # Ignore projects with a score of 0 since they
+-        # have no meaningful overlap with the user's inputs.
+-        if score > 0:
+-            scored_projects.append({"project": project, "score": score})
++        if score >= SCORING_WEIGHTS["skill"]:
++            scored.append({"project": project, "score": score})
++
++    scored.sort(key=lambda item: item["score"], reverse=True)
++    top_projects = [item["project"] for item in scored[:MAX_RESULTS]]
++    top_ids      = [p["id"] for p in top_projects]
+ 
+-    # Sort projects in descending order so the
+-    # most relevant recommendations appear first.
+-    scored_projects.sort(key=lambda item: item["score"], reverse=True)
++    cluster_data = _load_clusters()
++    related = _get_related(top_ids, all_projects, cluster_data) if cluster_data else []
+ 
+-    # Return only the project dicts, not the score metadata
+-    return [item["project"] for item in scored_projects[:MAX_RESULTS]]
++    return {
++        "recommendations": top_projects,
++        "related":         related,
++    }
+ 
+ 
+ def validate_recommendation_inputs(skills, level, interest, time_availability):
+@@ -150,4 +226,4 @@ def validate_recommendation_inputs(skills, level, interest, time_availability):
+     if not time_availability or not time_availability.strip():
+         errors.append("Please select your time availability.")
+ 
+-    return errors
++    return errors
+\ No newline at end of file
+
+commit a50491f089d9bcd4bfb410c40c61c48b6b96ef8f
+Author: eheguy <154012493+EHEGUY@users.noreply.github.com>
+Date:   Sun May 17 11:16:31 2026 +0530
+
+    Refactor scoring weights into dictionary
+    
+    Fixes #6
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+index e96f052..308c14f 100644
+--- a/utils/recommender.py
++++ b/utils/recommender.py
+@@ -10,10 +10,12 @@ MAX_RESULTS = 3
+ # Scoring weights used by the recommendation engine.
+ # Higher weights mean that criterion has more influence
+ # on the final recommendation score.
+-WEIGHT_SKILL = 3   # highest because they best reflect project compatibility
+-WEIGHT_LEVEL = 2   # helps avoid projects that are too easy or too difficult
+-WEIGHT_INTEREST = 2   # Interest alignment improves recommendation relevance
+-WEIGHT_TIME = 1    # Time availability acts as a smaller tie-breaker factor
++SCORING_WEIGHTS = {
++    "skill":    3,
++    "level":    2,
++    "interest": 2,
++    "time":     1,
++}
+ 
+ 
+ # Common aliases and abbreviations for skills
+@@ -74,17 +76,17 @@ def score_single_project(
+     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
+     # Add weighted points based on the number of matching skills.
+     # More overlapping skills result in a higher recommendation score.
+-    score += matched_skills * WEIGHT_SKILL
++    score += matched_skills * SCORING_WEIGHTS["skill"]
+ 
+     # Award points for each additional matching criterion
+     if project.get("level", "").lower() == level.lower():
+-        score += WEIGHT_LEVEL
++        score += SCORING_WEIGHTS["level"]
+ 
+     if project.get("interest", "").lower() == interest.lower():
+-        score += WEIGHT_INTEREST
++        score += SCORING_WEIGHTS["interest"]
+ 
+     if project.get("time", "").lower() == time_availability.lower():
+-        score += WEIGHT_TIME
++        score += SCORING_WEIGHTS["time"]
+ 
+     return score
+ 
+
+commit d4811585c0b9118284493fc3e69e2ec63ac86f0c
+Author: Pranav-IIITM <jogdandpranav2007@gmail.com>
+Date:   Mon May 25 10:21:45 2026 +0530
+
+    fix: resolve CI failures from int→float score change and missing imports
+    
+    - Add WEIGHT_SKILL, WEIGHT_LEVEL, WEIGHT_INTEREST, WEIGHT_TIME constants
+      to recommender.py to fix ImportError across all Python versions
+    - Implement coverage-weighted skill scoring with zero-division guard
+    - Update test assertions to use pytest.approx() for float-safe comparisons
+    - Fix coverage-isolation tests to prevent accidental criteria matching
+    - Fix test_health_check to use get_client() instead of missing fixture
+    
+    Fixes CI failures on Python 3.9, 3.11, 3.12
+    All 34 tests passing
+    
+    Related: #218
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+index 78780b5..35fe41f 100644
+--- a/utils/recommender.py
++++ b/utils/recommender.py
+@@ -17,6 +17,11 @@ SCORING_WEIGHTS = {
+     "time":     1,
+ }
+ 
++WEIGHT_SKILL = SCORING_WEIGHTS["skill"]
++WEIGHT_LEVEL = SCORING_WEIGHTS["level"]
++WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
++WEIGHT_TIME = SCORING_WEIGHTS["time"]
++
+ 
+ # Common aliases and abbreviations for skills
+ # This improves recommendation accuracy by normalizing user input
+@@ -76,9 +81,12 @@ def score_single_project(
+     # Compare user's skills against the project's required skills
+     project_skills = [s.lower() for s in project.get("skills", [])]
+     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
++    total_project_skills = len(project_skills)
++    coverage_ratio = matched_skills / total_project_skills if total_project_skills > 0 else 0.0
++
+     # Add weighted points based on the number of matching skills.
+-    # More overlapping skills result in a higher recommendation score.
+-    score += matched_skills * SCORING_WEIGHTS["skill"]
++    # Skill coverage boosts score when more project skills are matched.
++    score += matched_skills * SCORING_WEIGHTS["skill"] * coverage_ratio
+ 
+     # Award points for each additional matching criterion
+     if project.get("level", "").lower() == level.lower():
+
+commit 4b6f8871bdaa12d6625eeb3319bc2bb7b6e6073e
+Author: Atul Upadhyay <atul-upadhyay192@gmail.com>
+Date:   Fri May 22 08:50:14 2026 +0530
+
+    fix: expand 'web dev' alias to html/css/javascript instead of just javascript
+    
+    'web dev' in SKILL_ALIASES mapped to only 'javascript', which meant
+    projects listing HTML and CSS (without JS) were completely excluded
+    from results. This changes the alias to a list so all three core web
+    skills get matched, and updates parse_skills() to handle list-valued
+    aliases by extending rather than appending.
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+index 308c14f..5b465fa 100644
+--- a/utils/recommender.py
++++ b/utils/recommender.py
+@@ -26,7 +26,7 @@ SKILL_ALIASES = {
+     "html5": "html",
+     "css3": "css",
+     "c++": "cpp",
+-    "web dev": "javascript"
++    "web dev": ["javascript", "html", "css"]
+ }
+ 
+ 
+@@ -45,10 +45,13 @@ def parse_skills(skills_string):
+         if s.strip()
+     ]
+ 
+-    normalized_skills = [
+-        SKILL_ALIASES.get(skill, skill)
+-        for skill in raw_skills
+-    ]
++    normalized_skills = []
++    for skill in raw_skills:
++        alias = SKILL_ALIASES.get(skill, skill)
++        if isinstance(alias, list):
++            normalized_skills.extend(alias)
++        else:
++            normalized_skills.append(alias)
+ 
+     return normalized_skills
+ 
+
+commit 14a767eb233a9a80aed4ad353dd97e69db60b001
+Author: Abhiraj-Agarwal <agarwalabhiraj06@gmail.com>
+Date:   Tue May 19 00:10:31 2026 +0530
+
+    feat: implement project recommendation engine with scoring logic and associated unit tests
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+index 308c14f..ed41c0a 100644
+--- a/utils/recommender.py
++++ b/utils/recommender.py
+@@ -70,7 +70,7 @@ def score_single_project(
+     score = 0
+ 
+     # Compare user's skills against the project's required skills
+-    project_skills = [s.lower() for s in project.get("skills", [])]
++    project_skills = [SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", [])]
+     # Count how many user skills overlap with the
+     # skills required by the current project.
+     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
+
+commit 7d5dbd10877dc93e86750012c2a526dbd205f25a
+Merge: c70368d cde40ff
+Author: Pranav-IIITM <jogdandpranav2007@gmail.com>
+Date:   Mon May 18 23:04:15 2026 +0530
+
+    Merge branch 'main' into refactor/weighted-skill-coverage-scoring
+
+commit 8276e375a764e85619b60d5b3c8cc3b058888fb5
+Author: Triv24 <triveni01gauri@gmail.com>
+Date:   Mon May 18 22:59:50 2026 +0530
+
+    fix: Resolved the time availability bug to return only the projects having same or lower time availability as set by user.
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+index 308c14f..c5a4f21 100644
+--- a/utils/recommender.py
++++ b/utils/recommender.py
+@@ -67,6 +67,11 @@ def score_single_project(
+ 
+     Returns an integer score (0 means no match at all).
+     """
++    # Compare time availability, return results with the same time availibity or lower.
++    TIME_AVAILABILITY = ['low', 'medium', 'high']
++    time_availability_index =   TIME_AVAILABILITY.index(time_availability.strip().lower())
++    valid_time = TIME_AVAILABILITY[ : time_availability_index + 1 ]
++    
+     score = 0
+ 
+     # Compare user's skills against the project's required skills
+@@ -88,7 +93,9 @@ def score_single_project(
+     if project.get("time", "").lower() == time_availability.lower():
+         score += SCORING_WEIGHTS["time"]
+ 
+-    return score
++    if project.get("time", "").lower() in valid_time :
++        return score
++    return 0
+ 
+ 
+ def get_recommendations(skills_string, level, interest, time_availability):
+
+commit 5953d8712014fd7a66d718f9332474fd303c4e8e
+Author: jwalkorat <jwalkorat4@gmail.com>
+Date:   Mon May 18 10:46:30 2026 +0530
+
+    Fix skill parsing for skill names containing commas
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+index 308c14f..d8cdf84 100644
+--- a/utils/recommender.py
++++ b/utils/recommender.py
+@@ -32,18 +32,32 @@ SKILL_ALIASES = {
+ 
+ def parse_skills(skills_string):
+     """
+-    Convert a raw comma-separated skills string into
+-    a normalized lowercase list.
++    Convert a skills string into a normalized lowercase list.
+ 
+-    Example:
+-    "JS, HTML5, CSS3" -> ["javascript", "html", "css"]
+-    """
++    Accepts two formats:
++      1. JSON array (preferred): '["HTML, CSS", "JavaScript"]'
++         Handles skill names that contain commas without mis-splitting.
++      2. Comma-separated string (legacy fallback): "HTML, CSS, JavaScript"
+ 
+-    raw_skills = [
+-        s.strip().lower()
+-        for s in skills_string.split(",")
+-        if s.strip()
+-    ]
++    Example:    
++    '["JS", "HTML5", "CSS3"]' -> ["javascript", "html", "css"]
++    """
++    import json
++
++    try:
++        # Preferred path: frontend sends a JSON-serialized array
++        parsed = json.loads(skills_string)
++        if isinstance(parsed, list):
++            raw_skills = [s.strip().lower() for s in parsed if isinstance(s, str) and s.strip()]
++        else:
++            raise ValueError("Parsed JSON is not a list")
++    except (json.JSONDecodeError, ValueError, TypeError):
++        # Fallback: handle plain comma-separated strings
++        raw_skills = [
++            s.strip().lower()
++            for s in skills_string.split(",")
++            if s.strip()
++        ]
+ 
+     normalized_skills = [
+         SKILL_ALIASES.get(skill, skill)
+
+commit c70368d20087edee2a4bda8567ba0048813ebef9
+Author: Pranav-IIITM <jogdandpranav2007@gmail.com>
+Date:   Sun May 17 14:15:01 2026 +0530
+
+    refactor: add weighted skill coverage scoring to recommendation engine
+    
+    Fixes #98
+    
+    - utils/recommender.py: score now multiplied by coverage ratio (matched / total project skills) so partial skill matches rank lower than full matches
+    - tests/test_basic.py: added four coverage-weighted unit tests, cleaned up duplicate imports
+    - docs/architecture.md: updated scoring description to reflect new formula
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+index e96f052..89e6f7b 100644
+--- a/utils/recommender.py
++++ b/utils/recommender.py
+@@ -50,7 +50,7 @@ def parse_skills(skills_string):
+ 
+     return normalized_skills
+ 
+-
++# -------------
+ def score_single_project(
+         project, user_skills,
+         level, interest, time_availability):
+@@ -58,23 +58,32 @@ def score_single_project(
+     Calculate a numeric relevance score for one project.
+ 
+     Each matching criterion adds points:
+-      - Each matching skill:  +3
++      - Skill coverage score: matched * WEIGHT_SKILL * coverage_ratio
+       - Level match:          +2
+       - Interest match:       +2
+       - Time match:           +1
+ 
+-    Returns an integer score (0 means no match at all).
++    coverage_ratio = matched_skills / total_project_skills
++    This means a user covering 1 of 2 required skills scores less
++    than a user covering both, even with the same raw match count.
++
++    Returns a float score (0 means no match at all).
+     """
+     score = 0
+ 
+     # Compare user's skills against the project's required skills
+     project_skills = [s.lower() for s in project.get("skills", [])]
+-    # Count how many user skills overlap with the
+-    # skills required by the current project.
+     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
+-    # Add weighted points based on the number of matching skills.
+-    # More overlapping skills result in a higher recommendation score.
+-    score += matched_skills * WEIGHT_SKILL
++
++    # Coverage ratio: fraction of the project's skills the user covers
++    # Avoids division-by-zero if a project has no skills listed
++    if project_skills:
++        coverage = matched_skills / len(project_skills)
++    else:
++        coverage = 0
++
++    # Weighted skill score — partial matches score proportionally lower
++    score += round(matched_skills * WEIGHT_SKILL * coverage, 2)
+ 
+     # Award points for each additional matching criterion
+     if project.get("level", "").lower() == level.lower():
+@@ -88,7 +97,7 @@ def score_single_project(
+ 
+     return score
+ 
+-
++# -----------
+ def get_recommendations(skills_string, level, interest, time_availability):
+     """
+     Return the top N recommended projects for the given user inputs.
+
+commit 9a7517ac5c79c3f165e49aad1e4431f8d5a01473
+Author: eheguy <154012493+EHEGUY@users.noreply.github.com>
+Date:   Sat May 16 20:00:27 2026 +0530
+
+    Refactor recommender scoring weights and add test
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+index e96f052..308c14f 100644
+--- a/utils/recommender.py
++++ b/utils/recommender.py
+@@ -10,10 +10,12 @@ MAX_RESULTS = 3
+ # Scoring weights used by the recommendation engine.
+ # Higher weights mean that criterion has more influence
+ # on the final recommendation score.
+-WEIGHT_SKILL = 3   # highest because they best reflect project compatibility
+-WEIGHT_LEVEL = 2   # helps avoid projects that are too easy or too difficult
+-WEIGHT_INTEREST = 2   # Interest alignment improves recommendation relevance
+-WEIGHT_TIME = 1    # Time availability acts as a smaller tie-breaker factor
++SCORING_WEIGHTS = {
++    "skill":    3,
++    "level":    2,
++    "interest": 2,
++    "time":     1,
++}
+ 
+ 
+ # Common aliases and abbreviations for skills
+@@ -74,17 +76,17 @@ def score_single_project(
+     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
+     # Add weighted points based on the number of matching skills.
+     # More overlapping skills result in a higher recommendation score.
+-    score += matched_skills * WEIGHT_SKILL
++    score += matched_skills * SCORING_WEIGHTS["skill"]
+ 
+     # Award points for each additional matching criterion
+     if project.get("level", "").lower() == level.lower():
+-        score += WEIGHT_LEVEL
++        score += SCORING_WEIGHTS["level"]
+ 
+     if project.get("interest", "").lower() == interest.lower():
+-        score += WEIGHT_INTEREST
++        score += SCORING_WEIGHTS["interest"]
+ 
+     if project.get("time", "").lower() == time_availability.lower():
+-        score += WEIGHT_TIME
++        score += SCORING_WEIGHTS["time"]
+ 
+     return score
+ 
+
+commit e9f8cea1af881546fcc2613a88da2941147d3455
+Author: VikasPattar2006 <vikaspattar2106@gmail.com>
+Date:   Fri May 15 23:39:13 2026 +0530
+
+    Improve skill matching and add cybersecurity project
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+index aae85dd..e96f052 100644
+--- a/utils/recommender.py
++++ b/utils/recommender.py
+@@ -10,10 +10,10 @@ MAX_RESULTS = 3
+ # Scoring weights used by the recommendation engine.
+ # Higher weights mean that criterion has more influence
+ # on the final recommendation score.
+-WEIGHT_SKILL   = 3   # Skills are weighted highest because they best reflect project compatibility
+-WEIGHT_LEVEL   = 2   # Matching experience level helps avoid projects that are too easy or too difficult
++WEIGHT_SKILL = 3   # highest because they best reflect project compatibility
++WEIGHT_LEVEL = 2   # helps avoid projects that are too easy or too difficult
+ WEIGHT_INTEREST = 2   # Interest alignment improves recommendation relevance
+-WEIGHT_TIME    = 1    # Time availability acts as a smaller tie-breaker factor
++WEIGHT_TIME = 1    # Time availability acts as a smaller tie-breaker factor
+ 
+ 
+ # Common aliases and abbreviations for skills
+@@ -36,7 +36,7 @@ def parse_skills(skills_string):
+     Example:
+     "JS, HTML5, CSS3" -> ["javascript", "html", "css"]
+     """
+-    
++
+     raw_skills = [
+         s.strip().lower()
+         for s in skills_string.split(",")
+@@ -51,7 +51,9 @@ def parse_skills(skills_string):
+     return normalized_skills
+ 
+ 
+-def score_single_project(project, user_skills, level, interest, time_availability):
++def score_single_project(
++        project, user_skills,
++        level, interest, time_availability):
+     """
+     Calculate a numeric relevance score for one project.
+ 
+@@ -69,7 +71,7 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
+     project_skills = [s.lower() for s in project.get("skills", [])]
+     # Count how many user skills overlap with the
+     # skills required by the current project.
+-    matched_skills = sum(1 for skill in user_skills if skill in project_skills) 
++    matched_skills = sum(1 for skill in user_skills if skill in project_skills)
+     # Add weighted points based on the number of matching skills.
+     # More overlapping skills result in a higher recommendation score.
+     score += matched_skills * WEIGHT_SKILL
+
+commit 8249c2ce827d10372ca0f800a3077d6c0098dd37
+Author: VikasPattar2006 <vikaspattar2106@gmail.com>
+Date:   Fri May 15 23:12:34 2026 +0530
+
+    Improve skill matching and add cybersecurity projects
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+index 3a5b677..aae85dd 100644
+--- a/utils/recommender.py
++++ b/utils/recommender.py
+@@ -16,12 +16,39 @@ WEIGHT_INTEREST = 2   # Interest alignment improves recommendation relevance
+ WEIGHT_TIME    = 1    # Time availability acts as a smaller tie-breaker factor
+ 
+ 
++# Common aliases and abbreviations for skills
++# This improves recommendation accuracy by normalizing user input
++SKILL_ALIASES = {
++    "js": "javascript",
++    "py": "python",
++    "html5": "html",
++    "css3": "css",
++    "c++": "cpp",
++    "web dev": "javascript"
++}
++
++
+ def parse_skills(skills_string):
+     """
+-    Convert a raw comma-separated skills string into a clean lowercase list.
+-    Example: "Python, HTML, CSS" -> ["python", "html", "css"]
++    Convert a raw comma-separated skills string into
++    a normalized lowercase list.
++
++    Example:
++    "JS, HTML5, CSS3" -> ["javascript", "html", "css"]
+     """
+-    return [s.strip().lower() for s in skills_string.split(",") if s.strip()]
++    
++    raw_skills = [
++        s.strip().lower()
++        for s in skills_string.split(",")
++        if s.strip()
++    ]
++
++    normalized_skills = [
++        SKILL_ALIASES.get(skill, skill)
++        for skill in raw_skills
++    ]
++
++    return normalized_skills
+ 
+ 
+ def score_single_project(project, user_skills, level, interest, time_availability):
+
+commit 5545d10ac7d62b44bd6ddb6751324fa68f2d5a69
+Author: Srishti Saxena <isrishtivsaxena@gmail.com>
+Date:   Mon May 11 17:09:14 2026 +0530
+
+    Improve recommender scoring documentation
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+index b2661df..3a5b677 100644
+--- a/utils/recommender.py
++++ b/utils/recommender.py
+@@ -7,11 +7,13 @@ from utils.data_loader import load_all_projects
+ # Maximum number of recommendations returned to the user
+ MAX_RESULTS = 3
+ 
+-# Point weights for each matching criterion
+-WEIGHT_SKILL   = 3   # Skill matches carry the most influence
+-WEIGHT_LEVEL   = 2   # Experience level is the next strongest signal
+-WEIGHT_INTEREST = 2  # Area of interest is equally important as level
+-WEIGHT_TIME    = 1   # Time availability is a tiebreaker
++# Scoring weights used by the recommendation engine.
++# Higher weights mean that criterion has more influence
++# on the final recommendation score.
++WEIGHT_SKILL   = 3   # Skills are weighted highest because they best reflect project compatibility
++WEIGHT_LEVEL   = 2   # Matching experience level helps avoid projects that are too easy or too difficult
++WEIGHT_INTEREST = 2   # Interest alignment improves recommendation relevance
++WEIGHT_TIME    = 1    # Time availability acts as a smaller tie-breaker factor
+ 
+ 
+ def parse_skills(skills_string):
+@@ -38,7 +40,11 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
+ 
+     # Compare user's skills against the project's required skills
+     project_skills = [s.lower() for s in project.get("skills", [])]
+-    matched_skills = sum(1 for skill in user_skills if skill in project_skills)
++    # Count how many user skills overlap with the
++    # skills required by the current project.
++    matched_skills = sum(1 for skill in user_skills if skill in project_skills) 
++    # Add weighted points based on the number of matching skills.
++    # More overlapping skills result in a higher recommendation score.
+     score += matched_skills * WEIGHT_SKILL
+ 
+     # Award points for each additional matching criterion
+@@ -74,10 +80,13 @@ def get_recommendations(skills_string, level, interest, time_availability):
+         score = score_single_project(
+             project, user_skills, level, interest, time_availability
+         )
++        # Ignore projects with a score of 0 since they
++        # have no meaningful overlap with the user's inputs.
+         if score > 0:
+             scored_projects.append({"project": project, "score": score})
+ 
+-    # Sort so the highest-scoring project appears first
++    # Sort projects in descending order so the
++    # most relevant recommendations appear first.
+     scored_projects.sort(key=lambda item: item["score"], reverse=True)
+ 
+     # Return only the project dicts, not the score metadata
+
+commit 902dddddca00fd81f7972b90a7979750ffbe6b14
+Author: Komal Harshita <komal.sony234@gmail.com>
+Date:   Tue Mar 31 06:01:27 2026 +0000
+
+    Refactor codebase into modular structure with routes/ and utils/
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+index ac0cdc1..b2661df 100644
+--- a/utils/recommender.py
++++ b/utils/recommender.py
+@@ -1,44 +1,106 @@
+-import json
++# utils/recommender.py
++# Contains all recommendation logic: scoring and filtering projects.
++# Kept separate from routing so it can be tested and extended independently.
+ 
++from utils.data_loader import load_all_projects
+ 
+-# Load projects from JSON file
+-def load_projects():
+-    try:
+-        with open('data/projects.json', 'r') as file:
+-            projects = json.load(file)
+-            return projects
+-    except Exception:
+-        return []
++# Maximum number of recommendations returned to the user
++MAX_RESULTS = 3
+ 
++# Point weights for each matching criterion
++WEIGHT_SKILL   = 3   # Skill matches carry the most influence
++WEIGHT_LEVEL   = 2   # Experience level is the next strongest signal
++WEIGHT_INTEREST = 2  # Area of interest is equally important as level
++WEIGHT_TIME    = 1   # Time availability is a tiebreaker
+ 
+-# Check if a project matches user input
+-def matches_project(user_input, project):
+-    # Match skill
+-    if user_input['skill'] not in project.get('skills', []):
+-        return False
+ 
+-    # Match level
+-    if user_input['level'] != project.get('level'):
+-        return False
++def parse_skills(skills_string):
++    """
++    Convert a raw comma-separated skills string into a clean lowercase list.
++    Example: "Python, HTML, CSS" -> ["python", "html", "css"]
++    """
++    return [s.strip().lower() for s in skills_string.split(",") if s.strip()]
+ 
+-    # Match interest
+-    if user_input['interest'] != project.get('interest'):
+-        return False
+ 
+-    # Match time
+-    if user_input['time'] != project.get('time'):
+-        return False
++def score_single_project(project, user_skills, level, interest, time_availability):
++    """
++    Calculate a numeric relevance score for one project.
+ 
+-    return True
++    Each matching criterion adds points:
++      - Each matching skill:  +3
++      - Level match:          +2
++      - Interest match:       +2
++      - Time match:           +1
+ 
++    Returns an integer score (0 means no match at all).
++    """
++    score = 0
+ 
+-# Main recommendation function
+-def recommend_projects(user_input, projects):
+-    matched_projects = []
++    # Compare user's skills against the project's required skills
++    project_skills = [s.lower() for s in project.get("skills", [])]
++    matched_skills = sum(1 for skill in user_skills if skill in project_skills)
++    score += matched_skills * WEIGHT_SKILL
+ 
+-    for project in projects:
+-        if matches_project(user_input, project):
+-            matched_projects.append(project)
++    # Award points for each additional matching criterion
++    if project.get("level", "").lower() == level.lower():
++        score += WEIGHT_LEVEL
+ 
+-    # Return top 3 results only
+-    return matched_projects[:3]
++    if project.get("interest", "").lower() == interest.lower():
++        score += WEIGHT_INTEREST
++
++    if project.get("time", "").lower() == time_availability.lower():
++        score += WEIGHT_TIME
++
++    return score
++
++
++def get_recommendations(skills_string, level, interest, time_availability):
++    """
++    Return the top N recommended projects for the given user inputs.
++
++    Steps:
++      1. Parse the raw skills input into a list.
++      2. Score every project in the dataset.
++      3. Drop projects with a score of zero (no overlap at all).
++      4. Sort by score descending.
++      5. Return the top MAX_RESULTS projects.
++    """
++    user_skills = parse_skills(skills_string)
++    all_projects = load_all_projects()
++
++    scored_projects = []
++
++    for project in all_projects:
++        score = score_single_project(
++            project, user_skills, level, interest, time_availability
++        )
++        if score > 0:
++            scored_projects.append({"project": project, "score": score})
++
++    # Sort so the highest-scoring project appears first
++    scored_projects.sort(key=lambda item: item["score"], reverse=True)
++
++    # Return only the project dicts, not the score metadata
++    return [item["project"] for item in scored_projects[:MAX_RESULTS]]
++
++
++def validate_recommendation_inputs(skills, level, interest, time_availability):
++    """
++    Validate all four required fields.
++    Returns a list of error strings. An empty list means all inputs are valid.
++    """
++    errors = []
++
++    if not skills or not skills.strip():
++        errors.append("Please enter at least one skill.")
++
++    if not level or not level.strip():
++        errors.append("Please select an experience level.")
++
++    if not interest or not interest.strip():
++        errors.append("Please select an area of interest.")
++
++    if not time_availability or not time_availability.strip():
++        errors.append("Please select your time availability.")
++
++    return errors
+
+commit c6e5a86bb53fa7cf265ed42ccbfee0ce061b4a37
+Author: Komal Harshita <komal.sony234@gmail.com>
+Date:   Mon Mar 30 23:15:11 2026 +0530
+
+    Update recommender.py
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+index 1701037..ac0cdc1 100644
+--- a/utils/recommender.py
++++ b/utils/recommender.py
+@@ -1,35 +1,44 @@
+ import json
+ 
+-# Load project data from JSON
++
++# Load projects from JSON file
+ def load_projects():
+     try:
+         with open('data/projects.json', 'r') as file:
+-            return json.load(file)
++            projects = json.load(file)
++            return projects
+     except Exception:
+         return []
+ 
+-# Rule-based recommendation system
+-def recommend_projects(user_input, projects):
+-    results = []
+ 
+-    for project in projects:
+-        # Match skill
+-        if user_input['skill'] not in project.get('skills', []):
+-            continue
++# Check if a project matches user input
++def matches_project(user_input, project):
++    # Match skill
++    if user_input['skill'] not in project.get('skills', []):
++        return False
++
++    # Match level
++    if user_input['level'] != project.get('level'):
++        return False
+ 
+-        # Match level
+-        if user_input['level'] != project.get('level'):
+-            continue
++    # Match interest
++    if user_input['interest'] != project.get('interest'):
++        return False
+ 
+-        # Match interest
+-        if user_input['interest'] != project.get('interest'):
+-            continue
++    # Match time
++    if user_input['time'] != project.get('time'):
++        return False
+ 
+-        # Match time
+-        if user_input['time'] != project.get('time'):
+-            continue
++    return True
+ 
+-        results.append(project)
+ 
+-    # Return top 3 projects
+-    return results[:3]
++# Main recommendation function
++def recommend_projects(user_input, projects):
++    matched_projects = []
++
++    for project in projects:
++        if matches_project(user_input, project):
++            matched_projects.append(project)
++
++    # Return top 3 results only
++    return matched_projects[:3]
+
+commit 2616d53f71123d1e80aa2381bf9f0250de6c58e0
+Author: Komal Harshita <komal.sony234@gmail.com>
+Date:   Mon Mar 30 23:02:06 2026 +0530
+
+    Implement project recommendation system
+
+diff --git a/utils/recommender.py b/utils/recommender.py
+new file mode 100644
+index 0000000..1701037
+--- /dev/null
++++ b/utils/recommender.py
+@@ -0,0 +1,35 @@
++import json
++
++# Load project data from JSON
++def load_projects():
++    try:
++        with open('data/projects.json', 'r') as file:
++            return json.load(file)
++    except Exception:
++        return []
++
++# Rule-based recommendation system
++def recommend_projects(user_input, projects):
++    results = []
++
++    for project in projects:
++        # Match skill
++        if user_input['skill'] not in project.get('skills', []):
++            continue
++
++        # Match level
++        if user_input['level'] != project.get('level'):
++            continue
++
++        # Match interest
++        if user_input['interest'] != project.get('interest'):
++            continue
++
++        # Match time
++        if user_input['time'] != project.get('time'):
++            continue
++
++        results.append(project)
++
++    # Return top 3 projects
++    return results[:3]
