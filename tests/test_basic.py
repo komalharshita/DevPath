@@ -19,6 +19,11 @@ import pytest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from utils.data_loader import load_all_projects, find_project_by_id, clear_cache, validate_projects
+from utils.roadmap_comparer import (
+    load_all_career_roadmaps,
+    compare_roadmaps,
+    clear_roadmap_cache,
+)
 from utils.recommender import (
     get_recommendations,
     validate_recommendation_inputs,
@@ -38,6 +43,7 @@ from app import app, internal_server_error
 def setup_module():
     """Clear the data cache before running the test suite to ensure clean state."""
     clear_cache()
+    clear_roadmap_cache()
 
 
 # ============================================================
@@ -345,26 +351,26 @@ def test_score_single_project_alias_matching():
 def test_get_recommendations_returns_results():
     """Python + Beginner + Data + Low should always return at least one result."""
     results = get_recommendations("Python", "Beginner", "Data", "Low")
-    assert len(results) > 0, "Expected at least one recommendation"
+    assert len(results["recommendations"]) > 0, "Expected at least one recommendation"
 
 
 def test_get_recommendations_max_three():
     """The engine must never return more than three results."""
     results = get_recommendations("Python, JavaScript, HTML", "Beginner", "Web", "Low")
-    assert len(results) <= 3, f"Expected at most 3 results, got {len(results)}"
+    assert len(results["recommendations"]) <= 3, f'Expected at most 3 results, got {len(results["recommendations"])}'
 
 
 def test_get_recommendations_no_match_returns_empty():
     """A very unlikely skill/interest combo should return an empty list."""
     results = get_recommendations("Rust", "Advanced", "Games", "High")
     # Rust and Games are not in the dataset so this should be empty or minimal
-    assert isinstance(results, list)
+    assert isinstance(results["recommendations"], list)
 
 
 def test_get_recommendations_result_format():
     """Each returned project must be a dict with at least a title and id."""
     results = get_recommendations("Python", "Beginner", "Data", "Low")
-    for project in results:
+    for project in results["recommendations"]:
         assert "id" in project
         assert "title" in project
 
@@ -373,14 +379,14 @@ def test_case_insensitive_recommendations_identical():
     """Lowercase and titlecase skill inputs must produce identical recommendations."""
     results_lower = get_recommendations("python", "Beginner", "Data", "Low")
     results_title = get_recommendations("Python", "Beginner", "Data", "Low")
-    assert [p["id"] for p in results_lower] == [p["id"] for p in results_title]
+    assert [p["id"] for p in results_lower["recommendations"]] == [p["id"] for p in results_title["recommendations"]]
 
 
 def test_whitespace_stripped_in_skills():
     """Leading/trailing whitespace in the skills string must be ignored."""
     results_clean = get_recommendations("python", "Beginner", "Data", "Low")
     results_spaced = get_recommendations("   python  ", "Beginner", "Data", "Low")
-    assert [p["id"] for p in results_clean] == [p["id"] for p in results_spaced]
+    assert [p["id"] for p in results_clean["recommendations"]] == [p["id"] for p in results_spaced["recommendations"]]
 
 
 # ============================================================
@@ -467,7 +473,7 @@ def test_recommend_api_valid():
 
 
 def test_recommend_api_interest_not_available():
-    """The API should return no projects for blocked interest categories."""
+    """The API should return an error for invalid interest categories."""
     client = get_client()
     response = client.post("/api/recommend", json={
         "skills": "Python, JavaScript",
@@ -475,11 +481,9 @@ def test_recommend_api_interest_not_available():
         "interest": "Machine Learning/AI",
         "time": "Low"
     })
-    assert response.status_code == 200
+    assert response.status_code == 400
     data = response.get_json()
-    assert data["projects"] == []
-    assert "message" in data
-    assert "no projects are currently available" in data["message"].lower()
+    assert "error" in data
 
 
 def test_recommend_api_missing_field():
@@ -708,6 +712,91 @@ def test_project_links_have_noopener():
     assert response.status_code == 200
     assert b'target="_blank"' in response.data
     assert b'rel="noopener noreferrer"' in response.data
+
+
+# ============================================================
+# Career roadmap comparison tests
+# ============================================================
+
+def test_career_roadmaps_load():
+    """Career roadmaps JSON must load and contain entries."""
+    roadmaps = load_all_career_roadmaps()
+    assert isinstance(roadmaps, list)
+    assert len(roadmaps) >= 2
+
+
+def test_compare_roadmaps_finds_overlap():
+    """Comparing frontend and fullstack should find shared skills."""
+    result = compare_roadmaps("frontend", "fullstack")
+    assert result is not None
+    assert "overlapping_skills" in result
+    assert len(result["overlapping_skills"]) > 0
+    assert result["roadmap_a"]["id"] == "frontend"
+    assert result["roadmap_b"]["id"] == "fullstack"
+
+
+def test_compare_same_roadmap_returns_error():
+    """Comparing a roadmap with itself should return an error message."""
+    result = compare_roadmaps("react", "react")
+    assert result is not None
+    assert "error" in result
+
+
+def test_compare_invalid_roadmap_returns_none():
+    """Unknown roadmap IDs should return None."""
+    assert compare_roadmaps("nonexistent", "frontend") is None
+
+
+def test_compare_page_route():
+    """Compare page should render successfully."""
+    client = get_client()
+    response = client.get("/compare")
+    assert response.status_code == 200
+    assert b"Compare Learning Roadmaps" in response.data
+
+
+def test_list_roadmaps_api():
+    """API should return all career roadmaps."""
+    client = get_client()
+    response = client.get("/api/roadmaps")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert isinstance(data, list)
+    assert len(data) >= 2
+
+
+def test_compare_api():
+    """Compare API should return structured comparison data."""
+    client = get_client()
+    response = client.get("/api/compare?a=react&b=angular")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["roadmap_a"]["id"] == "react"
+    assert data["roadmap_b"]["id"] == "angular"
+    assert "metrics" in data
+    assert "overlapping_skills" in data
+
+
+def test_compare_api_missing_params():
+    """Compare API should reject requests missing query params."""
+    client = get_client()
+    response = client.get("/api/compare?a=react")
+    assert response.status_code == 400
+
+
+def test_compare_api_not_found():
+    """Compare API should 404 for invalid roadmap IDs."""
+    client = get_client()
+    response = client.get("/api/compare?a=invalid&b=alsoinvalid")
+    assert response.status_code == 404
+
+
+def test_sitemap_includes_compare():
+    """Sitemap should include the compare page."""
+    client = get_client()
+    response = client.get("/sitemap.xml")
+    assert response.status_code == 200
+    assert b"/compare" in response.data
 
 
 

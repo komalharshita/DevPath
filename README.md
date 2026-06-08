@@ -145,63 +145,126 @@ E --> H[Learning Resources]
 
 ## Quick Start
 
+### Linux/macOS Setup
+
 ```bash
 git clone https://github.com/komalharshita/devpath.git
 cd devpath
-python -m venv venv
-source venv/bin/activate          # Windows: venv\Scripts\activate
 
-# Shortcuts using the Makefile
-make install                      # Installs dependencies
-make run                          # Starts the development server
+python3 -m venv venv
+source venv/bin/activate
+
+pip install -r requirements.txt
+
+python app.py
+```
+
+### Windows Setup
+
+```powershell
+git clone https://github.com/komalharshita/devpath.git
+cd devpath
+
+python -m venv venv
+venv\Scripts\activate
+
+pip install -r requirements.txt
+
+python app.py
+```
+
+## Verify Everything Works
+
+Run the test suite:
+
+```bash
+python tests/test_basic.py
+```
+
+Expected output:
+
+```bash
+All tests passed
 ```
 
 ---
 
 ## Troubleshooting
 
-### Common Setup Issues
+<details>
+<summary>Virtual Environment Issues</summary>
 
-#### Virtual environment activation not working on Windows
+### Linux/macOS
 
-Use:
+If activation fails, verify Python 3 is installed:
 
 ```bash
+python3 --version
+```
+
+### Windows PowerShell
+
+If you see:
+
+```powershell
+running scripts is disabled on this system
+```
+
+Run:
+
+```powershell
+Set-ExecutionPolicy -Scope Process RemoteSigned
+```
+
+Then activate the environment again:
+
+```powershell
 venv\Scripts\activate
 ```
 
-instead of:
+</details>
+
+<details>
+<summary>Dependency & Flask Issues</summary>
+
+If dependency installation fails, first upgrade pip:
 
 ```bash
-source venv/bin/activate
+python -m pip install --upgrade pip
 ```
 
-#### ModuleNotFoundError
-
-Make sure all dependencies are installed:
+Ensure Python 3.9+ is installed:
 
 ```bash
-pip install -r requirements.txt
+python --version
 ```
 
-#### Flask app not starting
-
-Verify that you are running:
+Reinstall requirements without cache:
 
 ```bash
-python app.py
+pip install -r requirements.txt --no-cache-dir
 ```
 
-from the project root directory.
----
-
-**http://127.0.0.1:5000** — that is the entire setup.
+If Flask is still missing:
 
 ```bash
-# Verify everything works using the Makefile shortcut
-make test
-# 29 passed, 0 failed out of 29 tests
+pip install flask
 ```
+
+</details>
+
+<details>
+<summary>Port Already in Use</summary>
+
+If port 5000 is already in use, run the app on another port:
+
+```bash
+flask run --port 5001
+```
+
+Or stop the process currently using port 5000.
+
+</details>
 
 ---
 

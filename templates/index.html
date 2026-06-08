@@ -41,94 +41,85 @@
     <div class="nav-inner">
       <a href="/" class="nav-logo">Dev<span class="nav-logo-accent">Path</span></a>
 
-      <form id="topic-search-form" class="navbar-search">
-          <input
-            type="text"
-            id="topic-search"
-            autocomplete="on"
-            aria-label="Search projects"
-            placeholder="Search Projects"
-          />
-
-          <button class="glass-search-btn" type="submit" aria-label="Search">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </button>
-        </form>
-      
-      <div class="nav-links">
-        <a href="#home" class="nav-link">Home</a>
-        <a href="#how-it-works" class="nav-link">How It Works</a>
-        <a href="#features" class="nav-link">Features</a>
-        <a href="#find-project" class="nav-link">Find Project</a>
-        <a href="/contact" class="nav-link">Contact Us</a>
-        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-btn-outline">GitHub</a>
-       
-        <button class="theme-toggle" id="theme-toggle-desktop"
-                aria-pressed="false"
-                aria-label="Switch to dark mode">
-          <!-- Moon icon: shown in light mode (clicking switches to dark) -->
-          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24"
-               fill="none" stroke="currentColor" stroke-width="2"
-               stroke-linecap="round" stroke-linejoin="round"
-               aria-hidden="true">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-          </svg>
-          <!-- Sun icon: shown in dark mode (clicking switches to light) -->
-          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24"
-               fill="none" stroke="currentColor" stroke-width="2"
-               stroke-linecap="round" stroke-linejoin="round"
-               aria-hidden="true">
-            <circle cx="12" cy="12" r="5"/>
-            <line x1="12" y1="1" x2="12" y2="3"/>
-            <line x1="12" y1="21" x2="12" y2="23"/>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-            <line x1="1" y1="12" x2="3" y2="12"/>
-            <line x1="21" y1="12" x2="23" y2="12"/>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      <form id="topic-search-form" class="navbar-search" role="search">
+        <input
+          type="search"
+          id="topic-search"
+          autocomplete="off"
+          aria-label="Search projects"
+          placeholder="Search projects…"
+        />
+        <button class="navbar-search-btn" type="submit" aria-label="Search">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </button>
+      </form>
 
-        <button
-        id="theme-toggle"
-        class="theme-toggle"
-        aria-label="Toggle dark mode"
-        aria-pressed="false"
-        >
-        🌙
-      </button>
+      <div class="nav-right">
+        <div class="nav-links">
+          <a href="#home" class="nav-link">Home</a>
+          <a href="#how-it-works" class="nav-link">How It Works</a>
+          <a href="#features" class="nav-link">Features</a>
+          <a href="#find-project" class="nav-link">Find Project</a>
+          <a href="/compare" class="nav-link">Compare</a>
+          <a href="/contact" class="nav-link">Contact</a>
+        </div>
+
+        <div class="nav-actions">
+          <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
+            class="nav-btn-outline">GitHub</a>
+          <button class="theme-toggle" id="theme-toggle-desktop" aria-pressed="false"
+            aria-label="Switch to dark mode">
+            <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+            <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+          </button>
+        </div>
       </div>
-      <!-- Mobile hamburger toggle -->
-      <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation" aria-expanded="false"
-        aria-controls="nav-mobile-menu">
+
+      <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation"
+        aria-expanded="false" aria-controls="nav-mobile-menu">
         <span></span><span></span><span></span>
       </button>
     </div>
-    <!-- Mobile menu — includes upstream's #home link and HEAD's theme toggle + accessibility attrs -->
+
     <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
+      <form id="topic-search-form-mobile" class="navbar-search navbar-search--mobile" role="search">
+        <input type="search" id="topic-search-mobile" autocomplete="off" aria-label="Search projects"
+          placeholder="Search projects…" />
+        <button class="navbar-search-btn" type="submit" aria-label="Search">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
+      </form>
       <a href="#home" class="nav-mobile-link" role="menuitem">Home</a>
       <a href="#how-it-works" class="nav-mobile-link" role="menuitem">How It Works</a>
       <a href="#features" class="nav-mobile-link" role="menuitem">Features</a>
       <a href="#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
+      <a href="/compare" class="nav-mobile-link" role="menuitem">Compare</a>
+      <a href="/contact" class="nav-mobile-link" role="menuitem">Contact</a>
       <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
         class="nav-mobile-link" role="menuitem">GitHub</a>
-      <!-- Theme toggle in mobile menu — same .theme-toggle class so
-           the JS engine updates both this and the desktop button together -->
       <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile"
-        style="background:none;border:none;text-align:left;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;padding:10px 0;font-size:0.95rem;font-weight:500;color:rgba(255,255,255,0.8);"
         aria-pressed="false" aria-label="Switch to dark mode" role="menuitem">
         <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -231,6 +222,10 @@
 
         <div class="hero-visual-card hero-visual-card--bottom">
           <div class="hvc-icon hvc-icon--green">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke- 
+  width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 
+  12 2 12" /></svg>
+          <div class="hvc-icon hvc-icon--green">            
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
               stroke-linecap="round" stroke-linejoin="round">
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
@@ -525,7 +520,9 @@
                 <label for="skills-input">
                   Your Skills
                   <button type="button" class="tooltip" aria-label="Skills help" aria-describedby="skills-tooltip">
-                    ⓘ
+  <span aria-hidden="true">ⓘ</span>
+</button>
+                    
                     <span id="skills-tooltip" class="tooltip-text" role="tooltip">
                       Add technologies, programming languages, or tools you know like Python, React, Git, SQL, etc.
                     </span>
@@ -546,7 +543,11 @@
               </div>
               <div class="skill-input-wrap" id="skill-input-wrap">
                 <div class="skill-chips-selected" id="skill-chips-selected"></div>
-                <input type="text" id="skills-input" placeholder="Type a skill and press Enter..." autocomplete="off" />
+                <input type="text" id="skills-input" placeholder="Type a skill and press Enter..."
+  autocomplete="off"
+  aria-haspopup="listbox"
+  aria-expanded="false"
+  aria-controls="skills-suggestions" />
                 <div id="skills-suggestions" class="skills-suggestions"></div>
               </div>
               <!-- Hidden field holds the final comma-separated value -->
@@ -647,8 +648,6 @@
                     <option value="Machine Learning/AI">Machine Learning/AI</option>
                   </select>
                 </div>
-
-
                 <span class="form-hint">
                   Pick the domain you want to explore such as Web Development, Automation, or Games.
                 </span>
@@ -660,13 +659,10 @@
             <div class="form-group">
               <label for="time">
                 Time Availability
-                <button type="button" class="tooltip" aria-label="Time availability help"
-                  aria-describedby="time-tooltip">
+                <span class="tooltip"
+                  title="Estimate how much time you can realistically dedicate to building the project.">
                   ⓘ
-                  <span id="time-tooltip" class="tooltip-text" role="tooltip">
-                    Estimate how much time you can realistically dedicate to building the project.
-                  </span>
-                </button>
+                </span>
               </label>
               <div class="select-wrap">
                 <select id="time" name="time">
@@ -681,11 +677,9 @@
               </span>
               <div class="form-error-msg" id="time-error"></div>
             </div>
+ main
 
-            <!-- General error (shown above the button) -->
-            <p class="form-error-general" id="form-error-general"></p>
-
-            <!-- Submit button -->
+            <!-- Submit button and Clear actions -->
             <div class="form-actions">
               <button type="submit" class="btn-submit" id="submit-btn">
                 <span id="btn-label">Generate My Projects</span>
@@ -741,6 +735,17 @@
 
       <!-- Cards grid -->
       <div class="results-grid" id="results-grid"></div>
+
+      <div class="saved-projects-panel" id="saved-projects-panel">
+        <div class="saved-projects-header">
+          <div>
+            <h3>Saved Projects</h3>
+            <p>Shortlist ideas you want to revisit later.</p>
+          </div>
+          <span class="saved-projects-count" id="saved-projects-count">0 saved</span>
+        </div>
+        <div class="saved-projects-list" id="saved-projects-list"></div>
+      </div>
     </div>
   </section>
 
@@ -903,6 +908,9 @@
     }
   </style>
 
+
+  <script src="/static/data/skills.js"></script>
+
   <button id="scroll-top-btn" aria-label="Scroll to top" title="Scroll to top">
     <svg id="scroll-btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -910,7 +918,8 @@
     </svg>
   </button>
 
-  <script src="/static/data/skills.js"></script>
+    <script src="/static/data/skills.js"></script>
+
   <script src="/static/script.js"></script>
   <script>
     (function () {
