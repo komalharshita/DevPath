@@ -303,6 +303,17 @@ updateProfileWidgets();
   var visibleSuggestions = [];
   var SAVED_PROJECTS_KEY = "devpathSavedProjects";
 
+  window.addSkill = function addSkill(rawSkill) {
+    var skill = canonicalSkill(rawSkill);
+    if (!skill || isSelected(skill)) return;
+    selectedSkills.push(skill);
+    renderSelectedChips();
+    syncSkillsHiddenInput();
+    updateQuickPickState();
+    clearFieldError("skills-error");
+    if (skillsInput) skillsInput.focus();
+  };
+
   function normalize(value) {
     return String(value || "").trim().toLowerCase();
   }
@@ -457,17 +468,6 @@ updateProfileWidgets();
     });
   }
 
-  window.addSkill = function addSkill(rawSkill) {
-    var skill = canonicalSkill(rawSkill);
-    if (!skill || isSelected(skill)) return;
-    selectedSkills.push(skill);
-    renderSelectedChips();
-    syncSkillsHiddenInput();
-    updateQuickPickState();
-    clearFieldError("skills-error");
-    if (skillsInput) skillsInput.focus();
-  };
-
   function removeSkill(skill) {
     selectedSkills = selectedSkills.filter(function (item) { return normalize(item) !== normalize(skill); });
     renderSelectedChips();
@@ -576,63 +576,6 @@ updateProfileWidgets();
   // Form submission and API call
   // ----------------------------------------------------------
 
-  form.addEventListener("submit", function (evt) {
-    evt.preventDefault(); //stop the browser from reloading the page on form submit
-    clearAllErrors();
-
-    if (skillsTextInput.value.trim()) {
-      addSkill(skillsTextInput.value);
-      skillsTextInput.value = "";
-      hideSuggestions();
-    }
-
-    if (!validateForm()) return; //stop - anything missing/invalid
-
-    setLoadingState(true);
-
-    // Allow browser to paint spinner before request starts
-    requestAnimationFrame(function () {
-
-      //combine form values into an object to send to server/api
-      var payload = {
-        // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-        skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-        level: document.getElementById("level").value,
-        interest: document.getElementById("interest").value,
-        time: document.getElementById("time").value
-      };
-
-      //post the data to backend api as JSON, then handle the response
-      fetch("/api/recommend", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload) //convert object to json string
-      })
-        .then(function (res) {
-          return res.json(); //parse the response as JSON
-        })
-        .then(function (data) {
-          setLoadingState(false);
-
-          if (data.error) {
-            var generalErr = document.getElementById("form-error-general");
-            if (generalErr) generalErr.textContent = data.error;
-            return;
-          }
-
-          renderResults(data.projects || [], data.message);
-        })
-        .catch(function (err) {
-          // this runs if the network request itself fails
-          setLoadingState(false);
-          var generalErr = document.getElementById("form-error-general");
-          if (generalErr) generalErr.textContent = "Something went wrong. Please try again.";
-          console.error("API request failed:", err);
-        });
-    });
-  });
-
-
   // Manages the loading state of the form and results section(whats visible or not)
   function setLoadingState(isLoading) {
     submitBtn.disabled = isLoading;
@@ -707,6 +650,7 @@ updateProfileWidgets();
     span.className = "project-tag project-tag--" + normalize(type).replace(/[^a-z0-9_-]/g, "-");
     span.textContent = text;
     return span;
+  }
 
   //takes the array of projects from the api and draws them on the page as cards
   //if array is empty it shows the "no results" message instead
@@ -732,7 +676,6 @@ updateProfileWidgets();
     });
 
     resultsSection.scrollIntoView({ behavior: "smooth" });
- main
   }
 
   function buildProjectCard(project) {
