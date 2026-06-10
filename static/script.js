@@ -620,6 +620,7 @@ updateProfileWidgets();
             return;
           }
 
+          recordSearch();
           renderResults(data.projects || [], data.message);
         })
         .catch(function (err) {
@@ -975,43 +976,7 @@ updateProfileWidgets();
     });
   }
 
-  form.addEventListener("submit", function (event) {
-    event.preventDefault();
-    clearAllErrors();
-    if (skillsInput.value.trim()) {
-      window.addSkill(skillsInput.value);
-      skillsInput.value = "";
-      hideSuggestions();
-    }
-    if (!validateForm()) return;
-    setLoadingState(true);
-    fetch("/api/recommend", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        skills: JSON.stringify(selectedSkills),
-        level: document.getElementById("level").value,
-        interest: document.getElementById("interest").value,
-        time: document.getElementById("time").value
-      })
-    })
-      .then(function (response) {
-        return response.json().then(function (data) {
-          if (!response.ok) throw new Error(data.error || "Unable to generate recommendations.");
-          return data;
-        });
-      })
-      .then(function (data) {
-        setLoadingState(false);
-        recordSearch();
-        renderResults(data.projects || [], data.message);
-      })
-      .catch(function (err) {
-        setLoadingState(false);
-        var general = document.getElementById("form-error-general");
-        if (general) general.textContent = err.message || "An unexpected error occurred. Please try again.";
-      });
-  });
+
 
   var modal = document.getElementById("github-modal-overlay");
   var openModalBtn = document.getElementById("btn-show-github");
