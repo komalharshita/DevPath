@@ -1,41 +1,39 @@
 <div align="center">
 
+<img src="assets/devpath_banner.png" alt="DevPath Banner" width="100%" />
+
 <br/>
 
-```
- ____            ____       _   _
-|  _ \  _____  _|  _ \ __ _| |_| |__
-| | | |/ _ \ \/ / |_) / _` | __| '_ \
-| |_| |  __/>  <|  __/ (_| | |_| | | |
-|____/ \___/_/\_\_|   \__,_|\__|_| |_|
-```
+# DevPath
 
-**Skill to Project Recommender**
+### Skill to Project Recommender
 
 *Find your next coding project in under 30 seconds.*
 
 <br/>
 
-[![Python](https://img.shields.io/badge/Python-3.8%2B-2335c2?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
-[![Flask](https://img.shields.io/badge/Flask-3.0-2335c2?style=flat-square&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-fbbf24?style=flat-square)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-27%20passing-22c55e?style=flat-square&logo=checkmarx&logoColor=white)](#testing)
-[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-7c3aed?style=flat-square&logo=git&logoColor=white)](CONTRIBUTING.md)
-[![GSSoC](https://img.shields.io/badge/GSSoC-2026-fbbf24?style=flat-square&logo=opensourceinitiative&logoColor=0f1560)](https://gssoc.girlscript.tech/)
+[![Python](https://img.shields.io/badge/Python-3.8%2B-2335c2?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-3.0-0f172a?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![MIT License](https://img.shields.io/badge/License-MIT-fbbf24?style=for-the-badge)](LICENSE)
+[![Tests](https://img.shields.io/badge/Tests-27_Passing-22c55e?style=for-the-badge&logo=checkmarx&logoColor=white)](#quick-start)
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-7c3aed?style=for-the-badge&logo=git&logoColor=white)](CONTRIBUTING.md)
+[![GSSoC](https://img.shields.io/badge/GSSoC-2026-fbbf24?style=for-the-badge&logo=opensourceinitiative&logoColor=0f1560)](https://gssoc.girlscript.tech/)
 
 <br/>
-
 
 [![Open Issues](https://img.shields.io/github/issues/komalharshita/devpath?color=2335c2&style=flat-square&logo=github)](https://github.com/komalharshita/devpath/issues)
 [![Forks](https://img.shields.io/github/forks/komalharshita/devpath?color=7c3aed&style=flat-square&logo=github)](https://github.com/komalharshita/devpath/network/members)
 [![Stars](https://img.shields.io/github/stars/komalharshita/devpath?color=fbbf24&style=flat-square&logo=github)](https://github.com/komalharshita/devpath/stargazers)
 [![Contributors](https://img.shields.io/github/contributors/komalharshita/devpath?color=22c55e&style=flat-square&logo=github)](https://github.com/komalharshita/devpath/graphs/contributors)
 
+<br/>
+
 [Get Started](#quick-start) &nbsp;&bull;&nbsp;
+[Features](#features) &nbsp;&bull;&nbsp;
 [How It Works](#how-it-works) &nbsp;&bull;&nbsp;
 [Contribute](#contributing) &nbsp;&bull;&nbsp;
 [Docs](docs/) &nbsp;&bull;&nbsp;
-[Issues](https://github.com/komalharshita/devpath/issues)
+[Discussions](https://github.com/komalharshita/devpath/discussions)
 
 <br/>
 
@@ -43,45 +41,71 @@
 
 </div>
 
-## Overview
+## Screenshots
 
-DevPath is a beginner-friendly, open-source Flask application that solves
-a real problem: **knowing what to build**.
+<div align="center">
 
-Enter what you know. Choose your level and interests. DevPath runs a
-rule-based scoring engine against a curated project dataset and returns
-the top three matches — each with a full step-by-step roadmap and a
-starter code template you can download and run immediately.
+<img src="assets/homepage-preview.png" width="48%" alt="Homepage Preview" />
+<img src="assets/recommendation-preview.png" width="48%" alt="Recommendation Preview" />
 
-No database. No machine learning. No account required.
-Clean Python, readable code, and 27 passing tests.
+</div>
 
 ---
 
-## Quick Start
+## Why DevPath Exists
 
-```bash
-git clone https://github.com/komalharshita/devpath.git
-cd devpath
-python -m venv venv
-source venv/bin/activate          # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-python app.py
-```
+Most beginner developers complete tutorials but struggle with the next step:
+**what to build on their own.**
 
-**http://127.0.0.1:5000** — that is the entire setup.
+DevPath was created to solve that problem.
 
-```bash
-# Verify everything works
-python tests/test_basic.py
-# 27 passed, 0 failed out of 27 tests
-```
+Instead of endlessly searching for project ideas, users can enter their
+skills, interests, experience level, and available time to instantly get
+personalized project recommendations with:
+
+- Step-by-step roadmaps
+- Curated learning resources
+- Beginner-friendly starter code
+- Clear progression paths
+
+The goal is simple:
+
+> Help developers move from “learning syntax” to “building real projects.”
+
+---
+
+## Features
+
+| Feature | Description |
+|----------|-------------|
+| Personalized recommendations | Matches projects based on skills, level, interest, and time |
+| Rule-based scoring engine | Transparent and explainable recommendation logic |
+| Beginner-friendly architecture | Small, modular, and easy to understand |
+| Starter code templates | Downloadable boilerplate code for projects |
+| Guided roadmaps | Structured learning and implementation flow |
+| Open-source contribution ready | Designed for GSSoC and beginner contributors |
+
+---
+
+## Tech Stack
+
+<div align="center">
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Pytest](https://img.shields.io/badge/Pytest-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)
+![JSON](https://img.shields.io/badge/JSON-0f172a?style=for-the-badge&logo=json&logoColor=white)
+
+</div>
 
 ---
 
 ## How It Works
 
-```
+```text
 User inputs                 Scoring engine              Output
 -----------                 --------------              ------
 Skills (Python, HTML)  -->  +3 per skill match   -->   Top 3 projects
@@ -96,9 +120,157 @@ constants at the top of the file — easy to tune without reading the whole modu
 
 ---
 
-## Structure
+## Architecture
 
+```mermaid
+flowchart LR
+
+A[User Input Form]
+--> B[Flask Routes]
+
+B --> C[Recommendation Engine]
+
+C --> D[projects.json Dataset]
+
+C --> E[Top 3 Project Matches]
+
+E --> F[Project Roadmap]
+
+E --> G[Starter Code Download]
+
+E --> H[Learning Resources]
 ```
+
+---
+
+## Quick Start
+
+### Linux/macOS Setup
+
+```bash
+git clone https://github.com/komalharshita/devpath.git
+cd devpath
+
+python3 -m venv venv
+source venv/bin/activate
+
+pip install -r requirements.txt
+
+python app.py
+```
+
+### Windows Setup
+
+```powershell
+git clone https://github.com/komalharshita/devpath.git
+cd devpath
+
+python -m venv venv
+venv\Scripts\activate
+
+pip install -r requirements.txt
+
+python app.py
+```
+
+## Verify Everything Works
+
+Run the test suite:
+
+```bash
+python tests/test_basic.py
+```
+
+Expected output:
+
+```bash
+All tests passed
+```
+
+---
+
+## Troubleshooting
+
+<details>
+<summary>Virtual Environment Issues</summary>
+
+### Linux/macOS
+
+If activation fails, verify Python 3 is installed:
+
+```bash
+python3 --version
+```
+
+### Windows PowerShell
+
+If you see:
+
+```powershell
+running scripts is disabled on this system
+```
+
+Run:
+
+```powershell
+Set-ExecutionPolicy -Scope Process RemoteSigned
+```
+
+Then activate the environment again:
+
+```powershell
+venv\Scripts\activate
+```
+
+</details>
+
+<details>
+<summary>Dependency & Flask Issues</summary>
+
+If dependency installation fails, first upgrade pip:
+
+```bash
+python -m pip install --upgrade pip
+```
+
+Ensure Python 3.9+ is installed:
+
+```bash
+python --version
+```
+
+Reinstall requirements without cache:
+
+```bash
+pip install -r requirements.txt --no-cache-dir
+```
+
+If Flask is still missing:
+
+```bash
+pip install flask
+```
+
+</details>
+
+<details>
+<summary>Port Already in Use</summary>
+
+If port 5000 is already in use, run the app on another port:
+
+```bash
+flask run --port 5001
+```
+
+Or stop the process currently using port 5000.
+
+</details>
+
+---
+
+## Project Structure
+
+```text
 devpath/
 ├── app.py                   Entry point (30 lines)
 ├── routes/main_routes.py    5 HTTP routes as a Blueprint
@@ -154,6 +326,22 @@ No backend changes needed. The engine picks it up on the next request.
 
 ---
 
+## First Timers Welcome
+
+New to open source? This project is designed for beginners.
+
+Start here:
+
+- Look for issues labeled `good first issue`
+- Read `CONTRIBUTING.md`
+- Ask questions in Discussions
+- Follow the PR template
+- Start with documentation or UI improvements
+
+Maintainers review beginner PRs with guidance and feedback.
+
+---
+
 ## Contributing
 
 <div align="center">
@@ -169,7 +357,7 @@ contribution, this is a good place to start.
 
 **Step-by-step process:**
 
-```
+```text
 1. Browse issues          github.com/komalharshita/devpath/issues
 2. Comment to claim       Leave a comment before starting
 3. Fork the repo          Fork button on GitHub
@@ -181,7 +369,7 @@ contribution, this is a good place to start.
 
 **Branch naming:**
 
-```
+```text
 feat/description          New feature
 fix/description           Bug fix
 docs/description          Documentation only
@@ -192,34 +380,11 @@ test/description          Test additions or fixes
 
 ---
 
-## Open Issues
-
-
-**Beginner**
-- Fix form label spacing on mobile screens
-- Improve submit button hover state
-- Add three new projects to the dataset
-- Add ARIA attributes to form inputs
-- Add inline comments to script.js
-
-**Intermediate**
-- Refactor scoring weights into a config dictionary
-- Improve roadmap timeline visual styling
-- Add live keyword filter to results section
-- Fix card overflow at 360px width
-
-**Advanced**
-- Add localStorage bookmarking system
-- Add session-based recently viewed projects
-- Cache JSON data in memory
-
----
-
 ## GSSoC 2026
 
 <div align="center">
 
-[![GSSoC 2025](https://img.shields.io/badge/GSSoC-2026%20Participant-fbbf24?style=for-the-badge&logo=opensourceinitiative&logoColor=0f1560)](https://gssoc.girlscript.tech)
+[![GSSoC 2026](https://img.shields.io/badge/GSSoC-2026%20Participant-fbbf24?style=for-the-badge&logo=opensourceinitiative&logoColor=0f1560)](https://gssoc.girlscript.tech)
 
 </div>
 
@@ -230,6 +395,34 @@ Before starting work: comment on the issue, then fork and branch. Do not
 open a PR for an issue that is not assigned or claimed in the comments.
 
 Read the full onboarding guide: [docs/contribution_guide.md](docs/contribution_guide.md)
+
+---
+
+## Community & Support
+
+Have questions, ideas, or feature suggestions?
+
+- Open a discussion:
+  https://github.com/komalharshita/devpath/discussions
+- Report bugs through Issues
+- Suggest new project ideas
+- Help improve beginner onboarding
+
+Community contributions and feedback are always welcome.
+
+---
+
+## Contributors
+
+Thanks to all the amazing people who contribute to DevPath.
+
+<div align="center">
+
+<a href="https://github.com/komalharshita/devpath/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=komalharshita/devpath" />
+</a>
+
+</div>
 
 ---
 
@@ -261,7 +454,6 @@ MIT — see [LICENSE](LICENSE)
 ---
 
 <div align="center">
-
 
 <br/>
 
