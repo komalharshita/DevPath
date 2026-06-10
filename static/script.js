@@ -577,57 +577,49 @@ updateProfileWidgets();
   // ----------------------------------------------------------
 
   form.addEventListener("submit", function (evt) {
-    evt.preventDefault(); //stop the browser from reloading the page on form submit
+    evt.preventDefault();
     clearAllErrors();
 
-    if (skillsTextInput.value.trim()) {
-      addSkill(skillsTextInput.value);
-      skillsTextInput.value = "";
+    if (skillsInput && skillsInput.value.trim()) {
+      if (typeof window.addSkill === "function") {
+        window.addSkill(skillsInput.value);
+      }
+      skillsInput.value = "";
       hideSuggestions();
     }
 
-    if (!validateForm()) return; //stop - anything missing/invalid
+    if (!validateForm()) return;
 
     setLoadingState(true);
 
-    // Allow browser to paint spinner before request starts
     requestAnimationFrame(function () {
-
-      //combine form values into an object to send to server/api
       var payload = {
-        // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-        skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
+        skills: JSON.stringify(selectedSkills),
         level: document.getElementById("level").value,
         interest: document.getElementById("interest").value,
         time: document.getElementById("time").value
       };
 
-      //post the data to backend api as JSON, then handle the response
       fetch("/api/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload) //convert object to json string
+        body: JSON.stringify(payload)
       })
         .then(function (res) {
-          return res.json(); //parse the response as JSON
+          return res.json().then(function(data) {
+            if (!res.ok) throw new Error(data.error || "Unable to generate recommendations.");
+            return data;
+          });
         })
         .then(function (data) {
           setLoadingState(false);
-
-          if (data.error) {
-            var generalErr = document.getElementById("form-error-general");
-            if (generalErr) generalErr.textContent = data.error;
-            return;
-          }
-
-          recordSearch();
+          if (typeof recordSearch === "function") recordSearch();
           renderResults(data.projects || [], data.message);
         })
         .catch(function (err) {
-          // this runs if the network request itself fails
           setLoadingState(false);
           var generalErr = document.getElementById("form-error-general");
-          if (generalErr) generalErr.textContent = "Something went wrong. Please try again.";
+          if (generalErr) generalErr.textContent = err.message || "An unexpected error occurred. Please try again.";
           console.error("API request failed:", err);
         });
     });
