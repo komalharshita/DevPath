@@ -125,6 +125,14 @@ html[data-theme="dark"] {
   --text-body:    #94a3b8;
   --text-light:   #64748b;
 
+  .dark {
+    background: #111;
+    color: white;
+}
+
+background: var(--bg);
+color: var(--text);
+
   /* ---- Border ---- */
   --border: #1e293b;
 

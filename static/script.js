@@ -12,6 +12,33 @@
       // Storage can be unavailable in private browsing.
     }
 
+    import { ThemeProvider } from "./context/ThemeContext";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <ThemeProvider>
+    <App />
+  </ThemeProvider>
+);
+
+<button onClick={toggleTheme}>
+    🌙
+</button>
+
+useEffect(() => {
+    document.documentElement.setAttribute(
+        "data-theme",
+        theme
+    );
+}, [theme]);
+
+const [theme, setTheme] = useState(
+    localStorage.getItem("theme") || "light"
+);
+
+useEffect(() => {
+    localStorage.setItem("theme", theme);
+}, [theme]);
+
     document.querySelectorAll(".theme-toggle").forEach(function (button) {
       button.setAttribute("aria-pressed", isDark ? "true" : "false");
       button.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
