@@ -4422,6 +4422,14 @@ html[data-theme="dark"] .btn-view-code-sm {
   border-radius: var(--r-full);
   background: var(--gray-100);
   color: var(--text-body);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  cursor: default;
+}
+
+.compare-tag:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  filter: brightness(0.95);
 }
 
 .compare-tag--a {
@@ -4429,15 +4437,27 @@ html[data-theme="dark"] .btn-view-code-sm {
   color: var(--indigo-700);
 }
 
+.compare-tag--a:hover {
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
+}
+
 .compare-tag--b {
   background: var(--purple-100);
   color: var(--purple-700);
+}
+
+.compare-tag--b:hover {
+  box-shadow: 0 4px 10px rgba(139, 92, 246, 0.25);
 }
 
 .compare-tag--shared {
   background: var(--green-100);
   color: #047857;
   font-weight: 600;
+}
+
+.compare-tag--shared:hover {
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
 }
 
 .compare-skills-venn {
@@ -4469,6 +4489,14 @@ html[data-theme="dark"] .btn-view-code-sm {
   font-weight: 600;
   padding: 5px 12px;
   border-radius: var(--r-full);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  cursor: default;
+}
+
+.compare-skill-chip:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  filter: brightness(0.95);
 }
 
 .compare-skill-chip--a {
@@ -4476,14 +4504,26 @@ html[data-theme="dark"] .btn-view-code-sm {
   color: var(--indigo-700);
 }
 
+.compare-skill-chip--a:hover {
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
+}
+
 .compare-skill-chip--b {
   background: var(--purple-100);
   color: var(--purple-700);
 }
 
+.compare-skill-chip--b:hover {
+  box-shadow: 0 4px 10px rgba(139, 92, 246, 0.25);
+}
+
 .compare-skill-chip--shared {
   background: var(--green-100);
   color: #047857;
+}
+
+.compare-skill-chip--shared:hover {
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
 }
 
 .compare-skill-empty {
