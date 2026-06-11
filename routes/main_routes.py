@@ -6,18 +6,18 @@
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
-from utils.data_loader import find_project_by_id, load_all_projects, get_project_stats
+from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats
+from utils.roadmap_comparer import load_all_career_roadmaps, compare_roadmaps
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
+from config import Config
 import os
 
 # Interest categories that currently have no project recommendations available
 NO_PROJECT_INTERESTS = {
     "machine learning/ai",
     "devops",
-    "mobile",
     "artificial intelligence",
     "cloud computing",
-    "mobile app development",
 }
 
 def interest_has_no_projects(interest):
@@ -31,7 +31,46 @@ main = Blueprint("main", __name__)
 def index():
     """Render the homepage with the skill input form and dynamic stats."""
     stats = get_project_stats()
-    return render_template("index.html", stats=stats)
+    available_levels = get_available_levels()
+
+    return render_template("index.html", stats=stats, available_levels=available_levels, config=Config)
+
+@main.route("/contact")
+def contact():
+    return render_template("contact.html")
+
+
+@main.route("/compare")
+def compare_page():
+    """Render the career roadmap comparison page."""
+    roadmaps = load_all_career_roadmaps()
+    return render_template("compare.html", roadmaps=roadmaps, config=Config)
+
+
+@main.route("/api/roadmaps")
+def list_roadmaps():
+    """Return all career roadmaps as JSON."""
+    return jsonify(load_all_career_roadmaps()), 200
+
+
+@main.route("/api/compare")
+def compare_roadmaps_api():
+    """Return a side-by-side comparison of two career roadmaps."""
+    roadmap_a = (request.args.get("a") or "").strip()
+    roadmap_b = (request.args.get("b") or "").strip()
+
+    if not roadmap_a or not roadmap_b:
+        return jsonify({"error": "Both 'a' and 'b' query parameters are required."}), 400
+
+    result = compare_roadmaps(roadmap_a, roadmap_b)
+
+    if result is None:
+        return jsonify({"error": "One or both roadmap IDs were not found."}), 404
+
+    if result.get("error"):
+        return jsonify(result), 400
+
+    return jsonify(result), 200
 
 @main.route("/health")
 def health_check():
@@ -55,7 +94,7 @@ def recommend():
         interest (str) - Web | Data | Education | Automation | Games
         time     (str) - Low | Medium | High
     """
-    payload = request.get_json()
+    payload = request.get_json(silent=True)
 
     if not payload:
         return jsonify({"error": "Request body must be valid JSON."}), 400
@@ -173,7 +212,7 @@ def sitemap():
     base = request.host_url.rstrip("/")
     projects = load_all_projects()
 
-    urls = [f"<url><loc>{base}/</loc></url>"]
+    urls = [f"<url><loc>{base}/</loc></url>", f"<url><loc>{base}/compare</loc></url>"]
     for p in projects:
         urls.append(f"<url><loc>{base}/project/{p['id']}</loc></url>")
 
@@ -191,3 +230,32 @@ def sitemap():
 def robots():
     """Serve robots.txt from the static folder."""
     return send_from_directory("static", "robots.txt", mimetype="text/plain")
+
+@main.route("/api/search")
+def search_projects():
+    """Return projects matching the user's search query."""
+
+    query = request.args.get("q", "").strip().lower()
+
+    if not query:
+        return jsonify([])
+
+    projects = load_all_projects()
+    filtered_projects = []
+
+    for project in projects:
+
+        # Combine searchable project fields into one lowercase string
+        searchable_text = " ".join([
+            project.get("title", ""),
+            project.get("description", ""),
+            project.get("interest", ""),
+            " ".join(project.get("skills", [])),
+            " ".join(project.get("tech_stack", [])),
+            " ".join(project.get("features", []))
+        ]).lower()
+
+        if query in searchable_text:
+            filtered_projects.append(project)
+
+    return jsonify(filtered_projects)

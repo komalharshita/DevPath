@@ -7,14 +7,20 @@
   <title>{{ project.title }} — {{ project.level }}{% if project.skills %} {{ project.skills[0] }}{% endif %} Project | DevPath</title>
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
   {% include 'partials/theme_head.html' %}
+  
+  <!-- Open Graph meta tags for social media sharing -->
   <meta property="og:title" content="{{ project.title }} — DevPath" />
   <meta property="og:description" content="{{ project.description[:155] }}" />
+  <meta property="og:image" content="{{ config.get_og_image_url() }}" />
+  <meta property="og:url" content="{{ config.get_base_url() }}/project/{{ project.id }}" />
   <meta property="og:type" content="article" />
-  <meta property="og:url" content="https://mydevpath-github.vercel.app/project/{{ project.id }}" />
-
-  <meta name="twitter:card" content="summary" />
+  <meta property="og:site_name" content="{{ config.SITE_NAME }}" />
+  
+  <!-- Twitter Card meta tags -->
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="{{ project.title }} — DevPath" />
   <meta name="twitter:description" content="{{ project.description[:155] }}" />
+  <meta name="twitter:image" content="{{ config.get_og_image_url() }}" />
   <link rel="stylesheet" href="/static/style.css" />
   <link
     href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
@@ -45,7 +51,7 @@
     <!-- Mobile menu for project detail page -->
     <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
       <a href="/" class="nav-mobile-link" role="menuitem">Back to Search</a>
-      <a href="https://github.com" target="_blank" rel="noopener noreferrer"
+      <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
          class="nav-mobile-link" role="menuitem">GitHub</a>
       <!-- Theme toggle in mobile menu -->
       <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile"
@@ -164,7 +170,7 @@
             </ul>
           </section>
 
-          <!-- Roadmap Section with visual timeline -->
+          <!-- Roadmap Section -->
           <section class="detail-section">
             <div class="detail-section-header">
               <div class="detail-section-icon">
@@ -175,21 +181,32 @@
               </div>
               <h2>Project Roadmap</h2>
             </div>
+
             <p class="detail-section-sub">Follow these steps in order. Each one builds on the previous.</p>
 
-            <!-- Vertical timeline list — each step is one milestone -->
-            <ol class="roadmap-timeline">
+            <div class="roadmap-progress-wrap">
+              <div class="roadmap-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                aria-valuenow="0" aria-label="Roadmap completion progress">
+                <div id="roadmap-progress-fill"></div>
+              </div>
+              <span id="roadmap-progress-text" aria-live="polite">0% completed</span>
+            </div>
+
+            <ol class="roadmap-timeline" id="roadmap-list">
               {% for step in project.roadmap %}
-              <li class="roadmap-step">
+              <li class="roadmap-step" data-step="step-{{ loop.index }}">
                 <div class="roadmap-marker">
                   <span class="roadmap-dot"></span>
                   <span class="roadmap-line"></span>
                 </div>
                 <div class="roadmap-content">
-                  <!-- Step number badge derived from loop index -->
-                  <span class="roadmap-step-num">Step {{ loop.index }}</span>
-                  <!-- Strip the "Step N:" prefix if present in the data -->
-                  <p class="roadmap-step-text">{{ step | replace("Step " + loop.index|string + ": ", "") }}</p>
+                  <label class="roadmap-step-label">
+                    <input type="checkbox" class="roadmap-checkbox">
+                    <div class="roadmap-text-wrap">
+                      <span class="roadmap-step-num">Step {{ loop.index }}</span>
+                      <p class="roadmap-step-text">{{ step | replace("Step " ~ loop.index ~ ": ", "") }}</p>
+                    </div>
+                  </label>
                 </div>
               </li>
               {% endfor %}
@@ -300,6 +317,7 @@
               <button class="btn-view-code-sm" id="btn-view-code-sm">View Code</button>
               <a href="/project/{{ project.id }}/download" class="btn-download-sm">Download</a>
             </div>
+            <button id="btn-mark-complete" class="btn-ghost btn-mark-complete" type="button">Mark Project Complete</button>
           </div>
 
         </aside>
@@ -352,6 +370,8 @@
     Copied to clipboard!
   </div>
 
+  <div class="achievement-toast" id="achievement-toast" role="status" aria-live="polite"></div>
+
   <!-- ============================================================
      Project Navigation
      ============================================================ -->
@@ -398,9 +418,10 @@
   <!-- Scroll-to-top button -->
   <button id="scroll-top-btn" aria-label="Back to top" title="Back to top">↑</button>
 
-  <!-- Pass project ID to the JavaScript without hardcoding -->
+  <!-- Pass project metadata to the JavaScript without hardcoding -->
   <script>
-    var PROJECT_ID = parseInt("{{ project.id }}", 10);
+    var PROJECT_ID = {{ project.id | tojson }};
+    var PROJECT_TITLE = {{ project.title | tojson }};
   </script>
   <script src="/static/script.js"></script>
 </body>

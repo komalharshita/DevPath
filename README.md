@@ -145,24 +145,126 @@ E --> H[Learning Resources]
 
 ## Quick Start
 
+### Linux/macOS Setup
+
 ```bash
 git clone https://github.com/komalharshita/devpath.git
 cd devpath
-python -m venv venv
-source venv/bin/activate          # Windows: venv\Scripts\activate
 
-# Shortcuts using the Makefile
-make install                      # Installs dependencies
-make run                          # Starts the development server
+python3 -m venv venv
+source venv/bin/activate
+
+pip install -r requirements.txt
+
+python app.py
 ```
 
-**http://127.0.0.1:5000** — that is the entire setup.
+### Windows Setup
+
+```powershell
+git clone https://github.com/komalharshita/devpath.git
+cd devpath
+
+python -m venv venv
+venv\Scripts\activate
+
+pip install -r requirements.txt
+
+python app.py
+```
+
+## Verify Everything Works
+
+Run the test suite:
 
 ```bash
-# Verify everything works using the Makefile shortcut
-make test
-# 29 passed, 0 failed out of 29 tests
+python tests/test_basic.py
 ```
+
+Expected output:
+
+```bash
+All tests passed
+```
+
+---
+
+## Troubleshooting
+
+<details>
+<summary>Virtual Environment Issues</summary>
+
+### Linux/macOS
+
+If activation fails, verify Python 3 is installed:
+
+```bash
+python3 --version
+```
+
+### Windows PowerShell
+
+If you see:
+
+```powershell
+running scripts is disabled on this system
+```
+
+Run:
+
+```powershell
+Set-ExecutionPolicy -Scope Process RemoteSigned
+```
+
+Then activate the environment again:
+
+```powershell
+venv\Scripts\activate
+```
+
+</details>
+
+<details>
+<summary>Dependency & Flask Issues</summary>
+
+If dependency installation fails, first upgrade pip:
+
+```bash
+python -m pip install --upgrade pip
+```
+
+Ensure Python 3.9+ is installed:
+
+```bash
+python --version
+```
+
+Reinstall requirements without cache:
+
+```bash
+pip install -r requirements.txt --no-cache-dir
+```
+
+If Flask is still missing:
+
+```bash
+pip install flask
+```
+
+</details>
+
+<details>
+<summary>Port Already in Use</summary>
+
+If port 5000 is already in use, run the app on another port:
+
+```bash
+flask run --port 5001
+```
+
+Or stop the process currently using port 5000.
+
+</details>
 
 ---
 

@@ -4,8 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Page Not Found — DevPath</title>
+  <meta name="robots" content="noindex" />
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
   {% include 'partials/theme_head.html' %}
+  
+  <!-- Open Graph meta tags for social media sharing -->
+  <meta property="og:title" content="Page Not Found — DevPath" />
+  <meta property="og:description" content="The page you are looking for does not exist. Head back to DevPath to find your next coding project." />
+  <meta property="og:image" content="{{ config.get_og_image_url() }}" />
+  <meta property="og:url" content="{{ config.get_base_url() }}/" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="stylesheet" href="/static/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
 </head>

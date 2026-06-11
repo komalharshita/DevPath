@@ -18,7 +18,12 @@ import pytest
 # Allow imports from the project root when running tests directly
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from utils.data_loader import load_all_projects, find_project_by_id, clear_cache
+from utils.data_loader import load_all_projects, find_project_by_id, clear_cache, validate_projects
+from utils.roadmap_comparer import (
+    load_all_career_roadmaps,
+    compare_roadmaps,
+    clear_roadmap_cache,
+)
 from utils.recommender import (
     get_recommendations,
     validate_recommendation_inputs,
@@ -38,6 +43,7 @@ from app import app, internal_server_error
 def setup_module():
     """Clear the data cache before running the test suite to ensure clean state."""
     clear_cache()
+    clear_roadmap_cache()
 
 
 # ============================================================
@@ -50,6 +56,107 @@ def test_projects_json_loads():
     assert isinstance(projects, list), "Expected a list of projects"
     assert len(projects) > 0, "Project list must not be empty"
 
+def test_duplicate_ids_detected():
+    projects = [
+        {
+            "id": 1,
+            "title": "Project A",
+            "skills": [],
+            "level": "Beginner",
+            "interest": "AI",
+            "time": "1 week",
+            "description": "desc",
+            "features": [],
+            "tech_stack": [],
+            "roadmap": [],
+            "resources": [],
+            "starter_code": "code"
+        },
+        {
+            "id": 1,
+            "title": "Project B",
+            "skills": [],
+            "level": "Beginner",
+            "interest": "AI",
+            "time": "1 week",
+            "description": "desc",
+            "features": [],
+            "tech_stack": [],
+            "roadmap": [],
+            "resources": [],
+            "starter_code": "code"
+        }
+    ]
+
+    with pytest.raises(ValueError):
+        validate_projects(projects)
+
+def test_duplicate_titles_detected():
+    projects = [
+        {
+            "id": 1,
+            "title": "AI Resume Builder",
+            "skills": [],
+            "level": "Beginner",
+            "interest": "AI",
+            "time": "1 week",
+            "description": "desc",
+            "features": [],
+            "tech_stack": [],
+            "roadmap": [],
+            "resources": [],
+            "starter_code": "code"
+        },
+        {
+            "id": 2,
+            "title": "ai resume builder",
+            "skills": [],
+            "level": "Beginner",
+            "interest": "AI",
+            "time": "1 week",
+            "description": "desc",
+            "features": [],
+            "tech_stack": [],
+            "roadmap": [],
+            "resources": [],
+            "starter_code": "code"
+        }
+    ]
+
+    with pytest.raises(ValueError):
+        validate_projects(projects)
+
+def test_empty_title_detected():
+    projects = [
+        {
+            "id": 1,
+            "title": "",
+            "skills": [],
+            "level": "Beginner",
+            "interest": "AI",
+            "time": "1 week",
+            "description": "desc",
+            "features": [],
+            "tech_stack": [],
+            "roadmap": [],
+            "resources": [],
+            "starter_code": "code"
+        }
+    ]
+
+    with pytest.raises(ValueError):
+        validate_projects(projects)
+
+def test_missing_required_field_detected():
+    projects = [
+        {
+            "id": 1,
+            "title": "Project A"
+        }
+    ]
+
+    with pytest.raises(ValueError):
+        validate_projects(projects)
 
 def test_each_project_has_required_fields():
     """Every project must have the fields the UI depends on."""
@@ -93,6 +200,32 @@ def test_parse_skills_empty_string():
 def test_parse_skills_single_entry():
     """parse_skills should handle a single skill with no commas."""
     assert parse_skills("JavaScript") == ["javascript"]
+
+
+def test_parse_skills_valid_json_array():
+    """parse_skills should parse a valid JSON array of skills."""
+    result = parse_skills('["Python","React"]')
+    assert result == ["python", "react"]
+
+
+def test_parse_skills_malformed_json_handling():
+    """parse_skills should handle malformed JSON gracefully using fallback."""
+    # Should not crash, and parses via fallback comma-splitting behavior
+    result = parse_skills('["Python",]')
+    assert isinstance(result, list)
+    assert len(result) > 0
+
+
+def test_parse_skills_legacy_fallback():
+    """parse_skills should parse a legacy comma-separated string."""
+    result = parse_skills("Python,React")
+    assert result == ["python", "react"]
+
+
+def test_parse_skills_containing_commas():
+    """parse_skills should preserve skill names containing commas when using JSON."""
+    result = parse_skills('["HTML, CSS","JavaScript"]')
+    assert result == ["html, css", "javascript"]
 
 
 def test_score_single_project_full_match():
@@ -240,6 +373,20 @@ def test_get_recommendations_result_format():
     for project in results:
         assert "id" in project
         assert "title" in project
+
+
+def test_case_insensitive_recommendations_identical():
+    """Lowercase and titlecase skill inputs must produce identical recommendations."""
+    results_lower = get_recommendations("python", "Beginner", "Data", "Low")
+    results_title = get_recommendations("Python", "Beginner", "Data", "Low")
+    assert [p["id"] for p in results_lower] == [p["id"] for p in results_title]
+
+
+def test_whitespace_stripped_in_skills():
+    """Leading/trailing whitespace in the skills string must be ignored."""
+    results_clean = get_recommendations("python", "Beginner", "Data", "Low")
+    results_spaced = get_recommendations("   python  ", "Beginner", "Data", "Low")
+    assert [p["id"] for p in results_clean] == [p["id"] for p in results_spaced]
 
 
 # ============================================================
@@ -430,9 +577,13 @@ def test_download_code_found():
 
 
 def test_view_code_nested_path():
-    """Project 9 has a nested starter_code path; /code should still return 200."""
+    """A project with a nested starter_code path should still return 200."""
     client = get_client()
-    response = client.get("/project/9/code")
+    project = next(
+        p for p in load_all_projects()
+        if "/" in p["starter_code"].replace("starter_code/", "")
+    )
+    response = client.get(f"/project/{project['id']}/code")
     assert response.status_code == 200
     data = response.get_json()
     assert "code" in data
@@ -441,9 +592,13 @@ def test_view_code_nested_path():
 
 
 def test_download_code_nested_path():
-    """Project 9 has a nested starter_code path; /download should still return 200."""
+    """A project with a nested starter_code path should still download."""
     client = get_client()
-    response = client.get("/project/9/download")
+    project = next(
+        p for p in load_all_projects()
+        if "/" in p["starter_code"].replace("starter_code/", "")
+    )
+    response = client.get(f"/project/{project['id']}/download")
     assert response.status_code == 200
 
 
@@ -470,7 +625,31 @@ def test_scoring_weights_has_all_keys():
     expected_keys = {"skill", "level", "interest", "time"}
     assert set(SCORING_WEIGHTS.keys()) == expected_keys
 
+def test_search_api_returns_results():
+    """Search API should return matching projects for a valid query."""
+    client = get_client()
+    response = client.get("/api/search?q=python")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert isinstance(data, list)
 
+def test_search_api_empty_query():
+    """Search API should return an empty list for blank queries."""
+    client = get_client()
+    response = client.get("/api/search?q=")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data == []
+
+def test_search_api_no_match():
+    """Search should return empty list for nonsense query."""
+    client = get_client()
+    response = client.get("/api/search?q=nonexistentqueryxyz")
+    assert response.status_code == 200
+
+    data = response.get_json()
+    assert isinstance(data, list)
+    assert len(data) == 0
 # ============================================================
 # Sitemap and robots.txt tests
 # ============================================================
@@ -535,6 +714,91 @@ def test_project_links_have_noopener():
     assert response.status_code == 200
     assert b'target="_blank"' in response.data
     assert b'rel="noopener noreferrer"' in response.data
+
+
+# ============================================================
+# Career roadmap comparison tests
+# ============================================================
+
+def test_career_roadmaps_load():
+    """Career roadmaps JSON must load and contain entries."""
+    roadmaps = load_all_career_roadmaps()
+    assert isinstance(roadmaps, list)
+    assert len(roadmaps) >= 2
+
+
+def test_compare_roadmaps_finds_overlap():
+    """Comparing frontend and fullstack should find shared skills."""
+    result = compare_roadmaps("frontend", "fullstack")
+    assert result is not None
+    assert "overlapping_skills" in result
+    assert len(result["overlapping_skills"]) > 0
+    assert result["roadmap_a"]["id"] == "frontend"
+    assert result["roadmap_b"]["id"] == "fullstack"
+
+
+def test_compare_same_roadmap_returns_error():
+    """Comparing a roadmap with itself should return an error message."""
+    result = compare_roadmaps("react", "react")
+    assert result is not None
+    assert "error" in result
+
+
+def test_compare_invalid_roadmap_returns_none():
+    """Unknown roadmap IDs should return None."""
+    assert compare_roadmaps("nonexistent", "frontend") is None
+
+
+def test_compare_page_route():
+    """Compare page should render successfully."""
+    client = get_client()
+    response = client.get("/compare")
+    assert response.status_code == 200
+    assert b"Compare Learning Roadmaps" in response.data
+
+
+def test_list_roadmaps_api():
+    """API should return all career roadmaps."""
+    client = get_client()
+    response = client.get("/api/roadmaps")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert isinstance(data, list)
+    assert len(data) >= 2
+
+
+def test_compare_api():
+    """Compare API should return structured comparison data."""
+    client = get_client()
+    response = client.get("/api/compare?a=react&b=angular")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["roadmap_a"]["id"] == "react"
+    assert data["roadmap_b"]["id"] == "angular"
+    assert "metrics" in data
+    assert "overlapping_skills" in data
+
+
+def test_compare_api_missing_params():
+    """Compare API should reject requests missing query params."""
+    client = get_client()
+    response = client.get("/api/compare?a=react")
+    assert response.status_code == 400
+
+
+def test_compare_api_not_found():
+    """Compare API should 404 for invalid roadmap IDs."""
+    client = get_client()
+    response = client.get("/api/compare?a=invalid&b=alsoinvalid")
+    assert response.status_code == 404
+
+
+def test_sitemap_includes_compare():
+    """Sitemap should include the compare page."""
+    client = get_client()
+    response = client.get("/sitemap.xml")
+    assert response.status_code == 200
+    assert b"/compare" in response.data
 
 
 
