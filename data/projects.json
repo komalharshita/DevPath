@@ -416,7 +416,7 @@
     "starter_code": "starter_code/survey_form/index.html"
   },
   {
-    "id": 10,
+    "id": 12,
     "title": "API ETL Pipeline",
     "skills": ["Python", "pandas", "requests"],
     "level": "Intermediate",
@@ -503,7 +503,7 @@
     "starter_code": "starter_code/ai_resume_analyzer.py"
   },
   {
-    "id": 11,
+    "id": 14,
     "title": "Number Guessing Game",
     "skills": [
       "Python"
@@ -539,7 +539,7 @@
     "starter_code": "starter_code/number_guessing.py"
   },
   {
-    "id": 12,
+    "id": 15,
     "title": "Simple Email Automation",
     "skills": [
       "Python"
@@ -576,7 +576,7 @@
     "starter_code": "starter_code/email_automation.py"
   },
   {
-    "id": 13,
+    "id": 16,
     "title": "Quiz App",
     "skills": [
       "HTML",
@@ -616,7 +616,7 @@
     "starter_code": "starter_code/quiz_app.html"
   },
   {
-    "id": 14,
+    "id": 17,
     "title": "File Organiser Script",
     "skills": ["Python"],
     "level": "Beginner",
@@ -647,7 +647,7 @@
     "starter_code": "starter_code/file_organiser.py"
   },
   {
-    "id": 15,
+    "id": 18,
     "title": "Flashcard Study App",
     "skills": ["HTML", "CSS", "JavaScript"],
     "level": "Beginner",
@@ -678,7 +678,7 @@
     "starter_code": "starter_code/flashcard_app.html"
   },
   {
-    "id": 16,
+    "id": 19,
     "title": "Budget Tracker Web App",
     "skills": ["HTML", "CSS", "JavaScript"],
     "level": "Intermediate",
@@ -710,7 +710,7 @@
     "starter_code": "starter_code/budget_tracker.html"
   },
   {
-    "id": 17,
+    "id": 20,
     "title": "Network Port Scanner",
     "skills": ["Python"],
     "level": "Intermediate",
@@ -741,7 +741,7 @@
     "starter_code": "starter_code/port_scanner.py"
   },
   {
-    "id": 18,
+    "id": 21,
     "title": "Typing Speed Test",
     "skills": ["HTML", "CSS", "JavaScript"],
     "level": "Beginner",
@@ -773,7 +773,7 @@
     "starter_code": "starter_code/typing_test.html"
   },
   {
-    "id": 19,
+    "id": 22,
     "title": "Course Progress Tracker",
     "skills": ["Python"],
     "level": "Intermediate",
