@@ -53,12 +53,33 @@ _CLUSTERS_PATH = os.path.join(
 
 def parse_skills(skills_string):
     """
-    Convert a raw comma-separated skills string into
-    a normalized lowercase list.
-
+    Convert a raw skills string into a normalized lowercase list.
+    
+    Handles three formats:
+      1. JSON array: '["Python", "React"]' -> ["python", "react"]
+      2. Comma-separated: "Python, React" -> ["python", "react"]
+      3. Single skill: "Python" -> ["python"]
+    
     Example:
         "JS, HTML5, CSS3" -> ["javascript", "html", "css"]
     """
+    if not skills_string or not skills_string.strip():
+        return []
+    
+    # Try parsing as JSON first
+    try:
+        parsed = json.loads(skills_string.strip())
+        if isinstance(parsed, list):
+            raw_skills = [
+                str(s).strip().lower()
+                for s in parsed
+                if s
+            ]
+            return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
+    except (json.JSONDecodeError, ValueError):
+        pass  # Fall back to comma-splitting
+    
+    # Fallback: split by commas
     raw_skills = [
         s.strip().lower()
         for s in skills_string.split(",")
@@ -104,7 +125,12 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
     # Count how many user skills overlap with the
     # skills required by the current project.
     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
-    score += matched_skills * SCORING_WEIGHTS["skill"]
+    
+    # Calculate coverage: what % of project's required skills do you have?
+    project_skill_count = len(project_skills)
+    if project_skill_count > 0:
+        coverage = matched_skills / project_skill_count
+        score += matched_skills * SCORING_WEIGHTS["skill"] * coverage
 
     if project.get("level", "").lower() == level.lower():
         score += SCORING_WEIGHTS["level"]
@@ -172,22 +198,38 @@ def _get_related(recommended_ids, all_projects, cluster_data):
 
 
 # ---------------------------------------------------------------------------
+# Valid values lists
+# ---------------------------------------------------------------------------
+
+VALID_LEVELS = ["beginner", "intermediate", "advanced"]
+VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
+VALID_INTERESTS = [
+    "web",
+    "data",
+    "education",
+    "automation",
+    "games",
+    "cybersecurity",
+    "devops",
+    "backend",
+    "tools",
+    "productivity",
+    "business logic",
+    "mobile",
+    "machine learning/ai"
+]
+
+
+# ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 
 def get_recommendations(skills_string, level, interest, time_availability):
     """
-    Return the top N recommended projects for the given user inputs,
-    along with related projects from the same cluster.
+    Return the top N recommended projects for the given user inputs.
 
-    Return shape:
-        {
-            "recommendations": [ <project>, ... ],  # up to MAX_RESULTS
-            "related":         [ <project>, ... ],  # up to MAX_RELATED
-        }
-
-    The "related" list is empty when clusters.json does not exist yet.
-    Run scripts/cluster_projects.py to generate it.
+    Return value: A list of project dicts (up to MAX_RESULTS).
+    Each project is a full project object with all fields.
     """
     user_skills  = parse_skills(skills_string)
     all_projects = load_all_projects()
@@ -202,19 +244,8 @@ def get_recommendations(skills_string, level, interest, time_availability):
 
     scored.sort(key=lambda item: item["score"], reverse=True)
     top_projects = [item["project"] for item in scored[:MAX_RESULTS]]
-    top_ids      = [p["id"] for p in top_projects]
 
-    cluster_data = _load_clusters()
-    related = _get_related(top_ids, all_projects, cluster_data) if cluster_data else []
-
-    return {
-        "recommendations": top_projects,
-        "related":         related,
-    }
-
-
-VALID_LEVELS = ["beginner", "intermediate", "advanced"]
-VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
+    return top_projects
 
 
 def validate_recommendation_inputs(skills, level, interest, time_availability):
