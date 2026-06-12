@@ -823,3 +823,22 @@ if __name__ == "__main__":
     print(f"\n{passed} passed, {failed} failed out of {passed + failed} tests")
     if failed > 0:
         sys.exit(1)
+
+def test_ml_similarity_score_returns_float():
+    from utils.recommender import ml_similarity_score, parse_skills
+    projects = load_all_projects()
+    score = ml_similarity_score(
+        projects[0],
+        parse_skills("Python"),
+        "Beginner",
+        "Data",
+        "Low",
+        projects,
+    )
+    assert isinstance(score, float)
+    assert score >= 0
+
+def test_ml_recommendation_prefers_relevant_python_data_project():
+    results = get_recommendations("Python, pandas", "Intermediate", "Data", "High")
+    titles = [project["title"] for project in results]
+    assert any("Data" in title or "Pipeline" in title for title in titles)

@@ -6,6 +6,9 @@ DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "projects.json
 _projects_cache = None
 _cache_lock = threading.Lock()
 
+_projects_cache = None
+_cache_lock = threading.Lock()
+
 def validate_projects(projects):
     """
     Validate project dataset integrity.
@@ -96,7 +99,6 @@ def get_project_stats():
         "unique_skills": len(all_skills),
         "beginner_friendly": beginner_friendly,
     }
-
 
 def clear_cache():
     """Reset the in-memory project cache (used in tests)."""

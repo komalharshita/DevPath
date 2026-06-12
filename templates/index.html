@@ -41,6 +41,65 @@
     <div class="nav-inner">
       <a href="/" class="nav-logo">Dev<span class="nav-logo-accent">Path</span></a>
 
+      <form id="topic-search-form" class="navbar-search">
+          <input
+            type="text"
+            id="topic-search"
+            autocomplete="on"
+            aria-label="Search projects"
+            placeholder="Search Projects"
+          />
+
+          <button class="glass-search-btn" type="submit" aria-label="Search">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </button>
+        </form>
+      
+      <div class="nav-links">
+        <a href="#home" class="nav-link">Home</a>
+        <a href="#how-it-works" class="nav-link">How It Works</a>
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#the-project" class="nav-link">Find Project</a>
+        <a href="#find-project" class="nav-link">Find Project</a>
+        <a href="/contact" class="nav-link">Contact Us</a>
+        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-btn-outline">GitHub</a>
+       
+        <button class="theme-toggle" id="theme-toggle-desktop"
+                aria-pressed="false"
+                aria-label="Switch to dark mode">
+          <!-- Moon icon: shown in light mode (clicking switches to dark) -->
+          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <!-- Sun icon: shown in dark mode (clicking switches to light) -->
+          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
       <form id="topic-search-form" class="navbar-search" role="search">
         <input
           type="search"
@@ -177,7 +236,7 @@
 
 
         <div class="hero-cta-row">
-          <a href="#find-project" class="btn-hero-primary">Start Finding Projects</a>
+          <a href="#the-project" class="btn-hero-primary">Start Finding Projects</a>
           <a href="#how-it-works" class="btn-hero-ghost">See How It Works</a>
         </div>
       </div>
@@ -469,7 +528,7 @@
           </div>
           <h3>Personalized Matches</h3>
           <p>Projects are scored against your exact skills, level, and interest — not pulled from a generic list.</p>
-          <a href="#find-project" class="feature-card-link">Try it now</a>
+          <a href="#the-project" class="feature-card-link">Try it now</a>
         </div>
 
         <div class="feature-card feature-card--yellow">
@@ -481,7 +540,7 @@
           </div>
           <h3>Step-by-Step Roadmaps</h3>
           <p>Each project includes a numbered roadmap so you always know what to build next, without guessing.</p>
-          <a href="#find-project" class="feature-card-link">Explore roadmaps</a>
+          <a href="#the-project" class="feature-card-link">Explore roadmaps</a>
         </div>
 
         <div class="feature-card feature-card--purple">
@@ -493,6 +552,8 @@
             </svg>
           </div>
           <h3>Starter Code Included</h3>
+          <p>Download a working template for every project. Skip the blank-page problem and start building immediately.</p>
+          <a href="#the-project" class="feature-card-link">Get starter code</a>
           <p>Download a working template for every project. Skip the blank-page problem and start building immediately.
           </p>
           <a href="#find-project" class="feature-card-link">Get starter code</a>
@@ -505,10 +566,10 @@
   <!-- ============================================================
        Find Project Form Section
        ============================================================ -->
-  <section class="form-section" id="find-project">
+  <section class="form-section" id="the-project">
     <div class="container">
       <div class="section-eyebrow">Get Your Recommendations</div>
-      <h2 class="section-title">Find Your Next Project</h2>
+      <h2 class="section-title">Find The Project</h2>
       <p class="section-sub">Fill in your details below and DevPath will match you to the most relevant projects.</p>
 
       <div class="form-card-outer">
@@ -528,8 +589,12 @@
                     </span>
                   </button>
                 </label>
-
-                <!-- Inline GitHub Trigger -->
+                
+                <!-- Reset button and Inline GitHub Trigger -->
+                <div style="display: flex; gap: 3px; align-items: center;">
+                   <button type="reset" id="reset-btn" class="btn-clear" style="padding: 4px 12px; font-size: 0.75rem;">
+                    Reset
+                  </button>
                 <div class="github-inline-trigger" id="github-trigger-wrap" style="line-height: 1.2;">
                   <button type="button" id="btn-show-github" class="resource-link"
                     style="padding: 4px 8px; border-radius: var(--r-xs); font-size: 0.75rem; gap: 6px;">
@@ -540,9 +605,26 @@
                     <span>Import from GitHub</span>
                   </button>
                 </div>
+                </div>
               </div>
               <div class="skill-input-wrap" id="skill-input-wrap">
                 <div class="skill-chips-selected" id="skill-chips-selected"></div>
+                <div class="skill-multiselect-wrapper">
+                  <input
+                    type="text"
+                    id="skills-input" 
+                    placeholder="Type a skill and press Enter or select from dropdown..."
+                    autocomplete="off"
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                    aria-controls="skills-suggestions"
+                  />
+                  <button type="button" id="skills-dropdown-toggle" class="skill-dropdown-btn" aria-label="Toggle skills dropdown">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                </div>
+                <div id="skills-suggestions" class="skills-suggestions skills-dropdown" style="display: none; max-height: 250px; overflow-y: auto; border: 1px solid var(--color-border); border-top: none; background: white; position: absolute; width: 100%; margin-top: -2px; z-index: 10;"></div>
+                <input type="text" id="skills-input" placeholder="Type a skill and press Enter..." autocomplete="off" />
                 <input type="text" id="skills-input" placeholder="Type a skill and press Enter..."
   autocomplete="off"
   aria-haspopup="listbox"
@@ -683,13 +765,9 @@
             <div class="form-actions">
               <button type="submit" class="btn-submit" id="submit-btn">
                 <span id="btn-label">Generate My Projects</span>
-                <span id="btn-loading" style="display:none;">Finding matches...</span>
-              </button>
-
-              <button type="button" class="btn-clear" id="clear-filters-btn">
-                <span>Clear Filters</span>
-              </button>
-            </div>
+              <span id="btn-loading" style="display:none;">Finding matches...</span>
+            </button>
+        </div>
 
           </form>
         </div>
@@ -757,7 +835,7 @@
       <div class="cta-inner">
         <h2>Start Building.<br><span class="cta-accent">A New Skill</span> Awaits.</h2>
         <p>Find a project that challenges you and grow with every line of code.</p>
-        <a href="#find-project" class="btn-cta">Find My Project</a>
+        <a href="#the-project" class="btn-cta">Find My Project</a>
       </div>
     </div>
   </section>
@@ -809,6 +887,7 @@
           <li><a href="#home">Home</a></li>
           <li><a href="#how-it-works">How It Works</a></li>
           <li><a href="#features">Features</a></li>
+          <li><a href="#the-project">Find Project</a></li>
           <li><a href="#find-project">Find Project</a></li>
           <li><a href="/contact">Contact Us</a></li>
         </ul>
@@ -919,6 +998,7 @@
   </button>
 
     <script src="/static/data/skills.js"></script>
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
 
   <script src="/static/script.js"></script>
   <script>

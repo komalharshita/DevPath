@@ -1738,6 +1738,83 @@ label {
   box-shadow: none;
 }
 
+/* Multi-select wrapper for skills input */
+.skill-multiselect-wrapper {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 140px;
+  gap: 4px;
+  position: relative;
+}
+
+.skill-dropdown-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  color: var(--gray-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--t);
+  flex-shrink: 0;
+}
+
+.skill-dropdown-btn:hover {
+  color: var(--indigo-600);
+}
+
+.skill-dropdown-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Multi-select dropdown styling */
+.skills-dropdown.show {
+  display: block;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.skills-dropdown .suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.skills-dropdown .suggestion-item::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--gray-300);
+  border-radius: 3px;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.skills-dropdown .suggestion-item.selected::before {
+  background: var(--indigo-600);
+  border-color: var(--indigo-600);
+  box-shadow: inset 0 0 0 2px var(--white);
+}
+
+.skills-dropdown .suggestion-item:hover {
+  background: var(--indigo-50);
+}
+
+/*suggestions dropdown*/
 /* Suggestions dropdown */
 .skills-suggestions {
   position: absolute;
@@ -3514,9 +3591,9 @@ input[type="text"]:not(.skill-input-wrap input):focus {
   color: #e6edf3;
 }
 
-/* =============================================================
+/* 
    SECTION 21: ERROR PAGES
-   ============================================================= */
+ */
 .error-page {
   min-height: 100vh;
   display: flex;
@@ -3579,9 +3656,9 @@ input[type="text"]:not(.skill-input-wrap input):focus {
   outline-offset: var(--focus-ring-offset);
 }
 
-/* =============================================================
+/* 
    SECTION 22: SCROLL NAVIGATION BUTTON
-   ============================================================= */
+ */
 #scroll-top-btn {
   position: fixed;
   bottom: 2rem;
@@ -3624,9 +3701,9 @@ input[type="text"]:not(.skill-input-wrap input):focus {
   }
 }
 
-/* =============================================================
+/* 
    SECTION 23: RESPONSIVE BREAKPOINTS
-   ============================================================= */
+ */
 @media (max-width: 1024px) {
   .hero-inner {
     grid-template-columns: 1fr;
@@ -3816,11 +3893,11 @@ input[type="text"]:not(.skill-input-wrap input):focus {
   }
 }
 
-/* =============================================================
+/* 
    SECTION 24: DARK MODE — COMPONENT-SPECIFIC OVERRIDES
    Only for cases where CSS variables alone cannot reach the target
    (e.g., border-trick chevrons, elements with inherited light values).
-   ============================================================= */
+    */
 
 /* Select chevron arrow uses border colours, not text colour */
 html[data-theme="dark"] .select-wrap::after {
@@ -3952,9 +4029,374 @@ html[data-theme="dark"] .btn-view-code-sm {
   border-color: rgba(99, 102, 241, 0.4);
 }
 
-/* =============================================================
+#scroll-top-btn.visible {
+    display: flex;
+}
+
+/* DARK MODE */
+body.dark-theme {
+  background: #0b1120;
+  color: #f8fafc;
+}
+
+/* NAVBAR */
+body.dark-theme .navbar {
+  background: rgba(10, 15, 35, 0.96);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+body.dark-theme .nav-link,
+body.dark-theme .nav-mobile-link {
+  color: rgba(255,255,255,0.82);
+}
+
+body.dark-theme .nav-link:hover,
+body.dark-theme .nav-mobile-link:hover {
+  color: white;
+}
+
+body.dark-theme .nav-logo {
+  color: white;
+}
+
+body.dark-theme .nav-logo-accent {
+  color: #facc15;
+}
+
+/* hamburger */
+
+body.dark-theme .nav-mobile-toggle span {
+  background: white;
+}
+
+body.dark-theme .nav-mobile-menu {
+  background: #131c31;
+}
+
+/* HERO */
+body.dark-theme .hero {
+  background:
+    radial-gradient(circle at top left,
+      rgba(99,102,241,0.22),
+      transparent 32%),
+    linear-gradient(
+      135deg,
+      #0f172a 0%,
+      #1e1b4b 55%,
+      #4c1d95 100%
+    );
+}
+
+body.dark-theme .hero-heading {
+  color: white;
+}
+
+body.dark-theme .hero-subtext {
+  color: rgba(255,255,255,0.78);
+}
+
+/* hero buttons */
+
+body.dark-theme .btn-hero-ghost {
+  color: white;
+  border-color: rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+}
+
+body.dark-theme .btn-hero-ghost:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+/* hero floating cards */
+
+body.dark-theme .hero-visual-card {
+  background: rgba(255,255,255,0.96);
+}
+
+body.dark-theme .hvc-title {
+  color: #111827;
+}
+
+body.dark-theme .hvc-sub {
+  color: #4b5563;
+}
+
+/* 
+   GENERAL SECTIONS */
+body.dark-theme .features-section,
+body.dark-theme .how-section,
+body.dark-theme .form-section,
+body.dark-theme .about-section,
+body.dark-theme .stats-section {
+  background: #0f172a;
+}
+
+body.dark-theme .skill-strip {
+  background: #111827;
+  border-color: rgba(255,255,255,0.05);
+}
+
+/*
+   TITLES + TEXT */
+body.dark-theme .section-title,
+body.dark-theme .section-sub,
+body.dark-theme .step-card h3,
+body.dark-theme .step-card p,
+body.dark-theme .stat-value,
+body.dark-theme .stat-label,
+body.dark-theme .footer-tagline,
+body.dark-theme .footer-col-title,
+body.dark-theme .footer-links-list a,
+body.dark-theme .footer-bottom p,
+body.dark-theme .footer-bottom-links a {
+  color: white;
+}
+
+body.dark-theme .section-eyebrow {
+  background: rgba(255,255,255,0.08);
+  color: #a5b4fc;
+}
+
+/* 
+   CARDS */
+body.dark-theme .stat-card,
+body.dark-theme .step-card,
+body.dark-theme .form-card {
+  background: #172033;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* 
+   FEATURE CARDS */
+body.dark-theme .feature-card--pink {
+  background: #3c2230;
+}
+
+body.dark-theme .feature-card--yellow {
+  background: #3c3422;
+}
+
+body.dark-theme .feature-card--purple {
+  background: #2d2440;
+}
+
+body.dark-theme .feature-card h3 {
+  color: white;
+}
+
+body.dark-theme .feature-card p {
+  color: rgba(255,255,255,0.8);
+}
+
+body.dark-theme .feature-card-link {
+  background: rgba(255,255,255,0.08);
+  color: white;
+  border-color: rgba(255,255,255,0.14);
+}
+
+/*
+   ABOUT SECTION */
+body.dark-theme .about-card {
+  background: #172033;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+body.dark-theme .about-card h3,
+body.dark-theme .about-card p {
+  color: white;
+}
+
+/* 
+   FORMS */
+body.dark-theme label {
+  color: rgba(255,255,255,0.9);
+}
+
+body.dark-theme input,
+body.dark-theme select,
+body.dark-theme textarea,
+body.dark-theme .skill-input-wrap {
+  background: #111827;
+  color: white;
+  border-color: rgba(255,255,255,0.08);
+}
+
+body.dark-theme input::placeholder,
+body.dark-theme textarea::placeholder {
+  color: rgba(255,255,255,0.45);
+}
+
+/* dropdown */
+
+body.dark-theme .skills-suggestions {
+  background: #172033;
+  border-color: rgba(255,255,255,0.08);
+}
+
+body.dark-theme .suggestion-item {
+  color: white;
+  border-bottom-color: rgba(255,255,255,0.04);
+}
+
+body.dark-theme .suggestion-item:hover,
+body.dark-theme .suggestion-item--active {
+  background: #243047;
+}
+
+/* github button */
+
+body.dark-theme #btn-show-github {
+  background: rgba(255,255,255,0.08);
+  color: white;
+}
+
+body.dark-theme #btn-show-github:hover {
+  background: rgba(255,255,255,0.14);
+}
+
+/* 
+   FOOTER */
+body.dark-theme .footer {
+  background: #0b1120;
+}
+
+body.dark-theme .footer-inner {
+  border-color: rgba(255,255,255,0.06);
+}
+
+body.dark-theme .footer-links-list a:hover,
+body.dark-theme .footer-bottom-links a:hover {
+  color: white;
+}
+
+/* skill strip text */
+
+body.dark-theme .skill-strip-label,
+body.dark-theme .ss-item {
+  color: rgba(255,255,255,0.82);
+}
+
+body.dark-theme .ss-sep {
+  background: rgba(255,255,255,0.22);
+}
+
+/* 
+   THEME TOGGLE BUTTON */
+.theme-toggle {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  cursor: pointer;
+
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  transition: all 0.25s ease;
+
+  padding: 0;
+  outline: none;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-2px);
+}
+
+/* icon styling */
+
+.theme-toggle svg,
+.theme-toggle i,
+.theme-toggle img {
+  width: 22px !important;
+  height: 22px !important;
+
+  color: #facc15 !important;
+  fill: #facc15 !important;
+
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+
+  display: block;
+  object-fit: contain;
+}
+
+/* 
+   DARK MODE TOGGLE */
+body.dark-theme .theme-toggle {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+body.dark-theme .theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* 
+   MOBILE / HAMBURGER MENU TOGGLE */
+.mobile-theme-toggle {
+  width: 100%;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  margin-bottom: 14px;
+
+  transition: all 0.25s ease;
+
+  padding: 0 16px;
+}
+
+.mobile-theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* icon inside mobile button */
+
+.mobile-theme-toggle svg,
+.mobile-theme-toggle i,
+.mobile-theme-toggle img {
+  width: 20px !important;
+  height: 20px !important;
+
+  color: #facc15 !important;
+  fill: #facc15 !important;
+
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* 
+   REMOVE EXTRA WHITE BACKGROUNDS */
+.theme-toggle *,
+.mobile-theme-toggle * {
+  background: transparent !important;
+  display: flex;
+}
+
+/*
    Dark Mode
-   ============================================================= */
+ */
 [data-theme="dark"] {
   --white: #0f1117;
   --gray-50: #161822;
@@ -4015,13 +4457,13 @@ html[data-theme="dark"] .btn-view-code-sm {
   }
 }
 
-/* ============================================================
+/* 
    WORKING DARK MODE
-   ============================================================ */
+ */
 
-/* =============================================================
+/* 
    CAREER ROADMAP COMPARISON PAGE
-   ============================================================= */
+    */
 
 .compare-page-body {
   background: var(--bg-secondary);

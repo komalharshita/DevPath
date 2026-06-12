@@ -134,7 +134,16 @@ def recommend():
             )
         }), 200
 
-    return jsonify({"projects": results}), 200
+    # Ensure all projects have IDs in the response
+    projects_data = []
+    for project in results:
+        project_dict = dict(project)  # Convert to dict if needed
+        # Make sure ID is included
+        if 'id' not in project_dict:
+            project_dict['id'] = project.get('id', 0)
+        projects_data.append(project_dict)
+
+    return jsonify({"projects": projects_data}), 200
 
 
 @main.route("/project/<int:project_id>")

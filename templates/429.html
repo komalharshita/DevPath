@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Internal Server Error — DevPath</title>
+  <title>Too Many Requests — DevPath</title>
   <meta name="robots" content="noindex" />
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
-  <meta property="og:title" content="Internal Server Error — DevPath" />
-  <meta property="og:description" content="Something went wrong on our side. Please try again in a moment." />
+  <meta property="og:title" content="Too Many Requests — DevPath" />
+  <meta property="og:description" content="You have made too many requests. Please wait a moment before trying again." />
   <meta property="og:image" content="{{ config.get_og_image_url() }}" />
   <meta property="og:url" content="{{ config.get_base_url() }}/" />
   <meta property="og:type" content="website" />
@@ -24,13 +24,15 @@
   </nav>
   <div class="error-page">
     <div class="error-page-inner">
-      <div class="error-code">500</div>
-      <h1>Internal Server Error</h1>
-      <p>Something went wrong on our side. Please try again in a moment.</p>
+      <div class="error-code">429</div>
+      <h1>Too Many Requests</h1>
+      <p>You have sent too many requests in a short period. Please wait a moment before trying again.</p>
+      {% if reference %}
+      <p class="error-reference">Reference: <code>{{ reference }}</code></p>
+      {% endif %}
       <a href="/" class="btn-primary" style="display:inline-block;text-decoration:none;padding:14px 32px;">Back to Home</a>
     </div>
   </div>
-  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
   <script src="/static/script.js"></script>
 </body>
 </html>
