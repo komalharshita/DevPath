@@ -16,15 +16,12 @@ from config import Config
 
 app = Flask(__name__)
 
-@app.template_filter('escapejs')
-def escapejs_filter(val):
-    """Safely escape strings for use inside JavaScript."""
-    if val is None:
-        return ''
-    return str(val).replace('\\', '\\\\').replace("'", "\\'").replace('"', '\\"').replace('\n', '\\n').replace('\r', '\\r').replace('</', '<\\/')
+# Load config settings into Flask's internal config manager properly
+app.config.from_object(Config)
 
-# Register all routes defined in the main Blueprint
+# Register all routes defined in the main Blueprint (This handles your '/' route!)
 app.register_blueprint(main)
+
 
 @app.after_request
 def add_security_headers(response):
@@ -42,26 +39,28 @@ def add_security_headers(response):
 @app.errorhandler(404)
 def page_not_found(error):
     """Render a friendly 404 page instead of the raw Flask error."""
-    return render_template("404.html", config=Config), 404
+    return render_template("404.html", config=app.config), 404
 
 
 @app.errorhandler(500)
 def internal_server_error(error):
     """Render a friendly 500 page for unexpected server errors."""
-    return render_template("500.html", config=Config), 500
+    return render_template("500.html", config=app.config), 500
 
 @app.errorhandler(405)
 def method_not_allowed(error):
     """Render a friendly 405 page when the wrong HTTP method is used."""
-    return render_template("405.html", config=Config), 405
+    return render_template("405.html", config=app.config), 405
 
 @app.errorhandler(403)
 def forbidden(error):
     """Render a friendly 403 page when access is denied."""
-    return render_template("403.html", config=Config), 403
+    return render_template("403.html", config=app.config), 403
 
 
 if __name__ == "__main__":
+
     import os
     debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() in ("true", "1")
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=debug_mode)
+

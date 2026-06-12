@@ -100,7 +100,6 @@ def get_project_stats():
         "beginner_friendly": beginner_friendly,
     }
 
-
 def clear_cache():
     """Reset the in-memory project cache (used in tests)."""
     global _projects_cache

@@ -135,6 +135,16 @@ if (isIndexPage) {
       "Rust", "Kotlin"
     ];
   }
+}
+
+
+function recordSearch() {
+  progress.searches += 1;
+  computeProgressPoints();
+  tryUnlockBadges();
+  saveProgressState();
+  updateProfileWidgets();
+}
 
   var suggestionsDiv         = document.getElementById("skills-suggestions");
   var skillWrap              = document.getElementById("skill-input-wrap");
@@ -644,6 +654,7 @@ if (isIndexPage) {
   }
 
 
+
   // ----------------------------------------------------------
   // Form submission and API call
   // ----------------------------------------------------------
@@ -743,7 +754,7 @@ if (isIndexPage) {
     });
   });
 
-  // Manages the loading state of the form and results section (what's visible or not)
+
   function setLoadingState(isLoading) {
     // Disable the button so the user can't accidentally submit twice
     submitBtn.disabled = isLoading;
@@ -895,17 +906,123 @@ if (isIndexPage) {
     card.appendChild(desc);
     card.appendChild(tagsRow);
     card.appendChild(footer);
+    return card;
+  }
+
+  renderSavedProjects();
+
+  function renderResults(projects, message) {
+    resultsSection.style.display = "block";
+    resultsLoadingEl.style.display = "none";
+    resultsGrid.textContent = "";
+    if (!projects || projects.length === 0) {
+      resultsGrid.style.display = "none";
+      resultsEmptyEl.style.display = "block";
+      emptyMessageEl.textContent = message || "Try adjusting your skills or choosing a different interest area.";
+      resultsSection.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    resultsEmptyEl.style.display = "none";
+    resultsGrid.style.display = "grid";
+    projects.forEach(function (project) { resultsGrid.appendChild(buildProjectCard(project)); });
+    resultsSection.scrollIntoView({ behavior: "smooth" });
+  }
+
+
+  function runProjectSearch(query) {
+    if (!query) return;
+    setLoadingState(true);
+    fetch("/api/search?q=" + encodeURIComponent(query))
+      .then(function (response) {
+        return response.json().then(function (data) {
+          if (!response.ok) throw new Error("Search failed. Please try again.");
+          return data;
+        });
+      })
+      .then(function (projects) {
+        setLoadingState(false);
+        recordSearch();
+        var message = projects.length
+          ? null
+          : "No projects matched \"" + query + "\". Try a different keyword.";
+        renderResults(projects, message);
+        var mobileMenu = document.getElementById("nav-mobile-menu");
+        var mobileToggle = document.getElementById("nav-mobile-toggle");
+        if (mobileMenu && mobileMenu.classList.contains("open")) {
+          mobileMenu.classList.remove("open");
+          if (mobileToggle) {
+            mobileToggle.classList.remove("open");
+            mobileToggle.setAttribute("aria-expanded", "false");
+          }
+        }
+      })
+      .catch(function (err) {
+        setLoadingState(false);
+        var general = document.getElementById("form-error-general");
+        if (general) general.textContent = err.message || "Search failed. Please try again.";
+      });
+  }
 
     return card;
   }
 
-  // helper to create a coloured tag element (used for skills, level, time tags on the cards)
-  function createTag(text, type) {
-    var span = document.createElement("span");
-    // The type becomes a BEM modifier so CSS can style each tag differently
-    span.className = "project-tag project-tag--" + type;
-    span.textContent = text;
-    return span;
+  bindSearchForm(document.getElementById("topic-search-form"), document.getElementById("topic-search"));
+  bindSearchForm(document.getElementById("topic-search-form-mobile"), document.getElementById("topic-search-mobile"));
+
+
+  skillsInput.setAttribute("role", "combobox");
+  skillsInput.setAttribute("aria-expanded", "false");
+  suggestions.setAttribute("role", "listbox");
+
+  skillsInput.addEventListener("input", function () {
+    showSuggestions(filteredSkills(skillsInput.value));
+  });
+  skillsInput.addEventListener("focus", function () {
+    if (skillsInput.value.trim()) showSuggestions(filteredSkills(skillsInput.value));
+  });
+  skillsInput.addEventListener("blur", function () {
+    window.setTimeout(hideSuggestions, 150);
+  });
+  skillsInput.addEventListener("keydown", function (event) {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      if (!visibleSuggestions.length) showSuggestions(filteredSkills(skillsInput.value));
+      if (!visibleSuggestions.length) return;
+      event.preventDefault();
+      activeSuggestionIndex = event.key === "ArrowDown"
+        ? (activeSuggestionIndex + 1) % visibleSuggestions.length
+        : (activeSuggestionIndex <= 0 ? visibleSuggestions.length - 1 : activeSuggestionIndex - 1);
+      renderSuggestionState();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      hideSuggestions();
+      return;
+    }
+    if (event.key === "Enter") {
+      event.preventDefault();
+      if (activeSuggestionIndex >= 0 && visibleSuggestions[activeSuggestionIndex]) {
+        window.addSkill(visibleSuggestions[activeSuggestionIndex]);
+      } else {
+        window.addSkill(skillsInput.value);
+      }
+      skillsInput.value = "";
+      hideSuggestions();
+    }
+  });
+
+  quickPickChips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      var skill = chip.getAttribute("data-skill");
+      if (isSelected(skill)) removeSkill(skill);
+      else window.addSkill(skill);
+      skillsInput.value = "";
+      hideSuggestions();
+    });
+  });
+
+  if (skillWrap) {
+    skillWrap.addEventListener("click", function () { skillsInput.focus(); });
   }
 
   function truncate(text, maxLength) {
