@@ -8,7 +8,6 @@
     content="DevPath recommends real coding projects based on your skills, level, and interests — with full roadmaps and starter code." />
   <title>DevPath — Find Projects Based On Your Skills</title>
   
-  <!-- Open Graph meta tags for social media sharing -->
   <meta property="og:title" content="DevPath — Find Projects Based On Your Skills" />
   <meta property="og:description" content="{{ config.SITE_DESCRIPTION }}" />
   <meta property="og:image" content="{{ config.get_og_image_url() }}" />
@@ -16,7 +15,6 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="{{ config.SITE_NAME }}" />
   
-  <!-- Twitter Card meta tags -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="DevPath — Find Projects Based On Your Skills" />
   <meta name="twitter:description" content="{{ config.SITE_DESCRIPTION }}" />
@@ -34,9 +32,6 @@
 </head>
 
 <body>
-  <!-- ============================================================
-       Navigation
-       ============================================================ -->
   <nav class="navbar" id="navbar" aria-label="Main navigation">
     <div class="nav-inner">
       <a href="/" class="nav-logo">Dev<span class="nav-logo-accent">Path</span></a>
@@ -78,14 +73,12 @@
         <button class="theme-toggle" id="theme-toggle-desktop"
                 aria-pressed="false"
                 aria-label="Switch to dark mode">
-          <!-- Moon icon: shown in light mode (clicking switches to dark) -->
           <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24"
                fill="none" stroke="currentColor" stroke-width="2"
                stroke-linecap="round" stroke-linejoin="round"
                aria-hidden="true">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
           </svg>
-          <!-- Sun icon: shown in dark mode (clicking switches to light) -->
           <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24"
                fill="none" stroke="currentColor" stroke-width="2"
                stroke-linecap="round" stroke-linejoin="round"
@@ -111,13 +104,11 @@
         🌙
       </button>
       </div>
-      <!-- Mobile hamburger toggle -->
       <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation" aria-expanded="false"
         aria-controls="nav-mobile-menu">
         <span></span><span></span><span></span>
       </button>
     </div>
-    <!-- Mobile menu — includes upstream's #home link and HEAD's theme toggle + accessibility attrs -->
     <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
       <a href="#home" class="nav-mobile-link" role="menuitem">Home</a>
       <a href="#how-it-works" class="nav-mobile-link" role="menuitem">How It Works</a>
@@ -125,8 +116,6 @@
       <a href="#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
       <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
         class="nav-mobile-link" role="menuitem">GitHub</a>
-      <!-- Theme toggle in mobile menu — same .theme-toggle class so
-           the JS engine updates both this and the desktop button together -->
       <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile"
         style="background:none;border:none;text-align:left;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;padding:10px 0;font-size:0.95rem;font-weight:500;color:rgba(255,255,255,0.8);"
         aria-pressed="false" aria-label="Switch to dark mode" role="menuitem">
@@ -151,9 +140,6 @@
     </div>
   </nav>
 
-  <!-- ============================================================
-       No-Script Fallback
-       ============================================================ -->
   <noscript>
     <div class="noscript-warning">
       <p>JavaScript is required to use DevPath. Please enable JavaScript in your browser settings and reload the page.
@@ -161,12 +147,8 @@
     </div>
   </noscript>
 
-  <!-- ============================================================
-       Hero Section
-       ============================================================ -->
   <section class="hero" id="home">
     <div class="hero-inner">
-      <!-- Left: copy -->
       <div class="hero-copy">
         <div class="hero-badge">
           <span class="hero-badge-dot"></span>
@@ -191,7 +173,6 @@
         </div>
       </div>
 
-      <!-- Hero visual loads after main content for performance -->
       <div class="hero-visual">
         <div class="hero-visual-card hero-visual-card--top">
           <div class="hvc-icon hvc-icon--blue">
@@ -244,19 +225,14 @@
       </div>
     </div>
 
-    <!-- Hero visual loads after main content for performance -->
     <div class="hero-bg-grid"></div>
     <div class="hero-blob hero-blob-1"></div>
     <div class="hero-blob hero-blob-2"></div>
   </section>
 
-  <!-- ============================================================
-       Statistics Cards (Dynamic)
-       ============================================================ -->
   <section class="stats-section">
     <div class="container">
       <div class="stats-grid">
-        <!-- Total Projects -->
         <div class="stat-card">
           <div class="stat-icon stat-icon--indigo">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -270,7 +246,6 @@
           </div>
         </div>
 
-        <!-- Unique Skills -->
         <div class="stat-card">
           <div class="stat-icon stat-icon--yellow">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -285,7 +260,6 @@
           </div>
         </div>
 
-        <!-- Beginner Friendly -->
         <div class="stat-card">
           <div class="stat-icon stat-icon--green">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -303,9 +277,6 @@
     </div>
   </section>
 
-  <!-- ============================================================
-       Progress + Achievements
-       ============================================================ -->
   <section class="progress-section" id="progress">
     <div class="container">
       <div class="section-eyebrow">Your DevPath Profile</div>
@@ -368,10 +339,6 @@
 
   <div class="achievement-toast" id="achievement-toast" role="status" aria-live="polite"></div>
 
-  <!-- ============================================================
-       Language / Skill Strip (visual trust element)
-       ============================================================ -->
-
   <div class="skill-strip">
     <div class="skill-strip-inner">
       <span class="skill-strip-label">Supports skills including:</span>
@@ -410,9 +377,6 @@
   </div>
 
 
-  <!-- ============================================================
-       How It Works
-       ============================================================ -->
   <section class="how-section" id="how-it-works">
     <div class="container">
       <div class="section-eyebrow">How DevPath Works</div>
@@ -451,9 +415,6 @@
     </div>
   </section>
 
-  <!-- ============================================================
-       Features Section
-       ============================================================ -->
   <section class="features-section" id="features">
     <div class="container">
       <div class="section-eyebrow">What You Get</div>
@@ -507,9 +468,6 @@
     </div>
   </section>
 
-  <!-- ============================================================
-       Find Project Form Section
-       ============================================================ -->
   <section class="form-section" id="find-project">
     <div class="container">
       <div class="section-eyebrow">Get Your Recommendations</div>
@@ -532,7 +490,6 @@
                   </button>
                 </label>
 
-                <!-- Inline GitHub Trigger -->
                 <div class="github-inline-trigger" id="github-trigger-wrap" style="line-height: 1.2;">
                   <button type="button" id="btn-show-github" class="resource-link"
                     style="padding: 4px 8px; border-radius: var(--r-xs); font-size: 0.75rem; gap: 6px;">
@@ -549,7 +506,6 @@
                 <input type="text" id="skills-input" placeholder="Type a skill and press Enter..." autocomplete="off" />
                 <div id="skills-suggestions" class="skills-suggestions"></div>
               </div>
-              <!-- Hidden field holds the final comma-separated value -->
               <input type="hidden" id="skills" name="skills" />
               <span class="form-hint">
                 Add one or more skills you are comfortable with. Example: Python, React, SQL, Git.
@@ -557,50 +513,9 @@
               <div class="form-error-msg" id="skills-error"></div>
             </div>
 
-            <!-- Quick-select skill chips -->
-            <div class="skill-chips-row" id="skill-chips-available">
-              <button type="button" class="skill-chip" data-skill="Python">Python</button>
-              <button type="button" class="skill-chip" data-skill="JavaScript">JavaScript</button>
-              <button type="button" class="skill-chip" data-skill="HTML">HTML</button>
-              <button type="button" class="skill-chip" data-skill="CSS">CSS</button>
-              <button type="button" class="skill-chip" data-skill="Flask">Flask</button>
-              <button type="button" class="skill-chip" data-skill="SQL">SQL</button>
-              <button type="button" class="skill-chip" data-skill="React">React</button>
-              <button type="button" class="skill-chip" data-skill="Node.js">Node.js</button>
-              <button type="button" class="skill-chip" data-skill="C++">C++</button>
-              <button type="button" class="skill-chip" data-skill="Java">Java</button>
-              <button type="button" class="skill-chip" data-skill="TypeScript">TypeScript</button>
-              <button type="button" class="skill-chip" data-skill="Go">Go</button>
-              <button type="button" class="skill-chip" data-skill="Rust">Rust</button>
-              <button type="button" class="skill-chip" data-skill="C#">C#</button>
-              <button type="button" class="skill-chip" data-skill="Kotlin">Kotlin</button>
-              <button type="button" class="skill-chip" data-skill="Django">Django</button>
-              <button type="button" class="skill-chip" data-skill="FastAPI">FastAPI</button>
-              <button type="button" class="skill-chip" data-skill="Express.js">Express.js</button>
-              <button type="button" class="skill-chip" data-skill="Next.js">Next.js</button>
-              <button type="button" class="skill-chip" data-skill="Vue.js">Vue.js</button>
-              <button type="button" class="skill-chip" data-skill="Angular">Angular</button>
-              <button type="button" class="skill-chip" data-skill="Tailwind CSS">Tailwind CSS</button>
-              <button type="button" class="skill-chip" data-skill="Bootstrap">Bootstrap</button>
-              <button type="button" class="skill-chip" data-skill="PostgreSQL">PostgreSQL</button>
-              <button type="button" class="skill-chip" data-skill="MySQL">MySQL</button>
-              <button type="button" class="skill-chip" data-skill="MongoDB">MongoDB</button>
-              <button type="button" class="skill-chip" data-skill="Redis">Redis</button>
-              <button type="button" class="skill-chip" data-skill="Docker">Docker</button>
-              <button type="button" class="skill-chip" data-skill="Kubernetes">Kubernetes</button>
-              <button type="button" class="skill-chip" data-skill="Git">Git</button>
-              <button type="button" class="skill-chip" data-skill="Linux">Linux</button>
-              <button type="button" class="skill-chip" data-skill="Pandas">Pandas</button>
-              <button type="button" class="skill-chip" data-skill="NumPy">NumPy</button>
-              <button type="button" class="skill-chip" data-skill="TensorFlow">TensorFlow</button>
-              <button type="button" class="skill-chip" data-skill="PyTorch">PyTorch</button>
-              <button type="button" class="skill-chip" data-skill="AWS">AWS</button>
-              <button type="button" class="skill-chip" data-skill="GraphQL">GraphQL</button>
-              <button type="button" class="skill-chip" data-skill="Jest">Jest</button>
-              <button type="button" class="skill-chip" data-skill="pytest">pytest</button>
-              <button type="button" class="skill-chip" data-skill="Webpack">Webpack</button>
-            </div>
-            <!-- Level + Interest in a row -->
+            <div class="skill-chips-row" id="dynamic-skill-chips">
+              </div>
+
             <div class="form-row">
               <div class="form-group">
                 <label for="level">Experience Level</label>
@@ -656,7 +571,6 @@
               </div>
             </div>
 
-            <!-- Time availability -->
             <div class="form-group">
               <label for="time">
                 Time Availability
@@ -682,10 +596,8 @@
               <div class="form-error-msg" id="time-error"></div>
             </div>
 
-            <!-- General error (shown above the button) -->
             <p class="form-error-general" id="form-error-general"></p>
 
-            <!-- Submit button -->
             <div class="form-actions">
               <button type="submit" class="btn-submit" id="submit-btn">
                 <span id="btn-label">Generate My Projects</span>
@@ -703,17 +615,12 @@
     </div>
   </section>
 
-  <!-- ============================================================
-       Results Section
-       ============================================================ -->
-  <!-- aria-live="polite" announces newly injected results to screen readers -->
   <section class="results-section" id="results-section" style="display:none;" aria-live="polite" aria-atomic="false">
     <div class="container">
       <div class="section-eyebrow">Your Matches</div>
       <h2 class="section-title">Recommended Projects</h2>
       <p class="section-sub" id="results-subtitle">Based on your inputs, here are your top matches.</p>
 
-      <!-- Loading state -->
       <div id="results-loading" aria-live="polite" aria-atomic="true" style="display:none;">
         <div class="loading-box">
           <div class="loading-dots"><span></span><span></span><span></span></div>
@@ -721,7 +628,6 @@
         </div>
       </div>
 
-      <!-- Empty / no-match state -->
       <div id="results-empty" style="display:none;">
         <div class="empty-state">
           <div class="empty-icon">
@@ -739,14 +645,10 @@
         </div>
       </div>
 
-      <!-- Cards grid -->
       <div class="results-grid" id="results-grid"></div>
     </div>
   </section>
 
-  <!-- ============================================================
-       CTA Banner
-       ============================================================ -->
   <section class="cta-section">
     <div class="container">
       <div class="cta-inner">
@@ -757,9 +659,6 @@
     </div>
   </section>
 
-  <!-- ============================================================
-       Our Story / About Us
-       ============================================================ -->
   <section class="features-section" id="our-story">
     <div class="container">
       <div class="section-eyebrow">About Us</div>
@@ -787,9 +686,6 @@
     </div>
   </section>
 
-  <!-- ============================================================
-       Footer
-       ============================================================ -->
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-col footer-col--brand">
@@ -844,7 +740,6 @@
     </div>
   </footer>
 
-  <!-- GitHub Modal Overlay -->
   <div class="code-panel-overlay" id="github-modal-overlay"
     style="align-items: center; justify-content: center; opacity: 1;">
     <div class="sidebar-card"
@@ -943,6 +838,43 @@
         }
       });
     })();
+  </script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var skillsContainer = document.getElementById('dynamic-skill-chips');
+        if (!skillsContainer) return;
+        
+        fetch('/api/available-skills')
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                skillsContainer.innerHTML = '';
+                
+                data.skills.forEach(function(skill) {
+                    var button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'skill-chip'; 
+                    button.setAttribute('data-skill', skill);
+                    button.textContent = skill;
+                    
+                    button.addEventListener('click', function() {
+                        if (typeof toggleSkill === 'function') {
+                            toggleSkill(this.textContent); 
+                        }
+                    });
+                    
+                    skillsContainer.appendChild(button);
+                });
+            })
+            .catch(function(error) {
+                skillsContainer.innerHTML = '<span class="form-hint" style="color:red;">Failed to load skills dynamically.</span>';
+            });
+    });
   </script>
 </body>
 

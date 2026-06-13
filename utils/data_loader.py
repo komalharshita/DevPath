@@ -66,6 +66,21 @@ def load_all_projects():
             validate_projects(_projects_cache)
     return _projects_cache
 
+def get_available_skills(filepath='data/projects.json'):
+    try:
+        with open(filepath, 'r') as file:
+            projects = json.load(file)
+            
+        skills = set()
+        for project in projects:
+            project_skills = project.get("skills", [])
+            for skill in project_skills:
+                skills.add(skill.lower().strip())
+                
+        return sorted(list(skills))
+    except Exception as e:
+        return []
+
 def get_available_levels():
     """Return all unique project levels."""
     projects = load_all_projects()
