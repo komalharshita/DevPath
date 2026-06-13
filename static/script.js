@@ -1,74 +1,12 @@
 // script.js — DevPath client-side logic
 //
 // Responsibilities:
-//   - Dark mode toggle
 //   - Mobile navigation toggle
 //   - Skill chip manager (add/remove skills)
 //   - Form validation with per-field error messages
 //   - Recommendation API call and loading states
 //   - Result card rendering
 //   - Code viewer panel (detail page)
-
-// ============================================================
-// Dark Mode Toggle & Synchronization
-// ============================================================
-// UX Behavior Design Note:
-// 1. System Preference Sync: By default, the application respects the OS dark/light mode settings
-//    (using matchMedia("(prefers-color-scheme: dark)")).
-// 2. Manual Override (Intentional UX Pattern): Once a user explicitly chooses a theme by clicking the toggle,
-//    their manual preference is cached in localStorage. This manual choice intentionally takes precedence
-//    over the system preferences to provide a stable, consistent theme across sessions.
-// 3. System Re-sync: If the user wishes to revert back to system tracking, they can clear their browser data/localStorage.
-//    The media query listener will automatically resume tracking system preferences when no localStorage key exists.
-(function initTheme() {
-  var toggle = document.getElementById("theme-toggle");
-  var html = document.documentElement;
-  var sunIcon = toggle && toggle.querySelector(".theme-toggle-sun");
-  var moonIcon = toggle && toggle.querySelector(".theme-toggle-moon");
-
-  function getPreferredTheme() {
-    var saved = localStorage.getItem("theme");
-    if (saved) return saved;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  }
-
-  function setTheme(theme) {
-    html.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-    if (toggle) {
-      // Dynamic accessibility tracking using aria-pressed (true if dark mode is active)
-      toggle.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
-      if (sunIcon && moonIcon) {
-        if (theme === "dark") {
-          sunIcon.style.display = "none";
-          moonIcon.style.display = "inline";
-        } else {
-          sunIcon.style.display = "inline";
-          moonIcon.style.display = "none";
-        }
-      }
-    }
-  }
-
-  // Active theme is already initialized in <head> to prevent Flash of Unstyled Content (FOUC).
-  // We sync buttons and accessibility attributes based on the current state.
-  var activeTheme = html.getAttribute("data-theme") || getPreferredTheme();
-  setTheme(activeTheme);
-
-  if (toggle) {
-    toggle.addEventListener("click", function () {
-      var current = html.getAttribute("data-theme") || "light";
-      setTheme(current === "dark" ? "light" : "dark");
-    });
-  }
-
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function (e) {
-    // Only sync dynamic system changes if no manual preference currently overrides it.
-    if (!localStorage.getItem("theme")) {
-      setTheme(e.matches ? "dark" : "light");
-    }
-  });
-})();
 
 // ============================================================
 // Detect which page we are on
@@ -136,81 +74,115 @@ if (isIndexPage) {
 
   // Tracks currently selected skills to prevent duplicates
   var selectedSkills = [];
-  // Clear Filters Button Functionality
-var clearFiltersBtn = document.getElementById("clear-filters-btn");
-if (clearFiltersBtn) {
-    clearFiltersBtn.addEventListener("click", function() {
-        var recommendForm = document.getElementById("recommend-form");
-        if (recommendForm) {
-            // 1. Reset standard form dropdowns and fields
-            recommendForm.reset();
-            
-            // 2. Clear out the internal JavaScript array tracker completely
-            selectedSkills = [];
-            
-            // 3. Clear the hidden inputs and visual chips using the file's own variables
-            if (skillsHidden) skillsHidden.value = "";
-            if (chipsSelectedEl) chipsSelectedEl.innerHTML = "";
-            if (skillsTextInput) {
-                skillsTextInput.value = "";
-                skillsTextInput.focus(); // Place cursor back on input
-            }
-            
-            // 4. Hide autocomplete suggestions if any are open
-            var suggestionsBox = document.getElementById("skills-suggestions");
-            if (suggestionsBox) suggestionsBox.innerHTML = "";
 
-            // 5. Reset quick-pick chip visual active states if they have any
-            if (quickPickChips) {
-                quickPickChips.forEach(function(chip) {
-                    chip.classList.remove("active", "selected");
-                });
-            }
-        }
-    });
+// Points awarded per action
+var POINTS_PER_SEARCH     = 5;
+var POINTS_PER_VIEW       = 10;
+var POINTS_PER_CODE_OPEN  = 15;
+var POINTS_PER_COMPLETION = 30;
+
+var PROGRESS_TARGET_SEARCHES     = 10;
+var PROGRESS_TARGET_VIEWS        = 10;
+var PROGRESS_TARGET_CODE_OPENS   = 10;
+var PROGRESS_TARGET_COMPLETIONS  = 5;
+
+// Maximum achievable points given the targets above
+var PROGRESS_MAX_POINTS = (
+  PROGRESS_TARGET_SEARCHES    * POINTS_PER_SEARCH     +   // 50
+  PROGRESS_TARGET_VIEWS       * POINTS_PER_VIEW       +   // 100
+  PROGRESS_TARGET_CODE_OPENS  * POINTS_PER_CODE_OPEN  +   // 150
+  PROGRESS_TARGET_COMPLETIONS * POINTS_PER_COMPLETION     // 150
+);  // total = 450
+
+function computeProgressPoints() {
+  var raw =
+    progress.searches      * POINTS_PER_SEARCH     +
+    progress.projectViews  * POINTS_PER_VIEW       +
+    progress.codeOpens     * POINTS_PER_CODE_OPEN  +
+    progress.completions   * POINTS_PER_COMPLETION;
+  // Clamp stored points so they never exceed max — prevents aria-valuenow > 100
+  progress.points = Math.min(raw, PROGRESS_MAX_POINTS);
 }
+
+  // Clear Filters Button Functionality
+  var clearFiltersBtn = document.getElementById("clear-filters-btn");
+  if (clearFiltersBtn) {
+    clearFiltersBtn.addEventListener("click", function () {
+      var recommendForm = document.getElementById("recommend-form");
+      if (recommendForm) {
+        recommendForm.reset();
+        resetSkillSelection();
+        if (skillsTextInput) skillsTextInput.focus();
+      }
+    });
+  }
+
+  // Also reset skills when the native form reset event fires
+  form.addEventListener("reset", function () {
+    window.setTimeout(function () {
+      resetSkillSelection();
+      if (skillsTextInput) skillsTextInput.focus();
+    }, 0);
+  });
 
 
   // ----------------------------------------------------------
   // Skill chip manager
   // ----------------------------------------------------------
 
-  // Skills list for autocomplete (from skills.js)
-  var availableSkills = [];
-  if (typeof skills !== "undefined" && Array.isArray(skills) && skills.length > 0) {
-    availableSkills = skills.map(function (s) { return s.label; });
-  } else {
-    // Fallback if skills.js doesn't load
-    availableSkills = [
-      "Python", "JavaScript", "Java", "C++", "HTML", "CSS", "React", "Node.js",
-      "Django", "Flask", "SQL", "MongoDB", "AWS", "Docker", "Kubernetes", "Git",
-      "C#", "Ruby", "PHP", "Go", "Swift", "TypeScript", "Angular", "Vue.js",
-      "Spring", "Flutter", "TensorFlow", "PyTorch", "Data Science",
-      "Machine Learning", "Artificial Intelligence", "DevOps", "Cybersecurity",
-      "Blockchain", "UI/UX Design", "Game Development", "CI/CD", "REST API", "GraphQL",
-      "Rust", "Kotlin"
+function updateProfileWidgets() {
+  var pointsEl = document.getElementById("progress-points");
+  var statsEl = document.getElementById("progress-stats");
+  var meterFill = document.getElementById("progress-meter-fill");
+  var badgesEl = document.getElementById("progress-badges");
+  var achievementList = document.getElementById("achievement-list");
+  var leaderboardList = document.getElementById("leaderboard-list");
+  var historyList = document.getElementById("completed-history-list");
+  var completionBtn = document.getElementById("btn-mark-complete");
+
+  if (pointsEl) pointsEl.textContent = progress.points;
+  if (statsEl) {
+    statsEl.innerHTML =
+      "<li><strong>Searches</strong><span>" + progress.searches + "</span></li>" +
+      "<li><strong>Projects Viewed</strong><span>" + progress.projectViews + "</span></li>" +
+      "<li><strong>Code Opens</strong><span>" + progress.codeOpens + "</span></li>" +
+      "<li><strong>Projects Completed</strong><span>" + progress.completions + "</span></li>";
+  }
+  if (meterFill) {
+    var percentage = Math.min(
+      100,
+      Math.round((progress.points / PROGRESS_MAX_POINTS) * 100)
+    );
+    meterFill.style.width = percentage + "%";
+    meterFill.setAttribute("aria-valuenow", String(percentage));
+    meterFill.textContent = percentage + "%";
+  }
+  if (badgesEl) {
+    var badges = [
+      ["first_search", "First Search"],
+      ["project_explorer", "Project Explorer"],
+      ["code_starter", "Code Starter"],
+      ["completionist", "Completionist"],
+      ["roadmap_runner", "Roadmap Runner"]
     ];
   }
+}
 
-  var suggestionsDiv = document.getElementById("skills-suggestions");
-  var skillWrap = document.getElementById("skill-input-wrap");
-  var visibleSuggestions = [];
-  var activeSuggestionIndex = -1;
 
-  function initSkillStripMarquee() {
-    var marquee = document.querySelector(".skill-strip-marquee");
-    var track = marquee && marquee.querySelector(".skill-strip-track");
+function recordSearch() {
+  progress.searches += 1;
+  computeProgressPoints();
+  tryUnlockBadges();
+  saveProgressState();
+  updateProfileWidgets();
+}
 
-    if (!marquee || !track || track.querySelector(".skill-strip-items[data-marquee-clone='true']")) {
-      return;
-    }
+  var suggestionsDiv         = document.getElementById("skills-suggestions");
+  var skillWrap              = document.getElementById("skill-input-wrap");
+  var visibleSuggestions     = [];
+  var activeSuggestionIndex  = -1;
 
-    var clone = track.querySelector(".skill-strip-items").cloneNode(true);
-    clone.setAttribute("aria-hidden", "true");
-    clone.setAttribute("data-marquee-clone", "true");
-    track.appendChild(clone);
-  }
-
+  // Deduplicate available skills (case-insensitive)
   availableSkills = availableSkills.filter(function (skill, index, list) {
     return typeof skill === "string" && skill.trim() &&
       list.findIndex(function (item) {
@@ -218,29 +190,58 @@ if (clearFiltersBtn) {
       }) === index;
   });
 
-  if (suggestionsDiv) {
-    suggestionsDiv.setAttribute("role", "listbox");
-  }
+  if (suggestionsDiv) suggestionsDiv.setAttribute("role", "listbox");
 
-  initSkillStripMarquee();
+  function normalizeSkill(skill) { return skill.trim().toLowerCase(); }
 
-  function normalizeSkill(skill) {
-    return skill.trim().toLowerCase();
-  }
+loadProgressState();
+updateProfileWidgets();
 
-  function isSkillSelected(skill) {
-    var normalizedSkill = normalizeSkill(skill);
-    return selectedSkills.some(function (selectedSkill) {
-      return normalizeSkill(selectedSkill) === normalizedSkill;
-    });
+(function initIndexPage() {
+  var form = document.getElementById("recommend-form");
+  if (!form) return;
+
+  var submitBtn = document.getElementById("submit-btn");
+  var btnLabel = document.getElementById("btn-label");
+  var btnLoading = document.getElementById("btn-loading");
+  var resultsSection = document.getElementById("results-section");
+  var resultsGrid = document.getElementById("results-grid");
+  var resultsLoadingEl = document.getElementById("results-loading");
+  var resultsEmptyEl = document.getElementById("results-empty");
+  var emptyMessageEl = document.getElementById("empty-message");
+  var skillsHidden = document.getElementById("skills");
+  var skillsInput = document.getElementById("skills-input");
+  var selectedChips = document.getElementById("skill-chips-selected");
+  var suggestions = document.getElementById("skills-suggestions");
+  var skillWrap = document.getElementById("skill-input-wrap");
+  var quickPickChips = Array.prototype.slice.call(document.querySelectorAll(".skill-chip"));
+  var selectedSkills = [];
+  var availableSkills = (typeof skills !== "undefined" && Array.isArray(skills))
+    ? skills.map(function (item) { return item.label; }).filter(Boolean)
+    : quickPickChips.map(function (chip) { return chip.getAttribute("data-skill"); });
+  var activeSuggestionIndex = -1;
+  var visibleSuggestions = [];
+  var SAVED_PROJECTS_KEY = "devpathSavedProjects";
+
+  window.addSkill = function addSkill(rawSkill) {
+    var skill = canonicalSkill(rawSkill);
+    if (!skill || isSelected(skill)) return;
+    selectedSkills.push(skill);
+    renderSelectedChips();
+    syncSkillsHiddenInput();
+    updateQuickPickState();
+    clearFieldError("skills-error");
+    if (skillsInput) skillsInput.focus();
+  };
+
+  function normalize(value) {
+    return String(value || "").trim().toLowerCase();
   }
 
   function getCanonicalSkill(rawSkill) {
     var normalizedSkill = normalizeSkill(rawSkill);
-    var matchedSkill = availableSkills.find(function (skill) {
-      return normalizeSkill(skill) === normalizedSkill;
-    });
-    return matchedSkill || rawSkill.trim();
+    var matched = availableSkills.find(function (s) { return normalizeSkill(s) === normalizedSkill; });
+    return matched || rawSkill.trim();
   }
 
   function getFilteredSkills(query) {
@@ -248,10 +249,6 @@ if (clearFiltersBtn) {
     return availableSkills.filter(function (skill) {
       return normalizeSkill(skill).includes(normalizedQuery) && !isSkillSelected(skill);
     }).slice(0, 8);
-  }
-
-  function syncSuggestionsA11yState() {
-    skillsTextInput.setAttribute("aria-expanded", visibleSuggestions.length > 0 ? "true" : "false");
   }
 
   function renderActiveSuggestion() {
@@ -264,13 +261,9 @@ if (clearFiltersBtn) {
   }
 
   function hideSuggestions() {
-    visibleSuggestions = [];
-    activeSuggestionIndex = -1;
-    if (suggestionsDiv) {
-      suggestionsDiv.style.display = "none";
-      suggestionsDiv.innerHTML = "";
-    }
-    syncSuggestionsA11yState();
+    visibleSuggestions     = [];
+    activeSuggestionIndex  = -1;
+    if (suggestionsDiv) { suggestionsDiv.style.display = "none"; suggestionsDiv.innerHTML = ""; }
   }
 
   function selectSuggestion(skill) {
@@ -282,12 +275,9 @@ if (clearFiltersBtn) {
 
   function displaySuggestions(items) {
     if (!suggestionsDiv) return;
-    visibleSuggestions = items;
+    visibleSuggestions    = items;
     activeSuggestionIndex = -1;
-    if (items.length === 0) {
-      hideSuggestions();
-      return;
-    }
+    if (items.length === 0) { hideSuggestions(); return; }
     suggestionsDiv.innerHTML = "";
     items.forEach(function (skill, index) {
       var item = document.createElement("div");
@@ -296,25 +286,14 @@ if (clearFiltersBtn) {
       item.setAttribute("role", "option");
       item.setAttribute("id", "skills-suggestion-" + index);
       item.setAttribute("aria-selected", "false");
-
-      // Prevent the input blur handler from closing the menu before click runs.
-      item.addEventListener("mousedown", function (evt) {
-        evt.preventDefault();
-      });
-
-      item.addEventListener("mouseenter", function () {
-        activeSuggestionIndex = index;
-        renderActiveSuggestion();
-      });
-
-      item.addEventListener("click", function () {
-        selectSuggestion(skill);
-      });
-
+      // Prevent the input blur handler from closing the menu before click runs
+      item.addEventListener("mousedown", function (evt) { evt.preventDefault(); });
+      item.addEventListener("mouseenter", function () { activeSuggestionIndex = index; renderActiveSuggestion(); });
+      item.addEventListener("click", function () { selectSuggestion(skill); });
       suggestionsDiv.appendChild(item);
     });
     suggestionsDiv.style.display = "block";
-    syncSuggestionsA11yState();
+    skillsTextInput.setAttribute("aria-expanded", "true");
   }
 
   function updateQuickPickState() {
@@ -326,40 +305,28 @@ if (clearFiltersBtn) {
   }
 
   // Add skill on Enter key in the text input
-  // when the user types a skill and hits Enter, add it we intercept Enter here so it doesn't accidentally submit the whole form
+  // we intercept Enter here so it doesn't accidentally submit the whole form
   skillsTextInput.addEventListener("keydown", function (evt) {
     if (evt.key === "ArrowDown" || evt.key === "ArrowUp") {
-      if (visibleSuggestions.length === 0) {
-        displaySuggestions(getFilteredSkills(skillsTextInput.value));
-      }
+      if (visibleSuggestions.length === 0) displaySuggestions(getFilteredSkills(skillsTextInput.value));
       if (visibleSuggestions.length === 0) return;
       evt.preventDefault();
       if (evt.key === "ArrowDown") {
         activeSuggestionIndex = (activeSuggestionIndex + 1) % visibleSuggestions.length;
       } else {
-        activeSuggestionIndex = activeSuggestionIndex <= 0
-          ? visibleSuggestions.length - 1
-          : activeSuggestionIndex - 1;
+        activeSuggestionIndex = activeSuggestionIndex <= 0 ? visibleSuggestions.length - 1 : activeSuggestionIndex - 1;
       }
       renderActiveSuggestion();
       return;
     }
-
-    if (evt.key === "Escape") {
-      hideSuggestions();
-      return;
-    }
-
+    if (evt.key === "Escape") { hideSuggestions(); return; }
     if (evt.key === "Enter") {
       evt.preventDefault();
       if (activeSuggestionIndex >= 0 && visibleSuggestions[activeSuggestionIndex]) {
         selectSuggestion(visibleSuggestions[activeSuggestionIndex]);
         return;
       }
-      if (skillsTextInput.value.trim()) {
-        addSkill(skillsTextInput.value);
-        skillsTextInput.value = "";
-      }
+      if (skillsTextInput.value.trim()) { addSkill(skillsTextInput.value); skillsTextInput.value = ""; }
       hideSuggestions();
     }
   });
@@ -368,34 +335,22 @@ if (clearFiltersBtn) {
   quickPickChips.forEach(function (chip) {
     chip.addEventListener("click", function () {
       var skill = chip.getAttribute("data-skill");
-      var isAlreadySelected = selectedSkills.some(function (s) {
-        return s.toLowerCase() === skill.toLowerCase();
-      });
-
-      if (isAlreadySelected) {
-        removeSkill(skill);
-      } else {
-        addSkill(skill);
-      }
-      hideSuggestions();
+      if (!skill) return;
+      if (isSkillSelected(skill)) { removeSkill(skill); } else { addSkill(skill); }
       skillsTextInput.value = "";
+      hideSuggestions();
     });
   });
 
   // Show suggestions on input
   skillsTextInput.addEventListener("input", function (evt) {
     var typedValue = evt.target.value.trim();
-    if (typedValue.length === 0) {
-      hideSuggestions();
-      return;
-    }
+    if (typedValue.length === 0) { hideSuggestions(); return; }
     displaySuggestions(getFilteredSkills(typedValue));
   });
 
   skillsTextInput.addEventListener("focus", function () {
-    if (skillsTextInput.value.trim()) {
-      displaySuggestions(getFilteredSkills(skillsTextInput.value));
-    }
+    if (skillsTextInput.value.trim()) displaySuggestions(getFilteredSkills(skillsTextInput.value));
   });
 
   // Hide suggestions when input loses focus
@@ -404,42 +359,16 @@ if (clearFiltersBtn) {
   });
 
   if (skillWrap) {
-    skillWrap.addEventListener("click", function () {
-      skillsTextInput.focus();
-    });
+    skillWrap.addEventListener("click", function () { skillsTextInput.focus(); });
   }
-
 
   document.addEventListener("click", function (evt) {
-    if (skillWrap && !skillWrap.contains(evt.target)) {
-      hideSuggestions();
-    }
+    if (skillWrap && !skillWrap.contains(evt.target)) hideSuggestions();
   });
 
-  //add a skill to the list if it's not empty or a duplicate
-  function addSkill(rawSkill) {
-    // Clean up any extra spaces and match to canonical skill name
-    var skill = getCanonicalSkill(rawSkill);
-    // Nothing to add if string is empty after trimming
-    if (!skill) return;
-
-    // Block duplicate entries (case-insensitive)
-    if (isSkillSelected(skill)) return;
-
-    selectedSkills.push(skill);
-    renderSelectedChips();
-    syncSkillsHiddenInput();
-    updateQuickPickState();
-    // Once a skill is added, remove the "please add a skill" error if it was showing
-    clearFieldError("skills-error");
-  }
-
-  // remove a skill from the list and update the UI accordingly
   function removeSkill(skill) {
     // Rebuild the array without the skill that was just removed
-    selectedSkills = selectedSkills.filter(function (selectedSkill) {
-      return normalizeSkill(selectedSkill) !== normalizeSkill(skill);
-    });
+    selectedSkills = selectedSkills.filter(function (s) { return normalizeSkill(s) !== normalizeSkill(skill); });
     renderSelectedChips();
     syncSkillsHiddenInput();
     updateQuickPickState();
@@ -474,12 +403,258 @@ if (clearFiltersBtn) {
   }
 
   function syncSkillsHiddenInput() {
-    if (!skillsHidden){
-      var skillsHidden = document.getElementById("skills");
-    }
+    if (!skillsHidden) return;
     // Keep the hidden <input> in sync for form serialisation
     // The API expects a comma-separated string, so join the array that way
     skillsHidden.value = selectedSkills.join(", ");
+  }
+
+  updateQuickPickState();
+
+  function hideSuggestions() {
+    visibleSuggestions = [];
+    activeSuggestionIndex = -1;
+    if (suggestionsDiv) {
+      suggestionsDiv.style.display = "none";
+      suggestionsDiv.classList.remove("show");
+      suggestionsDiv.innerHTML = "";
+    }
+    syncSuggestionsA11yState();
+    suggestions.style.display = "none";
+    suggestions.textContent = "";
+    skillsInput.setAttribute("aria-expanded", "false");
+  }
+
+  // ----------------------------------------------------------
+  // Form validation
+  // ----------------------------------------------------------
+
+  //puts error msg under specific field
+  function showFieldError(fieldId, message) {
+    var el = document.getElementById(fieldId);
+    if (el) el.textContent = message;
+  }
+
+  //clears error msg under specific field
+  function clearFieldError(fieldId) {
+    var el = document.getElementById(fieldId);
+    if (el) el.textContent = ""; //empty string = no error msg
+  }
+
+  function showSuggestions(items) {
+    visibleSuggestions = items;
+    activeSuggestionIndex = -1;
+    suggestions.textContent = "";
+    if (!items.length) {
+      hideSuggestions();
+      return;
+    }
+    items.forEach(function (skill, index) {
+      var item = document.createElement("div");
+      item.className = "suggestion-item";
+      
+      // Check if skill is already selected for multi-select styling
+      var isSelected = isSkillSelected(skill);
+      if (isSelected) {
+        item.classList.add("selected");
+      }
+      
+      item.textContent = skill;
+      item.setAttribute("role", "option");
+      item.setAttribute("id", "skills-suggestion-" + index);
+      item.setAttribute("aria-selected", isSelected ? "true" : "false");
+
+      // Prevent the input blur handler from closing the menu before click runs.
+      item.addEventListener("mousedown", function (evt) {
+        evt.preventDefault();
+      });
+
+      item.id = "skills-suggestion-" + index;
+      item.setAttribute("role", "option");
+      item.setAttribute("aria-selected", "false");
+      item.textContent = skill;
+      item.addEventListener("mousedown", function (event) { event.preventDefault(); });
+      item.addEventListener("mouseenter", function () {
+        activeSuggestionIndex = index;
+        renderSuggestionState();
+      });
+      item.addEventListener("click", function () {
+        selectSuggestion(skill);
+        // Keep dropdown open if clicking from dropdown (multi-select mode)
+        if (suggestionsDiv.classList.contains("show")) {
+          displaySuggestions(items);
+          skillsTextInput.focus();
+        }
+        window.addSkill(skill);
+        skillsInput.value = "";
+        hideSuggestions();
+      });
+      suggestions.appendChild(item);
+    });
+    suggestions.style.display = "block";
+    skillsInput.setAttribute("aria-expanded", "true");
+  }
+
+  // checks form fields and shows error messages if any required field is missing or invalid. 
+  // Returns true if the form is valid, false otherwise
+  function validateForm() {
+    var valid = true;
+
+    // Check both the array and the hidden input since skills can come from either source
+    if (selectedSkills.length === 0 && !skillsHidden.value.trim()) {
+      showFieldError("skills-error", "Please add at least one skill.");
+      valid = false;
+    }
+    if (!document.getElementById("level").value) {
+      showFieldError("level-error", "Please select your experience level.");
+      valid = false;
+    }
+  });
+
+  // Add/toggle skill on quick-pick chip click
+  quickPickChips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      var skill = chip.getAttribute("data-skill");
+      var isAlreadySelected = selectedSkills.some(function (s) {
+        return s.toLowerCase() === skill.toLowerCase();
+      });
+
+      if (isAlreadySelected) {
+        removeSkill(skill);
+      } else {
+        addSkill(skill);
+      }
+      hideSuggestions();
+      skillsTextInput.value = "";
+    });
+  });
+
+  // Multi-select dropdown toggle functionality
+  var dropdownBtn = document.getElementById("skills-dropdown-toggle");
+  if (dropdownBtn) {
+    dropdownBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var suggestionsOpen = suggestionsDiv.style.display === "block";
+      
+      if (suggestionsOpen) {
+        hideSuggestions();
+      } else {
+        // Show all available skills in dropdown
+        displaySuggestions(availableSkills);
+        suggestionsDiv.classList.add("show");
+      }
+    });
+  }
+
+  // Show suggestions on input
+  skillsTextInput.addEventListener("input", function (evt) {
+    var typedValue = evt.target.value.trim();
+    if (typedValue.length === 0) {
+      hideSuggestions();
+      return;
+    if (!document.getElementById("interest").value) {
+      showFieldError("interest-error", "Please select an area of interest.");
+      valid = false;
+    }
+    if (!document.getElementById("time").value) {
+      showFieldError("time-error", "Please select your time availability.");
+      valid = false;
+    }
+
+    return valid;
+  }
+
+
+  document.addEventListener("click", function (evt) {
+    if (skillWrap && !skillWrap.contains(evt.target)) {
+      hideSuggestions();
+    }
+  });
+
+  //add a skill to the list if it's not empty or a duplicate
+  function addSkill(rawSkill) {
+    // Clean up any extra spaces and match to canonical skill name
+    var skill = getCanonicalSkill(rawSkill);
+    // Nothing to add if string is empty after trimming
+    if (!skill) return;
+
+    // Block duplicate entries (case-insensitive)
+    if (isSkillSelected(skill)) return;
+
+    selectedSkills.push(skill);
+    renderSelectedChips();
+    syncSkillsHiddenInput();
+    updateQuickPickState();
+    // Once a skill is added, remove the "please add a skill" error if it was showing
+    clearFieldError("skills-error");
+    // Ensure the corresponding quick-pick chip is visually active immediately
+    try {
+      var quickChip = document.querySelector('.skill-chip[data-skill="' + skill + '"]');
+      if (quickChip) {
+        quickChip.classList.add('active', 'selected');
+        quickChip.setAttribute('aria-pressed', 'true');
+      }
+    } catch (e) {
+      // ignore DOM errors
+    }
+    // Keep focus in the input so user can continue typing
+    if (skillsTextInput) skillsTextInput.focus();
+  }
+
+  // remove a skill from the list and update the UI accordingly
+  function removeSkill(skill) {
+    // Rebuild the array without the skill that was just removed
+    selectedSkills = selectedSkills.filter(function (selectedSkill) {
+      return normalizeSkill(selectedSkill) !== normalizeSkill(skill);
+    });
+    renderSelectedChips();
+    syncSkillsHiddenInput();
+    updateQuickPickState();
+    // Also clear the visual active state on the quick-pick chip if present
+    try {
+      var quickChip = document.querySelector('.skill-chip[data-skill="' + skill + '"]');
+      if (quickChip) {
+        quickChip.classList.remove('active', 'selected');
+        quickChip.setAttribute('aria-pressed', 'false');
+      }
+    } catch (e) {
+      // ignore DOM errors
+    }
+  }
+
+  // recreate the selected skills chips based on the current array(selectedSkills)
+  // called every time we add or remove a skill
+  function renderSelectedChips() {
+    // Wipe out old chips first so we don't end up with duplicates in the UI
+    chipsSelectedEl.innerHTML = "";
+    selectedSkills.forEach(function (skill) {
+      // Create a new chip element for each selected skill
+      var chipEl = document.createElement("span");
+      chipEl.className = "skill-chip-selected";
+      chipEl.textContent = skill;
+
+      // Remove button for each chip (create lil "x" button)
+      var removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.className = "skill-chip-remove";
+      removeBtn.innerHTML = "&times;"; //'x' symbol
+      removeBtn.setAttribute("aria-label", "Remove " + skill);
+      removeBtn.addEventListener("click", function (e) {
+        // Stop click from bubbling up to the chip wrap's click listener
+        e.stopPropagation();
+        removeSkill(skill);
+      });
+
+      chipEl.appendChild(removeBtn); // put x button inside the chip
+      chipsSelectedEl.appendChild(chipEl); //add chip to page
+    });
+  }
+
+  function syncSkillsHiddenInput() {
+    if (!skillsHidden) {
+      var skillsHidden = document.getElementById("skills");
+    }
   }
 
   updateQuickPickState();
@@ -535,70 +710,10 @@ if (clearFiltersBtn) {
   }
 
 
+
   // ----------------------------------------------------------
   // Form submission and API call
   // ----------------------------------------------------------
-
-  form.addEventListener("submit", function (evt) {
-    evt.preventDefault(); //stop the browser from reloading the page on form submit
-    clearAllErrors()
-    
-    if (skillsTextInput.value.trim()) {
-      addSkill(skillsTextInput.value);
-      skillsTextInput.value = "";
-      hideSuggestions();
-    }
-
-    if (!validateForm()) return; //stop - anything missing/invalid
-
-    setLoadingState(true);
-
-    // Allow browser to paint spinner before request starts
-    requestAnimationFrame(function () {
-
-      var payload = {
-        skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-        level: document.getElementById("level").value,
-        interest: document.getElementById("interest").value,
-        time: document.getElementById("time").value
-      };
-
-      fetch("/api/recommend", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      })
-        .then(function (res) {
-          return res.json();
-        })
-        .then(function (data) {
-
-          setLoadingState(false);
-
-          if (data.error) {
-            var generalErr = document.getElementById("form-error-general");
-
-            if (generalErr) {
-              generalErr.textContent = data.error;
-            }
-
-            return;
-          }
-
-          renderResults(data.projects || [], data.message);
-        })
-        .catch(function () {
-
-          setLoadingState(false);
-    //combine form values into an object to send to server/api
-    var payload = {
-      // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-      level: document.getElementById("level").value,
-      interest: document.getElementById("interest").value,
-      time: document.getElementById("time").value
-    };  
-  });
 
   // Manages the loading state of the form and results section(whats visible or not)
   function setLoadingState(isLoading) {
@@ -609,12 +724,12 @@ if (clearFiltersBtn) {
     btnLoading.style.display = isLoading ? "inline-flex" : "none";
 
     if (isLoading) {
-      // Show the results section with only the loading indicator visible
-      resultsSection.style.display = "block";
-      resultsLoadingEl.style.display = "block";
+      resultsGrid.innerHTML = "";         
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "none";
-      // Scroll down so the user can see the spinner without manually scrolling
+      resultsEmptyEl.textContent = "";
+      resultsLoadingEl.style.display = "block";
+      resultsSection.style.display = "block";
       resultsSection.scrollIntoView({ behavior: "smooth" });
     } else {
       resultsLoadingEl.style.display  = "none";
@@ -635,26 +750,10 @@ if (clearFiltersBtn) {
     // Clear out any cards from a previous search before showing new ones
     resultsGrid.innerHTML = "";
 
-    if (!projects || projects.length === 0) {
-      resultsGrid.style.display     = "none";
-      resultsEmptyEl.style.display  = "block";
-      resultsGrid.style.display = "none";
-      resultsEmptyEl.style.display = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
-    if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
+    if (!projects || projects.length === 0) { // if no projects returned from api, show "no results" and hide the grid
       resultsGrid.style.display    = "none";
       resultsEmptyEl.style.display = "block";
-
-      // Show a friendly custom message when the user selected an interest
-      var selectedInterest = document.getElementById("interest")?.value;
-      if (selectedInterest) {
-        emptyMessageEl.textContent = "No projects are currently available for this interest. Please check back later or try a different area.";
-      } else if (message) {
-        emptyMessageEl.textContent = message;
-      } else {
-        emptyMessageEl.textContent = "Try adjusting your skills or choosing a different interest area.";
-      }
-
+      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
       resultsSection.scrollIntoView({ behavior: "smooth" });
       return;
     }
@@ -670,11 +769,68 @@ if (clearFiltersBtn) {
     resultsSection.scrollIntoView({ behavior: "smooth" });
   }
 
-  // builds one project card as a DOM element and returns it
-  // the card has title, short description, tags and link
+  function truncate(text, maxLength) {
+    text = text || "";
+    return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
+  }
+
+  function createTag(text, type) {
+    var span = document.createElement("span");
+    span.className = "project-tag project-tag--" + normalize(type).replace(/[^a-z0-9_-]/g, "-");
+    span.textContent = text;
+    return span;
+  }
+
+  //takes the array of projects from the api and draws them on the page as cards
+  //if array is empty it shows the "no results" message instead
+  function renderResults(projects, message) {
+    console.log("Rendering results with projects:", projects);
+    console.log("Message:", message);
+    
+    resultsSection.style.display = "block";
+    resultsLoadingEl.style.display = "none";
+    // Clear out any cards from a previous search before showing new ones
+    resultsGrid.innerHTML = "";
+    recordSearch();
+
+    if (!projects || projects.length === 0) {
+      resultsGrid.style.display = "none";
+      resultsEmptyEl.style.display = "block";
+
+      // Show a friendly custom message when the user selected an interest
+      var selectedInterest = document.getElementById("interest")?.value;
+      if (selectedInterest) {
+        emptyMessageEl.textContent = "No projects are currently available for this interest. Please check back later or try a different area.";
+      } else if (message) {
+        emptyMessageEl.textContent = message;
+      } else {
+        emptyMessageEl.textContent = "Try adjusting your skills or choosing a different interest area.";
+      }
+
+  // Clear out previous results before rendering new ones
+  resultsGrid.innerHTML = "";
+
+  // If no projects are returned, show the empty state message
+  if (!projects || projects.length === 0) {
+    resultsGrid.style.display = "none";
+    resultsEmptyEl.style.display = "block";
+
+    projects.forEach(function (project) {
+      resultsGrid.appendChild(buildProjectCard(project));
+    });
+
+    recordSearch();
+    resultsSection.scrollIntoView({ behavior: "smooth" });
+  }
+
   function buildProjectCard(project) {
+    
     var card = document.createElement("div");
     card.className = "project-card";
+
+    // Console logging for debugging
+    console.log("Building card for project:", project);
+    console.log("Project ID:", project.id);
 
     // Title
     var title = document.createElement("h3");
@@ -698,8 +854,7 @@ if (clearFiltersBtn) {
 
     // Level tag (colour-coded via CSS class)
     // Lowercase so it matches the CSS class names like "level beginner", "level advanced"
-    var levelClass = "level " + (project.level || "").toLowerCase();
-    tagsRow.appendChild(createTag(project.level, levelClass));
+    tagsRow.appendChild(createTag(project.level, "level " + (project.level || "").toLowerCase()));
 
     // Time tag
     tagsRow.appendChild(createTag("Time: " + project.time, "time"));
@@ -712,7 +867,11 @@ if (clearFiltersBtn) {
     link.className = "btn-details";
     link.textContent = "View Full Project";
     link.href = "/project/" + project.id; //each project has a unique id
+    
+    console.log("Created link with href:", link.href);
 
+    link.href = "/project/" + project.id;
+    footer.appendChild(saveButton);
     footer.appendChild(link);
 
     // Assemble the card in order
@@ -720,17 +879,103 @@ if (clearFiltersBtn) {
     card.appendChild(desc);
     card.appendChild(tagsRow);
     card.appendChild(footer);
+    return card;
+  }
+
+  function runProjectSearch(query) {
+    if (!query) return;
+    setLoadingState(true);
+    fetch("/api/search?q=" + encodeURIComponent(query))
+      .then(function (response) {
+        return response.json().then(function (data) {
+          if (!response.ok) throw new Error("Search failed. Please try again.");
+          return data;
+        });
+      })
+      .then(function (projects) {
+        setLoadingState(false);
+        recordSearch();
+        var message = projects.length
+          ? null
+          : "No projects matched \"" + query + "\". Try a different keyword.";
+        renderResults(projects, message);
+        var mobileMenu = document.getElementById("nav-mobile-menu");
+        var mobileToggle = document.getElementById("nav-mobile-toggle");
+        if (mobileMenu && mobileMenu.classList.contains("open")) {
+          mobileMenu.classList.remove("open");
+          if (mobileToggle) {
+            mobileToggle.classList.remove("open");
+            mobileToggle.setAttribute("aria-expanded", "false");
+          }
+        }
+      })
+      .catch(function (err) {
+        setLoadingState(false);
+        var general = document.getElementById("form-error-general");
+        if (general) general.textContent = err.message || "Search failed. Please try again.";
+      });
+  }
 
     return card;
   }
 
-  // helper to create a coloured tag element (used for skills, level, time tags on the cards)
-  function createTag(text, type) {
-    var span = document.createElement("span");
-    // The type becomes a BEM modifier so CSS can style each tag differently
-    span.className = "project-tag project-tag--" + type;
-    span.textContent = text;
-    return span;
+  bindSearchForm(document.getElementById("topic-search-form"), document.getElementById("topic-search"));
+  bindSearchForm(document.getElementById("topic-search-form-mobile"), document.getElementById("topic-search-mobile"));
+
+
+  skillsInput.setAttribute("role", "combobox");
+  skillsInput.setAttribute("aria-expanded", "false");
+  suggestions.setAttribute("role", "listbox");
+
+  skillsInput.addEventListener("input", function () {
+    showSuggestions(filteredSkills(skillsInput.value));
+  });
+  skillsInput.addEventListener("focus", function () {
+    if (skillsInput.value.trim()) showSuggestions(filteredSkills(skillsInput.value));
+  });
+  skillsInput.addEventListener("blur", function () {
+    window.setTimeout(hideSuggestions, 150);
+  });
+  skillsInput.addEventListener("keydown", function (event) {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      if (!visibleSuggestions.length) showSuggestions(filteredSkills(skillsInput.value));
+      if (!visibleSuggestions.length) return;
+      event.preventDefault();
+      activeSuggestionIndex = event.key === "ArrowDown"
+        ? (activeSuggestionIndex + 1) % visibleSuggestions.length
+        : (activeSuggestionIndex <= 0 ? visibleSuggestions.length - 1 : activeSuggestionIndex - 1);
+      renderSuggestionState();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      hideSuggestions();
+      return;
+    }
+    if (event.key === "Enter") {
+      event.preventDefault();
+      if (activeSuggestionIndex >= 0 && visibleSuggestions[activeSuggestionIndex]) {
+        window.addSkill(visibleSuggestions[activeSuggestionIndex]);
+      } else {
+        window.addSkill(skillsInput.value);
+      }
+      skillsInput.value = "";
+      hideSuggestions();
+    }
+  });
+
+  quickPickChips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      var skill = chip.getAttribute("data-skill");
+      if (isSelected(skill)) removeSkill(skill);
+      else window.addSkill(skill);
+      skillsInput.value = "";
+      hideSuggestions();
+    });
+  });
+
+  if (skillWrap) {
+    skillWrap.addEventListener("click", function () { skillsInput.focus(); });
   }
 
   function truncate(text, maxLength) {
@@ -839,9 +1084,8 @@ if (isDetailPage) {
     // Swap icons on the button(copy and checkmark icons)
     var copyIcon  = btnCopyCode.querySelector(".copy-icon");
     var checkIcon = btnCopyCode.querySelector(".check-icon");
-    var btnLabel = btnCopyCode.querySelector(".copy-btn-label");
-
-    if (copyIcon) copyIcon.style.display = "none";
+    var btnLabel  = btnCopyCode.querySelector(".copy-btn-label");
+    if (copyIcon)  copyIcon.style.display  = "none";
     if (checkIcon) checkIcon.style.display = "inline";
     if (btnLabel) btnLabel.textContent = "Copied!";
     btnCopyCode.classList.add("copied");
@@ -885,6 +1129,30 @@ if (isDetailPage) {
         fallbackCopy(code); // Clipboard API not supported, use fallback method
       }
     });
+  } // end github modal handlers
+
+    /* ---- Scroll-to-top button ---- */
+      
+  var SCROLL_THRESHOLD = 300;
+  var scrollTopBtn = document.getElementById('scroll-top-btn');
+
+  function handleScroll() {
+    if (!scrollTopBtn) return;
+    if (window.pageYOffset > SCROLL_THRESHOLD) {
+      scrollTopBtn.classList.add('visible');
+    } else {
+      scrollTopBtn.classList.remove('visible');
+    }
+  }
+
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  if (scrollTopBtn) {
+    window.addEventListener('scroll', handleScroll);
+    scrollTopBtn.addEventListener('click', scrollToTop);
+  }
   }
 
   // Fallback method to copy text using a hidden textarea and execCommand (for older browsers)
@@ -962,33 +1230,35 @@ if (
           fetchBtn.textContent = 'Fetch Skills';
       }
   });
-}
+  update();
+})();
 
-/* ---- Scroll-to-top button ---- */
+(function initScrollSpy() {
+  var sections = document.querySelectorAll("section[id], header[id]");
+  var navLinks = document.querySelectorAll(".nav-link, .nav-mobile-link");
 
-/* Show the button only when the user has scrolled more than 300px */
-var SCROLL_THRESHOLD = 300;
+  if (sections.length === 0 || navLinks.length === 0) return;
 
-/* Get the button element; guard against pages that do not have it */
-var scrollTopBtn = document.getElementById('scroll-top-btn');
+  var observerOptions = {
+    root: null,
+    rootMargin: "-20% 0px -70% 0px",
+    threshold: 0
+  };
 
-/* Add or remove the .visible class based on scroll position */
-function handleScroll() {
-  if (!scrollTopBtn) return;
-  if (window.pageYOffset > SCROLL_THRESHOLD) {
-    scrollTopBtn.classList.add('visible');
-  } else {
-    scrollTopBtn.classList.remove('visible');
+  if (scrollTopBtn) {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    scrollTopBtn.addEventListener('click', function () {
+      if (atBottom) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      }
+    });
+    handleScroll();
   }
-}
+}());
 
-/* Smooth-scroll to the very top of the page */
-function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-/* Only wire up listeners if the button exists on this page */
-if (scrollTopBtn) {
-    window.addEventListener('scroll', handleScroll);
-    scrollTopBtn.addEventListener('click', scrollToTop);
-}
+  sections.forEach(function (sec) {
+    observer.observe(sec);
+  });
+})();

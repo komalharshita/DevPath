@@ -4,19 +4,30 @@
 # Responsibilities:
 #   - Create the Flask app instance
 #   - Register the main Blueprint from routes/
-#   - Register error handlers
+#   - Register the global error boundary via errors/handlers.py
 #   - Start the development server when run directly
 #
 # Business logic, recommendation scoring, and data loading all live in
 # the utils/ and routes/ packages, not here.
 
-from flask import Flask, render_template
+from flask import Flask
 from routes.main_routes import main
+from config import Config
+from errors.handlers import register_error_handlers
 
 app = Flask(__name__)
 
-# Register all routes defined in the main Blueprint
+# Load config settings into Flask's internal config manager properly
+app.config.from_object(Config)
+
+# Register all routes defined in the main Blueprint (This handles your '/' route!)
 app.register_blueprint(main)
+
+# Register the global error boundary (handles 400, 403, 404, 405, 429, 500,
+# and any unhandled Exception).  Must be called after Blueprint registration
+# so Blueprint-level error handlers take precedence where defined.
+register_error_handlers(app)
+
 
 @app.after_request
 def add_security_headers(response):
@@ -27,33 +38,41 @@ def add_security_headers(response):
     response.headers["Permissions-Policy"] = (
         "geolocation=(), microphone=(), camera=()"
     )
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data:; "
+        "font-src 'self'; "
+        "connect-src 'self'; "
+        "frame-ancestors 'none'"
+    )
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data:; "
+        "font-src 'self'; "
+        "connect-src 'self'; "
+        "frame-ancestors 'none'"
+    )
     return response
 
-# ---- Error handlers ----
 
-@app.errorhandler(404)
-def page_not_found(error):
-    """Render a friendly 404 page instead of the raw Flask error."""
-    return render_template("404.html"), 404
-
-
-@app.errorhandler(500)
+# Expose the 500 handler at module level so existing tests can import it
+# directly:  from app import app, internal_server_error
 def internal_server_error(error):
-    """Render a friendly 500 page for unexpected server errors."""
-    return render_template("500.html"), 500
-
-@app.errorhandler(405)
-def method_not_allowed(error):
-    """Render a friendly 405 page when the wrong HTTP method is used."""
-    return render_template("405.html"), 405
-
-@app.errorhandler(403)
-def forbidden(error):
-    """Render a friendly 403 page when access is denied."""
-    return render_template("403.html"), 403
+    """Proxy kept for backward compatibility with test_basic.py."""
+    from errors.handlers import internal_server_error as _handler
+    return _handler(error)
 
 
 if __name__ == "__main__":
-    # debug=True is only for local development.
-    # Never run with debug=True in a production deployment.
-    app.run(debug=True)
+
+    import os
+    debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() in ("true", "1")
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000)),
+        debug=debug_mode,
+    )

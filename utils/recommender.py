@@ -1,77 +1,108 @@
 # utils/recommender.py
 # Contains all recommendation logic: scoring and filtering projects.
-# Kept separate from routing so it can be tested and extended independently.
+
+import math
+import re
+from collections import Counter
+
+import json
+import os
 
 from utils.data_loader import load_all_projects
 
-# Maximum number of recommendations returned to the user
 MAX_RESULTS = 3
 
-# Scoring weights used by the recommendation engine.
-# Higher weights mean that criterion has more influence
-# on the final recommendation score.
 SCORING_WEIGHTS = {
-    "skill":    3,
-    "level":    2,
+    "skill": 3,
+    "level": 2,
     "interest": 2,
-    "time":     1,
+    "time": 1,
 }
 
-
-# Common aliases and abbreviations for skills
-# This improves recommendation accuracy by normalizing user input
 SKILL_ALIASES = {
     "js": "javascript",
     "py": "python",
     "html5": "html",
     "css3": "css",
     "c++": "cpp",
-    "web dev": "javascript"
+    "web dev": "javascript",
 }
 
-
 def parse_skills(skills_string):
-    """
-    Convert a raw comma-separated skills string into
-    a normalized lowercase list.
-
-    Example:
-    "JS, HTML5, CSS3" -> ["javascript", "html", "css"]
-    """
-
     raw_skills = [
         s.strip().lower()
         for s in skills_string.split(",")
         if s.strip()
     ]
+    return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
 
-    normalized_skills = [
-        SKILL_ALIASES.get(skill, skill)
-        for skill in raw_skills
+def _tokenize(text):
+    return re.findall(r"[a-z0-9]+", str(text).lower())
+
+def _project_text(project):
+    parts = [
+        project.get("title", ""),
+        project.get("level", ""),
+        project.get("interest", ""),
+        project.get("time", ""),
+        project.get("description", ""),
+        " ".join(project.get("skills", [])),
+        " ".join(project.get("tech_stack", [])),
+        " ".join(project.get("features", [])),
     ]
+    return " ".join(parts)
 
-    return normalized_skills
+def _user_text(user_skills, level, interest, time_availability):
+    return " ".join(user_skills + [level, interest, time_availability])
 
+def _tf(tokens):
+    counts = Counter(tokens)
+    total = len(tokens) or 1
+    return {token: count / total for token, count in counts.items()}
 
-def score_single_project(
-        project, user_skills,
-        level, interest, time_availability):
-    """
-    Calculate a numeric relevance score for one project.
+def _idf(documents):
+    total_docs = len(documents)
+    idf_scores = {}
 
-    Each matching criterion adds points:
-      - Each matching skill:  +3
-      - Level match:          +2
-      - Interest match:       +2
-      - Time match:           +1
+    all_tokens = set(token for doc in documents for token in set(doc))
 
-    Returns an integer score (0 means no match at all).
-    """
-    # Compare time availability, return results with the same time availibity or lower.
-    TIME_AVAILABILITY = ['low', 'medium', 'high']
-    time_availability_index =   TIME_AVAILABILITY.index(time_availability.strip().lower())
-    valid_time = TIME_AVAILABILITY[ : time_availability_index + 1 ]
-    
+    for token in all_tokens:
+        docs_with_token = sum(1 for doc in documents if token in doc)
+        idf_scores[token] = math.log((1 + total_docs) / (1 + docs_with_token)) + 1
+
+    return idf_scores
+
+def _tfidf_vector(tokens, idf_scores):
+    tf_scores = _tf(tokens)
+    return {
+        token: tf_scores[token] * idf_scores.get(token, 0)
+        for token in tf_scores
+    }
+
+def _cosine_similarity(vec_a, vec_b):
+    shared_tokens = set(vec_a) & set(vec_b)
+
+    dot_product = sum(vec_a[token] * vec_b[token] for token in shared_tokens)
+    magnitude_a = math.sqrt(sum(value ** 2 for value in vec_a.values()))
+    magnitude_b = math.sqrt(sum(value ** 2 for value in vec_b.values()))
+
+    if magnitude_a == 0 or magnitude_b == 0:
+        return 0
+
+    return dot_product / (magnitude_a * magnitude_b)
+
+def ml_similarity_score(project, user_skills, level, interest, time_availability, all_projects):
+    project_documents = [_tokenize(_project_text(p)) for p in all_projects]
+    user_tokens = _tokenize(_user_text(user_skills, level, interest, time_availability))
+
+    idf_scores = _idf(project_documents + [user_tokens])
+
+    user_vector = _tfidf_vector(user_tokens, idf_scores)
+    project_vector = _tfidf_vector(_tokenize(_project_text(project)), idf_scores)
+
+    return _cosine_similarity(user_vector, project_vector)
+
+def score_single_project(project, user_skills, level, interest, time_availability):
     score = 0
 
     # Compare user's skills against the project's required skills
@@ -79,75 +110,81 @@ def score_single_project(
     # Count how many user skills overlap with the
     # skills required by the current project.
     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
-    # Add weighted points based on the number of matching skills.
-    # More overlapping skills result in a higher recommendation score.
+
     score += matched_skills * SCORING_WEIGHTS["skill"]
 
-    # Award points for each additional matching criterion
     if project.get("level", "").lower() == level.lower():
         score += SCORING_WEIGHTS["level"]
 
     if project.get("interest", "").lower() == interest.lower():
         score += SCORING_WEIGHTS["interest"]
 
-    if project.get("time", "").lower() == time_availability.lower():
+    if project_time == user_time:
         score += SCORING_WEIGHTS["time"]
 
-    if project.get("time", "").lower() in valid_time :
-        return score
-    return 0
+    return score
 
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
 
 def get_recommendations(skills_string, level, interest, time_availability):
-    """
-    Return the top N recommended projects for the given user inputs.
-
-    Steps:
-      1. Parse the raw skills input into a list.
-      2. Score every project in the dataset.
-      3. Drop projects with a score of zero (no overlap at all).
-      4. Sort by score descending.
-      5. Return the top MAX_RESULTS projects.
-    """
     user_skills = parse_skills(skills_string)
     all_projects = load_all_projects()
 
-    scored_projects = []
-
+    scored = []
     for project in all_projects:
-        score = score_single_project(
-            project, user_skills, level, interest, time_availability
+        rule_score = score_single_project(
+            project,
+            user_skills,
+            level,
+            interest,
+            time_availability,
         )
-        # Ignore projects with a score of 0 since they
-        # have no meaningful overlap with the user's inputs.
-        if score > 0:
-            scored_projects.append({"project": project, "score": score})
+
+        similarity_score = ml_similarity_score(
+            project,
+            user_skills,
+            level,
+            interest,
+            time_availability,
+            all_projects,
+        )
 
     # Sort projects in descending order so the
     # most relevant recommendations appear first.
+    scored_projects.sort(key=lambda item: (item["score"], item["project"].get("id", 0)), reverse=True)
+        final_score = rule_score + similarity_score
+
+        if final_score > 0:
+            scored_projects.append({
+                "project": project,
+                "score": final_score,
+            })
+
     scored_projects.sort(key=lambda item: item["score"], reverse=True)
 
-    # Return only the project dicts, not the score metadata
     return [item["project"] for item in scored_projects[:MAX_RESULTS]]
 
-
 def validate_recommendation_inputs(skills, level, interest, time_availability):
-    """
-    Validate all four required fields.
-    Returns a list of error strings. An empty list means all inputs are valid.
-    """
     errors = []
 
     if not skills or not skills.strip():
         errors.append("Please enter at least one skill.")
+    elif not parse_skills(skills):
+        errors.append("Please enter at least one valid skill.")
 
     if not level or not level.strip():
         errors.append("Please select an experience level.")
+    elif level.strip().lower() not in VALID_LEVELS:
+        errors.append("Invalid experience level. Choose Beginner, Intermediate, or Advanced.")
 
-    if not interest or not interest.strip():
-        errors.append("Please select an area of interest.")
+    if not interest or not isinstance(interest, str) or interest.strip().lower() not in VALID_INTERESTS:
+        errors.append("Please select a valid area of interest.")
 
     if not time_availability or not time_availability.strip():
         errors.append("Please select your time availability.")
+    elif time_availability.strip().lower() not in VALID_TIME_AVAILABILITY:
+        errors.append("Invalid time availability. Choose Low, Medium, or High.")
 
     return errors
