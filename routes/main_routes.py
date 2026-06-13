@@ -6,7 +6,7 @@
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
-from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats
+from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats, get_available_skills
 from utils.roadmap_comparer import load_all_career_roadmaps, compare_roadmaps
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
 from utils.learning_path import (
@@ -54,6 +54,16 @@ def index():
 @main.route("/contact")
 def contact():
     return render_template("contact.html")
+
+@main.route('/api/available-skills', methods=['GET'])
+def available_skills():
+    """Return dynamically extracted skills for the frontend UI."""
+    skills = get_available_skills()
+    return jsonify({
+        'status': 'success',
+        'count': len(skills),
+        'skills': skills
+    }), 200
 
 
 @main.route("/compare")
