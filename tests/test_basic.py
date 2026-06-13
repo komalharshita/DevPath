@@ -19,6 +19,11 @@ import pytest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from utils.data_loader import load_all_projects, find_project_by_id, clear_cache, validate_projects
+from utils.roadmap_comparer import (
+    load_all_career_roadmaps,
+    compare_roadmaps,
+    clear_roadmap_cache,
+)
 from utils.recommender import (
     get_recommendations,
     validate_recommendation_inputs,
@@ -38,6 +43,7 @@ from app import app, internal_server_error
 def setup_module():
     """Clear the data cache before running the test suite to ensure clean state."""
     clear_cache()
+    clear_roadmap_cache()
 
 
 # ============================================================
@@ -710,6 +716,91 @@ def test_project_links_have_noopener():
     assert b'rel="noopener noreferrer"' in response.data
 
 
+# ============================================================
+# Career roadmap comparison tests
+# ============================================================
+
+def test_career_roadmaps_load():
+    """Career roadmaps JSON must load and contain entries."""
+    roadmaps = load_all_career_roadmaps()
+    assert isinstance(roadmaps, list)
+    assert len(roadmaps) >= 2
+
+
+def test_compare_roadmaps_finds_overlap():
+    """Comparing frontend and fullstack should find shared skills."""
+    result = compare_roadmaps("frontend", "fullstack")
+    assert result is not None
+    assert "overlapping_skills" in result
+    assert len(result["overlapping_skills"]) > 0
+    assert result["roadmap_a"]["id"] == "frontend"
+    assert result["roadmap_b"]["id"] == "fullstack"
+
+
+def test_compare_same_roadmap_returns_error():
+    """Comparing a roadmap with itself should return an error message."""
+    result = compare_roadmaps("react", "react")
+    assert result is not None
+    assert "error" in result
+
+
+def test_compare_invalid_roadmap_returns_none():
+    """Unknown roadmap IDs should return None."""
+    assert compare_roadmaps("nonexistent", "frontend") is None
+
+
+def test_compare_page_route():
+    """Compare page should render successfully."""
+    client = get_client()
+    response = client.get("/compare")
+    assert response.status_code == 200
+    assert b"Compare Learning Roadmaps" in response.data
+
+
+def test_list_roadmaps_api():
+    """API should return all career roadmaps."""
+    client = get_client()
+    response = client.get("/api/roadmaps")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert isinstance(data, list)
+    assert len(data) >= 2
+
+
+def test_compare_api():
+    """Compare API should return structured comparison data."""
+    client = get_client()
+    response = client.get("/api/compare?a=react&b=angular")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["roadmap_a"]["id"] == "react"
+    assert data["roadmap_b"]["id"] == "angular"
+    assert "metrics" in data
+    assert "overlapping_skills" in data
+
+
+def test_compare_api_missing_params():
+    """Compare API should reject requests missing query params."""
+    client = get_client()
+    response = client.get("/api/compare?a=react")
+    assert response.status_code == 400
+
+
+def test_compare_api_not_found():
+    """Compare API should 404 for invalid roadmap IDs."""
+    client = get_client()
+    response = client.get("/api/compare?a=invalid&b=alsoinvalid")
+    assert response.status_code == 404
+
+
+def test_sitemap_includes_compare():
+    """Sitemap should include the compare page."""
+    client = get_client()
+    response = client.get("/sitemap.xml")
+    assert response.status_code == 200
+    assert b"/compare" in response.data
+
+
 
 # ============================================================
 # Run tests directly (no pytest required)
@@ -732,3 +823,22 @@ if __name__ == "__main__":
     print(f"\n{passed} passed, {failed} failed out of {passed + failed} tests")
     if failed > 0:
         sys.exit(1)
+
+def test_ml_similarity_score_returns_float():
+    from utils.recommender import ml_similarity_score, parse_skills
+    projects = load_all_projects()
+    score = ml_similarity_score(
+        projects[0],
+        parse_skills("Python"),
+        "Beginner",
+        "Data",
+        "Low",
+        projects,
+    )
+    assert isinstance(score, float)
+    assert score >= 0
+
+def test_ml_recommendation_prefers_relevant_python_data_project():
+    results = get_recommendations("Python, pandas", "Intermediate", "Data", "High")
+    titles = [project["title"] for project in results]
+    assert any("Data" in title or "Pipeline" in title for title in titles)

@@ -3,6 +3,8 @@
 
 import sys
 import os
+import pytest
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from app import app
@@ -140,10 +142,10 @@ def test_og_banner_exists():
 
 def test_og_banner_dimensions():
     """The og-banner.png must be 1200x630 pixels."""
+    pytest.importorskip("PIL")
     from PIL import Image
     img = Image.open("static/og-banner.png")
     assert img.size == (1200, 630), f"Expected 1200x630, got {img.size}"
 
 if __name__ == "__main__":
-    import pytest
     pytest.main([__file__, "-v"])

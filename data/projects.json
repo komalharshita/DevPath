@@ -2,9 +2,7 @@
   {
     "id": 1,
     "title": "Personal Expense Tracker",
-    "skills": [
-      "Python"
-    ],
+    "skills": ["Python"],
     "level": "Beginner",
     "interest": "Data",
     "time": "Low",
@@ -15,11 +13,7 @@
       "View monthly summary",
       "Export data to CSV file"
     ],
-    "tech_stack": [
-      "Python",
-      "CSV module",
-      "datetime module"
-    ],
+    "tech_stack": ["Python", "CSV module", "datetime module"],
     "roadmap": [
       "Step 1: Set up the project folder and create main.py",
       "Step 2: Design the expense data structure as a dictionary",
@@ -39,11 +33,7 @@
   {
     "id": 2,
     "title": "Weather Dashboard",
-    "skills": [
-      "JavaScript",
-      "HTML",
-      "CSS"
-    ],
+    "skills": ["JavaScript", "HTML", "CSS"],
     "level": "Beginner",
     "interest": "Web",
     "time": "Low",
@@ -54,12 +44,7 @@
       "Show a weather icon based on conditions",
       "Toggle between Celsius and Fahrenheit"
     ],
-    "tech_stack": [
-      "HTML",
-      "CSS",
-      "JavaScript",
-      "OpenWeatherMap API"
-    ],
+    "tech_stack": ["HTML", "CSS", "JavaScript", "OpenWeatherMap API"],
     "roadmap": [
       "Step 1: Create the HTML structure with a search form",
       "Step 2: Style the page with CSS flexbox",
@@ -79,9 +64,7 @@
   {
     "id": 3,
     "title": "Student Grade Manager",
-    "skills": [
-      "Python"
-    ],
+    "skills": ["Python"],
     "level": "Beginner",
     "interest": "Education",
     "time": "Medium",
@@ -92,11 +75,7 @@
       "Assign letter grades automatically",
       "Save and load data from a JSON file"
     ],
-    "tech_stack": [
-      "Python",
-      "json module",
-      "os module"
-    ],
+    "tech_stack": ["Python", "json module", "os module"],
     "roadmap": [
       "Step 1: Define the student data structure using a dictionary",
       "Step 2: Write add_student() and add_grade() functions",
@@ -116,9 +95,7 @@
   {
     "id": 4,
     "title": "Task Manager REST API",
-    "skills": [
-      "Python"
-    ],
+    "skills": ["Python"],
     "level": "Intermediate",
     "interest": "Web",
     "time": "Medium",
@@ -129,12 +106,7 @@
       "Assign priority levels to tasks",
       "Persist data to a JSON file"
     ],
-    "tech_stack": [
-      "Python",
-      "Flask",
-      "JSON",
-      "Postman (for testing)"
-    ],
+    "tech_stack": ["Python", "Flask", "JSON", "Postman (for testing)"],
     "roadmap": [
       "Step 1: Install Flask and create the app.py file",
       "Step 2: Define the task data model as a dictionary",
@@ -155,11 +127,7 @@
   {
     "id": 5,
     "title": "Portfolio Website",
-    "skills": [
-      "HTML",
-      "CSS",
-      "JavaScript"
-    ],
+    "skills": ["HTML", "CSS", "JavaScript"],
     "level": "Beginner",
     "interest": "Web",
     "time": "Low",
@@ -170,11 +138,7 @@
       "Skills list with visual indicators",
       "Contact form with basic validation"
     ],
-    "tech_stack": [
-      "HTML",
-      "CSS",
-      "JavaScript"
-    ],
+    "tech_stack": ["HTML", "CSS", "JavaScript"],
     "roadmap": [
       "Step 1: Plan the page sections on paper first",
       "Step 2: Write the HTML structure for all sections",
@@ -195,12 +159,7 @@
   {
     "id": 6,
     "title": "URL Shortener",
-    "skills": [
-      "Python",
-      "JavaScript",
-      "HTML",
-      "CSS"
-    ],
+    "skills": ["Python", "JavaScript", "HTML", "CSS"],
     "level": "Intermediate",
     "interest": "Web",
     "time": "High",
@@ -211,14 +170,7 @@
       "Track how many times a link was clicked",
       "List all shortened links in a dashboard"
     ],
-    "tech_stack": [
-      "Python",
-      "Flask",
-      "HTML",
-      "CSS",
-      "JavaScript",
-      "JSON"
-    ],
+    "tech_stack": ["Python", "Flask", "HTML", "CSS", "JavaScript", "JSON"],
     "roadmap": [
       "Step 1: Set up Flask app with two routes: home and redirect",
       "Step 2: Write a random 6-character code generator",
@@ -239,9 +191,7 @@
   {
     "id": 7,
     "title": "Data Analysis Report Generator",
-    "skills": [
-      "Python"
-    ],
+    "skills": ["Python"],
     "level": "Intermediate",
     "interest": "Data",
     "time": "High",
@@ -252,12 +202,7 @@
       "Calculate mean, median, and mode per column",
       "Generate bar charts for categorical data"
     ],
-    "tech_stack": [
-      "Python",
-      "pandas",
-      "matplotlib",
-      "os module"
-    ],
+    "tech_stack": ["Python", "pandas", "matplotlib", "os module"],
     "roadmap": [
       "Step 1: Install pandas and matplotlib via pip",
       "Step 2: Write a CSV loader that validates the file path",
@@ -276,10 +221,9 @@
   },
   {
     "id": 8,
+
     "title": "Library Management System",
-    "skills": [
-      "Java"
-    ],
+    "skills": ["Java"],
     "level": "Beginner",
     "interest": "Backend",
     "time": "Medium",
@@ -290,11 +234,7 @@
       "Store student records",
       "Search books by title or author"
     ],
-    "tech_stack": [
-      "Java",
-      "OOP",
-      "File Handling"
-    ],
+    "tech_stack": ["Java", "OOP", "File Handling"],
     "roadmap": [
       "Step 1: Create Book and Student classes",
       "Step 2: Design the menu-driven interface",
@@ -314,10 +254,7 @@
   {
     "id": 9,
     "title": "Real-Time Chat Application",
-    "skills": [
-      "JavaScript",
-      "Node.js"
-    ],
+    "skills": ["JavaScript", "Node.js"],
     "level": "Intermediate",
     "interest": "Web",
     "time": "High",
@@ -328,13 +265,7 @@
       "User join and leave notifications",
       "Simple responsive chat interface"
     ],
-    "tech_stack": [
-      "Node.js",
-      "Express.js",
-      "Socket.IO",
-      "HTML",
-      "CSS"
-    ],
+    "tech_stack": ["Node.js", "Express.js", "Socket.IO", "HTML", "CSS"],
     "roadmap": [
       "Step 1: Initialize the Node.js project",
       "Step 2: Install Express and Socket.IO",
@@ -352,11 +283,9 @@
     "starter_code": "starter_code/realtime_chat_app.js"
   },
   {
-    "id": 10,
+    "id": 99,
     "title": "Password Strength Checker",
-    "skills": [
-      "Python"
-    ],
+    "skills": ["Python"],
     "level": "Beginner",
     "interest": "Cybersecurity",
     "time": "Low",
@@ -367,10 +296,7 @@
       "Suggest stronger password improvements",
       "Prevent weak password patterns"
     ],
-    "tech_stack": [
-      "Python",
-      "Regex"
-    ],
+    "tech_stack": ["Python", "Regex"],
     "roadmap": [
       "Step 1: Create the password input system",
       "Step 2: Check password length",
@@ -386,11 +312,9 @@
     "starter_code": "starter_code/password_checker.py"
   },
   {
-    "id": 11,
+    "id": 10,
     "title": "Feedback Survey Form",
-    "skills": [
-      "HTML"
-    ],
+    "skills": ["HTML"],
     "level": "Beginner",
     "interest": "Web",
     "time": "Low",
@@ -400,9 +324,7 @@
       "Dropdown menu for experience selection",
       "Text area for detailed user suggestions"
     ],
-    "tech_stack": [
-      "HTML"
-    ],
+    "tech_stack": ["HTML"],
     "roadmap": [
       "Step 1: Create the HTML folder structure inside starter_code",
       "Step 2: Build the input text fields and labels",
@@ -416,13 +338,9 @@
     "starter_code": "starter_code/survey_form/index.html"
   },
   {
-    "id": 12,
+    "id": 98,
     "title": "API ETL Pipeline",
-    "skills": [
-      "Python",
-      "pandas",
-      "requests"
-    ],
+    "skills": ["Python", "pandas", "requests"],
     "level": "Intermediate",
     "interest": "Data",
     "time": "Medium",
@@ -434,12 +352,7 @@
       "Generate summary statistics",
       "Export the processed CSV for any other Analytics projects"
     ],
-    "tech_stack": [
-      "Python",
-      "pandas",
-      "requests",
-      "JSON"
-    ],
+    "tech_stack": ["Python", "pandas", "requests", "JSON"],
     "roadmap": [
       "Step 1: Install required modules via pip",
       "Step 2: Find a public API key for this project",
@@ -461,62 +374,60 @@
     ],
     "starter_code": "starter_code/api_data_pipeline.py"
   },
-  {
-    "id": 13,
-    "title": "AI Resume Analyzer",
-    "skills": [
-      "Python",
-      "Flask",
-      "HTML",
-      "CSS",
-      "JavaScript"
-    ],
-    "level": "Intermediate",
-    "interest": "Data",
-    "time": "High",
-    "description": "A Flask web app that compares a resume against a job description using TF-IDF similarity and keyword extraction. Users upload a PDF or paste text, and the app returns a match score, a list of missing keywords, and actionable feedback — with no external AI API required.",
-    "features": [
-      "Upload a resume as PDF or paste plain text",
-      "Paste any job description for comparison",
-      "TF-IDF cosine similarity match score (0–100%)",
-      "Missing skills and keyword gap analysis",
-      "Actionable written feedback based on score",
-      "Single-page interface with interactive feedback display"
-    ],
-    "tech_stack": [
-      "Python",
-      "Flask",
-      "PyPDF2",
-      "scikit-learn",
-      "HTML",
-      "CSS",
-      "JavaScript"
-    ],
-    "roadmap": [
-      "Step 1: Run the server and verify the upload form renders",
-      "Step 2: Complete extract_text_from_pdf() using PyPDF2",
-      "Step 3: Complete clean_text() to normalise punctuation and whitespace",
-      "Step 4: Complete extract_keywords() to remove stopwords and count frequency",
-      "Step 5: Complete calculate_similarity() with TF-IDF and cosine distance",
-      "Step 6: Complete find_missing_skills() by comparing two keyword sets",
-      "Step 7: Complete generate_feedback() to produce written suggestions",
-      "Step 8: Wire everything together inside the /analyze Flask route",
-      "Step 9: Test with a real resume PDF and a real job posting"
-    ],
-    "resources": [
-      "PyPDF2 documentation: https://pypdf2.readthedocs.io/",
-      "scikit-learn TF-IDF guide: https://scikit-learn.org/stable/modules/feature_extraction.html#tfidf-term-weighting",
-      "Cosine similarity explained: https://www.machinelearningplus.com/nlp/cosine-similarity",
-      "Flask quickstart: https://flask.palletsprojects.com/quickstart"
-    ],
-    "starter_code": "starter_code/ai_resume_analyzer.py"
+ {
+  "id": 11,
+  "title": "AI Resume Analyzer",
+  "skills": [
+    "Python",
+    "Flask",
+    "HTML",
+    "CSS",
+    "JavaScript"
+  ],
+  "level": "Intermediate",
+  "interest": "Data",
+  "time": "High",
+  "description": "A Flask web app that compares a resume against a job description using TF-IDF similarity and keyword extraction. Users upload a PDF or paste text, and the app returns a match score, a list of missing keywords, and actionable feedback — with no external AI API required.",
+  "features": [
+    "Upload a resume as PDF or paste plain text",
+    "Paste any job description for comparison",
+    "TF-IDF cosine similarity match score (0–100%)",
+    "Missing skills and keyword gap analysis",
+    "Actionable written feedback based on score",
+    "Single-page interface with interactive feedback display"
+  ],
+  "tech_stack": [
+    "Python",
+    "Flask",
+    "PyPDF2",
+    "scikit-learn",
+    "HTML",
+    "CSS",
+    "JavaScript"
+  ],
+  "roadmap": [
+    "Step 1: Run the server and verify the upload form renders",
+    "Step 2: Complete extract_text_from_pdf() using PyPDF2",
+    "Step 3: Complete clean_text() to normalise punctuation and whitespace",
+    "Step 4: Complete extract_keywords() to remove stopwords and count frequency",
+    "Step 5: Complete calculate_similarity() with TF-IDF and cosine distance",
+    "Step 6: Complete find_missing_skills() by comparing two keyword sets",
+    "Step 7: Complete generate_feedback() to produce written suggestions",
+    "Step 8: Wire everything together inside the /analyze Flask route",
+    "Step 9: Test with a real resume PDF and a real job posting"
+  ],
+  "resources": [
+    "PyPDF2 documentation: https://pypdf2.readthedocs.io/",
+    "scikit-learn TF-IDF guide: https://scikit-learn.org/stable/modules/feature_extraction.html#tfidf-term-weighting",
+    "Cosine similarity explained: https://www.machinelearningplus.com/nlp/cosine-similarity",
+    "Flask quickstart: https://flask.palletsprojects.com/quickstart"
+  ],
+  "starter_code": "starter_code/ai_resume_analyzer.py"
   },
   {
-    "id": 14,
+    "id": 12,
     "title": "Number Guessing Game",
-    "skills": [
-      "Python"
-    ],
+    "skills": ["Python"],
     "level": "Beginner",
     "interest": "Games",
     "time": "Low",
@@ -527,10 +438,7 @@
       "Count number of attempts",
       "Show final score at the end"
     ],
-    "tech_stack": [
-      "Python",
-      "random module"
-    ],
+    "tech_stack": ["Python", "random module"],
     "roadmap": [
       "Step 1: Set up the Python file and import random module",
       "Step 2: Generate a random number using random.randint()",
@@ -548,11 +456,9 @@
     "starter_code": "starter_code/number_guessing.py"
   },
   {
-    "id": 15,
+    "id": 13,
     "title": "Simple Email Automation",
-    "skills": [
-      "Python"
-    ],
+    "skills": ["Python"],
     "level": "Beginner",
     "interest": "Automation",
     "time": "Low",
@@ -563,11 +469,7 @@
       "Add subject and body text",
       "Read recipient list from a text file"
     ],
-    "tech_stack": [
-      "Python",
-      "smtplib",
-      "email module"
-    ],
+    "tech_stack": ["Python", "smtplib", "email module"],
     "roadmap": [
       "Step 1: Set up Python file and import smtplib",
       "Step 2: Configure sender email and password",
@@ -585,13 +487,9 @@
     "starter_code": "starter_code/email_automation.py"
   },
   {
-    "id": 16,
+    "id": 14,
     "title": "Quiz App",
-    "skills": [
-      "HTML",
-      "CSS",
-      "JavaScript"
-    ],
+    "skills": ["HTML", "CSS", "JavaScript"],
     "level": "Beginner",
     "interest": "Games",
     "time": "Low",
@@ -602,11 +500,7 @@
       "Show correct or incorrect feedback instantly",
       "Display final score on results screen"
     ],
-    "tech_stack": [
-      "HTML",
-      "CSS",
-      "JavaScript"
-    ],
+    "tech_stack": ["HTML", "CSS", "JavaScript"],
     "roadmap": [
       "Step 1: Create HTML structure for question and options",
       "Step 2: Style the quiz card with CSS",
@@ -625,11 +519,9 @@
     "starter_code": "starter_code/quiz_app.html"
   },
   {
-    "id": 17,
+    "id": 15,
     "title": "Movie Recommendation System",
-    "skills": [
-      "Python"
-    ],
+    "skills": ["Python"],
     "level": "Intermediate",
     "interest": "Data",
     "time": "High",
@@ -640,12 +532,7 @@
       "Load and process movie datasets",
       "Display top recommended movies"
     ],
-    "tech_stack": [
-      "Python",
-      "pandas",
-      "scikit-learn",
-      "NumPy"
-    ],
+    "tech_stack": ["Python", "pandas", "scikit-learn", "NumPy"],
     "roadmap": [
       "Step 1: Download and inspect a movie ratings dataset",
       "Step 2: Load the dataset using pandas",
@@ -663,15 +550,11 @@
       "Cosine Similarity: https://naomy-gomes.medium.com/the-cosine-similarity-and-its-use-in-recommendation-systems-cb2ebd811ce1"
     ],
     "starter_code": "starter_code/movie_recommender.py"
-  },
+  }, 
   {
-    "id": 18,
+    "id": 16,
     "title": "Sentiment Analysis Web App",
-    "skills": [
-      "Python",
-      "HTML",
-      "CSS"
-    ],
+    "skills": ["Python", "HTML", "CSS"],
     "level": "Intermediate",
     "interest": "Data",
     "time": "High",
@@ -682,13 +565,7 @@
       "Preprocess text using NLP techniques",
       "Deploy the model with a simple web interface"
     ],
-    "tech_stack": [
-      "Python",
-      "Flask",
-      "scikit-learn",
-      "HTML",
-      "CSS"
-    ],
+    "tech_stack": ["Python", "Flask", "scikit-learn", "HTML", "CSS"],
     "roadmap": [
       "Step 1: Collect or download a sentiment dataset",
       "Step 2: Preprocess text data by cleaning and tokenizing",
@@ -706,14 +583,13 @@
       "Tokenization: https://www.geeksforgeeks.org/nlp/nlp-how-tokenizing-text-sentence-words-works/"
     ],
     "starter_code": "starter_code/sentiment_app.py"
-  },
+  }
+  ,
   {
-    "id": 19,
+    "id": 17,
     "title": "Sunrise Grand Hotel Management System",
-    "skills": [
-      "Python"
-    ],
-    "level": "Intermediate",
+    "skills": ["Python"],
+    "level": "Medium",
     "interest": "Business Logic",
     "time": "Medium",
     "description": "A robust CLI application to manage a 40-room inventory with tiered pricing, guest booking logic, and automatic billing calculation.",
@@ -724,11 +600,7 @@
       "Automatic stay duration and total price calculation",
       "Cancellation logic and detailed guest lookup"
     ],
-    "tech_stack": [
-      "Python",
-      "Dictionaries",
-      "Input Validation"
-    ],
+    "tech_stack": ["Python", "Dictionaries", "Input Validation"],
     "roadmap": [
       "Step 1: Initialize the 40-room inventory with tiered pricing",
       "Step 2: Implement availability display and category filtering",
@@ -744,11 +616,9 @@
     "starter_code": "starter_code/hotel_management.py"
   },
   {
-    "id": 20,
+    "id": 18,
     "title": "CLI URL Shortener",
-    "skills": [
-      "Go"
-    ],
+    "skills": ["Go"],
     "level": "Beginner",
     "interest": "Tools",
     "time": "Low",
@@ -759,13 +629,7 @@
       "Store URL mappings in a local JSON file",
       "Resolve a short code back to the original URL"
     ],
-    "tech_stack": [
-      "Go",
-      "encoding/json",
-      "crypto/md5",
-      "os",
-      "fmt"
-    ],
+    "tech_stack": ["Go", "encoding/json", "crypto/md5", "os", "fmt"],
     "roadmap": [
       "Step 1: Initialise a Go module with go mod init",
       "Step 2: Accept a URL as a CLI argument using os.Args",
@@ -780,14 +644,12 @@
       "Go by Example: https://gobyexample.com",
       "Go standard library docs: https://pkg.go.dev/std"
     ],
-    "starter_code": "starter_code/generated/cli_url_shortener.py"
+    "starter_code": null
   },
   {
-    "id": 21,
+    "id": 19,
     "title": "Go REST API Server",
-    "skills": [
-      "Go"
-    ],
+    "skills": ["Go"],
     "level": "Intermediate",
     "interest": "Web",
     "time": "Medium",
@@ -799,12 +661,7 @@
       "DELETE /notes/{id} — remove a note",
       "JSON request and response handling throughout"
     ],
-    "tech_stack": [
-      "Go",
-      "net/http",
-      "encoding/json",
-      "strconv"
-    ],
+    "tech_stack": ["Go", "net/http", "encoding/json", "strconv"],
     "roadmap": [
       "Step 1: Create main.go and start an HTTP server with http.ListenAndServe",
       "Step 2: Define a Note struct with ID, Title, and Body fields",
@@ -820,14 +677,12 @@
       "Go by Example — HTTP servers: https://gobyexample.com/http-servers",
       "Go by Example — JSON: https://gobyexample.com/json"
     ],
-    "starter_code": "starter_code/generated/go_rest_api_server.py"
+    "starter_code": null
   },
   {
-    "id": 22,
+    "id": 20,
     "title": "File Duplicate Finder",
-    "skills": [
-      "Rust"
-    ],
+    "skills": ["Rust"],
     "level": "Beginner",
     "interest": "Tools",
     "time": "Low",
@@ -838,12 +693,7 @@
       "Group files by hash and print duplicate sets",
       "Accept target directory as a CLI argument"
     ],
-    "tech_stack": [
-      "Rust",
-      "std::fs",
-      "std::collections::HashMap",
-      "sha2 crate"
-    ],
+    "tech_stack": ["Rust", "std::fs", "std::collections::HashMap", "sha2 crate"],
     "roadmap": [
       "Step 1: Create a new project with cargo new and add sha2 to Cargo.toml",
       "Step 2: Accept a directory path from std::env::args",
@@ -858,14 +708,12 @@
       "sha2 crate: https://crates.io/crates/sha2",
       "Rust std::fs docs: https://doc.rust-lang.org/std/fs/"
     ],
-    "starter_code": "starter_code/generated/file_duplicate_finder.py"
+    "starter_code": null
   },
   {
-    "id": 23,
+    "id": 21,
     "title": "Markdown to HTML Converter",
-    "skills": [
-      "Rust"
-    ],
+    "skills": ["Rust"],
     "level": "Intermediate",
     "interest": "Tools",
     "time": "Medium",
@@ -876,12 +724,7 @@
       "Accept input and output file paths as CLI arguments",
       "Wrap output in a minimal HTML template with inline CSS"
     ],
-    "tech_stack": [
-      "Rust",
-      "pulldown-cmark",
-      "std::fs",
-      "std::env"
-    ],
+    "tech_stack": ["Rust", "pulldown-cmark", "std::fs", "std::env"],
     "roadmap": [
       "Step 1: Create a Cargo project and add pulldown-cmark to Cargo.toml",
       "Step 2: Read the input Markdown file path from CLI arguments",
@@ -896,14 +739,12 @@
       "Rust CLI book: https://rust-cli.github.io/book/",
       "The Rust Book: https://doc.rust-lang.org/book/"
     ],
-    "starter_code": "starter_code/generated/markdown_to_html_converter.py"
+    "starter_code": null
   },
   {
-    "id": 24,
+    "id": 22,
     "title": "Android Tip Calculator",
-    "skills": [
-      "Kotlin"
-    ],
+    "skills": ["Kotlin"],
     "level": "Beginner",
     "interest": "Mobile",
     "time": "Low",
@@ -914,12 +755,7 @@
       "Live display of tip amount and total bill",
       "Handles empty or invalid input gracefully"
     ],
-    "tech_stack": [
-      "Kotlin",
-      "Android SDK",
-      "View Binding",
-      "SeekBar"
-    ],
+    "tech_stack": ["Kotlin", "Android SDK", "View Binding", "SeekBar"],
     "roadmap": [
       "Step 1: Create a new Android project in Android Studio with Kotlin",
       "Step 2: Build the layout with EditText, SeekBar, and TextViews",
@@ -934,14 +770,12 @@
       "Kotlin docs: https://kotlinlang.org/docs/",
       "Android View Binding: https://developer.android.com/topic/libraries/view-binding"
     ],
-    "starter_code": "starter_code/generated/android_tip_calculator.py"
+    "starter_code": null
   },
   {
-    "id": 25,
+    "id": 23,
     "title": "Kotlin Weather App",
-    "skills": [
-      "Kotlin"
-    ],
+    "skills": ["Kotlin"],
     "level": "Intermediate",
     "interest": "Mobile",
     "time": "Medium",
@@ -952,13 +786,7 @@
       "Show a loading indicator while fetching",
       "Display an error message if the city is not found"
     ],
-    "tech_stack": [
-      "Kotlin",
-      "Retrofit",
-      "Kotlin Coroutines",
-      "OpenWeatherMap API",
-      "Gson"
-    ],
+    "tech_stack": ["Kotlin", "Retrofit", "Kotlin Coroutines", "OpenWeatherMap API", "Gson"],
     "roadmap": [
       "Step 1: Create an Android project and add Retrofit and Gson dependencies",
       "Step 2: Sign up for a free OpenWeatherMap API key",
@@ -973,14 +801,12 @@
       "Kotlin Coroutines guide: https://kotlinlang.org/docs/coroutines-overview.html",
       "OpenWeatherMap API: https://openweathermap.org/api"
     ],
-    "starter_code": "starter_code/generated/kotlin_weather_app.py"
+    "starter_code": null
   },
   {
-    "id": 26,
+    "id": 24,
     "title": "Java Student Grade Tracker",
-    "skills": [
-      "Java"
-    ],
+    "skills": ["Java"],
     "level": "Beginner",
     "interest": "Education",
     "time": "Low",
@@ -991,12 +817,7 @@
       "Calculate overall class average",
       "Print a formatted report for all students"
     ],
-    "tech_stack": [
-      "Java",
-      "ArrayList",
-      "HashMap",
-      "Scanner"
-    ],
+    "tech_stack": ["Java", "ArrayList", "HashMap", "Scanner"],
     "roadmap": [
       "Step 1: Set up a Java project in IntelliJ IDEA or VS Code",
       "Step 2: Create a Student class with a name field and a grades ArrayList",
@@ -1011,14 +832,12 @@
       "MOOC Java programming: https://java-programming.mooc.fi/",
       "W3Schools Java: https://www.w3schools.com/java"
     ],
-    "starter_code": "starter_code/generated/java_student_grade_tracker.py"
+    "starter_code": null
   },
   {
-    "id": 27,
+    "id": 25,
     "title": "Java Bank Account System",
-    "skills": [
-      "Java"
-    ],
+    "skills": ["Java"],
     "level": "Intermediate",
     "interest": "Web",
     "time": "Medium",
@@ -1030,13 +849,7 @@
       "Transaction history stored as an ArrayList of strings",
       "Menu-driven console interface"
     ],
-    "tech_stack": [
-      "Java",
-      "OOP",
-      "ArrayList",
-      "Scanner",
-      "Inheritance"
-    ],
+    "tech_stack": ["Java", "OOP", "ArrayList", "Scanner", "Inheritance"],
     "roadmap": [
       "Step 1: Design the class hierarchy on paper before writing any code",
       "Step 2: Implement the BankAccount base class with balance and transaction list",
@@ -1052,16 +865,12 @@
       "MOOC Java programming: https://java-programming.mooc.fi/",
       "Java inheritance guide: https://www.w3schools.com/java/java_inheritance.asp"
     ],
-    "starter_code": "starter_code/generated/java_bank_account_system.py"
+    "starter_code": null
   },
   {
-    "id": 28,
+    "id": 26,
     "title": "TypeScript Todo App",
-    "skills": [
-      "TypeScript",
-      "HTML",
-      "CSS"
-    ],
+    "skills": ["TypeScript", "HTML", "CSS"],
     "level": "Beginner",
     "interest": "Productivity",
     "time": "Low",
@@ -1072,12 +881,7 @@
       "Filter view by All, Active, or Completed",
       "TypeScript interfaces used for all data structures"
     ],
-    "tech_stack": [
-      "TypeScript",
-      "HTML",
-      "CSS",
-      "tsc compiler"
-    ],
+    "tech_stack": ["TypeScript", "HTML", "CSS", "tsc compiler"],
     "roadmap": [
       "Step 1: Initialise the project with npm init and install TypeScript",
       "Step 2: Create tsconfig.json targeting ES6 with strict mode on",
@@ -1093,14 +897,12 @@
       "TypeScript in 5 minutes: https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes.html",
       "MDN DOM reference: https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model"
     ],
-    "starter_code": "starter_code/generated/typescript_todo_app.py"
+    "starter_code": null
   },
   {
-    "id": 29,
+    "id": 27,
     "title": "TypeScript REST API Client",
-    "skills": [
-      "TypeScript"
-    ],
+    "skills": ["TypeScript"],
     "level": "Intermediate",
     "interest": "Web",
     "time": "Medium",
@@ -1111,13 +913,7 @@
       "Loading and error state handling",
       "Render fetched data to the DOM dynamically"
     ],
-    "tech_stack": [
-      "TypeScript",
-      "Fetch API",
-      "HTML",
-      "CSS",
-      "tsconfig"
-    ],
+    "tech_stack": ["TypeScript", "Fetch API", "HTML", "CSS", "tsconfig"],
     "roadmap": [
       "Step 1: Set up a TypeScript project with tsconfig.json",
       "Step 2: Choose a public API (e.g. JSONPlaceholder or Open Library)",
@@ -1133,14 +929,12 @@
       "Using Fetch API: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch",
       "JSONPlaceholder (free test API): https://jsonplaceholder.typicode.com/"
     ],
-    "starter_code": "starter_code/generated/typescript_rest_api_client.py"
+    "starter_code": null
   },
   {
-    "id": 30,
+    "id": 28,
     "title": "C++ Student Records Manager",
-    "skills": [
-      "C++"
-    ],
+    "skills": ["C++"],
     "level": "Beginner",
     "interest": "Education",
     "time": "Low",
@@ -1151,13 +945,7 @@
       "Load existing records from file on startup",
       "Search for a student record by name"
     ],
-    "tech_stack": [
-      "C++",
-      "struct",
-      "vector",
-      "fstream",
-      "iostream"
-    ],
+    "tech_stack": ["C++", "struct", "vector", "fstream", "iostream"],
     "roadmap": [
       "Step 1: Define a Student struct with name, roll number, and grade fields",
       "Step 2: Use a std::vector to store Student objects in memory",
@@ -1173,14 +961,12 @@
       "cppreference std::fstream: https://en.cppreference.com/w/cpp/io/basic_fstream",
       "cppreference std::vector: https://en.cppreference.com/w/cpp/container/vector"
     ],
-    "starter_code": "starter_code/generated/c_student_records_manager.py"
+    "starter_code": null
   },
   {
-    "id": 31,
+    "id": 29,
     "title": "C++ Task Scheduler",
-    "skills": [
-      "C++"
-    ],
+    "skills": ["C++"],
     "level": "Intermediate",
     "interest": "Automation",
     "time": "Medium",
@@ -1191,13 +977,7 @@
       "Log each completed task to the console",
       "Display the pending queue at any time"
     ],
-    "tech_stack": [
-      "C++",
-      "std::priority_queue",
-      "struct",
-      "iostream",
-      "vector"
-    ],
+    "tech_stack": ["C++", "std::priority_queue", "struct", "iostream", "vector"],
     "roadmap": [
       "Step 1: Define a Task struct with name and priority fields",
       "Step 2: Write a custom comparator struct for the priority queue",
@@ -1212,6 +992,8 @@
       "LearnCpp: https://www.learncpp.com/",
       "C++ STL tutorial: https://www.geeksforgeeks.org/the-c-standard-template-library-stl/"
     ],
-    "starter_code": "starter_code/generated/c_task_scheduler.py"
+    "starter_code": null
   }
 ]
+
+

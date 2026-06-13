@@ -1,0 +1,158 @@
+[
+  {
+    "id": "frontend",
+    "title": "Frontend Development",
+    "description": "Build modern user interfaces with HTML, CSS, JavaScript, and popular frontend frameworks.",
+    "topics": [
+      "HTML & Semantic Markup",
+      "CSS Layout & Responsive Design",
+      "JavaScript Fundamentals",
+      "DOM Manipulation",
+      "React Basics",
+      "State Management",
+      "Accessibility (a11y)",
+      "Browser DevTools"
+    ],
+    "skills": ["HTML", "CSS", "JavaScript", "React", "Git", "Responsive Design", "REST APIs"],
+    "duration": "3–6 months",
+    "duration_weeks": 20,
+    "difficulty": "Beginner",
+    "difficulty_score": 2,
+    "career_opportunities": [
+      "Frontend Developer",
+      "UI Developer",
+      "Web Designer",
+      "React Developer"
+    ]
+  },
+  {
+    "id": "fullstack",
+    "title": "Full Stack Development",
+    "description": "End-to-end web development covering both client-side UI and server-side APIs, databases, and deployment.",
+    "topics": [
+      "Frontend Fundamentals",
+      "Backend APIs (REST)",
+      "Database Design (SQL)",
+      "Authentication & Sessions",
+      "Server Deployment",
+      "Testing Full Applications",
+      "DevOps Basics",
+      "Project Architecture"
+    ],
+    "skills": ["HTML", "CSS", "JavaScript", "Python", "Flask", "SQL", "Git", "REST APIs", "Deployment"],
+    "duration": "6–12 months",
+    "duration_weeks": 36,
+    "difficulty": "Intermediate",
+    "difficulty_score": 4,
+    "career_opportunities": [
+      "Full Stack Developer",
+      "Software Engineer",
+      "Web Application Developer",
+      "Startup Engineer"
+    ]
+  },
+  {
+    "id": "react",
+    "title": "React Development",
+    "description": "Specialize in building component-based UIs with React, hooks, routing, and modern frontend tooling.",
+    "topics": [
+      "JSX & Components",
+      "Props & State",
+      "React Hooks (useState, useEffect)",
+      "React Router",
+      "Context API",
+      "API Integration with fetch",
+      "Component Testing",
+      "Build Tools (Vite/CRA)"
+    ],
+    "skills": ["JavaScript", "React", "HTML", "CSS", "Git", "REST APIs", "npm"],
+    "duration": "2–4 months",
+    "duration_weeks": 14,
+    "difficulty": "Beginner",
+    "difficulty_score": 2,
+    "career_opportunities": [
+      "React Developer",
+      "Frontend Engineer",
+      "UI Engineer",
+      "JavaScript Developer"
+    ]
+  },
+  {
+    "id": "angular",
+    "title": "Angular Development",
+    "description": "Build enterprise-grade single-page applications with Angular, TypeScript, and RxJS.",
+    "topics": [
+      "TypeScript Fundamentals",
+      "Angular Components & Modules",
+      "Services & Dependency Injection",
+      "RxJS & Observables",
+      "Angular Routing",
+      "Forms (Template & Reactive)",
+      "HTTP Client",
+      "Unit Testing with Jasmine"
+    ],
+    "skills": ["TypeScript", "Angular", "RxJS", "HTML", "CSS", "Git", "REST APIs"],
+    "duration": "3–5 months",
+    "duration_weeks": 18,
+    "difficulty": "Intermediate",
+    "difficulty_score": 3,
+    "career_opportunities": [
+      "Angular Developer",
+      "Frontend Engineer",
+      "Enterprise Web Developer",
+      "TypeScript Developer"
+    ]
+  },
+  {
+    "id": "devops",
+    "title": "DevOps Engineering",
+    "description": "Automate software delivery with CI/CD pipelines, containerization, infrastructure as code, and monitoring.",
+    "topics": [
+      "Linux & Shell Scripting",
+      "Git & Version Control Workflows",
+      "CI/CD Pipelines",
+      "Docker & Containers",
+      "Kubernetes Basics",
+      "Infrastructure as Code (Terraform)",
+      "Monitoring & Logging",
+      "Cloud Deployment"
+    ],
+    "skills": ["Linux", "Docker", "Kubernetes", "Git", "CI/CD", "Terraform", "AWS", "Python", "Bash"],
+    "duration": "4–8 months",
+    "duration_weeks": 28,
+    "difficulty": "Intermediate",
+    "difficulty_score": 4,
+    "career_opportunities": [
+      "DevOps Engineer",
+      "Site Reliability Engineer (SRE)",
+      "Platform Engineer",
+      "Release Engineer"
+    ]
+  },
+  {
+    "id": "cloud",
+    "title": "Cloud Engineering",
+    "description": "Design, deploy, and manage scalable cloud-native applications on AWS, Azure, or GCP.",
+    "topics": [
+      "Cloud Computing Fundamentals",
+      "Virtual Machines & Networking",
+      "Serverless Architecture",
+      "Cloud Storage & Databases",
+      "Identity & Access Management (IAM)",
+      "Auto-scaling & Load Balancing",
+      "Cloud Security Best Practices",
+      "Cost Optimization"
+    ],
+    "skills": ["AWS", "Azure", "Linux", "Docker", "Terraform", "Python", "Networking", "SQL"],
+    "duration": "4–8 months",
+    "duration_weeks": 28,
+    "difficulty": "Intermediate",
+    "difficulty_score": 4,
+    "career_opportunities": [
+      "Cloud Engineer",
+      "Cloud Architect",
+      "Solutions Architect",
+      "Cloud Security Engineer"
+    ]
+  }
+]

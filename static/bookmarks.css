@@ -1,0 +1,53 @@
+/* =============================================================
+   bookmarks.css — DevPath Quick-Save additions
+   Appended to / imported alongside style.css.
+   Only adds styles not already present in style.css.
+   ============================================================= */
+
+/* ------------------------------------------------------------------
+   Bookmark / Save button — icon + label alignment
+   The base .btn-save-project class lives in style.css.
+   These rules add the SVG icon layout and the active-fill state.
+   ------------------------------------------------------------------ */
+.btn-save-project {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-save-project svg {
+  flex-shrink: 0;
+  transition: fill var(--t), stroke var(--t);
+}
+
+/* Filled bookmark when saved */
+.btn-save-project.saved svg {
+  fill: currentColor;
+}
+
+/* ------------------------------------------------------------------
+   Saved Projects Panel — hide by default (shown via JS when non-empty)
+   ------------------------------------------------------------------ */
+.saved-projects-panel {
+  display: none;
+}
+
+/* ------------------------------------------------------------------
+   Error page correlation ID  (used by 400/429/500 templates)
+   ------------------------------------------------------------------ */
+.error-reference {
+  font-size: 0.78rem;
+  color: var(--text-light);
+  margin-top: -16px;
+  margin-bottom: 24px;
+}
+
+.error-reference code {
+  font-family: var(--font-mono);
+  background: var(--gray-100);
+  padding: 2px 6px;
+  border-radius: var(--r-xs);
+  font-size: 0.75rem;
+  color: var(--gray-600);
+}

@@ -12,6 +12,7 @@
   <meta property="og:url" content="{{ config.get_base_url() }}/" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
+  {% include 'partials/theme_head.html' %}
   <link rel="stylesheet" href="/static/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
 </head>
@@ -19,6 +20,7 @@
   <nav class="navbar">
     <div class="nav-inner">
       <a href="/" class="nav-logo">DevPath</a>
+      {% include 'partials/theme_toggle.html' %}
     </div>
   </nav>
   <div class="error-page">
@@ -29,5 +31,7 @@
       <a href="/" class="btn-primary" style="display:inline-block;text-decoration:none;padding:14px 32px;">Back to Home</a>
     </div>
   </div>
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="/static/script.js"></script>
 </body>
 </html>

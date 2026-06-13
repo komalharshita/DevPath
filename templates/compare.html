@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Compare career roadmaps side by side — topics, duration, difficulty, skills overlap, and career opportunities on DevPath." />
+  <title>Compare Roadmaps — DevPath</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+  {% include 'partials/theme_head.html' %}
+  <link rel="stylesheet" href="/static/style.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+</head>
+
+<body class="compare-page-body">
+
+  <nav class="navbar" id="navbar" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">Dev<span class="nav-logo-accent">Path</span></a>
+      <div class="nav-links">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/compare" class="nav-link nav-link--active">Compare</a>
+        <a href="/#find-project" class="nav-link">Find Project</a>
+        <a href="/contact" class="nav-link">Contact</a>
+        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
+          class="nav-btn-outline">GitHub</a>
+        <button class="theme-toggle" id="theme-toggle-desktop" aria-pressed="false" aria-label="Switch to dark mode">
+          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+          </svg>
+        </button>
+      </div>
+      <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation" aria-expanded="false"
+        aria-controls="nav-mobile-menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
+      <a href="/" class="nav-mobile-link" role="menuitem">Home</a>
+      <a href="/compare" class="nav-mobile-link" role="menuitem">Compare</a>
+      <a href="/#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
+      <a href="/contact" class="nav-mobile-link" role="menuitem">Contact</a>
+    </div>
+  </nav>
+
+  <header class="compare-hero">
+    <div class="compare-hero-inner">
+      <span class="compare-badge">Career Decision Tool</span>
+      <h1 class="compare-title">Compare Learning Roadmaps</h1>
+      <p class="compare-subtitle">
+        Select two career paths to compare topics, duration, difficulty, overlapping skills, and job opportunities —
+        side by side.
+      </p>
+    </div>
+  </header>
+
+  <main class="compare-main">
+    <!-- Roadmap selectors -->
+    <section class="compare-selectors" aria-label="Select roadmaps to compare">
+      <div class="compare-select-card">
+        <label for="roadmap-select-a" class="compare-select-label">Roadmap A</label>
+        <select id="roadmap-select-a" class="compare-select">
+          <option value="">Choose a roadmap…</option>
+          {% for roadmap in roadmaps %}
+          <option value="{{ roadmap.id }}">{{ roadmap.title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="compare-vs-badge" aria-hidden="true">VS</div>
+
+      <div class="compare-select-card">
+        <label for="roadmap-select-b" class="compare-select-label">Roadmap B</label>
+        <select id="roadmap-select-b" class="compare-select">
+          <option value="">Choose a roadmap…</option>
+          {% for roadmap in roadmaps %}
+          <option value="{{ roadmap.id }}">{{ roadmap.title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <button type="button" id="compare-btn" class="btn-primary compare-btn">Compare Roadmaps</button>
+    </section>
+
+    <div id="compare-error" class="compare-error" role="alert" hidden></div>
+
+    <!-- Empty state -->
+    <section id="compare-empty" class="compare-empty">
+      <div class="compare-empty-icon" aria-hidden="true">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
+        </svg>
+      </div>
+      <h2>Pick two roadmaps to get started</h2>
+      <p>Try comparing <strong>Frontend vs Full Stack</strong>, <strong>React vs Angular</strong>, or
+        <strong>DevOps vs Cloud Engineering</strong>.
+      </p>
+      <div class="compare-quick-picks">
+        <button type="button" class="compare-quick-btn" data-a="frontend" data-b="fullstack">Frontend vs Full Stack</button>
+        <button type="button" class="compare-quick-btn" data-a="react" data-b="angular">React vs Angular</button>
+        <button type="button" class="compare-quick-btn" data-a="devops" data-b="cloud">DevOps vs Cloud</button>
+      </div>
+    </section>
+
+    <!-- Results -->
+    <section id="compare-results" class="compare-results" hidden>
+
+      <!-- Summary cards -->
+      <div class="compare-summary-grid">
+        <div class="compare-summary-card compare-summary-card--a">
+          <span class="compare-summary-label">Roadmap A</span>
+          <h2 id="summary-title-a"></h2>
+          <p id="summary-desc-a"></p>
+        </div>
+        <div class="compare-summary-card compare-summary-card--shared">
+          <span class="compare-summary-label">Overlap</span>
+          <div class="compare-shared-stat">
+            <span id="shared-skills-count" class="compare-stat-num">0</span>
+            <span class="compare-stat-text">shared skills</span>
+          </div>
+          <div class="compare-shared-stat">
+            <span id="shared-topics-count" class="compare-stat-num">0</span>
+            <span class="compare-stat-text">shared topics</span>
+          </div>
+        </div>
+        <div class="compare-summary-card compare-summary-card--b">
+          <span class="compare-summary-label">Roadmap B</span>
+          <h2 id="summary-title-b"></h2>
+          <p id="summary-desc-b"></p>
+        </div>
+      </div>
+
+      <!-- Visual charts -->
+      <section class="compare-charts" aria-label="Comparison charts">
+        <h2 class="compare-section-title">Visual Comparison</h2>
+        <div class="compare-charts-grid">
+          <div class="compare-chart-card">
+            <h3>Estimated Duration (weeks)</h3>
+            <div class="compare-bar-chart" id="chart-duration"></div>
+          </div>
+          <div class="compare-chart-card">
+            <h3>Difficulty Level</h3>
+            <div class="compare-bar-chart" id="chart-difficulty"></div>
+          </div>
+          <div class="compare-chart-card">
+            <h3>Topics Covered</h3>
+            <div class="compare-bar-chart" id="chart-topics"></div>
+          </div>
+          <div class="compare-chart-card">
+            <h3>Skills Required</h3>
+            <div class="compare-bar-chart" id="chart-skills"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Side-by-side details -->
+      <section class="compare-details" aria-label="Detailed comparison">
+        <h2 class="compare-section-title">Side-by-Side Details</h2>
+        <div class="compare-details-grid">
+          <div class="compare-detail-col compare-detail-col--a">
+            <h3 id="detail-title-a"></h3>
+            <ul class="compare-meta-list">
+              <li><span>Duration</span><strong id="meta-duration-a"></strong></li>
+              <li><span>Difficulty</span><strong id="meta-difficulty-a"></strong></li>
+            </ul>
+            <h4>Topics Covered</h4>
+            <ul id="topics-list-a" class="compare-tag-list"></ul>
+            <h4>Career Opportunities</h4>
+            <ul id="careers-list-a" class="compare-tag-list compare-tag-list--career"></ul>
+          </div>
+
+          <div class="compare-detail-col compare-detail-col--center">
+            <h3>Skills Breakdown</h3>
+            <div class="compare-skills-venn">
+              <div class="compare-skills-block compare-skills-block--unique-a">
+                <h4>Unique to A</h4>
+                <ul id="unique-skills-a" class="compare-skill-chips"></ul>
+              </div>
+              <div class="compare-skills-block compare-skills-block--shared">
+                <h4>Shared Skills</h4>
+                <ul id="shared-skills" class="compare-skill-chips compare-skill-chips--shared"></ul>
+              </div>
+              <div class="compare-skills-block compare-skills-block--unique-b">
+                <h4>Unique to B</h4>
+                <ul id="unique-skills-b" class="compare-skill-chips"></ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="compare-detail-col compare-detail-col--b">
+            <h3 id="detail-title-b"></h3>
+            <ul class="compare-meta-list">
+              <li><span>Duration</span><strong id="meta-duration-b"></strong></li>
+              <li><span>Difficulty</span><strong id="meta-difficulty-b"></strong></li>
+            </ul>
+            <h4>Topics Covered</h4>
+            <ul id="topics-list-b" class="compare-tag-list"></ul>
+            <h4>Career Opportunities</h4>
+            <ul id="careers-list-b" class="compare-tag-list compare-tag-list--career"></ul>
+          </div>
+        </div>
+      </section>
+
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p class="footer-copy">&copy; 2025 DevPath. Built for learners.</p>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/compare">Compare Roadmaps</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script src="/static/script.js"></script>
+  <script src="/static/compare.js"></script>
+</body>
+
+</html>
