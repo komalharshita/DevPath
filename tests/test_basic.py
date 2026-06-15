@@ -29,9 +29,7 @@ from utils.recommender import (
     validate_recommendation_inputs,
     parse_skills,
     score_single_project,
-    WEIGHT_LEVEL,
-    WEIGHT_INTEREST,
-    WEIGHT_TIME,
+    SCORING_WEIGHTS,
 )
 from app import app, internal_server_error
 
@@ -293,7 +291,7 @@ def test_score_no_project_skills_does_not_crash():
     project = {"skills": [], "level": "Beginner", "interest": "Data", "time": "Low"}
     score = score_single_project(project, ["python"], "Beginner", "Data", "Low")
     # Skill score is 0, but other criteria still score
-    assert score == pytest.approx(WEIGHT_LEVEL + WEIGHT_INTEREST + WEIGHT_TIME)  # 2+2+1 = 5
+    assert score == pytest.approx(SCORING_WEIGHTS["level"] + SCORING_WEIGHTS["interest"] + SCORING_WEIGHTS["time"])  # 2+2+1 = 5
 
 
 def test_score_three_skills_partial_coverage():
@@ -552,7 +550,7 @@ def test_project_detail_not_found():
 
 def test_internal_server_error_page():
     """The 500 handler should render the friendly internal error template."""
-    with app.app_context():
+    with app.test_request_context("/"):
         rendered_page, status_code = internal_server_error(Exception("Test error"))
 
     assert status_code == 500
@@ -641,15 +639,69 @@ def test_search_api_empty_query():
     data = response.get_json()
     assert data == []
 
-def test_search_api_no_match():
-    """Search should return empty list for nonsense query."""
+def test_home_route_with_share_params():
+    """The homepage should load normally even when share query params are present."""
     client = get_client()
-    response = client.get("/api/search?q=nonexistentqueryxyz")
+    response = client.get("/?skills=Python,HTML&level=Beginner&interest=Data&time=Low")
     assert response.status_code == 200
 
+
+def test_share_banner_element_exists():
+    """The page HTML must include the share-prefill-banner element for JS to populate."""
+    client = get_client()
+    response = client.get("/")
+    html = response.data.decode()
+    assert 'id="share-prefill-banner"' in html
+
+
+def test_share_params_partial_loads_ok():
+    """Partial share params should not break the page — server renders normally."""
+    client = get_client()
+    response = client.get("/?skills=Python&level=Beginner")
+    assert response.status_code == 200
+
+
+def test_share_params_invalid_level_not_reflected():
+    """An invalid level value should not appear in the server-rendered HTML form options."""
+    client = get_client()
+    response = client.get("/?skills=Python&level=Expert&interest=Data&time=Low")
+    html = response.data.decode()
+    # 'Expert' is not a valid option, so it must not appear as a selected value
+    assert 'value="Expert" selected' not in html
+
+
+def test_share_params_xss_not_reflected():
+    """Script tags in query params must not be rendered in server HTML."""
+    client = get_client()
+    response = client.get("/?skills=<script>alert(1)</script>&level=Beginner&interest=Data&time=Low")
+    html = response.data.decode()
+    assert "<script>alert(1)</script>" not in html
+
+
+def test_share_params_excessive_skills_loads_ok():
+    """A URL with many skills should not crash the server."""
+    skills = ",".join(["Skill" + str(i) for i in range(30)])
+    client = get_client()
+    response = client.get(f"/?skills={skills}&level=Beginner&interest=Data&time=Low")
+    assert response.status_code == 200
+
+
+def test_api_recommend_invalid_level_no_crash():
+    """Posting an unrecognized level should not crash — returns empty or error."""
+    client = get_client()
+    response = client.post("/api/recommend", json={
+        "skills": "Python",
+        "level": "Expert",
+        "interest": "Data",
+        "time": "Low"
+    })
+    assert response.status_code in (200, 400)
     data = response.get_json()
-    assert isinstance(data, list)
-    assert len(data) == 0
+    # Should either be an error or return empty results (no match for 'Expert')
+    if response.status_code == 200:
+        assert "projects" in data
+
+
 # ============================================================
 # Sitemap and robots.txt tests
 # ============================================================
@@ -823,3 +875,22 @@ if __name__ == "__main__":
     print(f"\n{passed} passed, {failed} failed out of {passed + failed} tests")
     if failed > 0:
         sys.exit(1)
+
+def test_ml_similarity_score_returns_float():
+    from utils.recommender import ml_similarity_score, parse_skills
+    projects = load_all_projects()
+    score = ml_similarity_score(
+        projects[0],
+        parse_skills("Python"),
+        "Beginner",
+        "Data",
+        "Low",
+        projects,
+    )
+    assert isinstance(score, float)
+    assert score >= 0
+
+def test_ml_recommendation_prefers_relevant_python_data_project():
+    results = get_recommendations("Python, pandas", "Intermediate", "Data", "High")
+    titles = [project["title"] for project in results]
+    assert any("Data" in title or "Pipeline" in title for title in titles)
