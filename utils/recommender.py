@@ -15,6 +15,7 @@ MAX_RESULTS = 3
 VALID_LEVELS = {"beginner", "intermediate", "advanced"}
 VALID_INTERESTS = {"web", "data", "education", "automation", "games", "cybersecurity", "devops", "backend", "tools", "productivity", "business logic", "mobile", "machine learning/ai"}
 VALID_TIME_AVAILABILITY = {"low", "medium", "high"}
+
 SCORING_WEIGHTS = {
     "skill": 3,
     "level": 2,
@@ -32,13 +33,19 @@ SKILL_ALIASES = {
 }
 
 def parse_skills(skills_string):
-    if not skills_string or not skills_string.strip():
+    if not skills_string:
         return []
+
     try:
-        raw_skills = json.loads(skills_string)
-        if isinstance(raw_skills, list):
-            return [SKILL_ALIASES.get(s.strip().lower(), s.strip().lower()) for s in raw_skills if str(s).strip()]
-    except json.JSONDecodeError:
+        parsed = json.loads(skills_string)
+
+        if isinstance(parsed, list):
+            return [
+                SKILL_ALIASES.get(str(skill).strip().lower(), str(skill).strip().lower())
+                for skill in parsed
+                if str(skill).strip()
+            ]
+    except (json.JSONDecodeError, TypeError):
         pass
 
     raw_skills = [
@@ -46,6 +53,7 @@ def parse_skills(skills_string):
         for s in skills_string.split(",")
         if s.strip()
     ]
+
     return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
 
 def _tokenize(text):
@@ -114,25 +122,41 @@ def ml_similarity_score(project, user_skills, level, interest, time_availability
 
     return _cosine_similarity(user_vector, project_vector)
 
+
 def score_single_project(project, user_skills, level, interest, time_availability):
     score = 0
 
-    # Compare user's skills against the project's required skills
-    project_skills = [SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", [])]
-    # Count how many user skills overlap with the
-    # skills required by the current project.
-    matched_skills = sum(1 for skill in user_skills if skill in project_skills)
+    project_skills = [
+        SKILL_ALIASES.get(s.lower(), s.lower())
+        for s in project.get("skills", [])
+    ]
 
-    coverage = (matched_skills / len(project_skills)) if project_skills else 0
-    score += matched_skills * SCORING_WEIGHTS["skill"] * coverage
+    matched_skills = sum(
+        1 for skill in user_skills
+        if skill in project_skills
+    )
+    # Coverage-weighted skill score
+    if project_skills:
+        coverage_ratio = matched_skills / len(project_skills)
+        score += (
+            matched_skills
+            * SCORING_WEIGHTS["skill"]
+            * coverage_ratio
+        )
 
+    # Level match
     if project.get("level", "").lower() == level.lower():
         score += SCORING_WEIGHTS["level"]
 
+    # Interest match
     if project.get("interest", "").lower() == interest.lower():
         score += SCORING_WEIGHTS["interest"]
 
-    if project.get("time", "").lower() == time_availability.lower():
+    # Time match
+    project_time = project.get("time", "").lower()
+    user_time = time_availability.lower()
+
+    if project_time == user_time:
         score += SCORING_WEIGHTS["time"]
 
     return score
@@ -146,6 +170,7 @@ def get_recommendations(skills_string, level, interest, time_availability):
     all_projects = load_all_projects()
 
     scored_projects = []
+
     for project in all_projects:
         rule_score = score_single_project(
             project,
@@ -172,8 +197,10 @@ def get_recommendations(skills_string, level, interest, time_availability):
                 "score": final_score,
             })
 
-    # Sort projects in descending order so the most relevant recommendations appear first.
-    scored_projects.sort(key=lambda item: (item["score"], item["project"].get("id", 0)), reverse=True)
+    scored_projects.sort(
+        key=lambda item: (item["score"], item["project"].get("id", 0)),
+        reverse=True,
+    )
 
     return [item["project"] for item in scored_projects[:MAX_RESULTS]]
 
