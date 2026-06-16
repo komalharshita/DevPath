@@ -56,7 +56,7 @@
   </script>
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
   {% include 'partials/theme_head.html' %}
-  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="/static/style.css?v=2" />
   <link rel="stylesheet" href="/static/bookmarks.css" />
   <link
     href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
@@ -86,7 +86,7 @@
               d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </button>
-      </div>
+      </form>
 
       <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation"
         aria-expanded="false" aria-controls="nav-mobile-menu">
@@ -697,15 +697,15 @@
                 Include coding, debugging, learning, and reviewing time in your estimate.
               </span>
               <div class="form-error-msg" id="time-error"></div>
-            </div>
- main
+             </div>
 
             <!-- Submit button and Clear actions -->
             <div class="form-actions">
               <button type="submit" class="btn-submit" id="submit-btn">
                 <span id="btn-label">Generate My Projects</span>
-              <span id="btn-loading" style="display:none;">Finding matches...</span>
-            </button>
+                <span id="btn-loading" style="display:none;">Finding matches...</span>
+              </button>
+
         </div>
 
           </form>
@@ -772,6 +772,11 @@
             onclick="document.getElementById('find-project').scrollIntoView({behavior:'smooth'})">Try Different
             Inputs</button>
         </div>
+      </div>
+
+      <!-- Live Search Filter -->
+      <div id="results-filter-wrap" style="display:none; margin-bottom: 24px;">
+        <input type="text" id="results-filter" class="results-filter-input" placeholder="Search projects by title or description..." autocomplete="off" aria-label="Search projects" />
       </div>
 
       <!-- Cards grid -->
@@ -962,7 +967,7 @@
 
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
 
-  <script src="/static/script.js"></script>
+  <script src="/static/script.js?v=2"></script>
   </script>
 </body>
 

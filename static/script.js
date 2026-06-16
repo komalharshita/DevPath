@@ -195,6 +195,13 @@ var errorMsg = document.getElementById('github-modal-error');
   });
 })();
 
+// Progress point values (must be declared before any function references them)
+var POINTS_PER_SEARCH      = 10;
+var POINTS_PER_VIEW        = 5;
+var POINTS_PER_CODE_OPEN   = 15;
+var POINTS_PER_COMPLETION  = 50;
+var PROGRESS_MAX_POINTS    = 500;
+
 var STORAGE_KEY = "devpathUserProgress";
 var progress = {
   searches: 0,
@@ -419,6 +426,8 @@ updateProfileWidgets();
   var resultsLoadingEl = document.getElementById("results-loading");
   var resultsEmptyEl = document.getElementById("results-empty");
   var emptyMessageEl = document.getElementById("empty-message");
+  var filterWrap = document.getElementById("results-filter-wrap");
+  var filterInput = document.getElementById("results-filter");
   var skillsHidden = document.getElementById("skills");
   var skillsInput = document.getElementById("skills-input");
   var selectedChips = document.getElementById("skill-chips-selected");
@@ -638,6 +647,8 @@ updateProfileWidgets();
     resultsGrid.style.display    = hasResults ? "grid" : "none";
     resultsEmptyEl.style.display = hasResults ? "none" : "block";
     if (shareWrap) shareWrap.style.display = hasResults ? "flex" : "none";
+    if (filterWrap) filterWrap.style.display = hasResults ? "block" : "none";
+    if (filterInput) filterInput.value = "";
 
     if (!hasResults) {
       if (emptyMessageEl) { if (message) emptyMessageEl.textContent = message; }
@@ -1097,6 +1108,19 @@ updateProfileWidgets();
           fetchBtn.disabled = false;
           fetchBtn.textContent = "Fetch Skills";
         });
+    });
+  }
+
+  if (filterInput) {
+    filterInput.addEventListener("input", function() {
+      var query = this.value.toLowerCase().trim();
+      var cards = resultsGrid.querySelectorAll(".project-card");
+      cards.forEach(function(card) {
+        var titleText = (card.querySelector(".project-card-title") || {}).textContent || "";
+        var descText = (card.querySelector(".project-card-desc-text") || {}).textContent || "";
+        var match = titleText.toLowerCase().indexOf(query) !== -1 || descText.toLowerCase().indexOf(query) !== -1;
+        card.style.display = match ? "flex" : "none";
+      });
     });
   }
 })();
