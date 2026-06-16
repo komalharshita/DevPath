@@ -195,6 +195,12 @@ var errorMsg = document.getElementById('github-modal-error');
   });
 })();
 
+var PROGRESS_MAX_POINTS = 100;
+var POINTS_PER_SEARCH = 10;
+var POINTS_PER_VIEW = 5;
+var POINTS_PER_CODE_OPEN = 5;
+var POINTS_PER_COMPLETION = 20;
+
 var STORAGE_KEY = "devpathUserProgress";
 var progress = {
   searches: 0,
