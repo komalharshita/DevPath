@@ -58,6 +58,7 @@
   {% include 'partials/theme_head.html' %}
   <link rel="stylesheet" href="/static/style.css" />
   <link rel="stylesheet" href="/static/bookmarks.css" />
+  <link rel="stylesheet" href="/static/animations.css" />
   <link
     href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet" />
@@ -86,7 +87,7 @@
               d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </button>
-      </div>
+      </form>
 
       <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation"
         aria-expanded="false" aria-controls="nav-mobile-menu">
@@ -109,7 +110,7 @@
       <a href="#home" class="nav-mobile-link" role="menuitem">Home</a>
       <a href="#how-it-works" class="nav-mobile-link" role="menuitem">How It Works</a>
       <a href="#features" class="nav-mobile-link" role="menuitem">Features</a>
-      <a href="#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
+      <a href="#the-project" class="nav-mobile-link" role="menuitem">Find Project</a>
       <a href="/compare" class="nav-mobile-link" role="menuitem">Compare</a>
       <a href="/contact" class="nav-mobile-link" role="menuitem">Contact</a>
       <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
@@ -486,9 +487,6 @@
           <h3>Starter Code Included</h3>
           <p>Download a working template for every project. Skip the blank-page problem and start building immediately.</p>
           <a href="#the-project" class="feature-card-link">Get starter code</a>
-          <p>Download a working template for every project. Skip the blank-page problem and start building immediately.
-          </p>
-          <a href="#find-project" class="feature-card-link">Get starter code</a>
         </div>
 
       </div>
@@ -698,15 +696,13 @@
               </span>
               <div class="form-error-msg" id="time-error"></div>
             </div>
- main
-
             <!-- Submit button and Clear actions -->
             <div class="form-actions">
               <button type="submit" class="btn-submit" id="submit-btn">
                 <span id="btn-label">Generate My Projects</span>
-              <span id="btn-loading" style="display:none;">Finding matches...</span>
-            </button>
-        </div>
+                <span id="btn-loading" style="display:none;">Finding matches...</span>
+              </button>
+            </div>
 
           </form>
         </div>
@@ -769,7 +765,7 @@
           <h3>No Projects Found</h3>
           <p id="empty-message">Try adjusting your skills or selecting a different interest area.</p>
           <button class="btn-try-again"
-            onclick="document.getElementById('find-project').scrollIntoView({behavior:'smooth'})">Try Different
+            onclick="document.getElementById('the-project').scrollIntoView({behavior:'smooth'})">Try Different
             Inputs</button>
         </div>
       </div>
@@ -851,7 +847,6 @@
           <li><a href="#how-it-works">How It Works</a></li>
           <li><a href="#features">Features</a></li>
           <li><a href="#the-project">Find Project</a></li>
-          <li><a href="#find-project">Find Project</a></li>
           <li><a href="/contact">Contact Us</a></li>
         </ul>
       </div>
@@ -962,8 +957,8 @@
 
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
 
+  <script src="/static/animations.js"></script>
   <script src="/static/script.js"></script>
-  </script>
 </body>
 
 </html>
