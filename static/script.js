@@ -47,17 +47,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function syncTheme(theme) {
     html.setAttribute("data-theme", theme);
-    try { localStorage.setItem("theme", theme); } catch (e) {}
-    
+    try { localStorage.setItem("theme", theme); } catch (e) { }
+
     // Sync accessibility attributes on toggle buttons
     var isDark = theme === "dark";
-    document.querySelectorAll(".theme-toggle").forEach(function(btn) {
+    document.querySelectorAll(".theme-toggle").forEach(function (btn) {
       btn.setAttribute("aria-pressed", isDark ? "true" : "false");
       btn.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
     });
 
     // Update active card styles
-    cards.forEach(function(card) {
+    cards.forEach(function (card) {
       if (card.getAttribute("data-theme-target") === theme) {
         card.style.borderColor = "var(--accent)";
       } else {
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
   syncTheme(activeTheme);
 
   // Toggle modal on theme button click
-  document.querySelectorAll(".theme-toggle").forEach(function(btn) {
+  document.querySelectorAll(".theme-toggle").forEach(function (btn) {
     btn.addEventListener("click", function (e) {
       e.preventDefault();
       modal.style.display = "flex";
@@ -86,23 +86,23 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   closeBtn.addEventListener("click", closeModal);
-  modal.addEventListener("click", function(e) {
+  modal.addEventListener("click", function (e) {
     if (e.target === modal) closeModal();
   });
 
   // Apply theme when card is clicked
-  cards.forEach(function(card) {
-    card.addEventListener("click", function() {
+  cards.forEach(function (card) {
+    card.addEventListener("click", function () {
       var theme = this.getAttribute("data-theme-target");
       syncTheme(theme);
       setTimeout(closeModal, 150); // slight delay for visual feedback
     });
-    card.addEventListener("mouseenter", function() {
+    card.addEventListener("mouseenter", function () {
       if (this.getAttribute("data-theme-target") !== html.getAttribute("data-theme")) {
         this.style.borderColor = "var(--gray-400)";
       }
     });
-    card.addEventListener("mouseleave", function() {
+    card.addEventListener("mouseleave", function () {
       if (this.getAttribute("data-theme-target") !== html.getAttribute("data-theme")) {
         this.style.borderColor = "var(--border)";
       }
@@ -143,20 +143,20 @@ var errorMsg = document.getElementById('github-modal-error');
   }
 
   function initTheme() {
-  var theme = "light";
+    var theme = "light";
 
-  try {
-    theme = localStorage.getItem("theme") || html.getAttribute("data-theme") || "light";
-  } catch (err) {
-    theme = html.getAttribute("data-theme") || "light";
+    try {
+      theme = localStorage.getItem("theme") || html.getAttribute("data-theme") || "light";
+    } catch (err) {
+      theme = html.getAttribute("data-theme") || "light";
+    }
+
+    applyTheme(theme);
+
+    requestAnimationFrame(function () {
+      html.classList.add("theme-ready");
+    });
   }
-
-  applyTheme(theme);
-
-  requestAnimationFrame(function () {
-    html.classList.add("theme-ready");
-  });
-}
 
   document.addEventListener("click", function (event) {
     var toggle = event.target.closest(".theme-toggle");
@@ -194,6 +194,25 @@ var errorMsg = document.getElementById('github-modal-error');
     if (window.innerWidth >= 640) setOpen(false);
   });
 })();
+
+// Points awarded per action
+var POINTS_PER_SEARCH = 5;
+var POINTS_PER_VIEW = 10;
+var POINTS_PER_CODE_OPEN = 15;
+var POINTS_PER_COMPLETION = 30;
+
+var PROGRESS_TARGET_SEARCHES = 10;
+var PROGRESS_TARGET_VIEWS = 10;
+var PROGRESS_TARGET_CODE_OPENS = 10;
+var PROGRESS_TARGET_COMPLETIONS = 5;
+
+// Maximum achievable points given the targets above
+var PROGRESS_MAX_POINTS = (
+  PROGRESS_TARGET_SEARCHES * POINTS_PER_SEARCH +   // 50
+  PROGRESS_TARGET_VIEWS * POINTS_PER_VIEW +   // 100
+  PROGRESS_TARGET_CODE_OPENS * POINTS_PER_CODE_OPEN +   // 150
+  PROGRESS_TARGET_COMPLETIONS * POINTS_PER_COMPLETION     // 150
+);  // total = 450
 
 var STORAGE_KEY = "devpathUserProgress";
 var progress = {
@@ -239,8 +258,10 @@ function saveProgressState() {
 }
 
 function computeProgressPoints() {
-  progress.points = progress.searches * POINTS_PER_SEARCH + progress.projectViews * POINTS_PER_VIEW +
+  var raw = progress.searches * POINTS_PER_SEARCH + progress.projectViews * POINTS_PER_VIEW +
     progress.codeOpens * POINTS_PER_CODE_OPEN + progress.completions * POINTS_PER_COMPLETION;
+  // Clamping stored points so that they never exceed maximum points
+  progress.points = Math.min(raw, PROGRESS_MAX_POINTS);
 }
 
 function showAchievementToast(title, detail) {
@@ -635,7 +656,7 @@ updateProfileWidgets();
     var hasResults = projects && projects.length > 0;
 
     // Single consolidated toggle for empty vs. populated state
-    resultsGrid.style.display    = hasResults ? "grid" : "none";
+    resultsGrid.style.display = hasResults ? "grid" : "none";
     resultsEmptyEl.style.display = hasResults ? "none" : "block";
     if (shareWrap) shareWrap.style.display = hasResults ? "flex" : "none";
 
@@ -727,7 +748,7 @@ updateProfileWidgets();
   // ----------------------------------------------------------
 
   var MAX_SHARE_SKILLS = 10;
-  var MAX_URL_LENGTH   = 2000;
+  var MAX_URL_LENGTH = 2000;
 
   // Build a shareable URL from the current form selections.
   // Caps skill count and enforces a max URL length to avoid oversized links.
@@ -824,9 +845,9 @@ updateProfileWidgets();
   // Query param validation for shared URLs
   // ----------------------------------------------------------
 
-  var VALID_LEVELS    = ["Beginner", "Intermediate", "Advanced"];
+  var VALID_LEVELS = ["Beginner", "Intermediate", "Advanced"];
   var VALID_INTERESTS = ["Web", "Data", "Education", "Automation", "Games"];
-  var VALID_TIMES     = ["Low", "Medium", "High"];
+  var VALID_TIMES = ["Low", "Medium", "High"];
 
   // Strip HTML tags and restrict to safe characters for skill values
   function sanitizeSkillValue(raw) {
@@ -856,18 +877,18 @@ updateProfileWidgets();
   // Pre-fill form from URL params but require user to click Generate
   (function initFromQueryParams() {
     var params = new URLSearchParams(window.location.search);
-    var qSkills   = params.get("skills");
-    var qLevel    = params.get("level");
+    var qSkills = params.get("skills");
+    var qLevel = params.get("level");
     var qInterest = params.get("interest");
-    var qTime     = params.get("time");
+    var qTime = params.get("time");
 
     // Only auto-fill if all four params are present
     if (!qSkills || !qLevel || !qInterest || !qTime) return;
 
     // Validate dropdown values against their allowlists
-    var safeLevel    = validateDropdownValue(qLevel, VALID_LEVELS);
+    var safeLevel = validateDropdownValue(qLevel, VALID_LEVELS);
     var safeInterest = validateDropdownValue(qInterest, VALID_INTERESTS);
-    var safeTime     = validateDropdownValue(qTime, VALID_TIMES);
+    var safeTime = validateDropdownValue(qTime, VALID_TIMES);
 
     // Abort if any dropdown value is invalid
     if (!safeLevel || !safeInterest || !safeTime) return;
@@ -1203,7 +1224,7 @@ updateProfileWidgets();
         document.body.appendChild(textarea);
         textarea.focus();
         textarea.select();
-        try { document.execCommand("copy"); } catch (err) {}
+        try { document.execCommand("copy"); } catch (err) { }
         document.body.removeChild(textarea);
         done();
       }
@@ -1231,7 +1252,7 @@ updateProfileWidgets();
       localStorage.setItem(roadmapStorageKey, JSON.stringify(roadmapCheckboxes.map(function (checkbox) {
         return checkbox.checked;
       })));
-    } catch (err) {}
+    } catch (err) { }
   }
 
   try {
@@ -1239,7 +1260,7 @@ updateProfileWidgets();
     roadmapCheckboxes.forEach(function (checkbox, index) {
       checkbox.checked = !!saved[index];
     });
-  } catch (err) {}
+  } catch (err) { }
   roadmapCheckboxes.forEach(function (checkbox) {
     checkbox.addEventListener("change", updateRoadmapProgress);
   });
@@ -1293,10 +1314,10 @@ updateProfileWidgets();
     threshold: 0
   };
 
-  var observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
       if (entry.isIntersecting) {
-        navLinks.forEach(function(link) {
+        navLinks.forEach(function (link) {
           link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
         });
       }
