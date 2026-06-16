@@ -45,6 +45,7 @@ def add_security_headers(response):
         "img-src 'self' data:; "
         "font-src 'self'; "
         "connect-src 'self'; "
+        "form-action 'self' https://formspree.io https://api.web3forms.com; "
         "frame-ancestors 'none'"
     )
     response.headers["Content-Security-Policy"] = (
@@ -54,6 +55,7 @@ def add_security_headers(response):
         "img-src 'self' data:; "
         "font-src 'self'; "
         "connect-src 'self'; "
+        "form-action 'self' https://formspree.io https://api.web3forms.com; "
         "frame-ancestors 'none'"
     )
     return response
