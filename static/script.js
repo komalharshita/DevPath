@@ -239,10 +239,29 @@ function saveProgressState() {
 }
 
 function computeProgressPoints() {
-  progress.points = progress.searches * POINTS_PER_SEARCH + progress.projectViews * POINTS_PER_VIEW +
-    progress.codeOpens * POINTS_PER_CODE_OPEN + progress.completions * POINTS_PER_COMPLETION;
-}
+  var raw =
+    progress.searches * POINTS_PER_SEARCH +
+    progress.projectViews * POINTS_PER_VIEW +
+    progress.codeOpens * POINTS_PER_CODE_OPEN +
+    progress.completions * POINTS_PER_COMPLETION;
 
+  progress.points = Math.min(raw, PROGRESS_MAX_POINTS);
+}
+var POINTS_PER_SEARCH = 5;
+var POINTS_PER_VIEW = 10;
+var POINTS_PER_CODE_OPEN = 15;
+var POINTS_PER_COMPLETION = 30;
+
+var PROGRESS_TARGET_SEARCHES = 10;
+var PROGRESS_TARGET_VIEWS = 10;
+var PROGRESS_TARGET_CODE_OPENS = 10;
+var PROGRESS_TARGET_COMPLETIONS = 5;
+
+var PROGRESS_MAX_POINTS =
+  PROGRESS_TARGET_SEARCHES * POINTS_PER_SEARCH +
+  PROGRESS_TARGET_VIEWS * POINTS_PER_VIEW +
+  PROGRESS_TARGET_CODE_OPENS * POINTS_PER_CODE_OPEN +
+  PROGRESS_TARGET_COMPLETIONS * POINTS_PER_COMPLETION;
 function showAchievementToast(title, detail) {
   var toast = document.getElementById("achievement-toast");
   if (!toast) return;
@@ -488,6 +507,7 @@ updateProfileWidgets();
     syncSkillsHiddenInput();
     updateQuickPickState();
     clearFieldError("skills-error");
+    skillsInput.setAttribute("aria-invalid", "false");
     if (skillsInput) skillsInput.focus();
   };
 
@@ -571,19 +591,26 @@ updateProfileWidgets();
   function validateForm() {
     var valid = true;
     if (!selectedSkills.length) {
-      showFieldError("skills-error", "Please add at least one skill.");
+      showFieldError("skills-error", "Please select at least one skill.");
+      skillsInput.setAttribute("aria-invalid", "true");
       valid = false;
     }
-    if (!document.getElementById("level").value) {
+    var levelEl = document.getElementById("level");
+    if (!levelEl.value) {
       showFieldError("level-error", "Please select your experience level.");
+      levelEl.setAttribute("aria-invalid", "true");
       valid = false;
     }
-    if (!document.getElementById("interest").value) {
-      showFieldError("interest-error", "Please select an area of interest.");
+    var interestEl = document.getElementById("interest");
+    if (!interestEl.value) {
+      showFieldError("interest-error", "Please select an interest area.");
+      interestEl.setAttribute("aria-invalid", "true");
       valid = false;
     }
-    if (!document.getElementById("time").value) {
-      showFieldError("time-error", "Please select your time availability.");
+    var timeEl = document.getElementById("time");
+    if (!timeEl.value) {
+      showFieldError("time-error", "Please select a time commitment.");
+      timeEl.setAttribute("aria-invalid", "true");
       valid = false;
     }
     return valid;
@@ -592,6 +619,16 @@ updateProfileWidgets();
   // ----------------------------------------------------------
   // Loading state
   // ----------------------------------------------------------
+
+  ["level", "interest", "time"].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("change", function() {
+        clearFieldError(id + "-error");
+        el.setAttribute("aria-invalid", "false");
+      });
+    }
+  });
 
   function setLoadingState(isLoading) {
     submitBtn.disabled = isLoading;
@@ -1031,7 +1068,7 @@ updateProfileWidgets();
       .catch(function (err) {
         setLoadingState(false);
         var general = document.getElementById("form-error-general");
-        if (general) general.textContent = err.message || "An unexpected error occurred. Please try again.";
+        if (general) general.textContent = "Unable to generate recommendations. Please try again.";
       });
   });
 
