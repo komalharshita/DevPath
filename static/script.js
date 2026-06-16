@@ -195,6 +195,15 @@ var errorMsg = document.getElementById('github-modal-error');
   });
 })();
 
+// ============================================================
+// PROGRESS POINT VALUES
+// ============================================================
+var POINTS_PER_SEARCH     = 10;
+var POINTS_PER_VIEW       = 15;
+var POINTS_PER_CODE_OPEN  = 20;
+var POINTS_PER_COMPLETION = 50;
+var PROGRESS_MAX_POINTS   = 200;
+
 var STORAGE_KEY = "devpathUserProgress";
 var progress = {
   searches: 0,
