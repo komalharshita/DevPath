@@ -1070,57 +1070,7 @@ updateProfileWidgets();
     }
   }
 
-  // ----------------------------------------------------------
-  // Render result cards
-  // ----------------------------------------------------------
 
-  //takes the array of projects from the api and draws them on the page as cards
-  //if array is empty it shows the "no results" message instead
-  function renderResults(projects, message) {
-    resultsSection.style.display = "block";
-    resultsLoadingEl.style.display = "none";
-    // Clear out any cards from a previous search before showing new ones
-    resultsGrid.innerHTML = "";
-
-    if (!projects || projects.length === 0) { // if no projects returned from api, show "no results" and hide the grid
-      resultsGrid.style.display    = "none";
-      resultsEmptyEl.style.display = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
-      resultsSection.scrollIntoView({ behavior: "smooth" });
-      return;
-    }
-
-    .empty-completed span {
-      font-size: 0.75rem;
-    }
-
-    /* Tabs */
-    .la-tabs {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-      border-bottom: 1px solid var(--border, #e5e7eb);
-      padding-bottom: 0.5rem;
-    }
-
-    .la-tab {
-      background: none;
-      border: none;
-      padding: 0.5rem 1rem;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      border-radius: 0.5rem;
-      color: var(--text-muted, #6b7280);
-      transition: all 0.2s;
-    }
-
-    .la-tab.active {
-      background: #6366f1;
-      color: white;
-    }
-    resultsSection.scrollIntoView({ behavior: "smooth" });
-  }
 
   function truncate(text, maxLength) {
     if (!text) return "";
