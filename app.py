@@ -23,6 +23,11 @@ app.config.from_object(Config)
 # Register all routes defined in the main Blueprint (This handles your '/' route!)
 app.register_blueprint(main)
 
+import json
+@app.template_filter('escapejs')
+def escapejs_filter(s):
+    return json.dumps(str(s))[1:-1]
+
 # Register the global error boundary (handles 400, 403, 404, 405, 429, 500,
 # and any unhandled Exception).  Must be called after Blueprint registration
 # so Blueprint-level error handlers take precedence where defined.
