@@ -232,6 +232,16 @@ def test_parse_skills_containing_commas():
     assert result == ["html, css", "javascript"]
 
 
+def test_parse_skills_deduplicates_entries():
+    """parse_skills should deduplicate skill entries, including resolving aliases."""
+    result = parse_skills("python, python, py, html, HTML")
+    assert result == ["python", "html"]
+
+    # Test JSON array deduplication
+    result_json = parse_skills('["Python", "python", "py", "JS", "JavaScript"]')
+    assert result_json == ["python", "javascript"]
+
+
 def test_score_single_project_full_match():
     """A project that matches all four criteria should receive the maximum score."""
     project = {

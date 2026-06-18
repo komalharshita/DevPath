@@ -63,20 +63,30 @@ def parse_skills(skills_string):
         "JS, HTML5, CSS3"   -> ["javascript", "html", "css"]
     """
     stripped = skills_string.strip()
+    raw_skills = []
     if stripped.startswith("["):
         try:
             parsed = json.loads(stripped)
             if isinstance(parsed, list):
                 raw_skills = [str(s).strip().lower() for s in parsed if str(s).strip()]
-                return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
         except (json.JSONDecodeError, ValueError):
             pass
-    raw_skills = [
-        s.strip().lower()
-        for s in skills_string.split(",")
-        if s.strip()
-    ]
-    return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
+    if not raw_skills:
+        raw_skills = [
+            s.strip().lower()
+            for s in skills_string.split(",")
+            if s.strip()
+        ]
+    
+    seen = set()
+    deduped_skills = []
+    for skill in raw_skills:
+        normalized = SKILL_ALIASES.get(skill, skill)
+        if normalized not in seen:
+            seen.add(normalized)
+            deduped_skills.append(normalized)
+            
+    return deduped_skills
 
 def _tokenize(text):
     return re.findall(r"[a-z0-9]+", str(text).lower())
