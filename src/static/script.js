@@ -552,6 +552,8 @@ updateProfileWidgets();
   var activeSuggestionIndex = -1;
   var visibleSuggestions = [];
   var SAVED_PROJECTS_KEY = "devpathSavedProjects";
+  var hasSearched = false;
+  var techStackSelect = document.getElementById("tech_stack");
 
   function normalize(value) {
     return String(value || "").trim().toLowerCase();
@@ -1420,6 +1422,10 @@ updateProfileWidgets();
       updateQuickPickState();
       clearAllErrors();
       hideSuggestions();
+      if (techStackSelect) {
+        techStackSelect.value = "all";
+      }
+      hasSearched = false;
       resultsSection.style.display = "none";
       skillsInput.focus();
     });
@@ -1470,7 +1476,8 @@ updateProfileWidgets();
         skills: JSON.stringify(selectedSkills),
         level: document.getElementById("level").value,
         interest: document.getElementById("interest").value,
-        time: document.getElementById("time").value
+        time: document.getElementById("time").value,
+        tech_stack: techStackSelect ? techStackSelect.value : "all"
       })
     })
       .then(function (response) {
@@ -1482,6 +1489,7 @@ updateProfileWidgets();
       .then(function (data) {
         setLoadingState(false);
         recordSearch();
+        hasSearched = true;
         renderResults(data.projects || [], data.message);
       })
       .catch(function (err) {
@@ -1489,7 +1497,16 @@ updateProfileWidgets();
         var general = document.getElementById("form-error-general");
         if (general) general.textContent = err.message || "An unexpected error occurred. Please try again.";
       });
-  })};
+  });
+
+  if (techStackSelect) {
+    techStackSelect.addEventListener("change", function () {
+      if (hasSearched) {
+        submitBtn.click();
+      }
+    });
+  }
+};
 
   // ----------------------------------------------------------
   // GitHub modal
