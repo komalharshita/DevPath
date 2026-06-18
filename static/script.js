@@ -1,3 +1,4 @@
+const PROGRESS_MAX_POINTS = 100;
 <!DOCTYPE html>
 <html lang="en">
 
