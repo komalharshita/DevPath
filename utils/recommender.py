@@ -126,16 +126,31 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
     coverage = (matched_skills / len(project_skills)) if project_skills else 0
     score += matched_skills * SCORING_WEIGHTS["skill"] * coverage
 
+    level_match = False
     if project.get("level", "").lower() == level.lower():
         score += SCORING_WEIGHTS["level"]
+        level_match = True
 
+    interest_match = False
     if project.get("interest", "").lower() == interest.lower():
         score += SCORING_WEIGHTS["interest"]
+        interest_match = True
 
+    time_match = False
     if project.get("time", "").lower() == time_availability.lower():
         score += SCORING_WEIGHTS["time"]
+        time_match = True
 
-    return score
+    matched_skills_list = [skill for skill in user_skills if skill in project_skills]
+
+    match_details = {
+        "matched_skills": matched_skills_list,
+        "level": level_match,
+        "interest": interest_match,
+        "time": time_match
+    }
+
+    return score, match_details
 
 # ---------------------------------------------------------------------------
 # Public API
@@ -147,13 +162,17 @@ def get_recommendations(skills_string, level, interest, time_availability):
 
     scored_projects = []
     for project in all_projects:
-        rule_score = score_single_project(
+        score_result = score_single_project(
             project,
             user_skills,
             level,
             interest,
             time_availability,
         )
+        if isinstance(score_result, tuple):
+            rule_score, match_details = score_result
+        else:
+            rule_score, match_details = score_result, {}
 
         similarity_score = ml_similarity_score(
             project,
@@ -170,12 +189,69 @@ def get_recommendations(skills_string, level, interest, time_availability):
             scored_projects.append({
                 "project": project,
                 "score": final_score,
+                "match_details": match_details
             })
 
     # Sort projects in descending order so the most relevant recommendations appear first.
     scored_projects.sort(key=lambda item: (item["score"], item["project"].get("id", 0)), reverse=True)
 
-    return [item["project"] for item in scored_projects[:MAX_RESULTS]]
+    results = []
+    for item in scored_projects[:MAX_RESULTS]:
+        project = item["project"]
+        match_details = item.get("match_details", {})
+        
+        # Construct distinct explanation
+        import random
+        
+        matched_skills_list = match_details.get("matched_skills", [])
+        skills_str = ""
+        if matched_skills_list:
+            skills_str = ", ".join(matched_skills_list[:3])
+            if len(matched_skills_list) > 3:
+                skills_str += f", and {len(matched_skills_list) - 3} more"
+        
+        # Determine components
+        has_skills = bool(skills_str)
+        has_level = bool(match_details.get("level"))
+        has_interest = bool(match_details.get("interest"))
+        
+        # Build dynamic parts
+        parts = []
+        if has_skills:
+            parts.append(f"utilizes your skills in {skills_str}")
+        if has_level:
+            parts.append("fits your current experience level")
+        if has_interest:
+            parts.append("aligns closely with your interests")
+            
+        project_title = project.get("title", "this project")
+            
+        if not parts:
+            explanation = f"We highly recommend '{project_title}' based on your overall profile."
+        else:
+            # Join the parts naturally
+            if len(parts) == 1:
+                reasons = parts[0]
+            elif len(parts) == 2:
+                reasons = f"{parts[0]} and {parts[1]}"
+            else:
+                reasons = f"{parts[0]}, {parts[1]}, and {parts[2]}"
+                
+            templates = [
+                f"'{project_title}' is a great match because it {reasons}.",
+                f"We recommend '{project_title}' as it {reasons}.",
+                f"Based on your profile, '{project_title}' stands out because it {reasons}.",
+                f"Dive into '{project_title}'! It's an excellent choice that {reasons}.",
+                f"This project, '{project_title}', is ideal for you since it {reasons}."
+            ]
+            explanation = random.choice(templates)
+            
+        # Add explanation to the project
+        project_copy = dict(project)
+        project_copy["match_explanation"] = explanation
+        results.append(project_copy)
+
+    return results
 
 def validate_recommendation_inputs(skills, level, interest, time_availability):
     errors = []

@@ -106,6 +106,7 @@
             {% endfor %}
             <span class="badge badge--time">{{ project.time }} effort</span>
           </div>
+          <div id="project-match-explanation-container"></div>
           <p class="detail-description">{{ project.description }}</p>
         </div>
 
@@ -473,17 +474,11 @@
   <!-- Scroll-to-top button -->
   <button id="scroll-top-btn" aria-label="Back to top" title="Back to top">↑</button>
 
-  <!-- Pass project metadata to the JavaScript without hardcoding -->
+  <meta id="project-metadata" data-id="{{ project.id }}" data-title="{{ project.title }}">
   <script>
-<<<<<<< HEAD
-    var PROJECT_ID = parseInt("{{ project.id }}", 10);
-    var PROJECT_TITLE = "{{ project.title | escapejs }}";
-=======
-
-    var PROJECT_ID = {{ project.id | tojson }};
-    var PROJECT_TITLE = {{ project.title | tojson }};
-
->>>>>>> upstream/main
+    var meta = document.getElementById('project-metadata');
+    var PROJECT_ID = parseInt(meta.getAttribute('data-id'), 10);
+    var PROJECT_TITLE = meta.getAttribute('data-title');
   </script>
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
   <script src="/static/script.js"></script>
