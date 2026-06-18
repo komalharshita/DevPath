@@ -10,6 +10,8 @@ DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "projects.json
 
 logger = logging.getLogger("devpath.data_loader")
 
+_projects_cache = None
+_cache_lock = threading.Lock()
 
 def validate_projects(projects):
     """
@@ -80,9 +82,21 @@ def load_all_projects():
     """
     global _projects_cache
     if _projects_cache is None:
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            _projects_cache = json.load(f)
-        validate_projects(_projects_cache)
+        with _cache_lock:
+            if _projects_cache is None:
+                try:
+                    with open(DATA_FILE, "r", encoding="utf-8") as f:
+                        _projects_cache = json.load(f)
+                    validate_projects(_projects_cache)
+                except FileNotFoundError:
+                    logger.error(f"Projects data file not found at {DATA_FILE}. Creating empty cache.")
+                    _projects_cache = []
+                except json.JSONDecodeError as e:
+                    logger.error(f"Failed to parse projects JSON: {e}. Creating empty cache.")
+                    _projects_cache = []
+                except Exception as e:
+                    logger.error(f"Unexpected error loading projects: {e}. Creating empty cache.")
+                    _projects_cache = []
     return _projects_cache
 
 
