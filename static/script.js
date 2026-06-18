@@ -918,56 +918,9 @@ updateProfileWidgets();
     }
   });
 
-  //add a skill to the list if it's not empty or a duplicate
-  function addSkill(rawSkill) {
-    // Clean up any extra spaces and match to canonical skill name
-    var skill = getCanonicalSkill(rawSkill);
-    // Nothing to add if string is empty after trimming
-    if (!skill) return;
+  
 
-    // Block duplicate entries (case-insensitive)
-    if (isSkillSelected(skill)) return;
-
-    selectedSkills.push(skill);
-    renderSelectedChips();
-    syncSkillsHiddenInput();
-    updateQuickPickState();
-    // Once a skill is added, remove the "please add a skill" error if it was showing
-    clearFieldError("skills-error");
-    // Ensure the corresponding quick-pick chip is visually active immediately
-    try {
-      var quickChip = document.querySelector('.skill-chip[data-skill="' + skill + '"]');
-      if (quickChip) {
-        quickChip.classList.add('active', 'selected');
-        quickChip.setAttribute('aria-pressed', 'true');
-      }
-    } catch (e) {
-      // ignore DOM errors
-    }
-    // Keep focus in the input so user can continue typing
-    if (skillsTextInput) skillsTextInput.focus();
-  }
-
-  // remove a skill from the list and update the UI accordingly
-  function removeSkill(skill) {
-    // Rebuild the array without the skill that was just removed
-    selectedSkills = selectedSkills.filter(function (selectedSkill) {
-      return normalizeSkill(selectedSkill) !== normalizeSkill(skill);
-    });
-    renderSelectedChips();
-    syncSkillsHiddenInput();
-    updateQuickPickState();
-    // Also clear the visual active state on the quick-pick chip if present
-    try {
-      var quickChip = document.querySelector('.skill-chip[data-skill="' + skill + '"]');
-      if (quickChip) {
-        quickChip.classList.remove('active', 'selected');
-        quickChip.setAttribute('aria-pressed', 'false');
-      }
-    } catch (e) {
-      // ignore DOM errors
-    }
-  }
+  
 
   // recreate the selected skills chips based on the current array(selectedSkills)
   // called every time we add or remove a skill
