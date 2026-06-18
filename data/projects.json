@@ -201,6 +201,7 @@
     "level": "Intermediate",
     "interest": "Data",
     "time": "High",
+    "estimated_hours": 30,
     "description": "Upload a CSV file and automatically generate a summary report with statistics, missing value counts, and basic charts. A practical project for learning data wrangling and pandas.",
     "features": [
       "Load and inspect CSV files",
@@ -232,6 +233,7 @@
     "level": "Beginner",
     "interest": "Backend",
     "time": "Medium",
+    "estimated_hours": 15,
     "description": "A Java application that helps manage books, students, and borrowing records in a library. This project teaches object-oriented programming concepts, file handling, and menu-driven application design.",
     "features": [
       "Add and remove books",
@@ -263,6 +265,7 @@
     "level": "Intermediate",
     "interest": "Web",
     "time": "High",
+    "estimated_hours": 35,
     "description": "A real-time chat application that allows multiple users to send and receive instant messages using WebSockets. This project introduces backend communication, event handling, and real-time systems.",
     "features": [
       "Multiple user chat support",
@@ -294,6 +297,7 @@
     "level": "Beginner",
     "interest": "Web",
     "time": "Low",
+    "estimated_hours": 3,
     "description": "A simple student feedback form that collects user names, emails, and ratings. Teaches basic HTML form handling and layout design.",
     "features": [
       "Collect user name, email, and age with validation",
@@ -320,6 +324,7 @@
     "level": "Intermediate",
     "interest": "Data",
     "time": "High",
+    "estimated_hours": 40,
     "description": "A Flask web app that compares a resume against a job description using TF-IDF similarity and keyword extraction. Users upload a PDF or paste text, and the app returns a match score, a list of missing keywords, and actionable feedback — with no external AI API required.",
     "features": [
       "Upload a resume as PDF or paste plain text",
@@ -364,6 +369,7 @@
     "level": "Beginner",
     "interest": "Games",
     "time": "Low",
+    "estimated_hours": 2,
     "description": "A fun command-line game where the computer picks a random number and the user tries to guess it. Great for learning loops, conditionals, and user input handling.",
     "features": [
       "Generate random number between 1 and 100",
@@ -395,6 +401,7 @@
     "level": "Beginner",
     "interest": "Automation",
     "time": "Low",
+    "estimated_hours": 4,
     "description": "A Python script that sends automated emails using the smtplib library. Learn how to automate repetitive tasks and work with Python standard libraries.",
     "features": [
       "Compose and send emails via Python",
@@ -426,6 +433,7 @@
     "level": "Beginner",
     "interest": "Games",
     "time": "Low",
+    "estimated_hours": 5,
     "description": "A browser-based quiz app with multiple choice questions, a score counter, and a results screen. Perfect for practising DOM manipulation and event handling in JavaScript.",
     "features": [
       "Display one question at a time",
@@ -458,6 +466,7 @@
     "level": "Intermediate",
     "interest": "Data",
     "time": "High",
+    "estimated_hours": 30,
     "description": "A recommendation system that suggests movies to users based on ratings and similarity scores. An intermediate project for learning similarity scoring, pandas data handling, and basic recommendation logic.",
     "features": [
       "Recommend movies based on user preferences",
@@ -491,6 +500,7 @@
     "level": "Intermediate",
     "interest": "Data",
     "time": "High",
+    "estimated_hours": 25,
     "description": "A web application that predicts whether user entered text has positive, negative, or neutral sentiment. Great for learning text preprocessing and basic sentiment prediction.",
     "features": [
       "Analyze sentiment from user input text",
@@ -524,6 +534,7 @@
     "level": "Intermediate",
     "interest": "Business Logic",
     "time": "Medium",
+    "estimated_hours": 18,
     "description": "A robust CLI application to manage a 40-room inventory with tiered pricing, guest booking logic, and automatic billing calculation.",
     "features": [
       "Dynamic 40-room inventory across 4 luxury categories",
@@ -554,6 +565,7 @@
     "level": "Beginner",
     "interest": "Tools",
     "time": "Low",
+    "estimated_hours": 4,
     "description": "A command-line tool that generates short hash codes for long URLs and stores the mappings in a local JSON file. Great for learning Go's standard library, file I/O, and CLI argument handling.",
     "features": [
       "Accept a URL as a CLI argument",
@@ -585,6 +597,7 @@
     "level": "Intermediate",
     "interest": "Web",
     "time": "Medium",
+    "estimated_hours": 12,
     "description": "A RESTful API server using Go's net/http standard library with full CRUD endpoints for a notes resource. Teaches HTTP routing, JSON encoding, and in-memory data management in Go.",
     "features": [
       "GET /notes — list all notes",
@@ -618,6 +631,7 @@
     "level": "Beginner",
     "interest": "Tools",
     "time": "Low",
+    "estimated_hours": 6,
     "description": "A CLI tool that recursively scans a directory, hashes every file using SHA-256, and reports groups of duplicates. A practical first Rust project for learning ownership, iterators, and the standard library.",
     "features": [
       "Recursively walk a directory with std::fs",
@@ -654,6 +668,7 @@
     "level": "Intermediate",
     "interest": "Tools",
     "time": "Medium",
+    "estimated_hours": 15,
     "description": "A CLI tool that reads a Markdown file and produces a styled HTML file using the pulldown-cmark parser. Teaches Rust's crate ecosystem, file handling, and string processing.",
     "features": [
       "Parse headings, bold, italic, lists, and links",
@@ -685,6 +700,7 @@
     "level": "Beginner",
     "interest": "Mobile",
     "time": "Low",
+    "estimated_hours": 5,
     "description": "An Android app that calculates the tip amount and total bill in real time as the user types a bill amount and adjusts a tip percentage slider. A solid first Kotlin project for learning Android UI basics.",
     "features": [
       "Input field for the bill amount",
@@ -716,6 +732,7 @@
     "level": "Intermediate",
     "interest": "Mobile",
     "time": "Medium",
+    "estimated_hours": 12,
     "description": "An Android weather app that fetches current conditions from the OpenWeatherMap API and displays temperature, humidity, and a weather description. Teaches Retrofit, Kotlin Coroutines, and API integration.",
     "features": [
       "Search weather by city name",
@@ -753,6 +770,7 @@
     "level": "Beginner",
     "interest": "Education",
     "time": "Low",
+    "estimated_hours": 6,
     "description": "A console application that stores student names and grades, calculates individual and class averages, and prints a formatted summary report. Great for practising Java OOP basics, ArrayLists, and Scanner input.",
     "features": [
       "Add students and record multiple grades per student",
@@ -784,6 +802,7 @@
     "level": "Intermediate",
     "interest": "Web",
     "time": "Medium",
+    "estimated_hours": 18,
     "description": "An OOP-based console banking application with deposit, withdrawal, balance inquiry, and transaction history. Demonstrates inheritance, encapsulation, and polymorphism through a BankAccount class hierarchy.",
     "features": [
       "BankAccount base class with deposit and withdrawal",
@@ -817,6 +836,7 @@
     "level": "Beginner",
     "interest": "Productivity",
     "time": "Low",
+    "estimated_hours": 4,
     "description": "A browser-based todo list app written entirely in TypeScript with strongly typed interfaces, DOM manipulation, and in-page state management. A great first TypeScript project that reinforces type safety concepts.",
     "features": [
       "Add and delete tasks",
@@ -849,6 +869,7 @@
     "level": "Intermediate",
     "interest": "Web",
     "time": "Medium",
+    "estimated_hours": 12,
     "description": "A fully typed API client that queries a public REST API using the Fetch API, maps the response to TypeScript interfaces, and renders the data to the DOM. Teaches type-safe async programming and error handling.",
     "features": [
       "Typed interfaces matching the API response shape",
@@ -881,6 +902,7 @@
     "level": "Beginner",
     "interest": "Education",
     "time": "Low",
+    "estimated_hours": 6,
     "description": "A console application to manage student records using structs, vectors, and file I/O in C++. Ideal for learning C++ fundamentals including structs, loops, and the fstream library.",
     "features": [
       "Add and display student records",
@@ -913,6 +935,7 @@
     "level": "Intermediate",
     "interest": "Automation",
     "time": "Medium",
+    "estimated_hours": 15,
     "description": "A CLI task scheduler that queues tasks with priority levels and processes them in order using a priority queue from the C++ STL. Teaches STL containers, custom comparators, and structured program design.",
     "features": [
       "Add tasks with a name and integer priority",
@@ -950,6 +973,7 @@
     "level": "Intermediate",
     "interest": "Data",
     "time": "Medium",
+    "estimated_hours": 20,
     "description": "Enter a public API URL to fetch data and automatically transform it into a structured CSV dataset.",
     "features": [
       "Fetch data from public APIs",
@@ -987,6 +1011,7 @@
     "level": "Beginner",
     "interest": "Cybersecurity",
     "time": "Low",
+    "estimated_hours": 5,
     "description": "A tool that checks password strength based on length, symbols, uppercase letters, and numbers. Helps beginners understand input validation and security basics.",
     "features": [
       "Check password complexity",
