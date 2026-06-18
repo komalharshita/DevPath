@@ -425,7 +425,9 @@ updateProfileWidgets();
   }
 
   function syncSkillsHiddenInput() {
-    skillsHidden.value = JSON.stringify(selectedSkills);
+    skillsHidden.value = selectedSkills.join(", ");
+    var event = new Event("change", { bubbles: true });
+    skillsHidden.dispatchEvent(event);
   }
 
   function isSelected(skill) {
