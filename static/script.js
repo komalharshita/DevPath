@@ -686,6 +686,12 @@ updateProfileWidgets();
 
     var tags = document.createElement("div");
     tags.className = "project-card-tags";
+
+    // Match score tag
+    if (project.match_score !== undefined) {
+      tags.appendChild(createTag("Match Score: " + project.match_score + "%", "score"));
+    }
+
     (project.skills || []).forEach(function (skill) { tags.appendChild(createTag(skill, "skill")); });
     tags.appendChild(createTag(project.level, project.level));
     tags.appendChild(createTag("Time: " + project.time, "time"));

@@ -175,7 +175,18 @@ def get_recommendations(skills_string, level, interest, time_availability):
     # Sort projects in descending order so the most relevant recommendations appear first.
     scored_projects.sort(key=lambda item: (item["score"], item["project"].get("id", 0)), reverse=True)
 
-    return [item["project"] for item in scored_projects[:MAX_RESULTS]]
+    # Calculate relative match score as a percentage of the highest score in this batch
+    max_score = scored_projects[0]["score"] if scored_projects else 1
+    if max_score == 0:
+        max_score = 1
+        
+    results = []
+    for item in scored_projects[:MAX_RESULTS]:
+        proj = item["project"].copy()
+        proj["match_score"] = round((item["score"] / max_score) * 100)
+        results.append(proj)
+
+    return results
 
 def validate_recommendation_inputs(skills, level, interest, time_availability):
     errors = []
