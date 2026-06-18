@@ -1,26 +1,25 @@
 # utils/recommender.py
-# Contains all recommendation logic: scoring, filtering, and related projects.
-# Kept separate from routing so it can be tested and extended independently.
+# Contains all recommendation logic: scoring and filtering projects.
+
+import math
+import re
+from collections import Counter
 
 import json
 import os
 
 from utils.data_loader import load_all_projects
 
-# Maximum number of recommendations returned to the user
 MAX_RESULTS = 3
 
-# Maximum number of "you might also like" projects returned alongside results
-MAX_RELATED = 3
-
-# Scoring weights used by the recommendation engine.
-# Higher weights mean that criterion has more influence
-# on the final recommendation score.
+VALID_LEVELS = {"beginner", "intermediate", "advanced"}
+VALID_INTERESTS = {"web", "data", "education", "automation", "games", "cybersecurity", "devops", "backend", "tools", "productivity", "business logic", "mobile", "machine learning/ai"}
+VALID_TIME_AVAILABILITY = {"low", "medium", "high"}
 SCORING_WEIGHTS = {
-    "skill":    3,
-    "level":    2,
+    "skill": 3,
+    "level": 2,
     "interest": 2,
-    "time":     1,
+    "time": 1,
 }
 
 WEIGHT_SKILL = SCORING_WEIGHTS["skill"]
@@ -39,11 +38,11 @@ VALID_TIMES = {"low", "medium", "high"}
 # Common aliases and abbreviations for skills
 # This improves recommendation accuracy by normalizing user input
 SKILL_ALIASES = {
-    "js":      "javascript",
-    "py":      "python",
-    "html5":   "html",
-    "css3":    "css",
-    "c++":     "cpp",
+    "js": "javascript",
+    "py": "python",
+    "html5": "html",
+    "css3": "css",
+    "c++": "cpp",
     "web dev": "javascript",
 }
 
@@ -60,170 +59,158 @@ _CLUSTERS_PATH = os.path.join(
 # Skill parsing
 # ---------------------------------------------------------------------------
 
-def parse_skills(skills_string):
-    """
-    Convert a raw comma-separated skills string into
-    a normalized lowercase list.
-
-    Example:
-        "JS, HTML5, CSS3" -> ["javascript", "html", "css"]
-    """
-    raw_skills = [
-        s.strip().lower()
-        for s in skills_string.split(",")
-        if s.strip()
-    ]
+def parse_skills(skills_input):
+    if isinstance(skills_input, list):
+        raw_skills = skills_input
+    else:
+        try:
+            parsed = json.loads(skills_input)
+            raw_skills = parsed if isinstance(parsed, list) else [str(parsed)]
+        except (json.JSONDecodeError, TypeError):
+            raw_skills = skills_input.split(",") if isinstance(skills_input, str) else []
+    raw_skills = [str(s).strip().lower() for s in raw_skills if str(s).strip()]
     return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
 
+def _tokenize(text):
+    return re.findall(r"[a-z0-9]+", str(text).lower())
 
-# ---------------------------------------------------------------------------
-# Scoring
-# ---------------------------------------------------------------------------
+def _project_text(project):
+    parts = [
+        project.get("title", ""),
+        project.get("level", ""),
+        project.get("interest", ""),
+        project.get("time", ""),
+        project.get("description", ""),
+        " ".join(project.get("skills", [])),
+        " ".join(project.get("tech_stack", [])),
+        " ".join(project.get("features", [])),
+    ]
+    return " ".join(parts)
+
+def _user_text(user_skills, level, interest, time_availability):
+    return " ".join(user_skills + [level, interest, time_availability])
+
+def _tf(tokens):
+    counts = Counter(tokens)
+    total = len(tokens) or 1
+    return {token: count / total for token, count in counts.items()}
+
+def _idf(documents):
+    total_docs = len(documents)
+    idf_scores = {}
+
+    all_tokens = set(token for doc in documents for token in set(doc))
+
+    for token in all_tokens:
+        docs_with_token = sum(1 for doc in documents if token in doc)
+        idf_scores[token] = math.log((1 + total_docs) / (1 + docs_with_token)) + 1
+
+    return idf_scores
+
+def _tfidf_vector(tokens, idf_scores):
+    tf_scores = _tf(tokens)
+    return {
+        token: tf_scores[token] * idf_scores.get(token, 0)
+        for token in tf_scores
+    }
+
+def _cosine_similarity(vec_a, vec_b):
+    shared_tokens = set(vec_a) & set(vec_b)
+
+    dot_product = sum(vec_a[token] * vec_b[token] for token in shared_tokens)
+    magnitude_a = math.sqrt(sum(value ** 2 for value in vec_a.values()))
+    magnitude_b = math.sqrt(sum(value ** 2 for value in vec_b.values()))
+
+    if magnitude_a == 0 or magnitude_b == 0:
+        return 0
+
+    return dot_product / (magnitude_a * magnitude_b)
+
+def ml_similarity_score(project, user_skills, level, interest, time_availability, all_projects):
+    project_documents = [_tokenize(_project_text(p)) for p in all_projects]
+    user_tokens = _tokenize(_user_text(user_skills, level, interest, time_availability))
+
+    idf_scores = _idf(project_documents + [user_tokens])
+
+    user_vector = _tfidf_vector(user_tokens, idf_scores)
+    project_vector = _tfidf_vector(_tokenize(_project_text(project)), idf_scores)
+
+    return _cosine_similarity(user_vector, project_vector)
 
 def score_single_project(project, user_skills, level, interest, time_availability):
-    """
-    Calculate a numeric relevance score for one project.
-
-    Scoring rules:
-      - Each matching skill:  +3
-      - Level match:          +2
-      - Interest match:       +2
-      - Time match:           +1
-
-    Time filtering: projects that require MORE time than the user has
-    available are excluded entirely (score returned as 0).
-
-    Returns an integer score (0 means no match or time mismatch).
-    """
-    TIME_RANKS = ["low", "medium", "high"]
-
-    user_time    = time_availability.strip().lower()
-    project_time = project.get("time", "").strip().lower()
-
-    # If the project needs more time than the user has, exclude it.
-    if project_time not in TIME_RANKS or user_time not in TIME_RANKS:
-        return 0
-    if TIME_RANKS.index(project_time) > TIME_RANKS.index(user_time):
-        return 0
-
     score = 0
 
     # Compare user's skills against the project's required skills
     project_skills = [SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", [])]
-    # Count how many user skills overlap with the
-    # skills required by the current project.
-    matched_skills = sum(1 for skill in user_skills if skill in project_skills)
+    
+    # Use partial matching for skills to be more forgiving
+    matched_skills = 0
+    for u_skill in user_skills:
+        if any(u_skill in p_skill or p_skill in u_skill for p_skill in project_skills):
+            matched_skills += 1
+            
     score += matched_skills * SCORING_WEIGHTS["skill"]
 
     if project.get("level", "").lower() == level.lower():
         score += SCORING_WEIGHTS["level"]
 
-    if project.get("interest", "").lower() == interest.lower():
+    p_interest = project.get("interest", "").lower()
+    u_interest = interest.lower()
+    # Use partial matching for interest as well
+    if p_interest == u_interest or (u_interest and u_interest in p_interest) or (p_interest and p_interest in u_interest):
         score += SCORING_WEIGHTS["interest"]
 
-    if project_time == user_time:
+    if project.get("time", "").lower() == time_availability.lower():
         score += SCORING_WEIGHTS["time"]
 
     return score
-
-
-# ---------------------------------------------------------------------------
-# Clustering helpers
-# ---------------------------------------------------------------------------
-
-def _load_clusters():
-    """
-    Load clusters.json if it exists.
-
-    Returns the parsed dict, or None if the file is missing or unreadable.
-    A missing file is a soft failure — the recommender still works,
-    it just won't return related projects.
-    """
-    if not os.path.exists(_CLUSTERS_PATH):
-        return None
-    try:
-        with open(_CLUSTERS_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except (json.JSONDecodeError, OSError):
-        return None
-
-
-def _get_related(recommended_ids, all_projects, cluster_data):
-    """
-    Find projects in the same cluster(s) as the recommended projects,
-    excluding the ones already recommended.
-
-    Returns up to MAX_RELATED project dicts.
-    """
-    clusters = cluster_data.get("clusters", {})  # {str(pid): cid}
-    members  = cluster_data.get("members",  {})  # {str(cid): [pid, ...]}
-
-    # Collect which clusters the recommended projects belong to.
-    relevant_cluster_ids = set()
-    for pid in recommended_ids:
-        cid = clusters.get(str(pid))
-        if cid is not None:
-            relevant_cluster_ids.add(str(cid))
-
-    if not relevant_cluster_ids:
-        return []
-
-    # Gather candidate IDs from those clusters, excluding already recommended.
-    candidate_ids = []
-    for cid in relevant_cluster_ids:
-        for pid in members.get(cid, []):
-            if pid not in recommended_ids and pid not in candidate_ids:
-                candidate_ids.append(pid)
-
-    id_to_project = {p["id"]: p for p in all_projects}
-    related = [id_to_project[pid] for pid in candidate_ids if pid in id_to_project]
-    return related[:MAX_RELATED]
-
 
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 
 def get_recommendations(skills_string, level, interest, time_availability):
-    """
-    Return the top N recommended projects for the given user inputs,
-    along with related projects from the same cluster.
-
-    Return shape:
-        {
-            "recommendations": [ <project>, ... ],  # up to MAX_RESULTS
-            "related":         [ <project>, ... ],  # up to MAX_RELATED
-        }
-
-    The "related" list is empty when clusters.json does not exist yet.
-    Run scripts/cluster_projects.py to generate it.
-    """
-    user_skills  = parse_skills(skills_string)
+    user_skills = parse_skills(skills_string)
     all_projects = load_all_projects()
 
-    scored = []
+    scored_projects = []
     for project in all_projects:
-        score = score_single_project(
-            project, user_skills, level, interest, time_availability
+        rule_score = score_single_project(
+            project,
+            user_skills,
+            level,
+            interest,
+            time_availability,
         )
-        if score >= SCORING_WEIGHTS["skill"]:
-            scored.append({"project": project, "score": score})
 
-    scored.sort(key=lambda item: item["score"], reverse=True)
-    top_projects = [item["project"] for item in scored[:MAX_RESULTS]]
-    top_ids      = [p["id"] for p in top_projects]
+        similarity_score = ml_similarity_score(
+            project,
+            user_skills,
+            level,
+            interest,
+            time_availability,
+            all_projects,
+        )
 
-    cluster_data = _load_clusters()
-    related = _get_related(top_ids, all_projects, cluster_data) if cluster_data else []
+        final_score = rule_score + similarity_score
 
-    return {
-        "recommendations": top_projects,
-        "related":         related,
-    }
+        if final_score > 0:
+            scored_projects.append({
+                "project": project,
+                "score": final_score,
+            })
 
+    # Sort projects in descending order so the most relevant recommendations appear first.
+    scored_projects.sort(key=lambda item: (item["score"], item["project"].get("id", 0)), reverse=True)
 
-VALID_LEVELS = ["beginner", "intermediate", "advanced"]
-VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
+    return [item["project"] for item in scored_projects[:MAX_RESULTS]]
+
+VALID_INTERESTS = {
+    "web", "data", "education", "automation", "games",
+    "cybersecurity", "devops", "mobile", "machine learning/ai",
+    "artificial intelligence", "cloud computing", "mobile app development",
+    "backend", "tools"
+}
 
 
 def validate_recommendation_inputs(skills, level, interest, time_availability):

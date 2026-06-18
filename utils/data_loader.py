@@ -1,10 +1,15 @@
+# utils/data_loader.py
 import json
 import os
 import threading
+import logging
+
+from utils.url_validator import is_valid_url, parse_resource
 
 DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "projects.json")
-_projects_cache = None
-_cache_lock = threading.Lock()
+
+logger = logging.getLogger("devpath.data_loader")
+
 
 def validate_projects(projects):
     """
@@ -15,9 +20,10 @@ def validate_projects(projects):
     - Duplicate project titles (case-insensitive)
     - Missing required fields
     - Empty required string fields
+    - Malformed resource URLs (logs a warning, does not raise)
 
     Raises:
-        ValueError: If any validation rule is violated.
+        ValueError: If any structural validation rule is violated.
     """
     seen_ids = set()
     seen_titles = set()
@@ -51,6 +57,20 @@ def validate_projects(projects):
             raise ValueError(f"Duplicate project title found: {project['title']}")
         seen_titles.add(title)
 
+        # Resource URL format validation — warn, do not raise
+        # Broken URLs in production are logged so they can be fixed in the
+        # data file without crashing the application.
+        for raw in project.get("resources", []):
+            parsed = parse_resource(raw)
+            url = parsed.get("url", "")
+            if url and not is_valid_url(url):
+                logger.warning(
+                    "Malformed resource URL in project '%s' (id=%s): %r",
+                    project.get("title", "Unknown"),
+                    project_id,
+                    url,
+                )
+
 
 def load_all_projects():
     """Read and return the full list of projects from the JSON file.
@@ -59,17 +79,18 @@ def load_all_projects():
     do not hit the filesystem.
     """
     global _projects_cache
-    with _cache_lock:
-        if _projects_cache is None:
-            with open(DATA_FILE, "r", encoding="utf-8") as f:
-                _projects_cache = json.load(f)
-            validate_projects(_projects_cache)
+    if _projects_cache is None:
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            _projects_cache = json.load(f)
+        validate_projects(_projects_cache)
     return _projects_cache
+
 
 def get_available_levels():
     """Return all unique project levels."""
     projects = load_all_projects()
     return sorted({p["level"] for p in projects})
+
 
 def find_project_by_id(project_id):
     """Return the project whose 'id' matches project_id, or None."""
@@ -96,7 +117,6 @@ def get_project_stats():
         "unique_skills": len(all_skills),
         "beginner_friendly": beginner_friendly,
     }
-
 
 def clear_cache():
     """Reset the in-memory project cache (used in tests)."""
