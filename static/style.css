@@ -5068,3 +5068,20 @@ body.dark-theme .theme-toggle:hover {
   background: rgba(124, 58, 237, 0.15);
   color: #c4b5fd;
 }
+/* Match Explanation */
+.project-match-explanation {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: -4px;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.explanation-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--accent);
+}

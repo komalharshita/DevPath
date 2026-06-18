@@ -1307,3 +1307,28 @@ updateProfileWidgets();
     observer.observe(sec);
   });
 })();
+
+// Explanation Logic
+function loadExplanation() {
+  var urlParams = new URLSearchParams(window.location.search);
+  var reason = urlParams.get('reason');
+  var explanationContainer = document.getElementById("project-match-explanation-container");
+  
+  if (explanationContainer && reason) {
+    var explanationHTML = `
+      <div class="project-match-explanation">
+        <svg class="explanation-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <span class="explanation-text"><strong>Why this fits you:</strong> ${decodeURIComponent(reason)}</span>
+      </div>
+    `;
+    explanationContainer.innerHTML = explanationHTML;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  loadExplanation();
+});
