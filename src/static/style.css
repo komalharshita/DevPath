@@ -1023,7 +1023,7 @@ html[data-theme="dark"] .theme-toggle-label::before {
   gap: 8px;
   padding: 14px 28px;
   background: var(--yellow-400);
-  color: var(--indigo-900);
+  color: #000000;
   font-family: var(--font-display);
   font-size: 0.95rem;
   font-weight: 700;
