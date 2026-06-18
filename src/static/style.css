@@ -5380,3 +5380,16 @@ body.dark-theme .theme-toggle:hover {
   background: rgba(124, 58, 237, 0.15);
   color: #c4b5fd;
 }
+
+/* ==========================================
+   Git Bash Project Progress Styling Override 
+   ========================================== */
+.step-completed {
+  text-decoration: line-through;
+  opacity: 0.65;
+  border-left: 4px solid #22c55e !important;
+  transition: all 0.25s ease-in-out;
+}
+.step-checker:checked {
+  accent-color: #22c55e;
+}
