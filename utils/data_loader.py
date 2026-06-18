@@ -10,6 +10,8 @@ DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "projects.json
 
 logger = logging.getLogger("devpath.data_loader")
 
+_projects_cache = None
+_cache_lock = threading.Lock()
 
 def validate_projects(projects):
     """
