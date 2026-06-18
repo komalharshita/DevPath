@@ -670,7 +670,7 @@ updateProfileWidgets();
     chip.addEventListener("click", function () {
       var skill = chip.getAttribute("data-skill");
       if (!skill) return;
-      if (isSkillSelected(skill)) { removeSkill(skill); } else { addSkill(skill); }
+      if (isSelected(skill)) { removeSkill(skill); } else { addSkill(skill); }
       skillsTextInput.value = "";
       hideSuggestions();
   function renderSelectedChips() {
@@ -927,7 +927,7 @@ updateProfileWidgets();
     if (!skill) return;
 
     // Block duplicate entries (case-insensitive)
-    if (isSkillSelected(skill)) return;
+    if (isSelected(skill)) return;
 
     selectedSkills.push(skill);
     renderSelectedChips();
