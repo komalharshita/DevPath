@@ -389,3 +389,46 @@ def validate_recommendation_inputs(skills, level, interest, time_availability):
         errors.append("Invalid time availability. Choose Low, Medium, or High.")
 
     return errors
+
+def diagnose_empty_state(skills_string, level, interest, time_availability):
+    """
+    Identifies the most likely cause of an empty result set and returns a
+    concrete suggestion for the user based on constraint relaxation.
+    """
+    user_skills = parse_skills(skills_string)
+    all_projects = load_all_projects()
+    
+    # 1. Unknown skills check: See if the user's skill exists in the DB at all
+    all_known_skills = set()
+    for p in all_projects:
+        for s in p.get("skills", []):
+            all_known_skills.add(SKILL_ALIASES.get(s.lower(), s.lower()))
+            
+    unmatched_skills = [s for s in user_skills if s not in all_known_skills]
+    if unmatched_skills:
+        skill_counts = Counter()
+        for p in all_projects:
+            for s in p.get("skills", []):
+                skill_counts[SKILL_ALIASES.get(s.lower(), s.lower())] += 1
+        top_skills = [s.title() for s, c in skill_counts.most_common(3)]
+        return f"No projects match '{', '.join(unmatched_skills)}'. Try popular skills like {', '.join(top_skills)}."
+        
+    # 2. Time constraint check: Relax time availability to see if matches appear
+    if time_availability.lower() != "high":
+        relaxed_time = get_recommendations(skills_string, level, interest, "high")
+        if relaxed_time:
+            return "Your time availability is filtering out matches. Try selecting 'Medium' or 'High'."
+        
+    # 3. Level constraint check: See if skills match but level is too restrictive
+    any_skill_match = []
+    for p in all_projects:
+        p_skills = [SKILL_ALIASES.get(ps.lower(), ps.lower()) for ps in p.get("skills", [])]
+        if any(s in p_skills for s in user_skills):
+            any_skill_match.append(p)
+            
+    if any_skill_match:
+        levels = sorted({p.get("level") for p in any_skill_match if p.get("level")})
+        if levels and level.title() not in levels:
+            return f"We have projects for those skills, but not at the '{level}' level. Try {', '.join(levels)}."
+            
+    return "No projects matched your inputs. Try broadening your interest area or selecting different skills."

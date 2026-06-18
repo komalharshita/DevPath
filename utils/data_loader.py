@@ -7,6 +7,8 @@ import logging
 from utils.url_validator import is_valid_url, parse_resource
 
 DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "projects.json")
+_projects_cache = None
+_cache_lock = threading.Lock()
 
 logger = logging.getLogger("devpath.data_loader")
 
