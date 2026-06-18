@@ -61,6 +61,311 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet" />
+  
+  <style>
+    /* ============================================
+       REDESIGNED PROFILE SECTION STYLES
+       Only these styles are new - rest remain original
+       ============================================ */
+    
+    /* Stats Dashboard Grid */
+    .stats-dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-dashboard-card {
+      background: var(--card-bg, #ffffff);
+      border-radius: 1.25rem;
+      padding: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid var(--border, #e5e7eb);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-dashboard-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px -12px rgba(0,0,0,0.15);
+    }
+
+    .stat-dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .stat-dashboard-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted, #6b7280);
+    }
+
+    .stat-dashboard-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .stat-dashboard-progress {
+      margin: 0.75rem 0;
+    }
+
+    .progress-meter {
+      background: var(--gray-200, #e5e7eb);
+      border-radius: 100px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .progress-meter-fill {
+      background: linear-gradient(90deg, #6366f1, #8b5cf6);
+      height: 100%;
+      border-radius: 100px;
+      display: block;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .stat-dashboard-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+      color: var(--text-muted, #6b7280);
+      margin-top: 0.75rem;
+    }
+
+    .reset-btn-mini {
+      background: none;
+      border: none;
+      color: var(--text-muted, #6b7280);
+      font-size: 0.7rem;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .reset-btn-mini:hover {
+      background: var(--gray-100, #f3f4f6);
+      color: #ef4444;
+    }
+
+    /* Badges Grid Mini */
+    .badges-grid-mini {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 0.75rem 0;
+      min-height: 60px;
+    }
+
+    .badge-mini {
+      background: var(--gray-100, #f3f4f6);
+      padding: 0.4rem 0.75rem;
+      border-radius: 2rem;
+      font-size: 0.7rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .badge-mini.earned {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: white;
+    }
+
+    /* Activity Stats */
+    .activity-stats-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .activity-stat-item {
+      text-align: center;
+      padding: 0.75rem;
+      background: var(--gray-50, #f9fafb);
+      border-radius: 1rem;
+    }
+
+    .activity-stat-value {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #6366f1;
+    }
+
+    .activity-stat-label {
+      font-size: 0.7rem;
+      color: var(--text-muted, #6b7280);
+    }
+
+    /* Bottom Grid */
+    .profile-bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 1.5rem;
+    }
+
+    .completed-card,
+    .leaderboard-achievement-card {
+      background: var(--card-bg, #ffffff);
+      border-radius: 1.25rem;
+      padding: 1.25rem;
+      border: 1px solid var(--border, #e5e7eb);
+    }
+
+    .completed-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border, #e5e7eb);
+    }
+
+    .completed-header h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .empty-completed {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted, #6b7280);
+    }
+
+    .empty-completed svg {
+      margin-bottom: 0.75rem;
+      opacity: 0.5;
+    }
+
+    .empty-completed p {
+      margin: 0;
+      font-weight: 500;
+    }
+
+    .empty-completed span {
+      font-size: 0.75rem;
+    }
+
+    /* Tabs */
+    .la-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border, #e5e7eb);
+      padding-bottom: 0.5rem;
+    }
+
+    .la-tab {
+      background: none;
+      border: none;
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 0.5rem;
+      color: var(--text-muted, #6b7280);
+      transition: all 0.2s;
+    }
+
+    .la-tab.active {
+      background: #6366f1;
+      color: white;
+    }
+
+    .la-content {
+      display: none;
+    }
+
+    .la-content.active {
+      display: block;
+    }
+
+    .leaderboard-list-compact,
+    .achievement-list-compact {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .leaderboard-list-compact li,
+    .achievement-list-compact li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border, #e5e7eb);
+      font-size: 0.85rem;
+    }
+
+    .leaderboard-empty,
+    .achievement-empty {
+      text-align: center;
+      color: var(--text-muted, #6b7280);
+      padding: 1.5rem !important;
+    }
+
+    .la-footer {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border, #e5e7eb);
+      font-size: 0.7rem;
+      color: var(--text-muted, #6b7280);
+      text-align: center;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .stats-dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      
+      .profile-bottom-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      
+      .activity-stats-row {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .activity-stats-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Dark mode support */
+    [data-theme="dark"] .stat-dashboard-card,
+    [data-theme="dark"] .completed-card,
+    [data-theme="dark"] .leaderboard-achievement-card {
+      background: #1f2937;
+    }
+
+    [data-theme="dark"] .activity-stat-item {
+      background: #374151;
+    }
+
+    [data-theme="dark"] .badge-mini {
+      background: #374151;
+    }
+  </style>
 </head>
 
 <body>
@@ -152,7 +457,6 @@
        ============================================================ -->
   <section class="hero" id="home">
     <div class="hero-inner">
-      <!-- Left: copy -->
       <div class="hero-copy">
         <div class="hero-badge">
           <span class="hero-badge-dot"></span>
@@ -170,14 +474,12 @@
           roadmaps and ready-to-run starter code.
         </p>
 
-
         <div class="hero-cta-row">
           <a href="#the-project" class="btn-hero-primary">Start Finding Projects</a>
           <a href="#how-it-works" class="btn-hero-ghost">See How It Works</a>
         </div>
       </div>
 
-      <!-- Hero visual loads after main content for performance -->
       <div class="hero-visual">
         <div class="hero-visual-card hero-visual-card--top">
           <div class="hvc-icon hvc-icon--blue">
@@ -201,12 +503,10 @@
             <span class="hvm-filename">expense_tracker.py</span>
           </div>
           <div class="hvm-code">
-            <span class="hvm-line"><span class="hvm-kw">def</span> <span class="hvm-fn">add_expense</span>(category,
-              amount):</span>
+            <span class="hvm-line"><span class="hvm-kw">def</span> <span class="hvm-fn">add_expense</span>(category, amount):</span>
             <span class="hvm-line hvm-indent"><span class="hvm-cm"># Save entry to CSV</span></span>
             <span class="hvm-line hvm-indent">date <span class="hvm-op">=</span> datetime.now()</span>
-            <span class="hvm-line hvm-indent"><span class="hvm-kw">with</span> open(DATA_FILE) <span
-                class="hvm-kw">as</span> f:</span>
+            <span class="hvm-line hvm-indent"><span class="hvm-kw">with</span> open(DATA_FILE) <span class="hvm-kw">as</span> f:</span>
             <span class="hvm-line hvm-indent2">writer.writerow([date, ...])</span>
             <span class="hvm-line">&nbsp;</span>
             <span class="hvm-line"><span class="hvm-kw">def</span> <span class="hvm-fn">monthly_summary</span>():</span>
@@ -230,7 +530,6 @@
       </div>
     </div>
 
-    <!-- Hero visual loads after main content for performance -->
     <div class="hero-bg-grid"></div>
     <div class="hero-blob hero-blob-1"></div>
     <div class="hero-blob hero-blob-2"></div>
@@ -242,7 +541,6 @@
   <section class="stats-section">
     <div class="container">
       <div class="stats-grid">
-        <!-- Total Projects -->
         <div class="stat-card">
           <div class="stat-icon stat-icon--indigo">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -256,7 +554,6 @@
           </div>
         </div>
 
-        <!-- Unique Skills -->
         <div class="stat-card">
           <div class="stat-icon stat-icon--yellow">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -271,7 +568,6 @@
           </div>
         </div>
 
-        <!-- Beginner Friendly -->
         <div class="stat-card">
           <div class="stat-icon stat-icon--green">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -290,7 +586,7 @@
   </section>
 
   <!-- ============================================================
-       Progress + Achievements
+       Progress + Achievements (REDESIGNED)
        ============================================================ -->
   <section class="progress-section" id="progress">
     <div class="container">
@@ -298,55 +594,114 @@
       <h2 class="section-title">Track Progress, Unlock Badges, and See Your Growth</h2>
       <p class="section-sub">Local progress is saved in your browser so you can build momentum without signing in.</p>
 
-      <div class="profile-grid">
-        <div class="profile-card">
-          <div class="profile-card-header">
-            <div>
-              <span class="profile-label">Total Points</span>
-              <h3 id="progress-points">0</h3>
+      <div class="stats-dashboard-grid">
+        <div class="stat-dashboard-card points-card">
+          <div class="stat-dashboard-header">
+            <span class="stat-dashboard-title">Total Points</span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+          <div class="stat-dashboard-value" id="progress-points">0</div>
+          <div class="stat-dashboard-progress">
+            <div class="progress-meter">
+              <span class="progress-meter-fill" id="progress-meter-fill" style="width: 0%;">0%</span>
             </div>
-            <button type="button" id="reset-progress-btn" class="btn-ghost">Reset Progress</button>
           </div>
-          <div class="progress-meter" aria-label="Progress meter">
-            <span class="progress-meter-fill" id="progress-meter-fill" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">0%</span>
+          <div class="stat-dashboard-footer">
+            <span>Next badge at 100 pts</span>
+            <button type="button" id="reset-progress-btn" class="reset-btn-mini">Reset</button>
           </div>
-          <ul class="progress-stats" id="progress-stats">
-            <li><strong>Searches</strong><span>0</span></li>
-            <li><strong>Projects Viewed</strong><span>0</span></li>
-            <li><strong>Code Opens</strong><span>0</span></li>
-            <li><strong>Projects Completed</strong><span>0</span></li>
-          </ul>
         </div>
 
-        <div class="badge-card">
-          <div class="badge-card-header">
-            <h3>Badges</h3>
-            <p>Unlock achievements as you explore projects and open starter code.</p>
+        <div class="stat-dashboard-card badges-card">
+          <div class="stat-dashboard-header">
+            <span class="stat-dashboard-title">Badges Earned</span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L15 8.5L22 9.5L17 14L18.5 21L12 17.5L5.5 21L7 14L2 9.5L9 8.5L12 2z"/>
+            </svg>
           </div>
-          <ul class="progress-badge-grid" id="progress-badges"></ul>
+          <div class="badges-grid-mini" id="progress-badges"></div>
+          <div class="stat-dashboard-footer">
+            <span>Unlock achievements as you explore</span>
+          </div>
         </div>
 
-        <div class="achievement-card">
-          <div class="achievement-card-header">
-            <h3>Recent Achievements</h3>
+        <div class="stat-dashboard-card activity-card">
+          <div class="stat-dashboard-header">
+            <span class="stat-dashboard-title">Your Activity</span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
           </div>
-          <ul class="achievement-list" id="achievement-list"></ul>
+          <div class="activity-stats-row">
+            <div class="activity-stat-item">
+              <span class="activity-stat-value" id="searches-count">0</span>
+              <span class="activity-stat-label">Searches</span>
+            </div>
+            <div class="activity-stat-item">
+              <span class="activity-stat-value" id="projects-viewed-count">0</span>
+              <span class="activity-stat-label">Viewed</span>
+            </div>
+            <div class="activity-stat-item">
+              <span class="activity-stat-value" id="code-opens-count">0</span>
+              <span class="activity-stat-label">Code Opens</span>
+            </div>
+            <div class="activity-stat-item">
+              <span class="activity-stat-value" id="projects-completed-count">0</span>
+              <span class="activity-stat-label">Completed</span>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div class="history-card">
-          <div class="history-card-header">
+      <div class="profile-bottom-grid">
+        <div class="completed-card">
+          <div class="completed-header">
             <h3>Completed Projects</h3>
-            <p>Track your recently finished work.</p>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
           </div>
-          <ol class="achievement-list" id="completed-history-list"></ol>
+          <div class="completed-list" id="completed-history-list">
+            <div class="empty-completed">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              <p>No completed projects yet</p>
+              <span>Start a project to see it here</span>
+            </div>
+          </div>
         </div>
 
-        <div class="leaderboard-card">
-          <div class="leaderboard-card-header">
-            <h3>Leaderboard</h3>
-            <p>See where you rank locally compared to other learners.</p>
+        <div class="leaderboard-achievement-card">
+          <div class="la-tabs">
+            <button class="la-tab active" data-tab="leaderboard">🏆 Leaderboard</button>
+            <button class="la-tab" data-tab="achievements">✨ Achievements</button>
           </div>
-          <ol class="leaderboard-list" id="leaderboard-list"></ol>
+          
+          <div class="la-content active" id="leaderboard-content">
+            <ol class="leaderboard-list-compact" id="leaderboard-list">
+              <li class="leaderboard-empty">Complete projects to see rankings</li>
+            </ol>
+            <div class="la-footer">
+              <span>Local rankings • Updated in real-time</span>
+            </div>
+          </div>
+          
+          <div class="la-content" id="achievements-content">
+            <ul class="achievement-list-compact" id="achievement-list">
+              <li class="achievement-empty">Complete actions to earn achievements</li>
+            </ul>
+            <div class="la-footer">
+              <span>Keep coding to unlock more!</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -355,46 +710,30 @@
   <div class="achievement-toast" id="achievement-toast" role="status" aria-live="polite"></div>
 
   <!-- ============================================================
-       Language / Skill Strip (visual trust element)
+       Language / Skill Strip
        ============================================================ -->
-
   <div class="skill-strip">
     <div class="skill-strip-inner">
       <span class="skill-strip-label">Supports skills including:</span>
       <div class="skill-strip-items">
         <span class="ss-item-indigo">Python</span>
-
         <span class="ss-item-green">JavaScript</span>
-
         <span class="ss-item-purple">HTML / CSS</span>
-
         <span class="ss-item-pink">Flask</span>
-
         <span class="ss-item-green">SQL</span>
-
         <span class="ss-item-purple">React</span>
-
         <span class="ss-item-pink">Node.js</span>
-
         <span class="ss-item-green">pandas</span>
-
         <span class="ss-item-pink">C++</span>
-
         <span class="ss-item-indigo">Java</span>
-
         <span class="ss-item-green">TypeScript</span>
-
         <span class="ss-item-purple">Go</span>
-
         <span class="ss-item-pink">Rust</span>
-
         <span class="ss-item-green">C#</span>
-
         <span class="ss-item-purple">Kotlin</span>
       </div>
     </div>
   </div>
-
 
   <!-- ============================================================
        How It Works
@@ -447,7 +786,6 @@
       <p class="section-sub">Every recommendation comes with practical resources — not just a project name.</p>
 
       <div class="features-grid">
-
         <div class="feature-card feature-card--pink">
           <div class="feature-card-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -490,7 +828,6 @@
           </p>
           <a href="#find-project" class="feature-card-link">Get starter code</a>
         </div>
-
       </div>
     </div>
   </section>
@@ -506,6 +843,7 @@
 
       <div class="form-card-outer">
         <div class="form-card" id="form-section">
+          <form id="recommend-form" novalidate>
           <!-- Shared link prefill banner (hidden by default, shown by JS when URL params detected) -->
           <div class="share-prefill-banner" id="share-prefill-banner" style="display:none;">
             <div class="share-prefill-banner-content">
@@ -523,17 +861,18 @@
           </div>
           <form id="recommend-form" novalidate onsubmit="event.preventDefault()">
             <div class="form-group">
-              <div class="form-label-row"
-                style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
+              <div class="form-label-row" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
                 <label for="skills-input">
                   Your Skills
                   <button type="button" class="tooltip" aria-label="Skills help" aria-describedby="skills-tooltip">
+                    <span aria-hidden="true">ⓘ</span>
   <span aria-hidden="true">ⓘ</span>
                     <span id="skills-tooltip" class="tooltip-text" role="tooltip">
                       Add technologies, programming languages, or tools you know like Python, React, Git, SQL, etc.
                     </span>
                   </button>
                 </label>
+
                 
                 <!-- Reset button and Inline GitHub Trigger -->
                 <div style="display: flex; gap: 3px; align-items: center;">
@@ -544,8 +883,7 @@
                   <button type="button" id="btn-show-github" class="resource-link"
                     style="padding: 4px 8px; border-radius: var(--r-xs); font-size: 0.75rem; gap: 6px;">
                     <svg style="width:14px; fill:currentColor" viewBox="0 0 24 24">
-                      <path
-                        d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
                     </svg>
                     <span>Import from GitHub</span>
                   </button>
@@ -569,9 +907,12 @@
                   </button>
                 </div>
                 <div id="skills-suggestions" class="skills-suggestions skills-dropdown" style="display: none; max-height: 250px; overflow-y: auto; border: 1px solid var(--color-border); border-top: none; background: white; position: absolute; width: 100%; margin-top: -2px; z-index: 10;"></div>
+                <input type="text" id="skills-input" placeholder="Type a skill and press Enter..." autocomplete="off" />
+                <input type="text" id="skills-input" placeholder="Type a skill and press Enter..."
+                  autocomplete="off" aria-haspopup="listbox" aria-expanded="false" aria-controls="skills-suggestions" />
+                <div id="skills-suggestions" class="skills-suggestions"></div>
 
               </div>
-              <!-- Hidden field holds the final comma-separated value -->
               <input type="hidden" id="skills" name="skills" />
               <span class="form-hint">
                 Add one or more skills you are comfortable with. Example: Python, React, SQL, Git.
@@ -579,7 +920,6 @@
               <div class="form-error-msg" id="skills-error"></div>
             </div>
 
-            <!-- Quick-select skill chips -->
             <div class="skill-chips-row" id="skill-chips-available">
               <button type="button" class="skill-chip" data-skill="Python">Python</button>
               <button type="button" class="skill-chip" data-skill="JavaScript">JavaScript</button>
@@ -622,22 +962,19 @@
               <button type="button" class="skill-chip" data-skill="pytest">pytest</button>
               <button type="button" class="skill-chip" data-skill="Webpack">Webpack</button>
             </div>
-            <!-- Level + Interest in a row -->
+
             <div class="form-row">
               <div class="form-group">
                 <label for="level">Experience Level</label>
                 <div class="select-wrap">
                   <select id="level" name="level">
                     <option value="" disabled selected>Select level</option>
-
                     {% for level in available_levels %}
                     <option value="{{ level }}">{{ level }}</option>
                     {% endfor %}
                   </select>
                 </div>
-                <span class="form-hint">
-                  Select your current proficiency level such as Beginner or Intermediate.
-                </span>
+                <span class="form-hint">Select your current proficiency level such as Beginner or Intermediate.</span>
                 <div class="form-error-msg" id="level-error"></div>
               </div>
 
@@ -669,19 +1006,15 @@
                     <option value="Machine Learning/AI">Machine Learning/AI</option>
                   </select>
                 </div>
-                <span class="form-hint">
-                  Pick the domain you want to explore such as Web Development, Automation, or Games.
-                </span>
+                <span class="form-hint">Pick the domain you want to explore such as Web Development, Automation, or Games.</span>
                 <div class="form-error-msg" id="interest-error"></div>
               </div>
             </div>
 
-            <!-- Time availability -->
             <div class="form-group">
               <label for="time">
                 Time Availability
-                <span class="tooltip"
-                  title="Estimate how much time you can realistically dedicate to building the project.">
+                <span class="tooltip" title="Estimate how much time you can realistically dedicate to building the project.">
                   ⓘ
                 </span>
               </label>
@@ -693,17 +1026,19 @@
                   <option value="High">High — a week or more</option>
                 </select>
               </div>
-              <span class="form-hint">
-                Include coding, debugging, learning, and reviewing time in your estimate.
-              </span>
+              <span class="form-hint">Include coding, debugging, learning, and reviewing time in your estimate.</span>
               <div class="form-error-msg" id="time-error"></div>
             </div>
- main
 
-            <!-- Submit button and Clear actions -->
             <div class="form-actions">
               <button type="submit" class="btn-submit" id="submit-btn">
                 <span id="btn-label">Generate My Projects</span>
+                <span id="btn-loading" style="display:none;">Finding matches...</span>
+              </button>
+              <button type="button" class="btn-clear" id="clear-filters-btn">
+                <span>Clear Filters</span>
+              </button>
+            </div>
               <span id="btn-loading" style="display:none;">Finding matches...</span>
             </button>
         </div>
@@ -717,7 +1052,6 @@
   <!-- ============================================================
        Results Section
        ============================================================ -->
-  <!-- aria-live="polite" announces newly injected results to screen readers -->
   <section class="results-section" id="results-section" style="display:none;" aria-live="polite" aria-atomic="false">
     <div class="container">
       <div class="section-eyebrow">Your Matches</div>
@@ -756,7 +1090,6 @@
         </div>
       </div>
 
-      <!-- Empty / no-match state -->
       <div id="results-empty" style="display:none;">
         <div class="empty-state">
           <div class="empty-icon">
@@ -768,13 +1101,10 @@
           </div>
           <h3>No Projects Found</h3>
           <p id="empty-message">Try adjusting your skills or selecting a different interest area.</p>
-          <button class="btn-try-again"
-            onclick="document.getElementById('find-project').scrollIntoView({behavior:'smooth'})">Try Different
-            Inputs</button>
+          <button class="btn-try-again" onclick="document.getElementById('find-project').scrollIntoView({behavior:'smooth'})">Try Different Inputs</button>
         </div>
       </div>
 
-      <!-- Cards grid -->
       <div class="results-grid" id="results-grid"></div>
 
       <div class="saved-projects-panel" id="saved-projects-panel">
@@ -860,12 +1190,9 @@
         <h4 class="footer-col-title">Resources</h4>
         <ul class="footer-links-list">
           <li><a href="/project/1">Sample Project</a></li>
-          <li><a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">GitHub</a>
-          </li>
-          <li><a href="https://github.com/komalharshita/DevPath/blob/main/CONTRIBUTING.md" target="_blank"
-              rel="noopener noreferrer">Contributing Guide</a></li>
-          <li><a href="https://github.com/komalharshita/DevPath/issues" target="_blank" rel="noopener noreferrer">Report
-              an Issue</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing Guide</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath/issues" target="_blank" rel="noopener noreferrer">Report an Issue</a></li>
         </ul>
       </div>
 
@@ -873,10 +1200,8 @@
         <h4 class="footer-col-title">About Us</h4>
         <ul class="footer-links-list">
           <li><a href="#our-story">Our Story</a></li>
-          <li><a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">Open
-              Source</a></li>
-          <li><a href="https://github.com/komalharshita/DevPath/blob/main/LICENSE" target="_blank"
-              rel="noopener noreferrer">License</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">Open Source</a></li>
+          <li><a href="https://github.com/komalharshita/DevPath/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">License</a></li>
         </ul>
       </div>
     </div>
@@ -885,22 +1210,17 @@
       <p>DevPath is open source. Licensed under the MIT License.</p>
       <div class="footer-bottom-links">
         <a href="#our-story">About Us</a>
-        <a href="https://github.com/komalharshita/DevPath/blob/main/LICENSE" target="_blank"
-          rel="noopener noreferrer">Project License</a>
+        <a href="https://github.com/komalharshita/DevPath/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Project License</a>
       </div>
     </div>
   </footer>
 
   <!-- GitHub Modal Overlay -->
-  <div class="code-panel-overlay" id="github-modal-overlay"
-    style="align-items: center; justify-content: center; opacity: 1;">
-    <div class="sidebar-card"
-      style="width: 100%; max-width: 400px; margin: 20px; z-index: 400; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
-
+  <div class="code-panel-overlay" id="github-modal-overlay" style="align-items: center; justify-content: center; opacity: 1;">
+    <div class="sidebar-card" style="width: 100%; max-width: 400px; margin: 20px; z-index: 400; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
       <div class="sidebar-card-title">
         <svg style="width:18px; fill:var(--indigo-600)" viewBox="0 0 24 24">
-          <path
-            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
         </svg>
         Sync with GitHub
       </div>
@@ -911,21 +1231,18 @@
       <div class="form-group" style="margin-bottom: 20px;">
         <div class="skill-input-wrap">
           <span style="color:var(--gray-400); font-family:var(--font-mono); font-size:0.8rem; margin-left:8px;">@</span>
-          <input type="text" id="github-username" placeholder="username"
-            style="border:none; outline:none; flex:1; padding:10px;">
+          <input type="text" id="github-username" placeholder="username" style="border:none; outline:none; flex:1; padding:10px;">
         </div>
         <div class="form-error-msg" id="github-modal-error"></div>
       </div>
 
       <div style="display: flex; gap: 12px;">
-        <button type="button" id="btn-fetch-github" class="btn-primary"
-          style="flex: 2; padding: 10px; font-size: 0.85rem;">Fetch Skills</button>
-        <button type="button" id="btn-close-github" class="btn-view-code-sm"
-          style="flex: 1; border-color: var(--border); color: var(--text-body);">Cancel</button>
+        <button type="button" id="btn-fetch-github" class="btn-primary" style="flex: 2; padding: 10px; font-size: 0.85rem;">Fetch Skills</button>
+        <button type="button" id="btn-close-github" class="btn-view-code-sm" style="flex: 1; border-color: var(--border); color: var(--text-body);">Cancel</button>
       </div>
-
     </div>
   </div>
+
   <style>
     .form-actions {
       display: flex;
@@ -950,16 +1267,41 @@
     }
   </style>
 
-
   <script src="/static/data/skills.js"></script>
 
   <button id="scroll-top-btn" aria-label="Scroll to top" title="Scroll to top">
-    <svg id="scroll-btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
-         stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <svg id="scroll-btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="18 15 12 9 6 15"/>
     </svg>
   </button>
 
+  <script src="/static/script.js"></script>
+  
+  <script>
+    // Tab switching for leaderboard/achievements (adds to your existing JS)
+    document.addEventListener('DOMContentLoaded', function() {
+      const tabs = document.querySelectorAll('.la-tab');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          const parent = this.closest('.leaderboard-achievement-card');
+          if (parent) {
+            parent.querySelectorAll('.la-tab').forEach(t => t.classList.remove('active'));
+            parent.querySelectorAll('.la-content').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            const tabId = this.getAttribute('data-tab');
+            if (tabId === 'leaderboard') {
+              const leaderboardContent = parent.querySelector('#leaderboard-content');
+              if (leaderboardContent) leaderboardContent.classList.add('active');
+            } else {
+              const achievementsContent = parent.querySelector('#achievements-content');
+              if (achievementsContent) achievementsContent.classList.add('active');
+            }
+          }
+        });
+      });
+    });
+  </script>
+    
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
 
   <script src="/static/script.js"></script>
