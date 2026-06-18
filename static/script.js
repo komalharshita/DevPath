@@ -582,9 +582,9 @@ updateProfileWidgets();
 
   // Add skill on Enter key in the text input
   // we intercept Enter here so it doesn't accidentally submit the whole form
-  skillsTextInput.addEventListener("keydown", function (evt) {
+  skillsInput.addEventListener("keydown", function (evt) {
     if (evt.key === "ArrowDown" || evt.key === "ArrowUp") {
-      if (visibleSuggestions.length === 0) displaySuggestions(getFilteredSkills(skillsTextInput.value));
+      if (visibleSuggestions.length === 0) displaySuggestions(getFilteredSkills(skillsInput.value));
       if (visibleSuggestions.length === 0) return;
       evt.preventDefault();
       if (evt.key === "ArrowDown") {
@@ -602,7 +602,7 @@ updateProfileWidgets();
         selectSuggestion(visibleSuggestions[activeSuggestionIndex]);
         return;
       }
-      if (skillsTextInput.value.trim()) { addSkill(skillsTextInput.value); skillsTextInput.value = ""; }
+      if (skillsInput.value.trim()) { addSkill(skillsInput.value); skillsInput.value = ""; }
       hideSuggestions();
     }
   });
@@ -670,7 +670,7 @@ updateProfileWidgets();
       var skill = chip.getAttribute("data-skill");
       if (!skill) return;
       if (isSkillSelected(skill)) { removeSkill(skill); } else { addSkill(skill); }
-      skillsTextInput.value = "";
+      skillsInput.value = "";
       hideSuggestions();
   function renderSelectedChips() {
     selectedChips.textContent = "";
@@ -820,7 +820,7 @@ updateProfileWidgets();
         addSkill(skill);
       }
       hideSuggestions();
-      skillsTextInput.value = "";
+      skillsInput.value = "";
     });
   });
 
@@ -843,7 +843,7 @@ updateProfileWidgets();
   }
 
   // Show suggestions on input
-  skillsTextInput.addEventListener("input", function (evt) {
+  skillsInput.addEventListener("input", function (evt) {
     var typedValue = evt.target.value.trim();
     if (typedValue.length === 0) {
       hideSuggestions();
@@ -945,7 +945,7 @@ updateProfileWidgets();
       // ignore DOM errors
     }
     // Keep focus in the input so user can continue typing
-    if (skillsTextInput) skillsTextInput.focus();
+    if (skillsInput) skillsInput.focus();
   }
 
   // remove a skill from the list and update the UI accordingly
