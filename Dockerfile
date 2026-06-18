@@ -1,23 +1,27 @@
-# Base image — pin to a specific digest in production for reproducibility
-FROM python:3.9-slim
-
-# Python runtime optimizations
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+# ----- Build Stage -----
+FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
-# Install dependencies as root before switching users
+# Create a virtual environment and install dependencies into it
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY . .
+# ----- Run Stage -----
+FROM python:3.11-slim
 
-# Create a non-root user and switch to it
-RUN adduser --disabled-password --gecos "" appuser
-USER appuser
+WORKDIR /app
+
+# Copy only the compiled virtual environment from the builder stage
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy the actual application code
+COPY . .
 
 EXPOSE 5000
 
-CMD ["python", "src/app.py"]
+CMD ["python", "app.py"]
