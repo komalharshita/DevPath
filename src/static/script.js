@@ -419,6 +419,9 @@ updateProfileWidgets();
     : quickPickChips.map(function (chip) { return chip.getAttribute("data-skill"); });
   var activeSuggestionIndex = -1;
   var visibleSuggestions = [];
+  var SAVED_PROJECTS_KEY = "devpathSavedProjects";
+  var hasSearched = false;
+  var techStackSelect = document.getElementById("tech_stack");
 
   function normalize(value) {
     return String(value || "").trim().toLowerCase();
@@ -594,6 +597,7 @@ updateProfileWidgets();
     }
   }
 
+
   function truncate(text, maxLength) {
     text = text || "";
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
@@ -681,9 +685,53 @@ updateProfileWidgets();
     if (!projects || projects.length === 0) {
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "block";
+      var displayMsg = message || "Try adjusting your skills or choosing a different interest area.";
       if (emptyMessageEl) {
-        emptyMessageEl.textContent = message || "Try adjusting your skills or choosing a different interest area.";
+        emptyMessageEl.textContent = displayMsg;
       }
+      resultsEmptyEl.innerHTML = 
+        '<div class="empty-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; max-width: 560px; margin: 0 auto; padding: 40px 20px; border: 1.5px dashed var(--border); border-radius: var(--r-md); background: var(--card-bg, #ffffff);">' +
+          '<div class="empty-icon" style="color: var(--gray-400); margin-bottom: 16px;">' +
+            '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+              '<circle cx="12" cy="12" r="10" />' +
+              '<line x1="12" y1="8" x2="12" y2="12" />' +
+              '<line x1="12" y1="16" x2="12.01" y2="16" />' +
+            '</svg>' +
+          '</div>' +
+          '<h3 style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: var(--text-heading); margin-bottom: 12px;">We couldn\'t find an exact match for your current filters.</h3>' +
+          '<p id="empty-message" style="color: var(--text-body); font-size: 0.95rem; margin-bottom: 24px; max-width: 440px; line-height: 1.5;">' + displayMsg + '</p>' +
+          '<div class="empty-relaxation-tips" style="background: var(--surface-light, #f9fafb); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 16px 20px; margin-bottom: 24px; text-align: left; width: 100%; max-width: 440px;">' +
+            '<span style="font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); display: block; margin-bottom: 10px;">Try relaxing your search constraints:</span>' +
+            '<ul style="list-style: none; padding: 0; margin: 0; font-size: 0.88rem; color: var(--text-body); display: flex; flex-direction: column; gap: 8px;">' +
+              '<li style="display: flex; gap: 8px; align-items: flex-start;">' +
+                '<span style="color: var(--indigo-500); font-weight: bold;">•</span>' +
+                '<span>Choose <strong>All Technologies</strong> in the Tech Stack dropdown selector.</span>' +
+              '</li>' +
+              '<li style="display: flex; gap: 8px; align-items: flex-start;">' +
+                '<span style="color: var(--indigo-500); font-weight: bold;">•</span>' +
+                '<span>Clear some of your selected skills to broaden recommendations.</span>' +
+              '</li>' +
+              '<li style="display: flex; gap: 8px; align-items: flex-start;">' +
+                '<span style="color: var(--indigo-500); font-weight: bold;">•</span>' +
+                '<span>Select a different Area of Interest or increase your Time Availability.</span>' +
+              '</li>' +
+            '</ul>' +
+          '</div>' +
+          '<button id="empty-state-reset-btn" class="btn-try-again" type="button" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 24px;">' +
+            'Clear All Filters' +
+          '</button>' +
+        '</div>';
+
+      var resetBtn = document.getElementById("empty-state-reset-btn");
+      if (resetBtn) {
+        resetBtn.addEventListener("click", function () {
+          var mainClearBtn = document.getElementById("clear-filters-btn");
+          if (mainClearBtn) {
+            mainClearBtn.click();
+          }
+        });
+      }
+
       resultsSection.scrollIntoView({ behavior: "smooth" });
       return;
     }
@@ -773,6 +821,10 @@ updateProfileWidgets();
     updateQuickPickState();
     clearAllErrors();
     hideSuggestions();
+    if (techStackSelect) {
+      techStackSelect.value = "all";
+    }
+    hasSearched = false;
     resultsSection.style.display = "none";
     if (skillsInput) skillsInput.focus();
   }
@@ -828,7 +880,8 @@ updateProfileWidgets();
         skills: JSON.stringify(selectedSkills),
         level: document.getElementById("level").value,
         interest: document.getElementById("interest").value,
-        time: document.getElementById("time").value
+        time: document.getElementById("time").value,
+        tech_stack: techStackSelect ? techStackSelect.value : "all"
       })
     })
       .then(function (response) {
@@ -840,6 +893,7 @@ updateProfileWidgets();
       .then(function (data) {
         setLoadingState(false);
         recordSearch();
+        hasSearched = true;
         renderResults(data.projects || [], data.message);
       })
       .catch(function (err) {
@@ -848,6 +902,13 @@ updateProfileWidgets();
         if (general) general.textContent = err.message || "An unexpected error occurred. Please try again.";
       });
   });
+  if (techStackSelect) {
+    techStackSelect.addEventListener("change", function () {
+      if (hasSearched) {
+        submitBtn.click();
+      }
+    });
+  }
 
   var modal = document.getElementById("github-modal-overlay");
   var openModalBtn = document.getElementById("btn-show-github");
