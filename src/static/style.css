@@ -4287,10 +4287,18 @@ body.dark-theme .feature-card p {
   color: rgba(255,255,255,0.8);
 }
 
-body.dark-theme .feature-card-link {
-  background: rgba(255,255,255,0.08);
+body.dark-theme .feature-card-link,
+[data-theme="dark"] .feature-card-link {
+  background: rgba(255, 255, 255, 0.08);
   color: white;
-  border-color: rgba(255,255,255,0.14);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+body.dark-theme .feature-card-link:hover,
+[data-theme="dark"] .feature-card-link:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
 }
 
 /*
