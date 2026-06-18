@@ -2,7 +2,9 @@
   {
     "id": 1,
     "title": "Personal Expense Tracker",
-    "skills": ["Python"],
+    "skills": [
+      "Python"
+    ],
     "level": "Beginner",
     "interest": "Data",
     "time": "Low",
@@ -14,7 +16,11 @@
       "View monthly summary",
       "Export data to CSV file"
     ],
-    "tech_stack": ["Python", "CSV module", "datetime module"],
+    "tech_stack": [
+      "Python",
+      "CSV module",
+      "datetime module"
+    ],
     "roadmap": [
       "Step 1: Set up the project folder and create main.py",
       "Step 2: Design the expense data structure as a dictionary",
@@ -34,7 +40,11 @@
   {
     "id": 2,
     "title": "Weather Dashboard",
-    "skills": ["JavaScript", "HTML", "CSS"],
+    "skills": [
+      "JavaScript",
+      "HTML",
+      "CSS"
+    ],
     "level": "Beginner",
     "interest": "Web",
     "time": "Low",
@@ -46,7 +56,12 @@
       "Show a weather icon based on conditions",
       "Toggle between Celsius and Fahrenheit"
     ],
-    "tech_stack": ["HTML", "CSS", "JavaScript", "OpenWeatherMap API"],
+    "tech_stack": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "OpenWeatherMap API"
+    ],
     "roadmap": [
       "Step 1: Create the HTML structure with a search form",
       "Step 2: Style the page with CSS flexbox",
@@ -66,7 +81,9 @@
   {
     "id": 3,
     "title": "Student Grade Manager",
-    "skills": ["Python"],
+    "skills": [
+      "Python"
+    ],
     "level": "Beginner",
     "interest": "Education",
     "time": "Medium",
@@ -78,7 +95,11 @@
       "Assign letter grades automatically",
       "Save and load data from a JSON file"
     ],
-    "tech_stack": ["Python", "json module", "os module"],
+    "tech_stack": [
+      "Python",
+      "json module",
+      "os module"
+    ],
     "roadmap": [
       "Step 1: Define the student data structure using a dictionary",
       "Step 2: Write add_student() and add_grade() functions",
@@ -98,7 +119,9 @@
   {
     "id": 4,
     "title": "Task Manager REST API",
-    "skills": ["Python"],
+    "skills": [
+      "Python"
+    ],
     "level": "Intermediate",
     "interest": "Web",
     "time": "Medium",
@@ -110,7 +133,12 @@
       "Assign priority levels to tasks",
       "Persist data to a JSON file"
     ],
-    "tech_stack": ["Python", "Flask", "JSON", "Postman (for testing)"],
+    "tech_stack": [
+      "Python",
+      "Flask",
+      "JSON",
+      "Postman (for testing)"
+    ],
     "roadmap": [
       "Step 1: Install Flask and create the app.py file",
       "Step 2: Define the task data model as a dictionary",
@@ -131,7 +159,11 @@
   {
     "id": 5,
     "title": "Portfolio Website",
-    "skills": ["HTML", "CSS", "JavaScript"],
+    "skills": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
     "level": "Beginner",
     "interest": "Web",
     "time": "Low",
@@ -143,7 +175,11 @@
       "Skills list with visual indicators",
       "Contact form with basic validation"
     ],
-    "tech_stack": ["HTML", "CSS", "JavaScript"],
+    "tech_stack": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
     "roadmap": [
       "Step 1: Plan the page sections on paper first",
       "Step 2: Write the HTML structure for all sections",
@@ -164,7 +200,12 @@
   {
     "id": 6,
     "title": "URL Shortener",
-    "skills": ["Python", "JavaScript", "HTML", "CSS"],
+    "skills": [
+      "Python",
+      "JavaScript",
+      "HTML",
+      "CSS"
+    ],
     "level": "Intermediate",
     "interest": "Web",
     "time": "High",
@@ -176,7 +217,14 @@
       "Track how many times a link was clicked",
       "List all shortened links in a dashboard"
     ],
-    "tech_stack": ["Python", "Flask", "HTML", "CSS", "JavaScript", "JSON"],
+    "tech_stack": [
+      "Python",
+      "Flask",
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "JSON"
+    ],
     "roadmap": [
       "Step 1: Set up Flask app with two routes: home and redirect",
       "Step 2: Write a random 6-character code generator",
@@ -197,7 +245,9 @@
   {
     "id": 7,
     "title": "Data Analysis Report Generator",
-    "skills": ["Python"],
+    "skills": [
+      "Python"
+    ],
     "level": "Intermediate",
     "interest": "Data",
     "time": "High",
@@ -209,7 +259,12 @@
       "Calculate mean, median, and mode per column",
       "Generate bar charts for categorical data"
     ],
-    "tech_stack": ["Python", "pandas", "matplotlib", "os module"],
+    "tech_stack": [
+      "Python",
+      "pandas",
+      "matplotlib",
+      "os module"
+    ],
     "roadmap": [
       "Step 1: Install pandas and matplotlib via pip",
       "Step 2: Write a CSV loader that validates the file path",
@@ -229,7 +284,9 @@
   {
     "id": 8,
     "title": "Library Management System",
-    "skills": ["Java"],
+    "skills": [
+      "Java"
+    ],
     "level": "Beginner",
     "interest": "Backend",
     "time": "Medium",
@@ -241,7 +298,11 @@
       "Store student records",
       "Search books by title or author"
     ],
-    "tech_stack": ["Java", "OOP", "File Handling"],
+    "tech_stack": [
+      "Java",
+      "OOP",
+      "File Handling"
+    ],
     "roadmap": [
       "Step 1: Create Book and Student classes",
       "Step 2: Design the menu-driven interface",
@@ -261,7 +322,10 @@
   {
     "id": 9,
     "title": "Real-Time Chat Application",
-    "skills": ["JavaScript", "Node.js"],
+    "skills": [
+      "JavaScript",
+      "Node.js"
+    ],
     "level": "Intermediate",
     "interest": "Web",
     "time": "High",
@@ -273,7 +337,13 @@
       "User join and leave notifications",
       "Simple responsive chat interface"
     ],
-    "tech_stack": ["Node.js", "Express.js", "Socket.IO", "HTML", "CSS"],
+    "tech_stack": [
+      "Node.js",
+      "Express.js",
+      "Socket.IO",
+      "HTML",
+      "CSS"
+    ],
     "roadmap": [
       "Step 1: Initialize the Node.js project",
       "Step 2: Install Express and Socket.IO",
@@ -292,8 +362,44 @@
   },
   {
     "id": 10,
+    "title": "Password Strength Checker",
+    "skills": [
+      "Python"
+    ],
+    "level": "Beginner",
+    "interest": "Cybersecurity",
+    "time": "Low",
+    "description": "A tool that checks password strength based on length, symbols, uppercase letters, and numbers. Helps beginners understand input validation and security basics.",
+    "features": [
+      "Check password complexity",
+      "Display strength rating",
+      "Suggest stronger password improvements",
+      "Prevent weak password patterns"
+    ],
+    "tech_stack": [
+      "Python",
+      "Regex"
+    ],
+    "roadmap": [
+      "Step 1: Create the password input system",
+      "Step 2: Check password length",
+      "Step 3: Detect uppercase and lowercase letters",
+      "Step 4: Detect numbers and symbols",
+      "Step 5: Create a scoring system",
+      "Step 6: Display password strength feedback"
+    ],
+    "resources": [
+      "Python regex docs: https://docs.python.org/3/library/re.html",
+      "OWASP password guidelines: https://owasp.org"
+    ],
+    "starter_code": "starter_code/password_checker.py"
+  },
+  {
+    "id": 11,
     "title": "Feedback Survey Form",
-    "skills": ["HTML"],
+    "skills": [
+      "HTML"
+    ],
     "level": "Beginner",
     "interest": "Web",
     "time": "Low",
@@ -304,7 +410,9 @@
       "Dropdown menu for experience selection",
       "Text area for detailed user suggestions"
     ],
-    "tech_stack": ["HTML"],
+    "tech_stack": [
+      "HTML"
+    ],
     "roadmap": [
       "Step 1: Create the HTML folder structure inside starter_code",
       "Step 2: Build the input text fields and labels",
@@ -318,14 +426,51 @@
     "starter_code": "starter_code/survey_form/index.html"
   },
   {
-    "id": 11,
+    "id": 12,
+    "title": "API ETL Pipeline",
+    "skills": ["Python", "pandas", "requests"],
+    "level": "Intermediate",
+    "interest": "Data",
+    "time": "High",
+    "estimated_hours": 20,
+    "description": "Enter a public API URL to fetch data and automatically transform it into a structured CSV dataset.",
+    "features": [
+      "Fetch data from public APIs",
+      "Handle missing values",
+      "Normalize nested JSON",
+      "Generate summary statistics",
+      "Export the processed CSV for any other analytics projects"
+    ],
+    "roadmap": [
+      "Step 1: Install required modules via pip",
+      "Step 2: Find a public API key for this project",
+      "Step 3: Fetch the data from the API using requests",
+      "Step 4: Validate the response you just fetched from the API",
+      "Step 5: Normalize the nested JSON data by flattening it",
+      "Step 6: Use the fetched data to build a pandas dataframe",
+      "Step 7: Handle missing values or duplicate values",
+      "Step 8: Export the cleaned dataset to CSV format",
+      "Step 9: Generate a summary for the newly created CSV dataset",
+      "Step 10: Test the file with at least two different public APIs"
+    ],
+    "resources": [
+      "pandas docs: https://pandas.pydata.org/docs",
+      "requests docs: https://requests.readthedocs.io/en/latest/",
+      "JSON handling in Python: https://docs.python.org/3/library/json.html",
+      "REST API tutorial: https://restfulapi.net/",
+      "Real Python API guide: https://realpython.com/api-integration-in-python/"
+    ],
+    "starter_code": "starter_code/api_data_pipeline.py"
+  },
+  {
+    "id": 13,
     "title": "AI Resume Analyzer",
     "skills": ["Python", "Flask", "HTML", "CSS", "JavaScript"],
     "level": "Intermediate",
     "interest": "Data",
     "time": "High",
     "estimated_hours": 40,
-    "description": "A Flask web app that compares a resume against a job description using TF-IDF similarity and keyword extraction. Users upload a PDF or paste text, and the app returns a match score, a list of missing keywords, and actionable feedback — with no external AI API required.",
+    "description": "A Flask web app that compares a resume against a job description using TF-IDF similarity and keyword extraction.",
     "features": [
       "Upload a resume as PDF or paste plain text",
       "Paste any job description for comparison",
@@ -335,13 +480,7 @@
       "Single-page interface with interactive feedback display"
     ],
     "tech_stack": [
-      "Python",
-      "Flask",
-      "PyPDF2",
-      "scikit-learn",
-      "HTML",
-      "CSS",
-      "JavaScript"
+      "Python", "Flask", "PyPDF2", "scikit-learn", "HTML", "CSS", "JavaScript"
     ],
     "roadmap": [
       "Step 1: Run the server and verify the upload form renders",
@@ -363,9 +502,11 @@
     "starter_code": "starter_code/ai_resume_analyzer.py"
   },
   {
-    "id": 12,
+    "id": 14,
     "title": "Number Guessing Game",
-    "skills": ["Python"],
+    "skills": [
+      "Python"
+    ],
     "level": "Beginner",
     "interest": "Games",
     "time": "Low",
@@ -377,7 +518,10 @@
       "Count number of attempts",
       "Show final score at the end"
     ],
-    "tech_stack": ["Python", "random module"],
+    "tech_stack": [
+      "Python",
+      "random module"
+    ],
     "roadmap": [
       "Step 1: Set up the Python file and import random module",
       "Step 2: Generate a random number using random.randint()",
@@ -395,9 +539,11 @@
     "starter_code": "starter_code/number_guessing.py"
   },
   {
-    "id": 13,
+    "id": 15,
     "title": "Simple Email Automation",
-    "skills": ["Python"],
+    "skills": [
+      "Python"
+    ],
     "level": "Beginner",
     "interest": "Automation",
     "time": "Low",
@@ -409,7 +555,11 @@
       "Add subject and body text",
       "Read recipient list from a text file"
     ],
-    "tech_stack": ["Python", "smtplib", "email module"],
+    "tech_stack": [
+      "Python",
+      "smtplib",
+      "email module"
+    ],
     "roadmap": [
       "Step 1: Set up Python file and import smtplib",
       "Step 2: Configure sender email and password",
@@ -427,9 +577,13 @@
     "starter_code": "starter_code/email_automation.py"
   },
   {
-    "id": 14,
+    "id": 16,
     "title": "Quiz App",
-    "skills": ["HTML", "CSS", "JavaScript"],
+    "skills": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
     "level": "Beginner",
     "interest": "Games",
     "time": "Low",
@@ -441,7 +595,11 @@
       "Show correct or incorrect feedback instantly",
       "Display final score on results screen"
     ],
-    "tech_stack": ["HTML", "CSS", "JavaScript"],
+    "tech_stack": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
     "roadmap": [
       "Step 1: Create HTML structure for question and options",
       "Step 2: Style the quiz card with CSS",
@@ -460,14 +618,14 @@
     "starter_code": "starter_code/quiz_app.html"
   },
   {
-    "id": 15,
+    "id": 17,
     "title": "Movie Recommendation System",
     "skills": ["Python"],
     "level": "Intermediate",
     "interest": "Data",
     "time": "High",
     "estimated_hours": 30,
-    "description": "A recommendation system that suggests movies to users based on ratings and similarity scores. An intermediate project for learning similarity scoring, pandas data handling, and basic recommendation logic.",
+    "description": "A recommendation system that suggests movies to users based on ratings and similarity scores.",
     "features": [
       "Recommend movies based on user preferences",
       "Find similar movies using similarity metrics",
@@ -494,14 +652,14 @@
     "starter_code": "starter_code/movie_recommender.py"
   },
   {
-    "id": 16,
+    "id": 18,
     "title": "Sentiment Analysis Web App",
     "skills": ["Python", "HTML", "CSS"],
     "level": "Intermediate",
     "interest": "Data",
     "time": "High",
     "estimated_hours": 25,
-    "description": "A web application that predicts whether user entered text has positive, negative, or neutral sentiment. Great for learning text preprocessing and basic sentiment prediction.",
+    "description": "A web application that predicts whether user entered text has positive, negative, or neutral sentiment.",
     "features": [
       "Analyze sentiment from user input text",
       "Display sentiment prediction results",
@@ -528,173 +686,201 @@
     "starter_code": "starter_code/sentiment_app.py"
   },
   {
-    "id": 17,
-    "title": "Sunrise Grand Hotel Management System",
-    "skills": ["Python"],
-    "level": "Intermediate",
-    "interest": "Business Logic",
-    "time": "Medium",
-    "estimated_hours": 18,
-    "description": "A robust CLI application to manage a 40-room inventory with tiered pricing, guest booking logic, and automatic billing calculation.",
-    "features": [
-      "Dynamic 40-room inventory across 4 luxury categories",
-      "Real-time availability filtering and room status tracking",
-      "Booking engine with 10-digit contact validation",
-      "Automatic stay duration and total price calculation",
-      "Cancellation logic and detailed guest lookup"
-    ],
-    "tech_stack": ["Python", "Dictionaries", "Input Validation"],
-    "roadmap": [
-      "Step 1: Initialize the 40-room inventory with tiered pricing",
-      "Step 2: Implement availability display and category filtering",
-      "Step 3: Build the booking engine with contact validation",
-      "Step 4: Create the cancellation and guest detail lookup logic",
-      "Step 5: Wrap all logic in a persistent main menu loop"
-    ],
-    "resources": [
-      "Python Dictionaries: https://docs.python.org/3/tutorial/datastructures.html#dictionaries",
-      "Python Input Validation: https://realpython.com/python-input-output/",
-      "Menu-driven CLI logic: https://www.geeksforgeeks.org/how-to-create-a-menu-driven-program-in-python/"
-    ],
-    "starter_code": "starter_code/hotel_management.py"
-  },
-  {
-    "id": 18,
-    "title": "CLI URL Shortener",
-    "skills": ["Go"],
-    "level": "Beginner",
-    "interest": "Tools",
-    "time": "Low",
-    "estimated_hours": 4,
-    "description": "A command-line tool that generates short hash codes for long URLs and stores the mappings in a local JSON file. Great for learning Go's standard library, file I/O, and CLI argument handling.",
-    "features": [
-      "Accept a URL as a CLI argument",
-      "Generate a short hash code using MD5",
-      "Store URL mappings in a local JSON file",
-      "Resolve a short code back to the original URL"
-    ],
-    "tech_stack": ["Go", "encoding/json", "crypto/md5", "os", "fmt"],
-    "roadmap": [
-      "Step 1: Initialise a Go module with go mod init",
-      "Step 2: Accept a URL as a CLI argument using os.Args",
-      "Step 3: Generate a short key by hashing the URL with MD5",
-      "Step 4: Read and write the mappings map to a JSON file",
-      "Step 5: Add a resolve subcommand to look up a short code",
-      "Step 6: Handle errors gracefully for missing or invalid input",
-      "Step 7: Test shorten and resolve with several sample URLs"
-    ],
-    "resources": [
-      "Go Tour: https://tour.golang.org",
-      "Go by Example: https://gobyexample.com",
-      "Go standard library docs: https://pkg.go.dev/std"
-    ],
-    "starter_code": null
-  },
-  {
     "id": 19,
-    "title": "Go REST API Server",
-    "skills": ["Go"],
-    "level": "Intermediate",
-    "interest": "Web",
-    "time": "Medium",
-    "estimated_hours": 12,
-    "description": "A RESTful API server using Go's net/http standard library with full CRUD endpoints for a notes resource. Teaches HTTP routing, JSON encoding, and in-memory data management in Go.",
+    "title": "File Organiser Script",
+    "skills": ["Python"],
+    "level": "Beginner",
+    "interest": "Automation",
+    "time": "Low",
+    "estimated_hours": 6,
+    "description": "A Python script that scans a folder and automatically sorts files into subfolders by type — images, documents, videos, code files. Great for learning os and shutil modules.",
     "features": [
-      "GET /notes — list all notes",
-      "POST /notes — create a new note",
-      "PUT /notes/{id} — update an existing note",
-      "DELETE /notes/{id} — remove a note",
-      "JSON request and response handling throughout"
+      "Detect file type by extension",
+      "Create subfolders automatically",
+      "Move files into the correct folder",
+      "Print a summary of what was moved"
     ],
-    "tech_stack": ["Go", "net/http", "encoding/json", "strconv"],
+    "tech_stack": ["Python", "os module", "shutil module"],
     "roadmap": [
-      "Step 1: Create main.go and start an HTTP server with http.ListenAndServe",
-      "Step 2: Define a Note struct with ID, Title, and Body fields",
-      "Step 3: Use a map as an in-memory store with a counter for IDs",
-      "Step 4: Write handler functions for each HTTP method",
-      "Step 5: Register routes using http.HandleFunc",
-      "Step 6: Parse request bodies with json.NewDecoder",
-      "Step 7: Write JSON responses with json.NewEncoder",
-      "Step 8: Test all endpoints with curl or Postman"
+      "Step 1: Import os and shutil",
+      "Step 2: Define a dictionary mapping extensions to folder names",
+      "Step 3: Loop through files in the target directory",
+      "Step 4: Check each file's extension",
+      "Step 5: Create the destination folder if it doesn't exist",
+      "Step 6: Move the file using shutil.move()",
+      "Step 7: Print a summary of moved files"
     ],
     "resources": [
-      "net/http docs: https://pkg.go.dev/net/http",
-      "Go by Example — HTTP servers: https://gobyexample.com/http-servers",
-      "Go by Example — JSON: https://gobyexample.com/json"
+      "Python os module: https://docs.python.org/3/library/os.html",
+      "Python shutil module: https://docs.python.org/3/library/shutil.html",
+      "Real Python file handling: https://realpython.com/working-with-files-in-python"
     ],
-    "starter_code": null
+    "starter_code": "starter_code/file_organiser.py"
   },
   {
     "id": 20,
-    "title": "File Duplicate Finder",
-    "skills": ["Rust"],
+    "title": "Flashcard Study App",
+    "skills": ["HTML", "CSS", "JavaScript"],
     "level": "Beginner",
-    "interest": "Tools",
+    "interest": "Education",
     "time": "Low",
-    "estimated_hours": 6,
-    "description": "A CLI tool that recursively scans a directory, hashes every file using SHA-256, and reports groups of duplicates. A practical first Rust project for learning ownership, iterators, and the standard library.",
+    "estimated_hours": 8,
+    "description": "A browser-based flashcard app where users can flip cards to reveal answers. Reinforces DOM manipulation, CSS transitions, and basic data storage in JavaScript.",
     "features": [
-      "Recursively walk a directory with std::fs",
-      "Hash each file using the sha2 crate",
-      "Group files by hash and print duplicate sets",
-      "Accept target directory as a CLI argument"
+      "Flip card animation on click",
+      "Navigate between cards",
+      "Track how many cards reviewed",
+      "Shuffle deck order"
     ],
-    "tech_stack": [
-      "Rust",
-      "std::fs",
-      "std::collections::HashMap",
-      "sha2 crate"
-    ],
+    "tech_stack": ["HTML", "CSS", "JavaScript"],
     "roadmap": [
-      "Step 1: Create a new project with cargo new and add sha2 to Cargo.toml",
-      "Step 2: Accept a directory path from std::env::args",
-      "Step 3: Walk the directory recursively using std::fs::read_dir",
-      "Step 4: Read each file and compute its SHA-256 hash",
-      "Step 5: Store results in a HashMap keyed by hash",
-      "Step 6: Print any hash bucket that contains more than one path",
-      "Step 7: Test on a folder with known duplicate files"
+      "Step 1: Create the card HTML structure with front and back faces",
+      "Step 2: Write CSS for the 3D flip animation",
+      "Step 3: Store flashcard data as a JavaScript array",
+      "Step 4: Render the current card from the array",
+      "Step 5: Add click handler to trigger the flip",
+      "Step 6: Add next/previous navigation buttons",
+      "Step 7: Implement the shuffle function"
     ],
     "resources": [
-      "The Rust Book: https://doc.rust-lang.org/book/",
-      "sha2 crate: https://crates.io/crates/sha2",
-      "Rust std::fs docs: https://doc.rust-lang.org/std/fs/"
+      "CSS 3D transforms: https://developer.mozilla.org/en-US/docs/Web/CSS/transform",
+      "JavaScript arrays: https://javascript.info/array",
+      "W3Schools CSS: https://www.w3schools.com/css"
     ],
-    "starter_code": null
+    "starter_code": "starter_code/flashcard_app.html"
   },
   {
     "id": 21,
-    "title": "Markdown to HTML Converter",
-    "skills": ["Rust"],
+    "title": "Budget Tracker Web App",
+    "skills": ["HTML", "CSS", "JavaScript"],
     "level": "Intermediate",
-    "interest": "Tools",
+    "interest": "Data",
     "time": "Medium",
-    "estimated_hours": 15,
-    "description": "A CLI tool that reads a Markdown file and produces a styled HTML file using the pulldown-cmark parser. Teaches Rust's crate ecosystem, file handling, and string processing.",
+    "estimated_hours": 12,
+    "description": "A browser-based personal finance tracker that lets users add income and expense entries and visualises the balance over time with a simple chart.",
     "features": [
-      "Parse headings, bold, italic, lists, and links",
-      "Generate a complete and valid HTML file",
-      "Accept input and output file paths as CLI arguments",
-      "Wrap output in a minimal HTML template with inline CSS"
+      "Add income and expense entries",
+      "Show running balance",
+      "Colour-code entries by type",
+      "Render a bar chart of monthly totals"
     ],
-    "tech_stack": ["Rust", "pulldown-cmark", "std::fs", "std::env"],
+    "tech_stack": ["HTML", "CSS", "JavaScript", "Chart.js"],
     "roadmap": [
-      "Step 1: Create a Cargo project and add pulldown-cmark to Cargo.toml",
-      "Step 2: Read the input Markdown file path from CLI arguments",
-      "Step 3: Load the file content into a String with std::fs::read_to_string",
-      "Step 4: Use pulldown-cmark Parser and push_html to convert to HTML",
-      "Step 5: Wrap the generated HTML in a full page template",
-      "Step 6: Write the output to the specified file path",
-      "Step 7: Test with a Markdown file containing all common elements"
+      "Step 1: Build the HTML form for adding entries",
+      "Step 2: Store entries in a JavaScript array",
+      "Step 3: Render the entry list dynamically",
+      "Step 4: Calculate and display the running balance",
+      "Step 5: Group entries by month for chart data",
+      "Step 6: Import Chart.js via CDN",
+      "Step 7: Render a bar chart using the monthly totals",
+      "Step 8: Add delete functionality for individual entries"
     ],
     "resources": [
-      "pulldown-cmark docs: https://docs.rs/pulldown-cmark",
-      "Rust CLI book: https://rust-cli.github.io/book/",
-      "The Rust Book: https://doc.rust-lang.org/book/"
+      "Chart.js docs: https://www.chartjs.org/docs/latest",
+      "MDN DOM: https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model",
+      "JavaScript arrays: https://javascript.info/array"
     ],
-    "starter_code": null
+    "starter_code": "starter_code/budget_tracker.html"
   },
   {
     "id": 22,
+    "title": "Network Port Scanner",
+    "skills": ["Python"],
+    "level": "Intermediate",
+    "interest": "Cybersecurity",
+    "time": "Medium",
+    "estimated_hours": 10,
+    "description": "A Python tool that scans a target host for open ports within a given range. Teaches socket programming, threading for speed, and basic network concepts.",
+    "features": [
+      "Accept host and port range as input",
+      "Check each port using sockets",
+      "Display open ports with service names",
+      "Use threading to speed up scanning"
+    ],
+    "tech_stack": ["Python", "socket module", "threading module"],
+    "roadmap": [
+      "Step 1: Import socket and threading modules",
+      "Step 2: Write a function to test a single port",
+      "Step 3: Loop through the port range and test each",
+      "Step 4: Add threading to run scans concurrently",
+      "Step 5: Map common ports to service names",
+      "Step 6: Display results sorted by port number",
+      "Step 7: Add input validation for host and port range"
+    ],
+    "resources": [
+      "Python socket docs: https://docs.python.org/3/library/socket.html",
+      "Python threading: https://docs.python.org/3/library/threading.html",
+      "OWASP testing guide: https://owasp.org/www-project-web-security-testing-guide"
+    ],
+    "starter_code": "starter_code/port_scanner.py"
+  },
+  {
+    "id": 23,
+    "title": "Typing Speed Test",
+    "skills": ["HTML", "CSS", "JavaScript"],
+    "level": "Beginner",
+    "interest": "Games",
+    "time": "Medium",
+    "estimated_hours": 12,
+    "description": "A browser-based typing test that measures words per minute and accuracy. Great for practising timers, string comparison, and dynamic DOM updates.",
+    "features": [
+      "Display a random passage to type",
+      "Start timer on first keypress",
+      "Highlight correct and incorrect characters in real time",
+      "Show WPM and accuracy on completion"
+    ],
+    "tech_stack": ["HTML", "CSS", "JavaScript"],
+    "roadmap": [
+      "Step 1: Store a list of sample passages",
+      "Step 2: Display a random passage in the UI",
+      "Step 3: Listen for keypress events in the input field",
+      "Step 4: Start the timer on the first keypress",
+      "Step 5: Compare typed characters to the passage character by character",
+      "Step 6: Highlight correct characters green and errors red",
+      "Step 7: Stop the timer when the passage is complete",
+      "Step 8: Calculate and display WPM and accuracy"
+    ],
+    "resources": [
+      "JavaScript timers: https://developer.mozilla.org/en-US/docs/Web/API/setInterval",
+      "JavaScript string methods: https://javascript.info/string",
+      "MDN keyboard events: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent"
+    ],
+    "starter_code": "starter_code/typing_test.html"
+  },
+  {
+    "id": 24,
+    "title": "Course Progress Tracker",
+    "skills": ["Python"],
+    "level": "Intermediate",
+    "interest": "Education",
+    "time": "Medium",
+    "estimated_hours": 15,
+    "description": "A CLI tool to track progress through online courses. Users can add courses, mark lessons complete, and see a visual progress bar per course.",
+    "features": [
+      "Add courses with a total lesson count",
+      "Mark individual lessons as complete",
+      "Display a text progress bar per course",
+      "Save and load state from a JSON file"
+    ],
+    "tech_stack": ["Python", "json module", "os module"],
+    "roadmap": [
+      "Step 1: Define the course data structure",
+      "Step 2: Write add_course() and add_lesson() functions",
+      "Step 3: Implement mark_complete() logic",
+      "Step 4: Build a text progress bar renderer",
+      "Step 5: Write JSON save and load functions",
+      "Step 6: Create a menu loop for user interaction",
+      "Step 7: Display all courses with progress on startup"
+    ],
+    "resources": [
+      "Python JSON module: https://docs.python.org/3/library/json.html",
+      "Real Python CLI apps: https://realpython.com/command-line-interfaces-python-argparse",
+      "Python os module: https://docs.python.org/3/library/os.html"
+    ],
+    "starter_code": "starter_code/course_tracker.py"
+  },
+  {
+    "id": 25,
     "title": "Android Tip Calculator",
     "skills": ["Kotlin"],
     "level": "Beginner",
@@ -726,7 +912,7 @@
     "starter_code": null
   },
   {
-    "id": 23,
+    "id": 26,
     "title": "Kotlin Weather App",
     "skills": ["Kotlin"],
     "level": "Intermediate",
@@ -764,7 +950,7 @@
     "starter_code": null
   },
   {
-    "id": 24,
+    "id": 27,
     "title": "Java Student Grade Tracker",
     "skills": ["Java"],
     "level": "Beginner",
@@ -796,7 +982,7 @@
     "starter_code": null
   },
   {
-    "id": 25,
+    "id": 28,
     "title": "Java Bank Account System",
     "skills": ["Java"],
     "level": "Intermediate",
@@ -805,39 +991,38 @@
     "estimated_hours": 18,
     "description": "An OOP-based console banking application with deposit, withdrawal, balance inquiry, and transaction history. Demonstrates inheritance, encapsulation, and polymorphism through a BankAccount class hierarchy.",
     "features": [
-      "BankAccount base class with deposit and withdrawal",
-      "SavingsAccount subclass with minimum balance enforcement",
-      "CheckingAccount subclass with overdraft protection",
-      "Transaction history stored as an ArrayList of strings",
-      "Menu-driven console interface"
+      "Add courses with a total lesson count",
+      "Mark individual lessons as complete",
+      "Display a text progress bar per course",
+      "Save and load state from a JSON file"
     ],
-    "tech_stack": ["Java", "OOP", "ArrayList", "Scanner", "Inheritance"],
+    "tech_stack": ["Python", "json module", "os module"],
     "roadmap": [
-      "Step 1: Design the class hierarchy on paper before writing any code",
-      "Step 2: Implement the BankAccount base class with balance and transaction list",
-      "Step 3: Write deposit() and withdraw() with input validation",
-      "Step 4: Create SavingsAccount subclass with minimum balance check",
-      "Step 5: Create CheckingAccount subclass with overdraft logic",
-      "Step 6: Build a menu-driven console interface using Scanner",
-      "Step 7: Add a printHistory() method to display all transactions",
-      "Step 8: Test each account type with edge case inputs"
+      "Step 1: Define the course data structure",
+      "Step 2: Write add_course() and add_lesson() functions",
+      "Step 3: Implement mark_complete() logic",
+      "Step 4: Build a text progress bar renderer",
+      "Step 5: Write JSON save and load functions",
+      "Step 6: Create a menu loop for user interaction",
+      "Step 7: Display all courses with progress on startup"
     ],
     "resources": [
-      "Java OOP tutorial: https://docs.oracle.com/javase/tutorial/java/concepts/",
-      "MOOC Java programming: https://java-programming.mooc.fi/",
-      "Java inheritance guide: https://www.w3schools.com/java/java_inheritance.asp"
+      "Python JSON module: https://docs.python.org/3/library/json.html",
+      "Real Python CLI apps: https://realpython.com/command-line-interfaces-python-argparse",
+      "Python os module: https://docs.python.org/3/library/os.html"
     ],
+<<<<<<< HEAD
     "starter_code": null
   },
   {
-    "id": 26,
+    "id": 29,
     "title": "TypeScript Todo App",
     "skills": ["TypeScript", "HTML", "CSS"],
     "level": "Beginner",
     "interest": "Productivity",
     "time": "Low",
     "estimated_hours": 4,
-    "description": "A browser-based todo list app written entirely in TypeScript with strongly typed interfaces, DOM manipulation, and in-page state management. A great first TypeScript project that reinforces type safety concepts.",
+    "description": "A browser-based todo list app written entirely in TypeScript with strongly typed interfaces, DOM manipulation, and in-page state management.",
     "features": [
       "Add and delete tasks",
       "Mark tasks as complete with a strikethrough",
@@ -863,14 +1048,14 @@
     "starter_code": null
   },
   {
-    "id": 27,
+    "id": 30,
     "title": "TypeScript REST API Client",
     "skills": ["TypeScript"],
     "level": "Intermediate",
     "interest": "Web",
     "time": "Medium",
     "estimated_hours": 12,
-    "description": "A fully typed API client that queries a public REST API using the Fetch API, maps the response to TypeScript interfaces, and renders the data to the DOM. Teaches type-safe async programming and error handling.",
+    "description": "A fully typed API client that queries a public REST API using the Fetch API, maps the response to TypeScript interfaces, and renders the data to the DOM.",
     "features": [
       "Typed interfaces matching the API response shape",
       "Async fetch wrapper with a typed return value",
@@ -896,7 +1081,7 @@
     "starter_code": null
   },
   {
-    "id": 28,
+    "id": 31,
     "title": "C++ Student Records Manager",
     "skills": ["C++"],
     "level": "Beginner",
@@ -929,26 +1114,22 @@
     "starter_code": null
   },
   {
-    "id": 29,
+    "id": 32,
     "title": "C++ Task Scheduler",
     "skills": ["C++"],
     "level": "Intermediate",
     "interest": "Automation",
     "time": "Medium",
     "estimated_hours": 15,
-    "description": "A CLI task scheduler that queues tasks with priority levels and processes them in order using a priority queue from the C++ STL. Teaches STL containers, custom comparators, and structured program design.",
+    "description": "A CLI task scheduler that queues tasks with priority levels and processes them in order using a priority queue from the C++ STL.",
     "features": [
       "Add tasks with a name and integer priority",
       "Process tasks in priority order using std::priority_queue",
       "Log each completed task to the console",
-      "Display the pending queue at any time"
+      "Display the pending main at any time"
     ],
     "tech_stack": [
-      "C++",
-      "std::priority_queue",
-      "struct",
-      "iostream",
-      "vector"
+      "C++", "std::priority_queue", "struct", "iostream", "vector"
     ],
     "roadmap": [
       "Step 1: Define a Task struct with name and priority fields",
@@ -965,73 +1146,5 @@
       "C++ STL tutorial: https://www.geeksforgeeks.org/the-c-standard-template-library-stl/"
     ],
     "starter_code": null
-  },
-  {
-    "id": 98,
-    "title": "API ETL Pipeline",
-    "skills": ["Python", "pandas", "requests"],
-    "level": "Intermediate",
-    "interest": "Data",
-    "time": "Medium",
-    "estimated_hours": 20,
-    "description": "Enter a public API URL to fetch data and automatically transform it into a structured CSV dataset.",
-    "features": [
-      "Fetch data from public APIs",
-      "handle missing values",
-      "Normalize nested JSON",
-      "Generate summary statistics",
-      "Export the processed CSV for any other Analytics projects"
-    ],
-    "tech_stack": ["Python", "pandas", "requests", "JSON"],
-    "roadmap": [
-      "Step 1: Install required modules via pip",
-      "Step 2: Find a public API key for this project",
-      "Step 3: Fetch the data from the API using requests",
-      "Step 4: Validate the response you just fetched From the API",
-      "Step 5: Normalize the nested JSON data by flattening it",
-      "Step 6: Use the fetched data to build a pandas dataframe",
-      "Step 7: Handle missing values or duplicate values",
-      "Step 8: Export the cleaned dataset to CSV format",
-      "Step 9: Generate a summary for the newly created CSV dataset",
-      "Step 10: Test the file with at least two different public APIs"
-    ],
-    "resources": [
-      "pandas docs: https://pandas.pydata.org/docs",
-      "requests docs: https://requests.readthedocs.io/en/latest/",
-      "JSON handling in Python: https://docs.python.org/3/library/json.html",
-      "REST API tutorial: https://restfulapi.net/",
-      "Real Python API guide: https://realpython.com/api-integration-in-python/"
-    ],
-    "starter_code": "starter_code/api_data_pipeline.py"
-  },
-  {
-    "id": 99,
-    "title": "Password Strength Checker",
-    "skills": ["Python"],
-    "level": "Beginner",
-    "interest": "Cybersecurity",
-    "time": "Low",
-    "estimated_hours": 5,
-    "description": "A tool that checks password strength based on length, symbols, uppercase letters, and numbers. Helps beginners understand input validation and security basics.",
-    "features": [
-      "Check password complexity",
-      "Display strength rating",
-      "Suggest stronger password improvements",
-      "Prevent weak password patterns"
-    ],
-    "tech_stack": ["Python", "Regex"],
-    "roadmap": [
-      "Step 1: Create the password input system",
-      "Step 2: Check password length",
-      "Step 3: Detect uppercase and lowercase letters",
-      "Step 4: Detect numbers and symbols",
-      "Step 5: Create a scoring system",
-      "Step 6: Display password strength feedback"
-    ],
-    "resources": [
-      "Python regex docs: https://docs.python.org/3/library/re.html",
-      "OWASP password guidelines: https://owasp.org"
-    ],
-    "starter_code": "starter_code/password_checker.py"
   }
 ]

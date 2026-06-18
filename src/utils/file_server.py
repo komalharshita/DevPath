@@ -3,9 +3,8 @@
 
 import os
 
-# Absolute path to the starter_code directory
 STARTER_CODE_DIR = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "starter_code")
+    os.path.join(os.path.dirname(__file__), "..", "..", "starter_code")
 )
 
 

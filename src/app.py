@@ -10,6 +10,12 @@
 # Business logic, recommendation scoring, and data loading all live in
 # the utils/ and routes/ packages, not here.
 
+import sys
+import os
+
+# Ensure the 'src' directory is in the python path for Vercel and root-level execution
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from flask import Flask
 from routes.main_routes import main
 from config import Config

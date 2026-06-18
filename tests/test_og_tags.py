@@ -6,6 +6,7 @@ import os
 import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from app import app
 from config import Config
@@ -138,13 +139,13 @@ def test_config_base_url_used():
 def test_og_banner_exists():
     """The og-banner.png file must exist in static folder."""
     import os
-    assert os.path.exists("static/og-banner.png"), "og-banner.png missing from static folder"
+    assert os.path.exists("src/static/og-banner.png"), "og-banner.png missing from static folder"
 
 def test_og_banner_dimensions():
     """The og-banner.png must be 1200x630 pixels."""
     pytest.importorskip("PIL")
     from PIL import Image
-    img = Image.open("static/og-banner.png")
+    img = Image.open("src/static/og-banner.png")
     assert img.size == (1200, 630), f"Expected 1200x630, got {img.size}"
 
 if __name__ == "__main__":

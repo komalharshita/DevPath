@@ -4,8 +4,9 @@
 import sys
 import os
 
-# Allow imports from the project root when running tests
+# Allow imports from the project root and src/ when running tests
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 import pytest
 from app import app
