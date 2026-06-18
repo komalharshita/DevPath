@@ -20,7 +20,7 @@ import re
 # Intentionally strict: rejects bare domains, ftp://, mailto:, etc.
 _URL_RE = re.compile(
     r'^https?://'                      # scheme
-    r'(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}'  # domain
+    r'(?:(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}|localhost)'  # domain
     r'(?::\d+)?'                       # optional port
     r'(?:[/?#][^\s]*)?$',              # optional path/query/fragment
     re.IGNORECASE,

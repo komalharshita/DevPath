@@ -7,8 +7,6 @@ import logging
 from utils.url_validator import is_valid_url, parse_resource
 
 DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "projects.json")
-_projects_cache = None
-_cache_lock = threading.Lock()
 
 logger = logging.getLogger("devpath.data_loader")
 
@@ -81,11 +79,10 @@ def load_all_projects():
     do not hit the filesystem.
     """
     global _projects_cache
-    with _cache_lock:
-        if _projects_cache is None:
-            with open(DATA_FILE, "r", encoding="utf-8") as f:
-                _projects_cache = json.load(f)
-            validate_projects(_projects_cache)
+    if _projects_cache is None:
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            _projects_cache = json.load(f)
+        validate_projects(_projects_cache)
     return _projects_cache
 
 

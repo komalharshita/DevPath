@@ -465,6 +465,11 @@ html[data-entry-anim="true"] .form-card form > .btn-submit              { animat
   color: var(--gray-600);
 }
 
+[data-theme="dark"] .badge {
+  background: rgba(148, 163, 184, 0.15);
+  color: #cbd5e1;
+}
+
 .badge--beginner {
   background: var(--green-100);
   color: var(--green-500);
@@ -483,6 +488,27 @@ html[data-entry-anim="true"] .form-card form > .btn-submit              { animat
 .badge--data {
   background: var(--purple-100);
   color: var(--purple-600);
+}
+
+/* Dark mode overrides for badges to improve contrast */
+[data-theme="dark"] .badge--beginner {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+}
+
+[data-theme="dark"] .badge--web {
+  background: rgba(79, 110, 247, 0.15);
+  color: #a5b4fc;
+}
+
+[data-theme="dark"] .badge--python {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fcd34d;
+}
+
+[data-theme="dark"] .badge--data {
+  background: rgba(124, 58, 237, 0.15);
+  color: #c4b5fd;
 }
 
 /* =============================================================
@@ -1632,13 +1658,9 @@ html[data-theme="dark"] .theme-toggle-label::before {
   text-align: left;
 }
 
+/* Form groups */
 .form-group {
   margin-bottom: 24px;
-}
-
-.form-card form > .form-group:first-child {
-  position: relative;
-  z-index: 1;
 }
 
 .form-row {
@@ -1660,7 +1682,6 @@ label {
 /* Skill input container */
 .skill-input-wrap {
   position: relative;
-  z-index: 1100;
   border: 1.5px solid var(--border);
   border-radius: var(--r-sm);
   background: var(--gray-50);
@@ -2857,15 +2878,17 @@ input[type="text"]:not(.skill-input-wrap input):focus {
     width:14px;
     height:14px;
     border-radius:50%;
-    background:var(--indigo-600);
-    border:3px solid var(--indigo-100);
+    background:var(--surface);
+    border:3px solid var(--indigo-600);
     margin-top:4px;
+    box-sizing:border-box;
 }
 
 .roadmap-line{
     flex:1;
-    width:2px;
-    background:var(--border);
+    width:0;
+    border-left:2px dashed var(--border);
+    background:transparent;
     margin:4px 0;
 }
 
@@ -2937,7 +2960,13 @@ input[type="text"]:not(.skill-input-wrap input):focus {
 /* Make completed node visually */
 .roadmap-step.completed .roadmap-dot {
   background: var(--green-500);
+  border-color: var(--green-200);
   box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+}
+
+/* Make completed line solid green */
+.roadmap-step.completed .roadmap-line {
+  border-left: 2px solid var(--green-500);
 }
 
 /* Progress container */
@@ -4628,6 +4657,11 @@ body.dark-theme .theme-toggle:hover {
   margin-bottom: 4px;
 }
 
+[data-theme="dark"] .compare-vs-badge {
+  background: rgba(79, 110, 247, 0.15);
+  color: #a5b4fc;
+}
+
 .compare-btn {
   white-space: nowrap;
   padding: 12px 24px;
@@ -5021,4 +5055,16 @@ body.dark-theme .theme-toggle:hover {
 [data-theme="dark"] .compare-skill-chip--shared {
   background: rgba(16, 185, 129, 0.15);
   color: #6ee7b7;
+}
+
+[data-theme="dark"] .compare-tag--a,
+[data-theme="dark"] .compare-skill-chip--a {
+  background: rgba(79, 110, 247, 0.15);
+  color: #a5b4fc;
+}
+
+[data-theme="dark"] .compare-tag--b,
+[data-theme="dark"] .compare-skill-chip--b {
+  background: rgba(124, 58, 237, 0.15);
+  color: #c4b5fd;
 }
