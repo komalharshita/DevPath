@@ -15,8 +15,8 @@
             </a>
 
             <div class="nav-links">
-                <a href="/" class="nav-link">Home</a>
-                <a href="/contact" class="nav-link">Contact Us</a>
+                <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">Home</a>
+                <a href="/contact" class="nav-link {% if request.path == '/contact' %}active{% endif %}">Contact Us</a>
             </div>
         </div>
     </nav>
