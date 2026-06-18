@@ -22,10 +22,12 @@ from utils.skill_progression import (
     SkillDifficulty,
     validate_skill_progression,
 )
+from utils.code_review import CodeReviewManager
 from config import Config
 import os
 
 _skill_validator = SkillProgressionValidator()
+_code_review_manager = CodeReviewManager()
 
 # Interest categories that currently have no project recommendations available
 NO_PROJECT_INTERESTS = {
@@ -427,6 +429,243 @@ def get_next_skill(user_id, skill):
             "skill": next_skill[0],
             "difficulty": next_skill[1].name
         }
+    }), 200
+
+
+@main.route("/api/code-review/submit", methods=["POST"])
+def submit_code_for_review():
+    """Submit code for expert review."""
+    payload = request.get_json(silent=True)
+
+    if not payload:
+        return jsonify({"error": "Request body must be valid JSON."}), 400
+
+    submission_id = (payload.get("submission_id") or "").strip()
+    user_id = (payload.get("user_id") or "").strip()
+    project_id = payload.get("project_id")
+    code = (payload.get("code") or "").strip()
+    language = (payload.get("language") or "").strip()
+    description = (payload.get("description") or "").strip()
+
+    if not all([submission_id, user_id, project_id, code, language]):
+        return jsonify({
+            "error": "submission_id, user_id, project_id, code, and language are required"
+        }), 400
+
+    try:
+        submission = _code_review_manager.submit_code(
+            submission_id=submission_id,
+            user_id=user_id,
+            project_id=int(project_id),
+            code=code,
+            language=language,
+            description=description or None,
+        )
+        return jsonify({
+            "success": True,
+            "submission": submission
+        }), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@main.route("/api/code-review/submission/<submission_id>")
+def get_submission(submission_id):
+    """Get submission details."""
+    submission_id = submission_id.strip()
+
+    submission = _code_review_manager.get_submission(submission_id)
+    if not submission:
+        return jsonify({"error": "Submission not found"}), 404
+
+    return jsonify({
+        "success": True,
+        "submission": submission
+    }), 200
+
+
+@main.route("/api/code-review/user/<user_id>/submissions")
+def get_user_code_submissions(user_id):
+    """Get all code submissions from a user."""
+    user_id = user_id.strip()
+
+    submissions = _code_review_manager.get_user_submissions(user_id)
+    return jsonify({
+        "user_id": user_id,
+        "submissions": submissions,
+        "count": len(submissions)
+    }), 200
+
+
+@main.route("/api/code-review/project/<int:project_id>/submissions")
+def get_project_code_submissions(project_id):
+    """Get all code submissions for a project."""
+    submissions = _code_review_manager.get_project_submissions(project_id)
+    return jsonify({
+        "project_id": project_id,
+        "submissions": submissions,
+        "count": len(submissions)
+    }), 200
+
+
+@main.route("/api/code-review/start", methods=["POST"])
+def start_code_review():
+    """Start a code review session."""
+    payload = request.get_json(silent=True)
+
+    if not payload:
+        return jsonify({"error": "Request body must be valid JSON."}), 400
+
+    submission_id = (payload.get("submission_id") or "").strip()
+    reviewer_id = (payload.get("reviewer_id") or "").strip()
+
+    if not submission_id or not reviewer_id:
+        return jsonify({
+            "error": "submission_id and reviewer_id are required"
+        }), 400
+
+    try:
+        review = _code_review_manager.start_review(
+            submission_id=submission_id,
+            reviewer_id=reviewer_id,
+        )
+        return jsonify({
+            "success": True,
+            "review": review
+        }), 201
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 404
+
+
+@main.route("/api/code-review/<review_id>/comment", methods=["POST"])
+def add_review_comment(review_id):
+    """Add feedback comment to a review."""
+    payload = request.get_json(silent=True)
+
+    if not payload:
+        return jsonify({"error": "Request body must be valid JSON."}), 400
+
+    line_number = payload.get("line_number")
+    code_snippet = (payload.get("code_snippet") or "").strip()
+    feedback = (payload.get("feedback") or "").strip()
+    severity = (payload.get("severity") or "info").strip()
+
+    if line_number is None or not code_snippet or not feedback:
+        return jsonify({
+            "error": "line_number, code_snippet, and feedback are required"
+        }), 400
+
+    try:
+        comment = _code_review_manager.add_feedback_comment(
+            review_id=review_id,
+            line_number=int(line_number),
+            code_snippet=code_snippet,
+            feedback=feedback,
+            severity=severity,
+        )
+        return jsonify({
+            "success": True,
+            "comment": comment
+        }), 201
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 404
+
+
+@main.route("/api/code-review/<review_id>/score", methods=["POST"])
+def score_review_category(review_id):
+    """Score a code quality category in a review."""
+    payload = request.get_json(silent=True)
+
+    if not payload:
+        return jsonify({"error": "Request body must be valid JSON."}), 400
+
+    category = (payload.get("category") or "").strip()
+    score = payload.get("score")
+    feedback = (payload.get("feedback") or "").strip()
+
+    if not category or score is None:
+        return jsonify({
+            "error": "category and score are required"
+        }), 400
+
+    try:
+        score = float(score)
+        category_score = _code_review_manager.score_category(
+            review_id=review_id,
+            category=category,
+            score=score,
+            feedback=feedback or "",
+        )
+        return jsonify({
+            "success": True,
+            "category_score": category_score
+        }), 201
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@main.route("/api/code-review/<review_id>/complete", methods=["POST"])
+def complete_code_review(review_id):
+    """Complete a code review."""
+    payload = request.get_json(silent=True)
+
+    if not payload:
+        return jsonify({"error": "Request body must be valid JSON."}), 400
+
+    summary = (payload.get("summary") or "").strip()
+    recommend_changes = payload.get("recommend_changes", False)
+
+    if not summary:
+        return jsonify({"error": "summary is required"}), 400
+
+    try:
+        completed = _code_review_manager.complete_review(
+            review_id=review_id,
+            summary=summary,
+            recommend_changes=bool(recommend_changes),
+        )
+        return jsonify({
+            "success": True,
+            "review": completed
+        }), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 404
+
+
+@main.route("/api/code-review/<review_id>/comments")
+def get_review_feedback(review_id):
+    """Get all feedback comments for a review."""
+    review_id = review_id.strip()
+
+    comments = _code_review_manager.get_review_comments(review_id)
+    return jsonify({
+        "review_id": review_id,
+        "comments": comments,
+        "count": len(comments)
+    }), 200
+
+
+@main.route("/api/code-review/submission/<submission_id>/quality")
+def get_code_quality_score(submission_id):
+    """Get code quality score for a submission."""
+    submission_id = submission_id.strip()
+
+    score_data = _code_review_manager.get_code_quality_score(submission_id)
+    return jsonify(score_data), 200
+
+
+@main.route("/api/code-review/submission/<submission_id>/recommendations")
+def get_code_recommendations(submission_id):
+    """Get improvement recommendations for a submission."""
+    submission_id = submission_id.strip()
+
+    recommendations = _code_review_manager.get_improvement_recommendations(
+        submission_id
+    )
+    return jsonify({
+        "submission_id": submission_id,
+        "recommendations": recommendations,
+        "count": len(recommendations)
     }), 200
 
 
