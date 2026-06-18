@@ -1093,7 +1093,53 @@ updateProfileWidgets();
     if (shareWrap) shareWrap.style.display = hasResults ? "flex" : "none";
 
     if (!hasResults) {
-      if (emptyMessageEl) { if (message) emptyMessageEl.textContent = message; }
+      var displayMsg = message || "Try adjusting your skills or selecting a different interest area.";
+      if (emptyMessageEl) {
+        emptyMessageEl.textContent = displayMsg;
+      }
+      resultsEmptyEl.innerHTML = 
+        '<div class="empty-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; max-width: 560px; margin: 0 auto; padding: 40px 20px; border: 1.5px dashed var(--border); border-radius: var(--r-md); background: var(--card-bg, #ffffff);">' +
+          '<div class="empty-icon" style="color: var(--gray-400); margin-bottom: 16px;">' +
+            '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+              '<circle cx="12" cy="12" r="10" />' +
+              '<line x1="12" y1="8" x2="12" y2="12" />' +
+              '<line x1="12" y1="16" x2="12.01" y2="16" />' +
+            '</svg>' +
+          '</div>' +
+          '<h3 style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: var(--text-heading); margin-bottom: 12px;">We couldn\'t find an exact match for your current filters.</h3>' +
+          '<p id="empty-message" style="color: var(--text-body); font-size: 0.95rem; margin-bottom: 24px; max-width: 440px; line-height: 1.5;">' + displayMsg + '</p>' +
+          '<div class="empty-relaxation-tips" style="background: var(--surface-light, #f9fafb); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 16px 20px; margin-bottom: 24px; text-align: left; width: 100%; max-width: 440px;">' +
+            '<span style="font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); display: block; margin-bottom: 10px;">Try relaxing your search constraints:</span>' +
+            '<ul style="list-style: none; padding: 0; margin: 0; font-size: 0.88rem; color: var(--text-body); display: flex; flex-direction: column; gap: 8px;">' +
+              '<li style="display: flex; gap: 8px; align-items: flex-start;">' +
+                '<span style="color: var(--indigo-500); font-weight: bold;">•</span>' +
+                '<span>Choose <strong>All Technologies</strong> in the Tech Stack dropdown selector.</span>' +
+              '</li>' +
+              '<li style="display: flex; gap: 8px; align-items: flex-start;">' +
+                '<span style="color: var(--indigo-500); font-weight: bold;">•</span>' +
+                '<span>Clear some of your selected skills to broaden recommendations.</span>' +
+              '</li>' +
+              '<li style="display: flex; gap: 8px; align-items: flex-start;">' +
+                '<span style="color: var(--indigo-500); font-weight: bold;">•</span>' +
+                '<span>Select a different Area of Interest or increase your Time Availability.</span>' +
+              '</li>' +
+            '</ul>' +
+          '</div>' +
+          '<button id="empty-state-reset-btn" class="btn-try-again" type="button" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 24px;">' +
+            'Clear All Filters' +
+          '</button>' +
+        '</div>';
+
+      var resetBtn = document.getElementById("empty-state-reset-btn");
+      if (resetBtn) {
+        resetBtn.addEventListener("click", function () {
+          var mainClearBtn = document.getElementById("clear-filters-btn");
+          if (mainClearBtn) {
+            mainClearBtn.click();
+          }
+        });
+      }
+
       resultsSection.scrollIntoView({ behavior: "smooth" });
       return;
     }
