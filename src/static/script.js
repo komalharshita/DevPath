@@ -781,30 +781,33 @@ updateProfileWidgets();
   }
 
   // checks form fields and shows error messages if any required field is missing or invalid. 
-  // Returns true if the form is valid, false otherwise
   function validateForm() {
-    var valid = true;
+  var valid = true;
 
-    // Check both the array and the hidden input since skills can come from either source
-    if (selectedSkills.length === 0 && !skillsHidden.value.trim()) {
-      showFieldError("skills-error", "Please add at least one skill.");
-      valid = false;
-    }
+  if (!selectedSkills.length) {
+    showFieldError("skills-error", "Please add at least one skill.");
+    valid = false;
+  }
 
-    /* Activity Stats */
-    .activity-stats-row {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-      margin-top: 0.5rem;
-    }
+  if (!document.getElementById("level").value) {
+    showFieldError("level-error", "Please select experience level.");
+    valid = false;
+  }
 
-    .activity-stat-item {
-      text-align: center;
-      padding: 0.75rem;
-      background: var(--gray-50, #f9fafb);
-      border-radius: 1rem;
-  });
+  if (!document.getElementById("interest").value) {
+    showFieldError("interest-error", "Please select interest.");
+    valid = false;
+  }
+
+  if (!document.getElementById("time").value) {
+    showFieldError("time-error", "Please select time availability.");
+    valid = false;
+  }
+
+  return valid;
+}
+
+    
 
   // Add/toggle skill on quick-pick chip click
   quickPickChips.forEach(function (chip) {
@@ -1029,7 +1032,7 @@ updateProfileWidgets();
     if (generalErr) generalErr.textContent = "";
   }
 
-  function validateForm() {
+   {
     var valid = true;
     if (!selectedSkills.length) {
       showFieldError("skills-error", "Please add at least one skill.");
@@ -1205,7 +1208,7 @@ updateProfileWidgets();
     if (allSkills) {
       skillsArr = allSkills.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
       if (skillsArr.length > MAX_SHARE_SKILLS) {
-        skillsArr = skillsArr.slice(0, MAX_SHARE_SKILLS);
+        skillsArr = function validateForm()skillsArr.slice(0, MAX_SHARE_SKILLS);
         truncatedFlag = true;
       }
       params.set("skills", skillsArr.join(", "));
