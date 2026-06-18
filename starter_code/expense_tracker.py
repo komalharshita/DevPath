@@ -158,8 +158,26 @@ def list_expenses():
     expenses = read_all_expenses()
 
     # --- Write your display code here ---
+import csv
 
-    pass
+def list_all_expenses():
+    try:
+        with open("expenses.csv", "r") as file:
+            reader = csv.DictReader(file)
+            print("\n=== All Expenses ===")
+            has_data = False
+            # Print header row
+            print(f"{'Date':<12} | {'Category':<12} | {'Amount':<10} | {'Note'}")
+            print("-" * 55)
+            for row in reader:
+                # Normalize category for consistency
+                category = row['category'].strip().capitalize()
+                print(f"{row['date']:<12} | {category:<12} | {row['amount']:<10} | {row['note']}")
+                has_data = True
+            if not has_data:
+                print("No expenses recorded yet.")
+    except FileNotFoundError:
+        print("No expense file found. Please add an expense first.")
 
 
 def monthly_summary():
@@ -193,7 +211,35 @@ def monthly_summary():
 
     # --- Write your summary code here ---
 
-    pass
+import csv
+from datetime import datetime
+
+def monthly_summary():
+    summary = {}
+    current_month = datetime.now().month
+    current_year = datetime.now().year
+
+    try:
+        with open("expenses.csv", "r") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                date = datetime.strptime(row["date"], "%Y-%m-%d")
+                if date.month == current_month and date.year == current_year:
+                    # Normalize category name
+                    category = row["category"].strip().capitalize()
+                    amount = float(row["amount"])
+                    summary[category] = summary.get(category, 0) + amount
+
+        print("\n=== Monthly Summary ===")
+        if summary:
+            for category, total in summary.items():
+                print(f"{category}: {total:.2f}")
+        else:
+            print("No expenses recorded for this month.")
+
+    except FileNotFoundError:
+        print("No expense file found. Please add an expense first.")
+
 
 
 def filter_by_category(category):
