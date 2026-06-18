@@ -997,11 +997,7 @@ updateProfileWidgets();
     });
   }
 
-  function syncSkillsHiddenInput() {
-    if (!skillsHidden) {
-      var skillsHidden = document.getElementById("skills");
-    }
-  }
+
 
   updateQuickPickState();
 
