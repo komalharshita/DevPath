@@ -195,6 +195,23 @@ var errorMsg = document.getElementById('github-modal-error');
   });
 })();
 
+var TARGET_SEARCHES = 10;
+var TARGET_PROJECT_VIEWS = 15;
+var TARGET_CODE_OPENS = 10;
+var TARGET_COMPLETIONS = 5;
+
+var POINTS_PER_SEARCH = 5;
+var POINTS_PER_VIEW = 10;
+var POINTS_PER_CODE_OPEN = 15;
+var POINTS_PER_COMPLETION = 30;
+
+var PROGRESS_MAX_POINTS = (
+  (TARGET_SEARCHES * POINTS_PER_SEARCH) +
+  (TARGET_PROJECT_VIEWS * POINTS_PER_VIEW) +
+  (TARGET_CODE_OPENS * POINTS_PER_CODE_OPEN) +
+  (TARGET_COMPLETIONS * POINTS_PER_COMPLETION)
+);
+
 var STORAGE_KEY = "devpathUserProgress";
 var progress = {
   searches: 0,
@@ -661,6 +678,34 @@ updateProfileWidgets();
     title.className = "project-card-title";
     title.textContent = project.title;
 
+    if (typeof project.match_score === "number") {
+      var scoreBadge = document.createElement("div");
+      scoreBadge.className = "project-match-score";
+      scoreBadge.setAttribute("aria-label", "Match score: " + project.match_score.toFixed(1) + " out of 10");
+
+      var scoreLabel = document.createElement("span");
+      scoreLabel.className = "score-label";
+      scoreLabel.textContent = "Match Score";
+
+      var scoreValue = document.createElement("span");
+      scoreValue.className = "score-value";
+      scoreValue.textContent = project.match_score.toFixed(1) + " / 10";
+
+      var scoreBar = document.createElement("div");
+      scoreBar.className = "score-bar";
+      scoreBar.setAttribute("role", "presentation");
+
+      var scoreBarFill = document.createElement("div");
+      scoreBarFill.className = "score-bar-fill";
+      scoreBarFill.style.width = (project.match_score * 10) + "%";
+
+      scoreBar.appendChild(scoreBarFill);
+      scoreBadge.appendChild(scoreLabel);
+      scoreBadge.appendChild(scoreValue);
+      scoreBadge.appendChild(scoreBar);
+      card.appendChild(scoreBadge);
+    }
+
     var desc = document.createElement("p");
     desc.className = "project-card-desc";
     var descText = document.createElement("span");
@@ -686,6 +731,9 @@ updateProfileWidgets();
 
     var tags = document.createElement("div");
     tags.className = "project-card-tags";
+
+
+
     (project.skills || []).forEach(function (skill) { tags.appendChild(createTag(skill, "skill")); });
     tags.appendChild(createTag(project.level, project.level));
     tags.appendChild(createTag("Time: " + project.time, "time"));
