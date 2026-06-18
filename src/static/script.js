@@ -1,99 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description"
-    content="DevPath recommends real coding projects based on your skills, level, and interests — with full roadmaps and starter code." />
-  <title>DevPath — Find Projects Based On Your Skills</title>
-  
-  <!-- Open Graph meta tags for social media sharing -->
-  <meta property="og:title" content="DevPath — Find Projects Based On Your Skills" />
-  <meta property="og:description" content="{{ config.SITE_DESCRIPTION }}" />
-  <meta property="og:image" content="{{ config.get_og_image_url() }}" />
-  <meta property="og:url" content="{{ config.get_base_url() }}/" />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="{{ config.SITE_NAME }}" />
-  
-  <!-- Twitter Card meta tags -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="DevPath — Find Projects Based On Your Skills" />
-  <meta name="twitter:description" content="{{ config.SITE_DESCRIPTION }}" />
-  <meta name="twitter:image" content="{{ config.get_og_image_url() }}" />
-  
-  <script>
-    document.documentElement.setAttribute("data-entry-anim", "true");
-  </script>
-  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
-  {% include 'partials/theme_head.html' %}
-  <link rel="stylesheet" href="/static/style.css" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
-    rel="stylesheet" />
-  
-  <style>
-    /* ============================================
-       REDESIGNED PROFILE SECTION STYLES
-       Only these styles are new - rest remain original
-       ============================================ */
-    
-    /* Stats Dashboard Grid */
-    .stats-dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .stat-dashboard-card {
-      background: var(--card-bg, #ffffff);
-      border-radius: 1.25rem;
-      padding: 1.25rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      border: 1px solid var(--border, #e5e7eb);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .stat-dashboard-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 24px -12px rgba(0,0,0,0.15);
-    }
-
-    .stat-dashboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    .stat-dashboard-title {
-      font-size: 0.85rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted, #6b7280);
-    }
-
-    .stat-dashboard-value {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 0.75rem;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .stat-dashboard-progress {
-      margin: 0.75rem 0;
-    }
-
-    .progress-meter {
-      background: var(--gray-200, #e5e7eb);
-      border-radius: 100px;
-      height: 8px;
-      overflow: hidden;
 // script.js — DevPath client-side logic
 //
 // Responsibilities:
@@ -109,7 +13,6 @@
 // THEME PREVIEW MODAL & TOGGLE
 // ============================================================
 document.addEventListener("DOMContentLoaded", function () {
-  // Inject the theme modal HTML
   var modalHtml = `
 <div id="theme-preview-modal" class="theme-modal-overlay" aria-hidden="true" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; backdrop-filter:blur(4px); align-items:center; justify-content:center;">
   <div class="theme-modal-content" role="dialog" aria-modal="true" aria-labelledby="theme-modal-title" style="background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); padding:1.5rem; max-width:500px; width:90%; box-shadow:var(--shadow-xl);">
@@ -118,7 +21,6 @@ document.addEventListener("DOMContentLoaded", function () {
       <button id="close-theme-modal" class="btn-clear" aria-label="Close modal" style="background:transparent; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-light);">&times;</button>
     </div>
     <div class="theme-preview-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-      <!-- Light Theme Card -->
       <button class="theme-preview-card" data-theme-target="light" style="background:transparent; border:2px solid var(--border); border-radius:var(--r-md); padding:1rem; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:1rem; transition:all 0.2s ease;">
         <div class="preview-mockup" style="width:100%; background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:8px; display:flex; flex-direction:column; gap:6px;">
           <div style="width:100%; height:12px; background:#f1f5f9; border-radius:3px;"></div>
@@ -129,7 +31,6 @@ document.addEventListener("DOMContentLoaded", function () {
         <span class="preview-label" style="font-weight:600; color:var(--text-heading);">Light Theme</span>
       </button>
       
-      <!-- Dark Theme Card -->
       <button class="theme-preview-card" data-theme-target="dark" style="background:transparent; border:2px solid var(--border); border-radius:var(--r-md); padding:1rem; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:1rem; transition:all 0.2s ease;">
         <div class="preview-mockup" style="width:100%; background:#0f172a; border:1px solid #1e293b; border-radius:6px; padding:8px; display:flex; flex-direction:column; gap:6px;">
           <div style="width:100%; height:12px; background:#1e293b; border-radius:3px;"></div>
@@ -154,14 +55,12 @@ document.addEventListener("DOMContentLoaded", function () {
     html.setAttribute("data-theme", theme);
     try { localStorage.setItem("theme", theme); } catch (e) {}
     
-    // Sync accessibility attributes on toggle buttons
     var isDark = theme === "dark";
     document.querySelectorAll(".theme-toggle").forEach(function(btn) {
       btn.setAttribute("aria-pressed", isDark ? "true" : "false");
       btn.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
     });
 
-    // Update active card styles
     cards.forEach(function(card) {
       if (card.getAttribute("data-theme-target") === theme) {
         card.style.borderColor = "var(--accent)";
@@ -171,11 +70,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Set initial theme in UI
   var activeTheme = html.getAttribute("data-theme") || localStorage.getItem("theme") || "light";
   syncTheme(activeTheme);
 
-  // Toggle modal on theme button click
   document.querySelectorAll(".theme-toggle").forEach(function(btn) {
     btn.addEventListener("click", function (e) {
       e.preventDefault();
@@ -184,7 +81,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // Close modal
   function closeModal() {
     modal.style.display = "none";
     modal.setAttribute("aria-hidden", "true");
@@ -195,12 +91,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (e.target === modal) closeModal();
   });
 
-  // Apply theme when card is clicked
   cards.forEach(function(card) {
     card.addEventListener("click", function() {
       var theme = this.getAttribute("data-theme-target");
       syncTheme(theme);
-      setTimeout(closeModal, 150); // slight delay for visual feedback
+      setTimeout(closeModal, 150); 
     });
     card.addEventListener("mouseenter", function() {
       if (this.getAttribute("data-theme-target") !== html.getAttribute("data-theme")) {
@@ -218,16 +113,8 @@ document.addEventListener("DOMContentLoaded", function () {
 // ============================================================
 // Detect which page we are on
 // ============================================================
-// !! trick turns the DOM result into a simple true/false
 var isIndexPage = !!document.getElementById("recommend-form");
-// PROJECT_ID is set by the server only on detail pages, so if it's missing we're elsewhere
 var isDetailPage = typeof PROJECT_ID !== "undefined";
-var modal = document.getElementById('github-modal-overlay');
-var openModalBtn = document.getElementById('btn-show-github'); // The trigger in your main form
-var closeModalBtn = document.getElementById('btn-close-github');
-var fetchBtn = document.getElementById('btn-fetch-github');
-var githubInput = document.getElementById('github-username');
-var errorMsg = document.getElementById('github-modal-error');
 
 (function () {
   var html = document.documentElement;
@@ -237,9 +124,7 @@ var errorMsg = document.getElementById('github-modal-error');
     html.setAttribute("data-theme", theme);
     try {
       localStorage.setItem("theme", theme);
-    } catch (err) {
-      // Storage can be unavailable in private browsing.
-    }
+    } catch (err) {}
 
     document.querySelectorAll(".theme-toggle").forEach(function (button) {
       button.setAttribute("aria-pressed", isDark ? "true" : "false");
@@ -248,20 +133,17 @@ var errorMsg = document.getElementById('github-modal-error');
   }
 
   function initTheme() {
-  var theme = "light";
-
-  try {
-    theme = localStorage.getItem("theme") || html.getAttribute("data-theme") || "light";
-  } catch (err) {
-    theme = html.getAttribute("data-theme") || "light";
+    var theme = "light";
+    try {
+      theme = localStorage.getItem("theme") || html.getAttribute("data-theme") || "light";
+    } catch (err) {
+      theme = html.getAttribute("data-theme") || "light";
+    }
+    applyTheme(theme);
+    requestAnimationFrame(function () {
+      html.classList.add("theme-ready");
+    });
   }
-
-  applyTheme(theme);
-
-  requestAnimationFrame(function () {
-    html.classList.add("theme-ready");
-  });
-}
 
   document.addEventListener("click", function (event) {
     var toggle = event.target.closest(".theme-toggle");
@@ -279,21 +161,6 @@ var errorMsg = document.getElementById('github-modal-error');
   var menu = document.getElementById("nav-mobile-menu");
   if (!toggle || !menu) return;
 
-  toggle.addEventListener("click", function () {
-    var isOpen = menu.classList.toggle("open");
-    toggle.classList.toggle("open", isOpen);
-    toggle.setAttribute("aria-expanded", isOpen);
-  });
-
-  document.querySelectorAll(".nav-mobile-link").forEach(function (link) {
-    link.addEventListener("click", function () {
-      menu.classList.remove("open");
-      toggle.classList.remove("open");
-      toggle.setAttribute("aria-expanded", "false");
-    });
-  });
-})();
-
   function setOpen(isOpen) {
     menu.classList.toggle("open", isOpen);
     toggle.classList.toggle("open", isOpen);
@@ -304,7 +171,7 @@ var errorMsg = document.getElementById('github-modal-error');
     setOpen(!menu.classList.contains("open"));
   });
 
-  menu.querySelectorAll(".nav-mobile-link").forEach(function (link) {
+  document.querySelectorAll(".nav-mobile-link").forEach(function (link) {
     link.addEventListener("click", function () {
       setOpen(false);
     });
@@ -313,8 +180,9 @@ var errorMsg = document.getElementById('github-modal-error');
   window.addEventListener("resize", function () {
     if (window.innerWidth >= 640) setOpen(false);
   });
+})();
 
-
+var PROGRESS_MAX_POINTS = 500; // Fixed: Added missing constant
 var STORAGE_KEY = "devpathUserProgress";
 var progress = {
   searches: 0,
@@ -359,8 +227,8 @@ function saveProgressState() {
 }
 
 function computeProgressPoints() {
-  progress.points = progress.searches * POINTS_PER_SEARCH + progress.projectViews * POINTS_PER_VIEW +
-    progress.codeOpens * POINTS_PER_CODE_OPEN + progress.completions * POINTS_PER_COMPLETION;
+  progress.points = progress.searches * 10 + progress.projectViews * 5 +
+    progress.codeOpens * 5 + progress.completions * 50;
 }
 
 function showAchievementToast(title, detail) {
@@ -558,7 +426,9 @@ updateProfileWidgets();
   }
 
   function syncSkillsHiddenInput() {
-    skillsHidden.value = JSON.stringify(selectedSkills);
+    if (skillsHidden) {
+      skillsHidden.value = JSON.stringify(selectedSkills);
+    }
   }
 
   function isSelected(skill) {
@@ -580,98 +450,6 @@ updateProfileWidgets();
     });
   }
 
-  // Add skill on Enter key in the text input
-  // we intercept Enter here so it doesn't accidentally submit the whole form
-  skillsTextInput.addEventListener("keydown", function (evt) {
-    if (evt.key === "ArrowDown" || evt.key === "ArrowUp") {
-      if (visibleSuggestions.length === 0) displaySuggestions(getFilteredSkills(skillsTextInput.value));
-      if (visibleSuggestions.length === 0) return;
-      evt.preventDefault();
-      if (evt.key === "ArrowDown") {
-        activeSuggestionIndex = (activeSuggestionIndex + 1) % visibleSuggestions.length;
-      } else {
-        activeSuggestionIndex = activeSuggestionIndex <= 0 ? visibleSuggestions.length - 1 : activeSuggestionIndex - 1;
-      }
-      renderActiveSuggestion();
-      return;
-    }
-    if (evt.key === "Escape") { hideSuggestions(); return; }
-    if (evt.key === "Enter") {
-      evt.preventDefault();
-      if (activeSuggestionIndex >= 0 && visibleSuggestions[activeSuggestionIndex]) {
-        selectSuggestion(visibleSuggestions[activeSuggestionIndex]);
-        return;
-      }
-      if (skillsTextInput.value.trim()) { addSkill(skillsTextInput.value); skillsTextInput.value = ""; }
-      hideSuggestions();
-    }
-  });
-
-    .progress-meter-fill {
-      background: linear-gradient(90deg, #6366f1, #8b5cf6);
-      height: 100%;
-      border-radius: 100px;
-      display: block;
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-
-    .stat-dashboard-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.7rem;
-      color: var(--text-muted, #6b7280);
-      margin-top: 0.75rem;
-    }
-
-    .reset-btn-mini {
-      background: none;
-      border: none;
-      color: var(--text-muted, #6b7280);
-      font-size: 0.7rem;
-      cursor: pointer;
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.5rem;
-      transition: all 0.2s;
-    }
-
-    .reset-btn-mini:hover {
-      background: var(--gray-100, #f3f4f6);
-      color: #ef4444;
-    }
-
-    /* Badges Grid Mini */
-    .badges-grid-mini {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin: 0.75rem 0;
-      min-height: 60px;
-    }
-
-    .badge-mini {
-      background: var(--gray-100, #f3f4f6);
-      padding: 0.4rem 0.75rem;
-      border-radius: 2rem;
-      font-size: 0.7rem;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-
-    .badge-mini.earned {
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
-      color: white;
-  // Add/toggle skill on quick-pick chip click
-  quickPickChips.forEach(function (chip) {
-    chip.addEventListener("click", function () {
-      var skill = chip.getAttribute("data-skill");
-      if (!skill) return;
-      if (isSkillSelected(skill)) { removeSkill(skill); } else { addSkill(skill); }
-      skillsTextInput.value = "";
-      hideSuggestions();
   function renderSelectedChips() {
     selectedChips.textContent = "";
     selectedSkills.forEach(function (skill) {
@@ -729,9 +507,11 @@ updateProfileWidgets();
   function hideSuggestions() {
     visibleSuggestions = [];
     activeSuggestionIndex = -1;
-    suggestions.style.display = "none";
-    suggestions.textContent = "";
-    skillsInput.setAttribute("aria-expanded", "false");
+    if(suggestions) {
+        suggestions.style.display = "none";
+        suggestions.textContent = "";
+    }
+    if(skillsInput) skillsInput.setAttribute("aria-expanded", "false");
   }
 
   function filteredSkills(query) {
@@ -743,6 +523,7 @@ updateProfileWidgets();
   }
 
   function renderSuggestionState() {
+    if(!suggestions) return;
     suggestions.querySelectorAll(".suggestion-item").forEach(function (item, index) {
       item.classList.toggle("suggestion-item--active", index === activeSuggestionIndex);
       item.setAttribute("aria-selected", index === activeSuggestionIndex ? "true" : "false");
@@ -752,6 +533,7 @@ updateProfileWidgets();
   function showSuggestions(items) {
     visibleSuggestions = items;
     activeSuggestionIndex = -1;
+    if(!suggestions) return;
     suggestions.textContent = "";
     if (!items.length) {
       hideSuggestions();
@@ -771,267 +553,18 @@ updateProfileWidgets();
       });
       item.addEventListener("click", function () {
         window.addSkill(skill);
-        skillsInput.value = "";
+        if(skillsInput) skillsInput.value = "";
         hideSuggestions();
       });
       suggestions.appendChild(item);
     });
     suggestions.style.display = "block";
-    skillsInput.setAttribute("aria-expanded", "true");
-  }
-
-  // checks form fields and shows error messages if any required field is missing or invalid. 
-  // Returns true if the form is valid, false otherwise
-  function validateForm() {
-    var valid = true;
-
-    // Check both the array and the hidden input since skills can come from either source
-    if (selectedSkills.length === 0 && !skillsHidden.value.trim()) {
-      showFieldError("skills-error", "Please add at least one skill.");
-      valid = false;
-    }
-
-    /* Activity Stats */
-    .activity-stats-row {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-      margin-top: 0.5rem;
-    }
-
-    .activity-stat-item {
-      text-align: center;
-      padding: 0.75rem;
-      background: var(--gray-50, #f9fafb);
-      border-radius: 1rem;
-  });
-
-  // Add/toggle skill on quick-pick chip click
-  quickPickChips.forEach(function (chip) {
-    chip.addEventListener("click", function () {
-      var skill = chip.getAttribute("data-skill");
-      var isAlreadySelected = selectedSkills.some(function (s) {
-        return s.toLowerCase() === skill.toLowerCase();
-      });
-
-      if (isAlreadySelected) {
-        removeSkill(skill);
-      } else {
-        addSkill(skill);
-      }
-      hideSuggestions();
-      skillsTextInput.value = "";
-    });
-  });
-
-  // Multi-select dropdown toggle functionality
-  var dropdownBtn = document.getElementById("skills-dropdown-toggle");
-  if (dropdownBtn) {
-    dropdownBtn.addEventListener("click", function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      var suggestionsOpen = suggestionsDiv.style.display === "block";
-      
-      if (suggestionsOpen) {
-        hideSuggestions();
-      } else {
-        // Show all available skills in dropdown
-        displaySuggestions(availableSkills);
-        suggestionsDiv.classList.add("show");
-      }
-    });
-  }
-
-  // Show suggestions on input
-  skillsTextInput.addEventListener("input", function (evt) {
-    var typedValue = evt.target.value.trim();
-    if (typedValue.length === 0) {
-      hideSuggestions();
-      return;
-    if (!document.getElementById("interest").value) {
-      showFieldError("interest-error", "Please select an area of interest.");
-      valid = false;
-    }
-
-    .activity-stat-value {
-      display: block;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #6366f1;
-    }
-
-    return valid;
-  }
-
-    .activity-stat-label {
-      font-size: 0.7rem;
-      color: var(--text-muted, #6b7280);
-    }
-
-    /* Bottom Grid */
-    .profile-bottom-grid {
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 1.5rem;
-    }
-
-    .completed-card,
-    .leaderboard-achievement-card {
-      background: var(--card-bg, #ffffff);
-      border-radius: 1.25rem;
-      padding: 1.25rem;
-      border: 1px solid var(--border, #e5e7eb);
-    }
-
-    .completed-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid var(--border, #e5e7eb);
-    }
-
-    .completed-header h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      margin: 0;
-    }
-
-    .empty-completed {
-      text-align: center;
-      padding: 2rem;
-      color: var(--text-muted, #6b7280);
-    }
-
-    .empty-completed svg {
-      margin-bottom: 0.75rem;
-      opacity: 0.5;
-    }
-
-    .empty-completed p {
-      margin: 0;
-      font-weight: 500;
-  document.addEventListener("click", function (evt) {
-    if (skillWrap && !skillWrap.contains(evt.target)) {
-      hideSuggestions();
-    }
-  });
-
-  //add a skill to the list if it's not empty or a duplicate
-  function addSkill(rawSkill) {
-    // Clean up any extra spaces and match to canonical skill name
-    var skill = getCanonicalSkill(rawSkill);
-    // Nothing to add if string is empty after trimming
-    if (!skill) return;
-
-    // Block duplicate entries (case-insensitive)
-    if (isSkillSelected(skill)) return;
-
-    selectedSkills.push(skill);
-    renderSelectedChips();
-    syncSkillsHiddenInput();
-    updateQuickPickState();
-    // Once a skill is added, remove the "please add a skill" error if it was showing
-    clearFieldError("skills-error");
-    // Ensure the corresponding quick-pick chip is visually active immediately
-    try {
-      var quickChip = document.querySelector('.skill-chip[data-skill="' + skill + '"]');
-      if (quickChip) {
-        quickChip.classList.add('active', 'selected');
-        quickChip.setAttribute('aria-pressed', 'true');
-      }
-    } catch (e) {
-      // ignore DOM errors
-    }
-    // Keep focus in the input so user can continue typing
-    if (skillsTextInput) skillsTextInput.focus();
-  }
-
-  // remove a skill from the list and update the UI accordingly
-  function removeSkill(skill) {
-    // Rebuild the array without the skill that was just removed
-    selectedSkills = selectedSkills.filter(function (selectedSkill) {
-      return normalizeSkill(selectedSkill) !== normalizeSkill(skill);
-    });
-    renderSelectedChips();
-    syncSkillsHiddenInput();
-    updateQuickPickState();
-    // Also clear the visual active state on the quick-pick chip if present
-    try {
-      var quickChip = document.querySelector('.skill-chip[data-skill="' + skill + '"]');
-      if (quickChip) {
-        quickChip.classList.remove('active', 'selected');
-        quickChip.setAttribute('aria-pressed', 'false');
-      }
-    } catch (e) {
-      // ignore DOM errors
-    }
-  }
-
-  // recreate the selected skills chips based on the current array(selectedSkills)
-  // called every time we add or remove a skill
-  function renderSelectedChips() {
-    // Wipe out old chips first so we don't end up with duplicates in the UI
-    chipsSelectedEl.innerHTML = "";
-    selectedSkills.forEach(function (skill) {
-      // Create a new chip element for each selected skill
-      var chipEl = document.createElement("span");
-      chipEl.className = "skill-chip-selected";
-      chipEl.textContent = skill;
-
-      // Remove button for each chip (create lil "x" button)
-      var removeBtn = document.createElement("button");
-      removeBtn.type = "button";
-      removeBtn.className = "skill-chip-remove";
-      removeBtn.innerHTML = "&times;"; //'x' symbol
-      removeBtn.setAttribute("aria-label", "Remove " + skill);
-      removeBtn.addEventListener("click", function (e) {
-        // Stop click from bubbling up to the chip wrap's click listener
-        e.stopPropagation();
-        removeSkill(skill);
-      });
-
-      chipEl.appendChild(removeBtn); // put x button inside the chip
-      chipsSelectedEl.appendChild(chipEl); //add chip to page
-    });
-  }
-
-  function syncSkillsHiddenInput() {
-    if (!skillsHidden) {
-      var skillsHidden = document.getElementById("skills");
-    }
-  }
-
-  updateQuickPickState();
-
-
-  // ----------------------------------------------------------
-  // Form validation
-  // ----------------------------------------------------------
-
-  //puts error msg under specific field
-  function showFieldError(fieldId, message) {
-    var el = document.getElementById(fieldId);
-    if (el) el.textContent = message;
-  }
-
-  //clears error msg under specific field
-  function clearFieldError(fieldId) {
-    var el = document.getElementById(fieldId);
-    if (el) el.textContent = ""; //empty string = no error msg
-  }
-
-  //clears all error msgs in the form, called at the start of form submission to reset any previous errors
-  function clearAllErrors() {
-    ["skills-error", "level-error", "interest-error", "time-error"].forEach(clearFieldError);
-    var generalErr = document.getElementById("form-error-general");
-    if (generalErr) generalErr.textContent = "";
+    if(skillsInput) skillsInput.setAttribute("aria-expanded", "true");
   }
 
   function validateForm() {
     var valid = true;
-    if (!selectedSkills.length) {
+    if (selectedSkills.length === 0 && (!skillsHidden || !skillsHidden.value.trim())) {
       showFieldError("skills-error", "Please add at least one skill.");
       valid = false;
     }
@@ -1050,10 +583,6 @@ updateProfileWidgets();
     return valid;
   }
 
-  // ----------------------------------------------------------
-  // Loading state
-  // ----------------------------------------------------------
-
   function setLoadingState(isLoading) {
     submitBtn.disabled = isLoading;
     submitBtn.setAttribute("aria-busy", isLoading ? "true" : "false");
@@ -1070,13 +599,6 @@ updateProfileWidgets();
     }
   }
 
-  // ----------------------------------------------------------
-  // Render result cards
-  // ----------------------------------------------------------
-
-  //takes the array of projects from the api and draws them on the page as cards
-  //if array is empty it shows the "no results" message instead
-  // Renders project result cards or shows the empty-state message.
   function renderResults(projects, message) {
     resultsSection.style.display = "block";
     resultsLoadingEl.style.display = "none";
@@ -1085,8 +607,7 @@ updateProfileWidgets();
     var shareWrap = document.getElementById("share-result-wrap");
     var hasResults = projects && projects.length > 0;
 
-    // Single consolidated toggle for empty vs. populated state
-    resultsGrid.style.display    = hasResults ? "grid" : "none";
+    resultsGrid.style.display = hasResults ? "grid" : "none";
     resultsEmptyEl.style.display = hasResults ? "none" : "block";
     if (shareWrap) shareWrap.style.display = hasResults ? "flex" : "none";
 
@@ -1097,7 +618,6 @@ updateProfileWidgets();
     }
 
     recordSearch();
-    // Build a card for each project and add it to the grid
     projects.forEach(function (project) {
       resultsGrid.appendChild(buildProjectCard(project));
     });
@@ -1185,229 +705,63 @@ updateProfileWidgets();
     return card;
   }
 
-
-  // ----------------------------------------------------------
-  // Share My Result ΓÇö build URL and copy to clipboard
-  // ----------------------------------------------------------
-
-  var MAX_SHARE_SKILLS = 10;
-  var MAX_URL_LENGTH   = 2000;
-
-  // Build a shareable URL from the current form selections.
-  // Caps skill count and enforces a max URL length to avoid oversized links.
-  function buildShareUrl() {
-    var baseUrl = window.location.origin + window.location.pathname;
-    var params = new URLSearchParams();
-    var allSkills = skillsHidden.value.trim();
-    var skillsArr = [];
-    var truncatedFlag = false;
-
-    if (allSkills) {
-      skillsArr = allSkills.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
-      if (skillsArr.length > MAX_SHARE_SKILLS) {
-        skillsArr = skillsArr.slice(0, MAX_SHARE_SKILLS);
-        truncatedFlag = true;
-      }
-      params.set("skills", skillsArr.join(", "));
-    }
-
-    params.set("level", document.getElementById("level").value);
-    params.set("interest", document.getElementById("interest").value);
-    params.set("time", document.getElementById("time").value);
-
-    var url = baseUrl + "?" + params.toString();
-
-    // Progressively trim skills if URL still exceeds safe browser limit
-    while (url.length > MAX_URL_LENGTH && skillsArr.length > 1) {
-      skillsArr.pop();
-      truncatedFlag = true;
-      params.set("skills", skillsArr.join(", "));
-      url = baseUrl + "?" + params.toString();
-    }
-
-    return { url: url, truncated: truncatedFlag };
-  }
-
-  var shareBtn = document.getElementById("share-result-btn");
-  var shareToast = document.getElementById("share-toast");
-  var shareToastTimeout = null;
-  var _shareWasTruncated = false;
-
-  // Show the "Copied!" state on the share button and display the toast.
-  function showShareSuccess() {
-    if (!shareBtn) return;
-    var originalLabel = shareBtn.querySelector(".share-btn-label");
-    var labelText = _shareWasTruncated ? "Copied! (some skills trimmed)" : "Copied!";
-    if (originalLabel) originalLabel.textContent = labelText;
-    shareBtn.classList.add("copied");
-
-    if (shareToast) shareToast.classList.add("show");
-
-    // Auto-reset after 2.5 seconds
-    clearTimeout(shareToastTimeout);
-    shareToastTimeout = setTimeout(function () {
-      if (originalLabel) originalLabel.textContent = "Share My Result";
-      shareBtn.classList.remove("copied");
-      if (shareToast) shareToast.classList.remove("show");
-    }, 2500);
-  }
-
-  // Fallback clipboard copy using a hidden textarea (for older browsers)
-  function fallbackShareCopy(text) {
-    var ta = document.createElement("textarea");
-    ta.value = text;
-    ta.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0";
-    document.body.appendChild(ta);
-    ta.focus();
-    ta.select();
-    try { document.execCommand("copy"); showShareSuccess(); } catch (e) { /* silent fail */ }
-    document.body.removeChild(ta);
-  }
-
-  if (shareBtn) {
-    shareBtn.addEventListener("click", function () {
-      var result = buildShareUrl();
-      var url = result.url;
-      _shareWasTruncated = result.truncated;
-
-      // Use Clipboard API with textarea fallback
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(url).then(function () {
-          showShareSuccess();
-        }).catch(function () {
-          fallbackShareCopy(url);
-        });
-      } else {
-        fallbackShareCopy(url);
-      }
-    });
-  }
-
-
-  // ----------------------------------------------------------
-  // Query param validation for shared URLs
-  // ----------------------------------------------------------
-
-  var VALID_LEVELS    = ["Beginner", "Intermediate", "Advanced"];
-  var VALID_INTERESTS = ["Web", "Data", "Education", "Automation", "Games"];
-  var VALID_TIMES     = ["Low", "Medium", "High"];
-
-  // Strip HTML tags and restrict to safe characters for skill values
-  function sanitizeSkillValue(raw) {
-    if (!raw || typeof raw !== "string") return "";
-    // Remove any HTML/script tags
-    var cleaned = raw.replace(/<[^>]*>/g, "");
-    // Allow only safe characters: letters, digits, spaces, dots, #, +, _, -, /
-    cleaned = cleaned.replace(/[^A-Za-z0-9 .#+_\-\/]/g, "");
-    return cleaned.trim();
-  }
-
-  // Return the value only if it appears in the allowlist, otherwise ""
-  function validateDropdownValue(value, allowlist) {
-    if (!value || typeof value !== "string") return "";
-    var trimmed = value.trim();
-    for (var i = 0; i < allowlist.length; i++) {
-      if (allowlist[i] === trimmed) return trimmed;
-    }
-    return "";
-  }
-
-
-  // ----------------------------------------------------------
-  // Auto-fill from shared URL query params (no auto-submit)
-  // ----------------------------------------------------------
-
-  // Pre-fill form from URL params but require user to click Generate
-  (function initFromQueryParams() {
-    var params = new URLSearchParams(window.location.search);
-    var qSkills   = params.get("skills");
-    var qLevel    = params.get("level");
-    var qInterest = params.get("interest");
-    var qTime     = params.get("time");
-
-    // Only auto-fill if all four params are present
-    if (!qSkills || !qLevel || !qInterest || !qTime) return;
-
-    // Validate dropdown values against their allowlists
-    var safeLevel    = validateDropdownValue(qLevel, VALID_LEVELS);
-    var safeInterest = validateDropdownValue(qInterest, VALID_INTERESTS);
-    var safeTime     = validateDropdownValue(qTime, VALID_TIMES);
-
-    // Abort if any dropdown value is invalid
-    if (!safeLevel || !safeInterest || !safeTime) return;
-
-    // Sanitize and add each skill from the comma-separated query param
-    qSkills.split(",").forEach(function (s) {
-      var safe = sanitizeSkillValue(s);
-      if (safe) window.addSkill(safe);
-    });
-
-    // Set dropdown values to the validated selections
-    document.getElementById("level").value = safeLevel;
-    document.getElementById("interest").value = safeInterest;
-    document.getElementById("time").value = safeTime;
-
-    // Show the prefill banner instead of auto-submitting
-    var banner = document.getElementById("share-prefill-banner");
-    var bannerClose = document.getElementById("share-prefill-banner-close");
-    if (banner) {
-      banner.style.display = "flex";
-      if (bannerClose) {
-        bannerClose.addEventListener("click", function () {
-          banner.style.display = "none";
-        });
-      }
-      // Scroll form into view so user sees the pre-filled state
-      var formSection = document.getElementById("find-project");
-      if (formSection) formSection.scrollIntoView({ behavior: "smooth" });
-    }
-  })();
-
-
-  // ----------------------------------------------------------
-  // Skill input event listeners
-  // ----------------------------------------------------------
-
-  skillsInput.addEventListener("input", function () {
-    showSuggestions(filteredSkills(skillsInput.value));
-  });
-  skillsInput.addEventListener("focus", function () {
-    if (skillsInput.value.trim()) showSuggestions(filteredSkills(skillsInput.value));
-  });
-  skillsInput.addEventListener("blur", function () {
-    window.setTimeout(hideSuggestions, 150);
-  });
-  skillsInput.addEventListener("keydown", function (event) {
-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      if (!visibleSuggestions.length) showSuggestions(filteredSkills(skillsInput.value));
-      if (!visibleSuggestions.length) return;
-      event.preventDefault();
-      activeSuggestionIndex = event.key === "ArrowDown"
-        ? (activeSuggestionIndex + 1) % visibleSuggestions.length
-        : (activeSuggestionIndex <= 0 ? visibleSuggestions.length - 1 : activeSuggestionIndex - 1);
-      renderSuggestionState();
-      return;
-    }
-    if (event.key === "Escape") {
+  document.addEventListener("click", function (evt) {
+    if (skillWrap && !skillWrap.contains(evt.target)) {
       hideSuggestions();
-      return;
     }
-
-    
   });
+
+  if (skillsInput) {
+    skillsInput.addEventListener("input", function () {
+      showSuggestions(filteredSkills(skillsInput.value));
+    });
+    skillsInput.addEventListener("focus", function () {
+      if (skillsInput.value.trim()) showSuggestions(filteredSkills(skillsInput.value));
+    });
+    skillsInput.addEventListener("blur", function () {
+      window.setTimeout(hideSuggestions, 150);
+    });
+    skillsInput.addEventListener("keydown", function (event) {
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        if (!visibleSuggestions.length) showSuggestions(filteredSkills(skillsInput.value));
+        if (!visibleSuggestions.length) return;
+        event.preventDefault();
+        activeSuggestionIndex = event.key === "ArrowDown"
+          ? (activeSuggestionIndex + 1) % visibleSuggestions.length
+          : (activeSuggestionIndex <= 0 ? visibleSuggestions.length - 1 : activeSuggestionIndex - 1);
+        renderSuggestionState();
+        return;
+      }
+      if (event.key === "Escape") {
+        hideSuggestions();
+        return;
+      }
+      if (event.key === "Enter") {
+        event.preventDefault();
+        if (activeSuggestionIndex >= 0 && visibleSuggestions[activeSuggestionIndex]) {
+          window.addSkill(visibleSuggestions[activeSuggestionIndex]);
+          skillsInput.value = "";
+          hideSuggestions();
+          return;
+        }
+        if (skillsInput.value.trim()) { window.addSkill(skillsInput.value); skillsInput.value = ""; }
+        hideSuggestions();
+      }
+    });
+  }
 
   quickPickChips.forEach(function (chip) {
     chip.addEventListener("click", function () {
       var skill = chip.getAttribute("data-skill");
       if (isSelected(skill)) removeSkill(skill);
       else window.addSkill(skill);
-      skillsInput.value = "";
+      if(skillsInput) skillsInput.value = "";
       hideSuggestions();
     });
   });
 
   if (skillWrap) {
-    skillWrap.addEventListener("click", function () { skillsInput.focus(); });
+    skillWrap.addEventListener("click", function () { if(skillsInput) skillsInput.focus(); });
   }
 
   var clearBtn = document.getElementById("clear-filters-btn");
@@ -1421,7 +775,7 @@ updateProfileWidgets();
       clearAllErrors();
       hideSuggestions();
       resultsSection.style.display = "none";
-      skillsInput.focus();
+      if(skillsInput) skillsInput.focus();
     });
   }
 
@@ -1449,14 +803,10 @@ updateProfileWidgets();
     });
   }
 
-  // ----------------------------------------------------------
-  // Form submission and API call
-  // ----------------------------------------------------------
-
   form.addEventListener("submit", function (event) {
     event.preventDefault();
     clearAllErrors();
-    if (skillsInput.value.trim()) {
+    if (skillsInput && skillsInput.value.trim()) {
       window.addSkill(skillsInput.value);
       skillsInput.value = "";
       hideSuggestions();
@@ -1489,12 +839,13 @@ updateProfileWidgets();
         var general = document.getElementById("form-error-general");
         if (general) general.textContent = err.message || "An unexpected error occurred. Please try again.";
       });
-  })};
+  });
+})();
 
-  // ----------------------------------------------------------
-  // GitHub modal
-  // ----------------------------------------------------------
-
+// ============================================================
+// GitHub modal
+// ============================================================
+(function initGithubModal() {
   var modal = document.getElementById("github-modal-overlay");
   var openModalBtn = document.getElementById("btn-show-github");
   var closeModalBtn = document.getElementById("btn-close-github");
@@ -1503,9 +854,10 @@ updateProfileWidgets();
   var errorMsg = document.getElementById("github-modal-error");
 
   function closeGithubModal() {
+    if(!modal) return;
     modal.classList.remove("active");
-    githubInput.value = "";
-    errorMsg.textContent = "";
+    if(githubInput) githubInput.value = "";
+    if(errorMsg) errorMsg.textContent = "";
   }
 
   if (modal && openModalBtn && closeModalBtn && fetchBtn && githubInput && errorMsg) {
@@ -1539,9 +891,15 @@ updateProfileWidgets();
           });
           if (!languages.length) {
             errorMsg.textContent = "No public languages found.";
+            fetchBtn.disabled = false;
+            fetchBtn.textContent = "Fetch Skills";
             return;
           }
-          languages.forEach(window.addSkill);
+          if(window.addSkill) {
+              languages.forEach(window.addSkill);
+          }
+          fetchBtn.disabled = false;
+          fetchBtn.textContent = "Fetch Skills";
           closeGithubModal();
         })
         .catch(function (err) {
@@ -1555,16 +913,14 @@ updateProfileWidgets();
         });
     });
   }
-;
-
+})();
 
 // ============================================================
 // DETAIL PAGE
 // ============================================================
 (function initDetailPage() {
   if (typeof PROJECT_ID === "undefined") return;
-  recordProjectView();
-
+  
   var codePanel = document.getElementById("code-panel");
   var codePanelOverlay = document.getElementById("code-panel-overlay");
   var codeContentEl = document.getElementById("code-content");
@@ -1578,6 +934,7 @@ updateProfileWidgets();
   var codeFetched = false;
 
   function renderCode(code) {
+    if(!codeContentEl) return;
     codeContentEl.textContent = "";
     String(code || "").split("\n").forEach(function (line, index) {
       var row = document.createElement("div");
@@ -1596,6 +953,7 @@ updateProfileWidgets();
   }
 
   function fetchStarterCode() {
+    if(!codeContentEl) return;
     codeContentEl.textContent = "Loading starter code...";
     fetch("/project/" + PROJECT_ID + "/code")
       .then(function (response) {
@@ -1605,7 +963,7 @@ updateProfileWidgets();
         });
       })
       .then(function (data) {
-        codePanelFilename.textContent = data.filename;
+        if(codePanelFilename) codePanelFilename.textContent = data.filename;
         renderCode(data.code);
         codeFetched = true;
       })
@@ -1619,7 +977,7 @@ updateProfileWidgets();
     codePanel.classList.add("active");
     if (codePanelOverlay) codePanelOverlay.classList.add("active");
     document.body.style.overflow = "hidden";
-    recordCodeOpen();
+    if (typeof recordCodeOpen === "function") recordCodeOpen();
     if (!codeFetched) fetchStarterCode();
   }
 
@@ -1638,7 +996,7 @@ updateProfileWidgets();
     if (event.key === "Escape") closeCodePanel();
   });
 
-  if (btnCopyCode) {
+  if (btnCopyCode && codeContentEl) {
     btnCopyCode.addEventListener("click", function () {
       var code = Array.prototype.slice.call(codeContentEl.querySelectorAll(".code-line-content"))
         .map(function (line) { return line.textContent; })
@@ -1703,12 +1061,15 @@ updateProfileWidgets();
 
   if (completionBtn) {
     completionBtn.addEventListener("click", function () {
-      recordCompletion(PROJECT_ID, typeof PROJECT_TITLE !== "undefined" ? PROJECT_TITLE : "");
-      showAchievementToast("Project completed", "Nice work finishing this project.");
+      if (typeof recordCompletion === "function") {
+        recordCompletion(PROJECT_ID, typeof PROJECT_TITLE !== "undefined" ? PROJECT_TITLE : "");
+      }
+      if (typeof showAchievementToast === "function") {
+        showAchievementToast("Project completed", "Nice work finishing this project.");
+      }
     });
   }
 })();
-
 
 // ============================================================
 // Scroll-to-top / scroll-to-bottom button
@@ -1736,4 +1097,4 @@ updateProfileWidgets();
     window.scrollTo({ top: atBottom ? 0 : document.body.scrollHeight, behavior: "smooth" });
   });
   update();
-})});
+})();
