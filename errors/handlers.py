@@ -9,7 +9,7 @@
 #
 # Register by calling register_error_handlers(app) from app.py.
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, has_request_context, jsonify
 from config import Config
 from utils.error_logger import log_exception
 
@@ -20,9 +20,16 @@ def _wants_json() -> bool:
     API routes (prefixed /api/) always receive JSON error responses.
     Browser requests receive the HTML error pages.
     """
+    
+    if not has_request_context():
+        return False
+        
     if request.path.startswith("/api/"):
         return True
-    best = request.accept_mimetypes.best_match(["application/json", "text/html"])
+    best = request.accept_mimetypes.best_match(
+        ["application/json", "text/html"]
+    )
+    
     return best == "application/json"
 
 
