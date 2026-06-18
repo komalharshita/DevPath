@@ -172,6 +172,20 @@ def test_each_project_has_required_fields():
             assert field in project, f"Project '{project.get('title')}' is missing field: {field}"
 
 
+def test_project_ids_are_unique():
+    """All projects in the active dataset must have unique IDs."""
+    projects = load_all_projects()
+    ids = [p["id"] for p in projects]
+    assert len(ids) == len(set(ids)), f"Duplicate project IDs found in dataset: {ids}"
+
+
+def test_project_titles_are_unique():
+    """All projects in the active dataset must have unique titles (case-insensitive)."""
+    projects = load_all_projects()
+    titles = [p["title"].lower().strip() for p in projects]
+    assert len(titles) == len(set(titles)), f"Duplicate project titles found in dataset: {titles}"
+
+
 def test_find_project_by_id_found():
     """find_project_by_id should return the correct project when the ID exists."""
     project = find_project_by_id(1)
