@@ -2021,9 +2021,17 @@ input[type="text"]:not(.skill-input-wrap input):focus {
   font-weight: 500;
 }
 
+/* Form Actions Container */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  align-items: center;
+}
+
 /* Submit button */
 .btn-submit {
-  width: 100%;
+  flex: 2;
   padding: 16px 24px;
   background: linear-gradient(90deg, var(--indigo-700) 0%, var(--purple-600) 100%);
   color: #ffffff;
@@ -2036,7 +2044,55 @@ input[type="text"]:not(.skill-input-wrap input):focus {
   letter-spacing: 0.01em;
   box-shadow: 0 4px 20px rgba(35, 53, 194, 0.35);
   transition: opacity var(--t), transform var(--t), box-shadow var(--t);
-  margin-top: 8px;
+  margin-top: 0;
+  white-space: nowrap;
+}
+
+/* Secondary/Clear button */
+.btn-clear {
+  flex: 1;
+  padding: 16px 24px;
+  background: var(--white);
+  color: var(--indigo-700);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition: all var(--t);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.btn-clear:hover {
+  background: var(--gray-50);
+  border-color: var(--indigo-300);
+}
+
+body.dark-theme .btn-clear {
+  background: #172033;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .btn-clear:hover {
+  background: #1d283f;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 640px) {
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .btn-submit,
+  .btn-clear {
+    width: 100%;
+    flex: none;
+  }
 }
 
 .btn-submit:hover {
