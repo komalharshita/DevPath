@@ -15,8 +15,9 @@ import os
 
 import pytest
 
-# Allow imports from the project root when running tests directly
+# Allow imports from the project root and src/ when running tests directly
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from utils.data_loader import load_all_projects, find_project_by_id, clear_cache, validate_projects
 from utils.roadmap_comparer import (

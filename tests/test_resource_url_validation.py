@@ -9,6 +9,7 @@ import os
 import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from utils.url_validator import is_valid_url, parse_resource, validate_resource, validate_resources
 from utils.data_loader import load_all_projects, clear_cache
