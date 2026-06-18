@@ -443,6 +443,23 @@ def test_validate_all_missing():
     assert len(errors) == 4
 
 
+def test_validate_invalid_time_and_non_string_inputs():
+    """validate_recommendation_inputs should handle invalid values and non-string types gracefully."""
+    # Test invalid time availability
+    errors = validate_recommendation_inputs("Python", "Beginner", "Web", "unknown_value")
+    assert len(errors) > 0
+    assert any("Invalid time availability" in e for e in errors)
+
+    # Test non-string types
+    errors = validate_recommendation_inputs(123, "Beginner", "Web", "Low")
+    assert len(errors) > 0
+    assert any("Please enter at least one skill" in e for e in errors)
+
+    errors = validate_recommendation_inputs("Python", ["Beginner"], "Web", "Low")
+    assert len(errors) > 0
+    assert any("Please select an experience level" in e for e in errors)
+
+
 # ============================================================
 # HTTP route tests (using Flask test client)
 # ============================================================

@@ -400,12 +400,12 @@ VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
 def validate_recommendation_inputs(skills, level, interest, time_availability):
     errors = []
 
-    if not skills or not skills.strip():
+    if not skills or not isinstance(skills, str) or not skills.strip():
         errors.append("Please enter at least one skill.")
     elif not parse_skills(skills):
         errors.append("Please enter at least one valid skill.")
 
-    if not level or not level.strip():
+    if not level or not isinstance(level, str) or not level.strip():
         errors.append("Please select an experience level.")
     elif level.strip().lower() not in VALID_LEVELS:
         errors.append("Invalid experience level. Choose Beginner, Intermediate, or Advanced.")
@@ -413,7 +413,7 @@ def validate_recommendation_inputs(skills, level, interest, time_availability):
     if not interest or not isinstance(interest, str) or not interest.strip():
         errors.append("Please select an area of interest.")
 
-    if not time_availability or not time_availability.strip():
+    if not time_availability or not isinstance(time_availability, str) or not time_availability.strip():
         errors.append("Please select your time availability.")
     elif time_availability.strip().lower() not in VALID_TIME_AVAILABILITY:
         errors.append("Invalid time availability. Choose Low, Medium, or High.")
