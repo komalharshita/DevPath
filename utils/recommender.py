@@ -175,15 +175,27 @@ def get_recommendations(skills_string, level, interest, time_availability):
     # Sort projects in descending order so the most relevant recommendations appear first.
     scored_projects.sort(key=lambda item: (item["score"], item["project"].get("id", 0)), reverse=True)
 
-    # Calculate relative match score as a percentage of the highest score in this batch
-    max_score = scored_projects[0]["score"] if scored_projects else 1
-    if max_score == 0:
-        max_score = 1
-        
     results = []
     for item in scored_projects[:MAX_RESULTS]:
         proj = item["project"].copy()
-        proj["match_score"] = round((item["score"] / max_score) * 100)
+        
+        # Calculate theoretical maximum possible score for this specific project
+        num_skills = len(proj.get("skills", []))
+        theoretical_max = (
+            (num_skills * SCORING_WEIGHTS["skill"])
+            + SCORING_WEIGHTS["level"]
+            + SCORING_WEIGHTS["interest"]
+            + SCORING_WEIGHTS["time"]
+            + 1.0  # Max possible cosine similarity from ML
+        )
+        
+        # Calculate 4.0 - 10.0 scale based on absolute perfection
+        if theoretical_max > 0:
+            match_score = round(4.0 + ((item["score"] / theoretical_max) * 6.0), 1)
+            proj["match_score"] = min(max(match_score, 4.0), 10.0)
+        else:
+            proj["match_score"] = 4.0
+            
         results.append(proj)
 
     return results

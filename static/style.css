@@ -5068,3 +5068,552 @@ body.dark-theme .theme-toggle:hover {
   background: rgba(124, 58, 237, 0.15);
   color: #c4b5fd;
 }
+.project-match-score {
+  display: flex;       /* REASON: puts label, value, and bar side by side in a row */
+  align-items: center; /* REASON: vertically centers all three elements */
+  gap: 8px;            /* REASON: adds space between the label, number, and bar */
+  margin-bottom: 10px; /* REASON: creates breathing room below the badge before the description */
+  font-size: 0.8rem;   /* REASON: slightly smaller than body text so it doesn't overpower the title */
+}
+
+/* "Match Score" label text shown on the left of the badge */
+.score-label {
+  font-weight: 600;          /* REASON: semi-bold so it reads as a label, not body text */
+  color: var(--text-body);   /* REASON: uses the theme's body text color — works in light AND dark mode */
+  white-space: nowrap;       /* REASON: stops the label from wrapping onto a second line on small screens */
+}
+
+/* Numeric score e.g. "3.8 / 10" shown next to the label */
+.score-value {
+  font-weight: 700;       /* REASON: bold so the number stands out — it's the most important piece of info */
+  color: var(--accent);   /* REASON: uses the app's primary indigo accent color to make the score eye-catching */
+  white-space: nowrap;    /* REASON: keeps "3.8 / 10" on one line, never wraps */
+}
+
+/* Background track of the visual progress bar */
+.score-bar {
+  flex: 1;                   /* REASON: expands to fill the remaining space in the row after label and number */
+  height: 6px;               /* REASON: thin bar so it's decorative, not dominant */
+  background: var(--border); /* REASON: uses theme border color — light gray in light mode, dark in dark mode */
+  border-radius: 3px;        /* REASON: rounded ends make the bar look polished */
+  overflow: hidden;          /* REASON: clips the fill so it never spills outside the rounded track */
+}
+
+/* Colored fill inside the track — width is set dynamically by script.js */
+.score-bar-fill {
+  height: 100%;              /* REASON: fills the full height of the track */
+  background: var(--accent); /* REASON: same accent color as the score number for visual consistency */
+  border-radius: 3px;        /* REASON: rounded fill matches the rounded track edges */
+  transition: width 0.4s ease; /* REASON: animates the bar smoothly when the card appears on screen */
+}
+
+/* =============================================================
+   CAREER ROADMAP COMPARISON PAGE
+   ============================================================= */
+
+.compare-page-body {
+  background: var(--bg-secondary);
+  min-height: 100vh;
+}
+
+.nav-link--active {
+  color: var(--indigo-600);
+  font-weight: 600;
+}
+
+.compare-hero {
+  background: linear-gradient(135deg, var(--indigo-900) 0%, var(--indigo-700) 60%, var(--purple-700) 100%);
+  padding: 120px 24px 64px;
+  text-align: center;
+}
+
+.compare-hero-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.compare-badge {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--yellow-300);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 6px 14px;
+  border-radius: var(--r-full);
+  margin-bottom: 16px;
+}
+
+.compare-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+
+.compare-subtitle {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.6;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.compare-main {
+  max-width: 1100px;
+  margin: -32px auto 64px;
+  padding: 0 20px;
+}
+
+.compare-selectors {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 24px;
+}
+
+.compare-select-card {
+  flex: 1;
+  min-width: 200px;
+}
+
+.compare-select-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-body);
+  margin-bottom: 8px;
+}
+
+.compare-select {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 0.92rem;
+  font-family: var(--font-body);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--text-heading);
+  cursor: pointer;
+}
+
+.compare-select:focus {
+  outline: 2px solid var(--indigo-500);
+  outline-offset: 2px;
+}
+
+.compare-vs-badge {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: var(--indigo-600);
+  background: var(--indigo-100);
+  padding: 10px 14px;
+  border-radius: var(--r-full);
+  align-self: center;
+  margin-bottom: 4px;
+}
+
+.compare-btn {
+  white-space: nowrap;
+  padding: 12px 24px;
+}
+
+.compare-error {
+  background: #fef2f2;
+  color: var(--red-500);
+  border: 1px solid #fecaca;
+  border-radius: var(--r-md);
+  padding: 12px 16px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.compare-empty {
+  text-align: center;
+  padding: 64px 24px;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--r-lg);
+}
+
+.compare-empty-icon {
+  color: var(--gray-400);
+  margin-bottom: 16px;
+}
+
+.compare-empty h2 {
+  font-size: 1.2rem;
+  color: var(--text-heading);
+  margin-bottom: 8px;
+}
+
+.compare-empty p {
+  color: var(--text-body);
+  font-size: 0.92rem;
+  margin-bottom: 24px;
+}
+
+.compare-quick-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.compare-quick-btn {
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--r-full);
+  border: 1px solid var(--indigo-100);
+  background: var(--indigo-50);
+  color: var(--indigo-600);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.compare-quick-btn:hover {
+  background: var(--indigo-100);
+  transform: translateY(-1px);
+}
+
+.compare-results {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.compare-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.compare-summary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.compare-summary-card--a {
+  border-top: 3px solid var(--indigo-600);
+}
+
+.compare-summary-card--b {
+  border-top: 3px solid var(--purple-600);
+}
+
+.compare-summary-card--shared {
+  border-top: 3px solid var(--green-500);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 160px;
+}
+
+.compare-summary-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-light);
+}
+
+.compare-summary-card h2 {
+  font-size: 1.1rem;
+  color: var(--text-heading);
+  margin: 8px 0;
+}
+
+.compare-summary-card p {
+  font-size: 0.85rem;
+  color: var(--text-body);
+  line-height: 1.5;
+}
+
+.compare-shared-stat {
+  margin-top: 12px;
+}
+
+.compare-stat-num {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--green-500);
+}
+
+.compare-stat-text {
+  font-size: 0.78rem;
+  color: var(--text-body);
+}
+
+.compare-section-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin-bottom: 16px;
+}
+
+.compare-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.compare-chart-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 20px;
+}
+
+.compare-chart-card h3 {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-body);
+  margin-bottom: 16px;
+}
+
+.compare-bar-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.compare-bar-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-heading);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compare-bar-track {
+  height: 10px;
+  background: var(--gray-100);
+  border-radius: var(--r-full);
+  overflow: hidden;
+}
+
+.compare-bar-fill {
+  height: 100%;
+  border-radius: var(--r-full);
+  transition: width 0.6s ease;
+}
+
+.compare-bar-fill.compare-bar--a {
+  background: var(--indigo-600);
+}
+
+.compare-bar-fill.compare-bar--b {
+  background: var(--purple-600);
+}
+
+.compare-bar-value {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-body);
+  min-width: 48px;
+  text-align: right;
+}
+
+.compare-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 20px;
+}
+
+.compare-detail-col {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 24px;
+}
+
+.compare-detail-col--a {
+  border-top: 3px solid var(--indigo-600);
+}
+
+.compare-detail-col--b {
+  border-top: 3px solid var(--purple-600);
+}
+
+.compare-detail-col--center {
+  border-top: 3px solid var(--green-500);
+}
+
+.compare-detail-col h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin-bottom: 12px;
+}
+
+.compare-detail-col h4 {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-body);
+  margin: 16px 0 8px;
+}
+
+.compare-meta-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px;
+}
+
+.compare-meta-list li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.compare-meta-list span {
+  color: var(--text-light);
+}
+
+.compare-tag-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.compare-tag {
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: var(--r-full);
+  background: var(--gray-100);
+  color: var(--text-body);
+}
+
+.compare-tag--a {
+  background: var(--indigo-100);
+  color: var(--indigo-700);
+}
+
+.compare-tag--b {
+  background: var(--purple-100);
+  color: var(--purple-700);
+}
+
+.compare-tag--shared {
+  background: var(--green-100);
+  color: #047857;
+  font-weight: 600;
+}
+
+.compare-skills-venn {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.compare-skills-block h4 {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-light);
+  margin-bottom: 8px;
+}
+
+.compare-skill-chips {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.compare-skill-chip {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: var(--r-full);
+}
+
+.compare-skill-chip--a {
+  background: var(--indigo-100);
+  color: var(--indigo-700);
+}
+
+.compare-skill-chip--b {
+  background: var(--purple-100);
+  color: var(--purple-700);
+}
+
+.compare-skill-chip--shared {
+  background: var(--green-100);
+  color: #047857;
+}
+
+.compare-skill-empty {
+  font-size: 0.82rem;
+  color: var(--text-light);
+  font-style: italic;
+}
+
+@media (max-width: 900px) {
+  .compare-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .compare-summary-card--shared {
+    order: -1;
+  }
+
+  .compare-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .compare-selectors {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .compare-vs-badge {
+    align-self: center;
+  }
+
+  .compare-btn {
+    width: 100%;
+  }
+}
+
+[data-theme="dark"] .compare-error {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+[data-theme="dark"] .compare-tag--shared,
+[data-theme="dark"] .compare-skill-chip--shared {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+}
