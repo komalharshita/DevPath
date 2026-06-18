@@ -1011,23 +1011,50 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <label for="time">
-                Time Availability
-                <span class="tooltip" title="Estimate how much time you can realistically dedicate to building the project.">
-                  ⓘ
-                </span>
-              </label>
-              <div class="select-wrap">
-                <select id="time" name="time">
-                  <option value="" disabled selected>How much time can you commit?</option>
-                  <option value="Low">Low — a few hours total</option>
-                  <option value="Medium">Medium — across a weekend</option>
-                  <option value="High">High — a week or more</option>
-                </select>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="time">
+                  Time Availability
+                  <span class="tooltip" title="Estimate how much time you can realistically dedicate to building the project.">
+                    ⓘ
+                  </span>
+                </label>
+                <div class="select-wrap">
+                  <select id="time" name="time">
+                    <option value="" disabled selected>How much time can you commit?</option>
+                    <option value="Low">Low — a few hours total</option>
+                    <option value="Medium">Medium — across a weekend</option>
+                    <option value="High">High — a week or more</option>
+                  </select>
+                </div>
+                <span class="form-hint">Include coding, debugging, learning, and reviewing time in your estimate.</span>
+                <div class="form-error-msg" id="time-error"></div>
               </div>
-              <span class="form-hint">Include coding, debugging, learning, and reviewing time in your estimate.</span>
-              <div class="form-error-msg" id="time-error"></div>
+
+              <div class="form-group">
+                <label for="tech_stack">
+                  Technology Stack
+                  <button type="button" class="tooltip" aria-label="Technology Stack help" aria-describedby="tech-tooltip">
+                    ⓘ
+                    <span id="tech-tooltip" class="tooltip-text" role="tooltip">
+                      Refine project recommendations based on target languages/frameworks.
+                    </span>
+                  </button>
+                </label>
+                <div class="select-wrap">
+                  <select id="tech_stack" name="tech_stack">
+                    <option value="all" selected>All Technologies</option>
+                    <option value="java">Java</option>
+                    <option value="mysql">MySQL</option>
+                    <option value="python">Python</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="react">React</option>
+                    <option value="jsp">JSP / Servlets</option>
+                  </select>
+                </div>
+                <span class="form-hint">Filter projects that use a specific language or framework.</span>
+                <div class="form-error-msg" id="tech-error"></div>
+              </div>
             </div>
 
             <div class="form-actions">

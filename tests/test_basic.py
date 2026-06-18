@@ -904,3 +904,23 @@ def test_ml_recommendation_prefers_relevant_python_data_project():
     recs = results.get("recommendations", [])
     titles = [project["title"] for project in recs]
     assert any("Data" in title or "Pipeline" in title for title in titles)
+
+def test_tech_stack_filtering_strict_boundaries():
+    # When java is requested, we should get Java projects but NOT JavaScript projects
+    results_java = get_recommendations("Java, JavaScript", "Beginner", "Education", "High", tech_stack="java")
+    recs_java = results_java.get("recommendations", [])
+    assert len(recs_java) > 0
+    for p in recs_java:
+        # Check that java is matched
+        assert any(s.lower() == "java" for s in p.get("skills", []) + p.get("tech_stack", []))
+        # Ensure we don't accidentally match JavaScript (unless the project also has Java)
+        # Note: Library Management System has Java only.
+        assert not any(s.lower() == "javascript" for s in p.get("skills", []) + p.get("tech_stack", []))
+
+    # When javascript is requested, we should get JavaScript projects but NOT Java-only projects
+    results_js = get_recommendations("Java, JavaScript", "Beginner", "Web", "High", tech_stack="javascript")
+    recs_js = results_js.get("recommendations", [])
+    assert len(recs_js) > 0
+    for p in recs_js:
+        assert any("javascript" in s.lower() or "js" in s.lower() for s in p.get("skills", []) + p.get("tech_stack", []))
+
