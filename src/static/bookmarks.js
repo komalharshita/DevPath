@@ -276,14 +276,19 @@ var DevPathBookmarks = (function () {
       }, true); // capture phase so it runs before script.js submit handler
     }
 
-    // Clear session when the Clear Filters button is clicked
-    var clearBtn = document.getElementById("clear-filters-btn");
-    if (clearBtn) {
-      clearBtn.addEventListener("click", function () {
-        clearSession();
-        renderPanel();
-      });
-    }
+    // Clear session when the Clear Filters or Reset button is clicked
+    var clearButtons = [
+      document.getElementById("reset-filters-btn"),
+      document.getElementById("clear-filters-btn")
+    ];
+    clearButtons.forEach(function (btn) {
+      if (btn) {
+        btn.addEventListener("click", function () {
+          clearSession();
+          renderPanel();
+        });
+      }
+    });
   });
 
   /* ------------------------------------------------------------------ */

@@ -1410,20 +1410,25 @@ updateProfileWidgets();
     skillWrap.addEventListener("click", function () { skillsInput.focus(); });
   }
 
-  var clearBtn = document.getElementById("clear-filters-btn");
-  if (clearBtn) {
-    clearBtn.addEventListener("click", function () {
-      form.reset();
-      selectedSkills = [];
-      renderSelectedChips();
-      syncSkillsHiddenInput();
-      updateQuickPickState();
-      clearAllErrors();
-      hideSuggestions();
-      resultsSection.style.display = "none";
-      skillsInput.focus();
-    });
-  }
+  var clearButtons = [
+    document.getElementById("reset-filters-btn"),
+    document.getElementById("clear-filters-btn")
+  ];
+  clearButtons.forEach(function (btn) {
+    if (btn) {
+      btn.addEventListener("click", function () {
+        form.reset();
+        selectedSkills = [];
+        renderSelectedChips();
+        syncSkillsHiddenInput();
+        updateQuickPickState();
+        clearAllErrors();
+        hideSuggestions();
+        resultsSection.style.display = "none";
+        skillsInput.focus();
+      });
+    }
+  });
 
   var resetProgressBtn = document.getElementById("reset-progress-btn");
   if (resetProgressBtn) {
