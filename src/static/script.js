@@ -1080,3 +1080,45 @@ updateProfileWidgets();
   });
   update();
 })();
+
+// ==========================================
+// Git Bash Feature Injection: Clickable Skill Chips (GSSoC '26)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Select the input field (commonly matched by ID or type)
+  const skillsInput = document.getElementById('skills-input') || document.querySelector('input[placeholder*="skill"]');
+  // Target suggestion chips
+  const skillChips = document.querySelectorAll('.skill-chip, .suggestion-chip, .chip, [class*="chip"]');
+
+  if (!skillsInput || skillChips.length === 0) return;
+
+  skillChips.forEach(chip => {
+    // Add visual indicator that the chip is interactive
+    chip.style.cursor = 'pointer';
+
+    chip.addEventListener('click', () => {
+      const selectedSkill = chip.textContent.trim().replace(/[+#🎲]/g, ''); // Clean any emoji/characters
+      
+      let currentInputValue = skillsInput.value.trim();
+      
+      if (currentInputValue === '') {
+        skillsInput.value = selectedSkill;
+      } else {
+        // Parse skills into an array to avoid repeating the same skill
+        const existingSkills = currentInputValue.split(',').map(s => s.trim().toLowerCase());
+        
+        if (!existingSkills.includes(selectedSkill.toLowerCase())) {
+          skillsInput.value = currentInputValue ? `${currentInputValue}, ${selectedSkill}` : selectedSkill;
+        }
+      }
+      
+      // Dispatch an input/change event so any active live-filter triggers instantly
+      skillsInput.dispatchEvent(new Event('input', { bubbles: true }));
+      skillsInput.dispatchEvent(new Event('change', { bubbles: true }));
+      
+      // Add a brief subtle visual click indicator effect
+      chip.style.transform = 'scale(0.95)';
+      setTimeout(() => chip.style.transform = 'none', 100);
+    });
+  });
+});
