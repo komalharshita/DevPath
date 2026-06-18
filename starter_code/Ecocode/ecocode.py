@@ -116,3 +116,28 @@ if __name__ == "__main__":
     target = sys.argv[1]
     engine = EcoCodeCLI(target)
     engine.run_analysis()
+
+"""
+Test Results:
+=======================================================
+          🍀 ECOCODE STATIC CARBON REPORT 🍀          
+=======================================================
+Target File:          test_perf.py
+Max Loop Nesting:     Depth 2
+-------------------------------------------------------
+📊 STRUCTURAL METRICS COUNTS:
+  • Variable Assignments: 1
+  • Active Control Loops: 2
+  • Function Executions:  0
+-------------------------------------------------------
+🌱 PREDICTIVE ENVIRONMENTAL IMPACT:
+  • Algorithmic Weight:   650 Complexity Units
+  • Carbon Footprint:     0.3250 mg CO2e
+-------------------------------------------------------
+❌ STATUS: ⚠️ High Consumption. Consider optimizing loops.
+
+💡 ECO-OPTIMIZATION SUGGESTIONS:
+  [!] Deeply nested structures exponentially raise computation heat.
+      Look into replacing inner loops with hash maps or vector operations.
+=======================================================
+"""
