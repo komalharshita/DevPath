@@ -1,97 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - DevPath</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Contact the DevPath maintainers with questions, feedback, suggestions, or contribution ideas." />
+  <title>Contact Us - DevPath</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+  {% include 'partials/theme_head.html' %}
+  <link rel="stylesheet" href="/static/style.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet" />
 </head>
-<body>
 
-    <nav class="navbar" aria-label="Main navigation">
-        <div class="nav-inner">
-            <a href="/" class="nav-logo">
-                Dev<span class="nav-logo-accent">Path</span>
-            </a>
+<body class="contact-page-body">
+  <nav class="navbar" id="navbar" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">Dev<span class="nav-logo-accent">Path</span></a>
 
-            <div class="nav-links">
-                <a href="/" class="nav-link">Home</a>
-                <a href="/contact" class="nav-link">Contact Us</a>
-            </div>
+      <div class="nav-links">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/compare" class="nav-link">Compare</a>
+        <a href="/#find-project" class="nav-link">Find Project</a>
+        <a href="/contact" class="nav-link nav-link--active">Contact</a>
+        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
+          class="nav-btn-outline">GitHub</a>
+        <button class="theme-toggle" id="theme-toggle-desktop" aria-pressed="false" aria-label="Switch to dark mode">
+          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+          </svg>
+        </button>
+      </div>
+
+      <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation" aria-expanded="false"
+        aria-controls="nav-mobile-menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
+      <a href="/" class="nav-mobile-link" role="menuitem">Home</a>
+      <a href="/compare" class="nav-mobile-link" role="menuitem">Compare</a>
+      <a href="/#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
+      <a href="/contact" class="nav-mobile-link" role="menuitem">Contact</a>
+      <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
+        class="nav-mobile-link" role="menuitem">GitHub</a>
+    </div>
+  </nav>
+
+  <main>
+    <section class="contact-hero">
+      <div class="hero-bg-grid"></div>
+      <div class="contact-hero-inner">
+        <div class="contact-copy">
+          <span class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            Contact DevPath
+          </span>
+          <h1 class="contact-title">Get in Touch</h1>
+          <p class="contact-subtitle">
+            Have questions, feedback, or suggestions? Send a message directly from DevPath and help improve the
+            experience for every learner.
+          </p>
+
+          <div class="contact-info-panel" aria-label="Contact information">
+            <h2>Contact Information</h2>
+            <ul class="contact-info-list">
+              <li>
+                <span class="contact-info-icon" aria-hidden="true">@</span>
+                <span>support@devpath.dev</span>
+              </li>
+              <li>
+                <span class="contact-info-icon" aria-hidden="true">#</span>
+                <span>GitHub community support</span>
+              </li>
+              <li>
+                <span class="contact-info-icon" aria-hidden="true">+</span>
+                <span>Open to feedback, suggestions, and contributions</span>
+              </li>
+            </ul>
+          </div>
         </div>
-    </nav>
 
-    <section class="hero" style="min-height: 100vh; display:flex; align-items:center; justify-content:center; text-align:center;">
-        <div class="hero-content" style="max-width: 700px; width:100%;">
-            <div class="hero-badge">
-                Contact DevPath
+        <div class="contact-form-card">
+          <h2>Send Message</h2>
+          <p>Share your question or idea with the maintainers.</p>
+
+          <form class="contact-form" action="{{ config.CONTACT_FORM_ACTION }}" method="POST">
+            <input type="hidden" name="_subject" value="New DevPath contact message" />
+
+            <div class="form-group">
+              <label for="contact-name">Name</label>
+              <input type="text" id="contact-name" name="name" placeholder="Your name" autocomplete="name" required />
             </div>
 
-            <h1 class="hero-title" style="color: white;">
-                Get In Touch
-            </h1>
-            <p class="hero-subtitle" style="color: #d1d5db; margin-bottom: 2rem;">
-                Have questions, feedback, or suggestions?
-                We'd love to hear from you and improve DevPath together.
-            </p>
-
-            <div style="
-                background: rgba(255,255,255,0.06);
-                box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-                border: 1px solid rgba(255,255,255,0.1);
-                padding: 2rem;
-                border-radius: 16px;
-                max-width: 500px;
-                margin: 2rem auto 0;
-                transform: translateX(20px);
-                backdrop-filter: blur(10px);
-                text-align:center;
-            ">
-                <h3 style="color: white; margin-bottom: 1rem;">
-                    Contact Information
-                </h3>
-
-                <p style="color: #d1d5db; margin-bottom: 1rem;">
-                    📧 support@devpath.dev
-                </p>
-
-                <p style="color: #d1d5db; margin-bottom: 1rem;">
-                    🌐 GitHub Community Support
-                </p>
-
-                <p style="color: #d1d5db;">
-                    💡 Open to feedback, suggestions, and contributions
-                </p>
+            <div class="form-group">
+              <label for="contact-email">Email Address</label>
+              <input type="email" id="contact-email" name="email" placeholder="you@example.com" autocomplete="email"
+                required />
             </div>
 
-            
-
-            <div class="contact-info" style="margin-top: 3rem auto 0 auto;">
-                
-
-                
+            <div class="form-group">
+              <label for="contact-message">Message</label>
+              <textarea id="contact-message" name="message" rows="6" placeholder="How can we help?" required></textarea>
             </div>
 
-            <div style="margin-top: 2rem; display:flex; justify-content:center; align-items:center; gap:1.5rem; flex-wrap:wrap;">
-                <a href="https://github.com/komalharshita/DevPath"
-                   target="_blank"
-                   class="btn-primary">
-                    Visit GitHub Repository
-                </a>
-                <a href="/"
-                    class="btn-primary"
-                    style="
-                    text-decoration:none;
-                    background: rgba(255,255,255,0.08);
-                    border: 1px solid rgba(255,255,255,0.15);
-                    min-width: 220px;
-                    ">
-                        Back to Home
-                </a>
-                
-            </div>
+            <button type="submit" class="btn-submit">Send Message</button>
+          </form>
         </div>
+      </div>
     </section>
+  </main>
 
+  <footer class="footer">
+    <div class="footer-inner">
+      <p class="footer-copy">&copy; 2025 DevPath. Built for learners.</p>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/compare">Compare Roadmaps</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script src="/static/script.js"></script>
 </body>
+
 </html>

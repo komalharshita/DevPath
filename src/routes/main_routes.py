@@ -53,7 +53,7 @@ def index():
 
 @main.route("/contact")
 def contact():
-    return render_template("contact.html")
+    return render_template("contact.html", config=Config)
 
 
 @main.route("/compare")
