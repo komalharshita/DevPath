@@ -5380,3 +5380,14 @@ body.dark-theme .theme-toggle:hover {
   background: rgba(124, 58, 237, 0.15);
   color: #c4b5fd;
 }
+
+/* Skill Chips Interactive Pointer Overrides */
+.skill-chip, .suggestion-chip, .chip {
+  cursor: pointer !important;
+  user-select: none;
+  transition: transform 0.1s ease, background-color 0.2s ease;
+}
+.skill-chip:hover, .suggestion-chip:hover, .chip:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.95);
+}
