@@ -1,5 +1,129 @@
 // DevPath client-side behavior.
 
+// ============================================================
+// THEME PREVIEW MODAL & TOGGLE
+// ============================================================
+document.addEventListener("DOMContentLoaded", function () {
+  // Inject the theme modal HTML
+  var modalHtml = `
+<div id="theme-preview-modal" class="theme-modal-overlay" aria-hidden="true" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+  <div class="theme-modal-content" role="dialog" aria-modal="true" aria-labelledby="theme-modal-title" style="background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); padding:1.5rem; max-width:500px; width:90%; box-shadow:var(--shadow-xl);">
+    <div class="theme-modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+      <h2 id="theme-modal-title" style="font-size:1.25rem; margin:0; color:var(--text-heading);">Choose a Theme</h2>
+      <button id="close-theme-modal" class="btn-clear" aria-label="Close modal" style="background:transparent; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-light);">&times;</button>
+    </div>
+    <div class="theme-preview-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+      <!-- Light Theme Card -->
+      <button class="theme-preview-card" data-theme-target="light" style="background:transparent; border:2px solid var(--border); border-radius:var(--r-md); padding:1rem; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:1rem; transition:all 0.2s ease;">
+        <div class="preview-mockup" style="width:100%; background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:8px; display:flex; flex-direction:column; gap:6px;">
+          <div style="width:100%; height:12px; background:#f1f5f9; border-radius:3px;"></div>
+          <div style="width:100%; height:6px; background:#cbd5e1; border-radius:2px;"></div>
+          <div style="width:60%; height:6px; background:#cbd5e1; border-radius:2px;"></div>
+          <div style="width:100%; margin-top:4px; padding:4px 0; background:#3b82f6; border-radius:3px; color:#fff; font-size:8px; text-align:center; font-weight:bold;">Button</div>
+        </div>
+        <span class="preview-label" style="font-weight:600; color:var(--text-heading);">Light Theme</span>
+      </button>
+      
+      <!-- Dark Theme Card -->
+      <button class="theme-preview-card" data-theme-target="dark" style="background:transparent; border:2px solid var(--border); border-radius:var(--r-md); padding:1rem; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:1rem; transition:all 0.2s ease;">
+        <div class="preview-mockup" style="width:100%; background:#0f172a; border:1px solid #1e293b; border-radius:6px; padding:8px; display:flex; flex-direction:column; gap:6px;">
+          <div style="width:100%; height:12px; background:#1e293b; border-radius:3px;"></div>
+          <div style="width:100%; height:6px; background:#334155; border-radius:2px;"></div>
+          <div style="width:60%; height:6px; background:#334155; border-radius:2px;"></div>
+          <div style="width:100%; margin-top:4px; padding:4px 0; background:#60a5fa; border-radius:3px; color:#0f172a; font-size:8px; text-align:center; font-weight:bold;">Button</div>
+        </div>
+        <span class="preview-label" style="font-weight:600; color:var(--text-heading);">Dark Theme</span>
+      </button>
+    </div>
+  </div>
+</div>
+  `;
+  document.body.insertAdjacentHTML("beforeend", modalHtml);
+
+  var modal = document.getElementById("theme-preview-modal");
+  var closeBtn = document.getElementById("close-theme-modal");
+  var cards = document.querySelectorAll(".theme-preview-card");
+  var html = document.documentElement;
+
+  function syncTheme(theme) {
+    html.setAttribute("data-theme", theme);
+    try { localStorage.setItem("theme", theme); } catch (e) {}
+    
+    // Sync accessibility attributes on toggle buttons
+    var isDark = theme === "dark";
+    document.querySelectorAll(".theme-toggle").forEach(function(btn) {
+      btn.setAttribute("aria-pressed", isDark ? "true" : "false");
+      btn.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+    });
+
+    // Update active card styles
+    cards.forEach(function(card) {
+      if (card.getAttribute("data-theme-target") === theme) {
+        card.style.borderColor = "var(--accent)";
+      } else {
+        card.style.borderColor = "var(--border)";
+      }
+    });
+  }
+
+  // Set initial theme in UI
+  var activeTheme = html.getAttribute("data-theme") || localStorage.getItem("theme") || "light";
+  syncTheme(activeTheme);
+
+  // Toggle modal on theme button click
+  document.querySelectorAll(".theme-toggle").forEach(function(btn) {
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      modal.style.display = "flex";
+      modal.setAttribute("aria-hidden", "false");
+    });
+  });
+
+  // Close modal
+  function closeModal() {
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden", "true");
+  }
+
+  closeBtn.addEventListener("click", closeModal);
+  modal.addEventListener("click", function(e) {
+    if (e.target === modal) closeModal();
+  });
+
+  // Apply theme when card is clicked
+  cards.forEach(function(card) {
+    card.addEventListener("click", function() {
+      var theme = this.getAttribute("data-theme-target");
+      syncTheme(theme);
+      setTimeout(closeModal, 150); // slight delay for visual feedback
+    });
+    card.addEventListener("mouseenter", function() {
+      if (this.getAttribute("data-theme-target") !== html.getAttribute("data-theme")) {
+        this.style.borderColor = "var(--gray-400)";
+      }
+    });
+    card.addEventListener("mouseleave", function() {
+      if (this.getAttribute("data-theme-target") !== html.getAttribute("data-theme")) {
+        this.style.borderColor = "var(--border)";
+      }
+    });
+  });
+});
+
+// ============================================================
+// Detect which page we are on
+// ============================================================
+// !! trick turns the DOM result into a simple true/false
+var isIndexPage = !!document.getElementById("recommend-form");
+// PROJECT_ID is set by the server only on detail pages, so if it's missing we're elsewhere
+var isDetailPage = typeof PROJECT_ID !== "undefined";
+var modal = document.getElementById('github-modal-overlay');
+var openModalBtn = document.getElementById('btn-show-github'); // The trigger in your main form
+var closeModalBtn = document.getElementById('btn-close-github');
+var fetchBtn = document.getElementById('btn-fetch-github');
+var githubInput = document.getElementById('github-username');
+var errorMsg = document.getElementById('github-modal-error');
+
 (function () {
   var html = document.documentElement;
 
@@ -19,17 +143,20 @@
   }
 
   function initTheme() {
-    var theme = "light";
-    try {
-      theme = localStorage.getItem("theme") || html.getAttribute("data-theme") || "light";
-    } catch (err) {
-      theme = html.getAttribute("data-theme") || "light";
-    }
-    applyTheme(theme);
-    requestAnimationFrame(function () {
-      html.classList.add("theme-ready");
-    });
+  var theme = "light";
+
+  try {
+    theme = localStorage.getItem("theme") || html.getAttribute("data-theme") || "light";
+  } catch (err) {
+    theme = html.getAttribute("data-theme") || "light";
   }
+
+  applyTheme(theme);
+
+  requestAnimationFrame(function () {
+    html.classList.add("theme-ready");
+  });
+}
 
   document.addEventListener("click", function (event) {
     var toggle = event.target.closest(".theme-toggle");
@@ -112,8 +239,8 @@ function saveProgressState() {
 }
 
 function computeProgressPoints() {
-  progress.points = progress.searches * 5 + progress.projectViews * 10 +
-    progress.codeOpens * 15 + progress.completions * 30;
+  progress.points = progress.searches * POINTS_PER_SEARCH + progress.projectViews * POINTS_PER_VIEW +
+    progress.codeOpens * POINTS_PER_CODE_OPEN + progress.completions * POINTS_PER_COMPLETION;
 }
 
 function showAchievementToast(title, detail) {
@@ -183,7 +310,7 @@ function updateProfileWidgets() {
       "<li><strong>Projects Completed</strong><span>" + progress.completions + "</span></li>";
   }
   if (meterFill) {
-    var percentage = Math.min(100, Math.round((progress.points / 250) * 100));
+    var percentage = Math.min(100, Math.round((progress.points / PROGRESS_MAX_POINTS) * 100));
     meterFill.style.width = percentage + "%";
     meterFill.setAttribute("aria-valuenow", String(percentage));
     meterFill.textContent = percentage + "%";
@@ -277,6 +404,9 @@ function recordCompletion(projectId, projectTitle) {
 loadProgressState();
 updateProfileWidgets();
 
+// ============================================================
+// INDEX PAGE
+// ============================================================
 (function initIndexPage() {
   var form = document.getElementById("recommend-form");
   if (!form) return;
@@ -305,113 +435,6 @@ updateProfileWidgets();
 
   function normalize(value) {
     return String(value || "").trim().toLowerCase();
-  }
-
-  function getSavedProjects() {
-    try {
-      var saved = JSON.parse(localStorage.getItem(SAVED_PROJECTS_KEY) || "[]");
-      return Array.isArray(saved) ? saved : [];
-    } catch (err) {
-      console.warn("Unable to load saved projects", err);
-      return [];
-    }
-  }
-
-  function saveSavedProjects(projects) {
-    try {
-      localStorage.setItem(SAVED_PROJECTS_KEY, JSON.stringify(projects));
-    } catch (err) {
-      console.warn("Unable to save projects", err);
-    }
-  }
-
-  function projectIsSaved(projectId) {
-    return getSavedProjects().some(function (project) {
-      return String(project.id) === String(projectId);
-    });
-  }
-
-  function saveProject(project) {
-    var saved = getSavedProjects();
-    if (saved.some(function (item) { return String(item.id) === String(project.id); })) return;
-
-    saved.unshift({
-      id: project.id,
-      title: project.title,
-      level: project.level || "",
-      time: project.time || "",
-      skills: Array.isArray(project.skills) ? project.skills.slice(0, 4) : []
-    });
-    saveSavedProjects(saved);
-    renderSavedProjects();
-  }
-
-  function removeSavedProject(projectId) {
-    var saved = getSavedProjects().filter(function (project) {
-      return String(project.id) !== String(projectId);
-    });
-    saveSavedProjects(saved);
-    renderSavedProjects();
-    document.querySelectorAll("[data-save-project-id='" + projectId + "']").forEach(function (button) {
-      button.classList.remove("saved");
-      button.textContent = "Save Project";
-      button.setAttribute("aria-pressed", "false");
-    });
-  }
-
-  function toggleSavedProject(project, button) {
-    if (projectIsSaved(project.id)) {
-      removeSavedProject(project.id);
-      return;
-    }
-
-    saveProject(project);
-    button.classList.add("saved");
-    button.textContent = "Saved";
-    button.setAttribute("aria-pressed", "true");
-  }
-
-  function renderSavedProjects() {
-    var list = document.getElementById("saved-projects-list");
-    var count = document.getElementById("saved-projects-count");
-    if (!list || !count) return;
-
-    var saved = getSavedProjects();
-    count.textContent = saved.length + " saved";
-    list.textContent = "";
-
-    if (!saved.length) {
-      var empty = document.createElement("p");
-      empty.className = "saved-projects-empty";
-      empty.textContent = "No saved projects yet.";
-      list.appendChild(empty);
-      return;
-    }
-
-    saved.forEach(function (project) {
-      var item = document.createElement("article");
-      item.className = "saved-project-item";
-
-      var title = document.createElement("a");
-      title.href = "/project/" + project.id;
-      title.textContent = project.title;
-
-      var meta = document.createElement("span");
-      meta.textContent = [project.level, project.time].filter(Boolean).join(" - ");
-
-      var remove = document.createElement("button");
-      remove.type = "button";
-      remove.className = "saved-project-remove";
-      remove.textContent = "Remove";
-      remove.addEventListener("click", function () {
-        removeSavedProject(project.id);
-      });
-
-      item.appendChild(title);
-      item.appendChild(meta);
-      item.appendChild(remove);
-      list.appendChild(item);
-    });
   }
 
   function syncSkillsHiddenInput() {
@@ -480,13 +503,9 @@ updateProfileWidgets();
     if (el) el.textContent = "";
   }
 
-  function syncSkillsHiddenInput() {
-    if (!skillsHidden){
-      skillsHidden = document.getElementById("skills");
-    }
-    // Keep the hidden <input> in sync for form serialisation
-    // The API expects a comma-separated string, so join the array that way
-    skillsHidden.value = selectedSkills.join(", ");
+  function showFieldError(id, message) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = message;
   }
 
   function clearAllErrors() {
@@ -570,70 +589,10 @@ updateProfileWidgets();
     return valid;
   }
 
-
-
   // ----------------------------------------------------------
-  // Form submission and API call
+  // Loading state
   // ----------------------------------------------------------
 
-  form.addEventListener("submit", function (evt) {
-    evt.preventDefault(); //stop the browser from reloading the page on form submit
-    clearAllErrors();
-
-    if (skillsTextInput.value.trim()) {
-      addSkill(skillsTextInput.value);
-      skillsTextInput.value = "";
-      hideSuggestions();
-    }
-
-    if (!validateForm()) return; //stop - anything missing/invalid
-
-    setLoadingState(true);
-
-    // Allow browser to paint spinner before request starts
-    requestAnimationFrame(function () {
-
-      //combine form values into an object to send to server/api
-      var payload = {
-        // Prefer the hidden input value; fall back to raw text box if hidden input is empty
-        skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-        level: document.getElementById("level").value,
-        interest: document.getElementById("interest").value,
-        time: document.getElementById("time").value
-      };
-
-      //post the data to backend api as JSON, then handle the response
-      fetch("/api/recommend", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload) //convert object to json string
-      })
-        .then(function (res) {
-          return res.json(); //parse the response as JSON
-        })
-        .then(function (data) {
-          setLoadingState(false);
-
-          if (data.error) {
-            var generalErr = document.getElementById("form-error-general");
-            if (generalErr) generalErr.textContent = data.error;
-            return;
-          }
-
-          renderResults(data.projects || [], data.message);
-        })
-        .catch(function (err) {
-          // this runs if the network request itself fails
-          setLoadingState(false);
-          var generalErr = document.getElementById("form-error-general");
-          if (generalErr) generalErr.textContent = "Something went wrong. Please try again.";
-          console.error("API request failed:", err);
-        });
-    });
-  });
-
-
-  // Manages the loading state of the form and results section(whats visible or not)
   function setLoadingState(isLoading) {
     submitBtn.disabled = isLoading;
     submitBtn.setAttribute("aria-busy", isLoading ? "true" : "false");
@@ -647,92 +606,51 @@ updateProfileWidgets();
       resultsSection.scrollIntoView({ behavior: "smooth" });
     } else {
       resultsLoadingEl.style.display = "none";
-      resultsGrid.style.display = "grid"; //switch back to grid layout
     }
   }
-
 
   // ----------------------------------------------------------
   // Render result cards
   // ----------------------------------------------------------
 
-  //takes the array of projects from the api and draws them on the page as cards
-  //if array is empty it shows the "no results" message instead
-  function renderResults(projects, message) {
-    resultsSection.style.display = "block";
-    resultsLoadingEl.style.display = "none";
-    // Clear out any cards from a previous search before showing new ones
-    resultsGrid.innerHTML = "";
-
-    if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
-      resultsGrid.style.display = "none";
-      resultsEmptyEl.style.display = "block";
-
-      var interestEl = document.getElementById("interest");
-      var selectedInterest = interestEl ? interestEl.value : null;
-
-      // Show a friendly custom message when the user selected an interest
-      if (emptyMessageEl) {
-        if (selectedInterest) {
-          emptyMessageEl.textContent = "No projects are currently available for this interest. Please check back later or try a different area.";
-        } else if (message) {
-          emptyMessageEl.textContent = message;
-        } else {
-          emptyMessageEl.textContent = "Try adjusting your skills or choosing a different interest area.";
-        }
-      }
-
-      resultsSection.scrollIntoView({ behavior: "smooth" });
-      return;
-    }
-
-    resultsEmptyEl.style.display = "none";
-    resultsGrid.style.display = "grid";
-
-    //build a card for each project and add it to the grid
-    projects.forEach(function (project) {
-      resultsGrid.appendChild(buildProjectCard(project));
-    });
-
-    resultsSection.scrollIntoView({ behavior: "smooth" });
-  }
-
   function truncate(text, maxLength) {
-    text = text || "";
+    if (!text) return "";
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
   }
 
   function createTag(text, type) {
     var span = document.createElement("span");
-    span.className = "project-tag project-tag--" + normalize(type).replace(/[^a-z0-9_-]/g, "-");
+    span.className = "project-tag project-tag--" + type;
     span.textContent = text;
     return span;
+  }
 
-  //takes the array of projects from the api and draws them on the page as cards
-  //if array is empty it shows the "no results" message instead
+  // Renders project result cards or shows the empty-state message.
   function renderResults(projects, message) {
     resultsSection.style.display = "block";
     resultsLoadingEl.style.display = "none";
-    // Clear out any cards from a previous search before showing new ones
     resultsGrid.innerHTML = "";
 
-    if (!projects || projects.length === 0) {
-      resultsGrid.style.display     = "none";
-      resultsEmptyEl.style.display  = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
+    var shareWrap = document.getElementById("share-result-wrap");
+    var hasResults = projects && projects.length > 0;
+
+    // Single consolidated toggle for empty vs. populated state
+    resultsGrid.style.display    = hasResults ? "grid" : "none";
+    resultsEmptyEl.style.display = hasResults ? "none" : "block";
+    if (shareWrap) shareWrap.style.display = hasResults ? "flex" : "none";
+
+    if (!hasResults) {
+      if (emptyMessageEl) { if (message) emptyMessageEl.textContent = message; }
       resultsSection.scrollIntoView({ behavior: "smooth" });
       return;
     }
 
-    resultsEmptyEl.style.display = "none";
-    resultsGrid.style.display = "grid";
-
+    // Build a card for each project and add it to the grid
     projects.forEach(function (project) {
       resultsGrid.appendChild(buildProjectCard(project));
     });
 
     resultsSection.scrollIntoView({ behavior: "smooth" });
- main
   }
 
   function buildProjectCard(project) {
@@ -775,26 +693,25 @@ updateProfileWidgets();
     var footer = document.createElement("div");
     footer.className = "project-card-footer";
 
-    var saveButton = document.createElement("button");
-    saveButton.type = "button";
-    saveButton.className = "btn-save-project";
-    saveButton.setAttribute("data-save-project-id", project.id);
-    saveButton.setAttribute("aria-pressed", projectIsSaved(project.id) ? "true" : "false");
-    if (projectIsSaved(project.id)) {
-      saveButton.classList.add("saved");
-      saveButton.textContent = "Saved";
-    } else {
-      saveButton.textContent = "Save Project";
+    if (typeof DevPathBookmarks !== "undefined") {
+      var saveBtn = document.createElement("button");
+      saveBtn.type = "button";
+      saveBtn.className = "btn-save-project";
+      saveBtn.setAttribute("data-save-project-id", project.id);
+      var isSaved = DevPathBookmarks.isSaved(project.id);
+      if (isSaved) saveBtn.classList.add("saved");
+      saveBtn.setAttribute("aria-pressed", isSaved ? "true" : "false");
+      DevPathBookmarks.setButtonContent(saveBtn, isSaved);
+      saveBtn.addEventListener("click", function () {
+        DevPathBookmarks.toggle(project, saveBtn);
+      });
+      footer.appendChild(saveBtn);
     }
-    saveButton.addEventListener("click", function () {
-      toggleSavedProject(project, saveButton);
-    });
 
     var link = document.createElement("a");
     link.className = "btn-details";
     link.textContent = "View Full Project";
     link.href = "/project/" + project.id;
-    footer.appendChild(saveButton);
     footer.appendChild(link);
 
     card.appendChild(title);
@@ -804,73 +721,188 @@ updateProfileWidgets();
     return card;
   }
 
-  renderSavedProjects();
 
-  function renderResults(projects, message) {
-    resultsSection.style.display = "block";
-    resultsLoadingEl.style.display = "none";
-    resultsGrid.textContent = "";
-    if (!projects || projects.length === 0) {
-      resultsGrid.style.display = "none";
-      resultsEmptyEl.style.display = "block";
-      emptyMessageEl.textContent = message || "Try adjusting your skills or choosing a different interest area.";
-      resultsSection.scrollIntoView({ behavior: "smooth" });
-      return;
+  // ----------------------------------------------------------
+  // Share My Result ΓÇö build URL and copy to clipboard
+  // ----------------------------------------------------------
+
+  var MAX_SHARE_SKILLS = 10;
+  var MAX_URL_LENGTH   = 2000;
+
+  // Build a shareable URL from the current form selections.
+  // Caps skill count and enforces a max URL length to avoid oversized links.
+  function buildShareUrl() {
+    var baseUrl = window.location.origin + window.location.pathname;
+    var params = new URLSearchParams();
+    var allSkills = skillsHidden.value.trim();
+    var skillsArr = [];
+    var truncatedFlag = false;
+
+    if (allSkills) {
+      skillsArr = allSkills.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+      if (skillsArr.length > MAX_SHARE_SKILLS) {
+        skillsArr = skillsArr.slice(0, MAX_SHARE_SKILLS);
+        truncatedFlag = true;
+      }
+      params.set("skills", skillsArr.join(", "));
     }
-    resultsEmptyEl.style.display = "none";
-    resultsGrid.style.display = "grid";
-    projects.forEach(function (project) { resultsGrid.appendChild(buildProjectCard(project)); });
-    resultsSection.scrollIntoView({ behavior: "smooth" });
+
+    params.set("level", document.getElementById("level").value);
+    params.set("interest", document.getElementById("interest").value);
+    params.set("time", document.getElementById("time").value);
+
+    var url = baseUrl + "?" + params.toString();
+
+    // Progressively trim skills if URL still exceeds safe browser limit
+    while (url.length > MAX_URL_LENGTH && skillsArr.length > 1) {
+      skillsArr.pop();
+      truncatedFlag = true;
+      params.set("skills", skillsArr.join(", "));
+      url = baseUrl + "?" + params.toString();
+    }
+
+    return { url: url, truncated: truncatedFlag };
   }
 
-  function runProjectSearch(query) {
-    if (!query) return;
-    setLoadingState(true);
-    fetch("/api/search?q=" + encodeURIComponent(query))
-      .then(function (response) {
-        return response.json().then(function (data) {
-          if (!response.ok) throw new Error("Search failed. Please try again.");
-          return data;
+  var shareBtn = document.getElementById("share-result-btn");
+  var shareToast = document.getElementById("share-toast");
+  var shareToastTimeout = null;
+  var _shareWasTruncated = false;
+
+  // Show the "Copied!" state on the share button and display the toast.
+  function showShareSuccess() {
+    if (!shareBtn) return;
+    var originalLabel = shareBtn.querySelector(".share-btn-label");
+    var labelText = _shareWasTruncated ? "Copied! (some skills trimmed)" : "Copied!";
+    if (originalLabel) originalLabel.textContent = labelText;
+    shareBtn.classList.add("copied");
+
+    if (shareToast) shareToast.classList.add("show");
+
+    // Auto-reset after 2.5 seconds
+    clearTimeout(shareToastTimeout);
+    shareToastTimeout = setTimeout(function () {
+      if (originalLabel) originalLabel.textContent = "Share My Result";
+      shareBtn.classList.remove("copied");
+      if (shareToast) shareToast.classList.remove("show");
+    }, 2500);
+  }
+
+  // Fallback clipboard copy using a hidden textarea (for older browsers)
+  function fallbackShareCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand("copy"); showShareSuccess(); } catch (e) { /* silent fail */ }
+    document.body.removeChild(ta);
+  }
+
+  if (shareBtn) {
+    shareBtn.addEventListener("click", function () {
+      var result = buildShareUrl();
+      var url = result.url;
+      _shareWasTruncated = result.truncated;
+
+      // Use Clipboard API with textarea fallback
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function () {
+          showShareSuccess();
+        }).catch(function () {
+          fallbackShareCopy(url);
         });
-      })
-      .then(function (projects) {
-        setLoadingState(false);
-        recordSearch();
-        var message = projects.length
-          ? null
-          : "No projects matched \"" + query + "\". Try a different keyword.";
-        renderResults(projects, message);
-        var mobileMenu = document.getElementById("nav-mobile-menu");
-        var mobileToggle = document.getElementById("nav-mobile-toggle");
-        if (mobileMenu && mobileMenu.classList.contains("open")) {
-          mobileMenu.classList.remove("open");
-          if (mobileToggle) {
-            mobileToggle.classList.remove("open");
-            mobileToggle.setAttribute("aria-expanded", "false");
-          }
-        }
-      })
-      .catch(function (err) {
-        setLoadingState(false);
-        var general = document.getElementById("form-error-general");
-        if (general) general.textContent = err.message || "Search failed. Please try again.";
-      });
-  }
-
-  function bindSearchForm(form, input) {
-    if (!form || !input) return;
-    form.addEventListener("submit", function (event) {
-      event.preventDefault();
-      runProjectSearch(input.value.trim());
+      } else {
+        fallbackShareCopy(url);
+      }
     });
   }
 
-  bindSearchForm(document.getElementById("topic-search-form"), document.getElementById("topic-search"));
-  bindSearchForm(document.getElementById("topic-search-form-mobile"), document.getElementById("topic-search-mobile"));
 
-  skillsInput.setAttribute("role", "combobox");
-  skillsInput.setAttribute("aria-expanded", "false");
-  suggestions.setAttribute("role", "listbox");
+  // ----------------------------------------------------------
+  // Query param validation for shared URLs
+  // ----------------------------------------------------------
+
+  var VALID_LEVELS    = ["Beginner", "Intermediate", "Advanced"];
+  var VALID_INTERESTS = ["Web", "Data", "Education", "Automation", "Games"];
+  var VALID_TIMES     = ["Low", "Medium", "High"];
+
+  // Strip HTML tags and restrict to safe characters for skill values
+  function sanitizeSkillValue(raw) {
+    if (!raw || typeof raw !== "string") return "";
+    // Remove any HTML/script tags
+    var cleaned = raw.replace(/<[^>]*>/g, "");
+    // Allow only safe characters: letters, digits, spaces, dots, #, +, _, -, /
+    cleaned = cleaned.replace(/[^A-Za-z0-9 .#+_\-\/]/g, "");
+    return cleaned.trim();
+  }
+
+  // Return the value only if it appears in the allowlist, otherwise ""
+  function validateDropdownValue(value, allowlist) {
+    if (!value || typeof value !== "string") return "";
+    var trimmed = value.trim();
+    for (var i = 0; i < allowlist.length; i++) {
+      if (allowlist[i] === trimmed) return trimmed;
+    }
+    return "";
+  }
+
+
+  // ----------------------------------------------------------
+  // Auto-fill from shared URL query params (no auto-submit)
+  // ----------------------------------------------------------
+
+  // Pre-fill form from URL params but require user to click Generate
+  (function initFromQueryParams() {
+    var params = new URLSearchParams(window.location.search);
+    var qSkills   = params.get("skills");
+    var qLevel    = params.get("level");
+    var qInterest = params.get("interest");
+    var qTime     = params.get("time");
+
+    // Only auto-fill if all four params are present
+    if (!qSkills || !qLevel || !qInterest || !qTime) return;
+
+    // Validate dropdown values against their allowlists
+    var safeLevel    = validateDropdownValue(qLevel, VALID_LEVELS);
+    var safeInterest = validateDropdownValue(qInterest, VALID_INTERESTS);
+    var safeTime     = validateDropdownValue(qTime, VALID_TIMES);
+
+    // Abort if any dropdown value is invalid
+    if (!safeLevel || !safeInterest || !safeTime) return;
+
+    // Sanitize and add each skill from the comma-separated query param
+    qSkills.split(",").forEach(function (s) {
+      var safe = sanitizeSkillValue(s);
+      if (safe) window.addSkill(safe);
+    });
+
+    // Set dropdown values to the validated selections
+    document.getElementById("level").value = safeLevel;
+    document.getElementById("interest").value = safeInterest;
+    document.getElementById("time").value = safeTime;
+
+    // Show the prefill banner instead of auto-submitting
+    var banner = document.getElementById("share-prefill-banner");
+    var bannerClose = document.getElementById("share-prefill-banner-close");
+    if (banner) {
+      banner.style.display = "flex";
+      if (bannerClose) {
+        bannerClose.addEventListener("click", function () {
+          banner.style.display = "none";
+        });
+      }
+      // Scroll form into view so user sees the pre-filled state
+      var formSection = document.getElementById("find-project");
+      if (formSection) formSection.scrollIntoView({ behavior: "smooth" });
+    }
+  })();
+
+
+  // ----------------------------------------------------------
+  // Skill input event listeners
+  // ----------------------------------------------------------
 
   skillsInput.addEventListener("input", function () {
     showSuggestions(filteredSkills(skillsInput.value));
@@ -961,6 +993,10 @@ updateProfileWidgets();
     });
   }
 
+  // ----------------------------------------------------------
+  // Form submission and API call
+  // ----------------------------------------------------------
+
   form.addEventListener("submit", function (event) {
     event.preventDefault();
     clearAllErrors();
@@ -999,6 +1035,10 @@ updateProfileWidgets();
       });
   });
 
+  // ----------------------------------------------------------
+  // GitHub modal
+  // ----------------------------------------------------------
+
   var modal = document.getElementById("github-modal-overlay");
   var openModalBtn = document.getElementById("btn-show-github");
   var closeModalBtn = document.getElementById("btn-close-github");
@@ -1007,38 +1047,22 @@ updateProfileWidgets();
   var errorMsg = document.getElementById("github-modal-error");
 
   function closeGithubModal() {
-  modal.classList.remove("active");
-  githubInput.value = "";
-  errorMsg.textContent = "";
-  openModalBtn.focus(); // add this line
-}
+    modal.classList.remove("active");
+    githubInput.value = "";
+    errorMsg.textContent = "";
+  }
 
   if (modal && openModalBtn && closeModalBtn && fetchBtn && githubInput && errorMsg) {
     openModalBtn.addEventListener("click", function () {
       modal.classList.add("active");
       githubInput.focus();
     });
-    modal.addEventListener("keydown", function (event) {
-  if (!modal.classList.contains("active")) return;
-  var focusable = modal.querySelectorAll("button, input");
-  var first = focusable[0];
-  var last = focusable[focusable.length - 1];
-  if (event.key === "Tab") {
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
-  }
-  if (event.key === "Escape") closeGithubModal();
-});
     closeModalBtn.addEventListener("click", closeGithubModal);
     modal.addEventListener("click", function (event) {
       if (event.target === modal) closeGithubModal();
     });
-    fetchBtn.addEventListener("click", function () {
+    fetchBtn.addEventListener("click", function (event) {
+      event.preventDefault();
       var username = githubInput.value.trim();
       errorMsg.textContent = "";
       if (!username) {
@@ -1065,9 +1089,11 @@ updateProfileWidgets();
           closeGithubModal();
         })
         .catch(function (err) {
-          errorMsg.textContent = err.message || "Failed to fetch skills.";
-        })
-        .finally(function () {
+          if (err.message && err.message.toLowerCase().indexOf("networkerror") !== -1 || err.name === "TypeError") {
+            errorMsg.textContent = "Network error: Connection blocked or offline. Please disable adblockers or check your connection.";
+          } else {
+            errorMsg.textContent = err.message || "Failed to fetch skills.";
+          }
           fetchBtn.disabled = false;
           fetchBtn.textContent = "Fetch Skills";
         });
@@ -1075,6 +1101,10 @@ updateProfileWidgets();
   }
 })();
 
+
+// ============================================================
+// DETAIL PAGE
+// ============================================================
 (function initDetailPage() {
   if (typeof PROJECT_ID === "undefined") return;
   recordProjectView();
@@ -1223,6 +1253,10 @@ updateProfileWidgets();
   }
 })();
 
+
+// ============================================================
+// Scroll-to-top / scroll-to-bottom button
+// ============================================================
 (function initScrollButton() {
   var button = document.getElementById("scroll-top-btn");
   var icon = document.getElementById("scroll-btn-icon");
@@ -1246,4 +1280,30 @@ updateProfileWidgets();
     window.scrollTo({ top: atBottom ? 0 : document.body.scrollHeight, behavior: "smooth" });
   });
   update();
+})();
+(function initScrollSpy() {
+  var sections = document.querySelectorAll("section[id], header[id]");
+  var navLinks = document.querySelectorAll(".nav-link, .nav-mobile-link");
+
+  if (sections.length === 0 || navLinks.length === 0) return;
+
+  var observerOptions = {
+    root: null,
+    rootMargin: "0px 0px -50% 0px",
+    threshold: 0
+  };
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        navLinks.forEach(function(link) {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+        });
+      }
+    });
+  }, observerOptions);
+
+  sections.forEach(function (sec) {
+    observer.observe(sec);
+  });
 })();

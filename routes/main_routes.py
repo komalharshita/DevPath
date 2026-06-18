@@ -9,6 +9,14 @@ from utils.recommender import get_recommendations, validate_recommendation_input
 from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats
 from utils.roadmap_comparer import load_all_career_roadmaps, compare_roadmaps
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
+from utils.learning_path import (
+    create_learning_path,
+    get_learning_path,
+    update_learning_path,
+    PathNotFoundError,
+    PathAlreadyExistsError,
+    AuthorizationError,
+)
 from config import Config
 import os
 
@@ -30,8 +38,16 @@ main = Blueprint("main", __name__)
 @main.route("/")
 def index():
     """Render the homepage with the skill input form and dynamic stats."""
-    stats = get_project_stats()
-    available_levels = get_available_levels()
+    try:
+        stats = get_project_stats()
+        available_levels = get_available_levels()
+    except Exception as e:
+        # In development, we prefer rendering a fallback homepage rather than
+        # aborting entirely. Log the error and use safe defaults so UI/layout
+        # checks can proceed.
+        print("Warning: failed to load project stats:", e)
+        stats = {"total_projects": 0, "unique_skills": 0, "beginner_friendly": 0}
+        available_levels = ["Beginner", "Intermediate", "Advanced"]
 
     return render_template("index.html", stats=stats, available_levels=available_levels, config=Config)
 
@@ -134,8 +150,45 @@ def recommend():
             )
         }), 200
 
-    return jsonify({"projects": results}), 200
+    # Ensure all projects have IDs in the response
+    projects_data = []
+    for project in results:
+        project_dict = dict(project)  # Convert to dict if needed
+        # Make sure ID is included
+        if 'id' not in project_dict:
+            project_dict['id'] = project.get('id', 0)
+        projects_data.append(project_dict)
 
+    return jsonify({"projects": projects_data}), 200
+
+@main.route("/api/project/<int:project_id>/resources")
+def project_resources(project_id):
+    """Return the validated resource list for a project.
+
+    Each resource is parsed from its raw "Label: URL" string format and
+    returned as a structured object so the frontend can render broken
+    links differently from valid ones.
+
+    Response shape:
+        {
+            "project_id": 1,
+            "resources": [
+                {"label": "Python official docs", "url": "https://docs.python.org", "valid": true},
+                {"label": "Broken link", "url": "not-a-url", "valid": false}
+            ]
+        }
+    """
+    from utils.url_validator import validate_resources
+
+    project = find_project_by_id(project_id)
+    if not project:
+        return jsonify({"error": "Project not found."}), 404
+
+    validated = validate_resources(project.get("resources", []))
+    return jsonify({
+        "project_id": project_id,
+        "resources": validated
+    }), 200
 
 @main.route("/project/<int:project_id>")
 def project_detail(project_id):
@@ -232,3 +285,129 @@ def search_projects():
             filtered_projects.append(project)
 
     return jsonify(filtered_projects)
+
+
+# ---------------------------------------------------------------------------
+# Learning path API
+#
+# Endpoints for reading and writing a user's learning path data.  Every
+# request must supply the owner token that was returned when the path was
+# first created.  Requests with a missing or wrong token are rejected with
+# 403 Forbidden before any data is read or modified, closing the
+# cross-user exposure described in issue #736.
+#
+# Token transport: the X-Learning-Path-Token request header.
+# Path identity:   the <path_id> URL segment (opaque, UUID-like string).
+# ---------------------------------------------------------------------------
+
+_TOKEN_HEADER = "X-Learning-Path-Token"
+_MAX_DATA_BYTES = 64 * 1024  # 64 KB — guard against oversized payloads
+
+
+def _extract_token(req):
+    """Return the bearer token from the request header, or None if absent."""
+    return req.headers.get(_TOKEN_HEADER, "").strip() or None
+
+
+@main.route("/api/learning-path/<path_id>", methods=["POST"])
+def create_path(path_id):
+    """Create a new learning path and bind it to the supplied token.
+
+    Request headers:
+        X-Learning-Path-Token  (required) - the secret token chosen by the
+                               client (should be a random UUID or similar).
+
+    Request body (JSON):
+        Any JSON object representing the initial learning-path state.
+
+    Response 201:  {"path_id": "<path_id>", "message": "Learning path created."}
+    Response 400:  malformed request body or invalid path_id / token format.
+    Response 409:  a learning path with this path_id already exists.
+    """
+    token = _extract_token(request)
+    if not token:
+        return jsonify({"error": f"'{_TOKEN_HEADER}' header is required."}), 400
+
+    payload = request.get_json(silent=True)
+    if payload is None:
+        return jsonify({"error": "Request body must be valid JSON."}), 400
+
+    if not isinstance(payload, dict):
+        return jsonify({"error": "Request body must be a JSON object."}), 400
+
+    try:
+        create_learning_path(path_id, token, payload)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    except PathAlreadyExistsError:
+        return jsonify({"error": "A learning path with this ID already exists."}), 409
+
+    return jsonify({"path_id": path_id, "message": "Learning path created."}), 201
+
+
+@main.route("/api/learning-path/<path_id>", methods=["GET"])
+def read_path(path_id):
+    """Return the data payload for a learning path.
+
+    Request headers:
+        X-Learning-Path-Token  (required) - the token associated with this
+                               path when it was created.
+
+    Response 200:  {"path_id": "<path_id>", "data": { ... }}
+    Response 400:  token header missing or path_id format invalid.
+    Response 403:  token does not match the owner token.
+    Response 404:  no learning path found for this path_id.
+    """
+    token = _extract_token(request)
+    if not token:
+        return jsonify({"error": f"'{_TOKEN_HEADER}' header is required."}), 400
+
+    try:
+        data = get_learning_path(path_id, token)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    except PathNotFoundError:
+        return jsonify({"error": "Learning path not found."}), 404
+    except AuthorizationError:
+        return jsonify({"error": "Forbidden: invalid token for this path."}), 403
+
+    return jsonify({"path_id": path_id, "data": data}), 200
+
+
+@main.route("/api/learning-path/<path_id>", methods=["PUT"])
+def update_path(path_id):
+    """Overwrite the data payload for an existing learning path.
+
+    Request headers:
+        X-Learning-Path-Token  (required) - the token associated with this
+                               path when it was created.
+
+    Request body (JSON):
+        Any JSON object representing the new learning-path state.
+
+    Response 200:  {"path_id": "<path_id>", "message": "Learning path updated."}
+    Response 400:  malformed request body, missing token, or invalid format.
+    Response 403:  token does not match the owner token.
+    Response 404:  no learning path found for this path_id.
+    """
+    token = _extract_token(request)
+    if not token:
+        return jsonify({"error": f"'{_TOKEN_HEADER}' header is required."}), 400
+
+    payload = request.get_json(silent=True)
+    if payload is None:
+        return jsonify({"error": "Request body must be valid JSON."}), 400
+
+    if not isinstance(payload, dict):
+        return jsonify({"error": "Request body must be a JSON object."}), 400
+
+    try:
+        update_learning_path(path_id, token, payload)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    except PathNotFoundError:
+        return jsonify({"error": "Learning path not found."}), 404
+    except AuthorizationError:
+        return jsonify({"error": "Forbidden: invalid token for this path."}), 403
+
+    return jsonify({"path_id": path_id, "message": "Learning path updated."}), 200

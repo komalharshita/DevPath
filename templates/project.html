@@ -51,7 +51,7 @@
     <!-- Mobile menu for project detail page -->
     <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
       <a href="/" class="nav-mobile-link" role="menuitem">Back to Search</a>
-      <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
+      <a href="https://github.com" target="_blank" rel="noopener noreferrer"
          class="nav-mobile-link" role="menuitem">GitHub</a>
       <!-- Theme toggle in mobile menu -->
       <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile"
@@ -170,7 +170,80 @@
             </ul>
           </section>
 
-          <!-- Roadmap Section -->
+          <!-- Roadmap Section with visual timeline -->
+
+ <!-- Roadmap Section -->
+<section class="detail-section">
+
+    <!-- Header -->
+    <div class="detail-section-header">
+
+        <div class="detail-section-icon">
+            <svg width="18"
+                 height="18"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 stroke-linecap="round"
+                 stroke-linejoin="round">
+
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+
+            </svg>
+        </div>
+
+        <h2>Project Roadmap</h2>
+
+    </div>
+
+
+    <!-- Description -->
+    <p class="detail-section-sub">
+        Follow these steps in order.
+        Each one builds on the previous.
+    </p>
+
+
+   <!-- Progress -->
+<div class="roadmap-progress-wrap">
+
+    <div
+        class="roadmap-progress-bar"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+        aria-label="Roadmap completion progress"
+    >
+        <div id="roadmap-progress-fill"></div>
+    </div>
+
+    <span
+        id="roadmap-progress-text"
+        aria-live="polite"
+    >
+        0% completed
+    </span>
+
+</div>
+
+    <!-- Timeline -->
+    <ol class="roadmap-timeline" id="roadmap-list">
+
+        {% for step in project.roadmap %}
+
+        <li class="roadmap-step"
+            data-step="step-{{loop.index}}">
+
+            <!-- Marker -->
+            <div class="roadmap-marker">
+
+                <span class="roadmap-dot"></span>
+
+                <span class="roadmap-line"></span>
+
+
           <section class="detail-section">
             <div class="detail-section-header">
               <div class="detail-section-icon">
@@ -180,38 +253,45 @@
                 </svg>
               </div>
               <h2>Project Roadmap</h2>
+
             </div>
 
-            <p class="detail-section-sub">Follow these steps in order. Each one builds on the previous.</p>
 
-            <div class="roadmap-progress-wrap">
-              <div class="roadmap-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
-                aria-valuenow="0" aria-label="Roadmap completion progress">
-                <div id="roadmap-progress-fill"></div>
-              </div>
-              <span id="roadmap-progress-text" aria-live="polite">0% completed</span>
-            </div>
+            <!-- Content -->
+            <div class="roadmap-content">
 
-            <ol class="roadmap-timeline" id="roadmap-list">
-              {% for step in project.roadmap %}
-              <li class="roadmap-step" data-step="step-{{ loop.index }}">
-                <div class="roadmap-marker">
-                  <span class="roadmap-dot"></span>
-                  <span class="roadmap-line"></span>
-                </div>
-                <div class="roadmap-content">
-                  <label class="roadmap-step-label">
-                    <input type="checkbox" class="roadmap-checkbox">
+                <label class="roadmap-step-label">
+
+                    <input
+                        type="checkbox"
+                        class="roadmap-checkbox"
+                    >
+
                     <div class="roadmap-text-wrap">
-                      <span class="roadmap-step-num">Step {{ loop.index }}</span>
-                      <p class="roadmap-step-text">{{ step | replace("Step " ~ loop.index ~ ": ", "") }}</p>
+
+                        <span class="roadmap-step-num">
+                            Step {{loop.index}}
+                        </span>
+
+                        <p class="roadmap-step-text">
+
+                            {{ step | replace("Step " ~ loop.index ~ ": ", "") }}
+
+                        </p>
+
                     </div>
-                  </label>
-                </div>
-              </li>
-              {% endfor %}
-            </ol>
-          </section>
+
+                </label>
+
+            </div>
+
+        </li>
+
+        {% endfor %}
+
+    </ol>
+
+</section>
 
           <!-- Resources Section -->
           <section class="detail-section">
@@ -395,9 +475,17 @@
 
   <!-- Pass project metadata to the JavaScript without hardcoding -->
   <script>
+<<<<<<< HEAD
+    var PROJECT_ID = parseInt("{{ project.id }}", 10);
+    var PROJECT_TITLE = "{{ project.title | escapejs }}";
+=======
+
     var PROJECT_ID = {{ project.id | tojson }};
     var PROJECT_TITLE = {{ project.title | tojson }};
+
+>>>>>>> upstream/main
   </script>
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
   <script src="/static/script.js"></script>
 </body>
 

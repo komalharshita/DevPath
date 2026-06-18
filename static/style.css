@@ -465,6 +465,11 @@ html[data-entry-anim="true"] .form-card form > .btn-submit              { animat
   color: var(--gray-600);
 }
 
+[data-theme="dark"] .badge {
+  background: rgba(148, 163, 184, 0.15);
+  color: #cbd5e1;
+}
+
 .badge--beginner {
   background: var(--green-100);
   color: var(--green-500);
@@ -483,6 +488,27 @@ html[data-entry-anim="true"] .form-card form > .btn-submit              { animat
 .badge--data {
   background: var(--purple-100);
   color: var(--purple-600);
+}
+
+/* Dark mode overrides for badges to improve contrast */
+[data-theme="dark"] .badge--beginner {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+}
+
+[data-theme="dark"] .badge--web {
+  background: rgba(79, 110, 247, 0.15);
+  color: #a5b4fc;
+}
+
+[data-theme="dark"] .badge--python {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fcd34d;
+}
+
+[data-theme="dark"] .badge--data {
+  background: rgba(124, 58, 237, 0.15);
+  color: #c4b5fd;
 }
 
 /* =============================================================
@@ -662,12 +688,14 @@ html[data-entry-anim="true"] .form-card form > .btn-submit              { animat
     opacity   0.25s ease;
 }
 
-.nav-link:hover {
+.nav-link:hover,
+.nav-link.active {
   color: #ffffff;
   text-decoration: none;
 }
 
-.nav-link:hover::after {
+.nav-link:hover::after,
+.nav-link.active::after {
   transform: translateX(-50%) scaleX(1);
   opacity: 1;
 }
@@ -788,12 +816,14 @@ html[data-entry-anim="true"] .form-card form > .btn-submit              { animat
     opacity   0.25s ease;
 }
 
-.nav-mobile-link:hover {
+.nav-mobile-link:hover,
+.nav-mobile-link.active {
   color: #ffffff;
   text-decoration: none;
 }
 
-.nav-mobile-link:hover::after {
+.nav-mobile-link:hover::after,
+.nav-mobile-link.active::after {
   transform: scaleX(1);
   opacity: 1;
 }
@@ -1628,13 +1658,9 @@ html[data-theme="dark"] .theme-toggle-label::before {
   text-align: left;
 }
 
+/* Form groups */
 .form-group {
   margin-bottom: 24px;
-}
-
-.form-card form > .form-group:first-child {
-  position: relative;
-  z-index: 1;
 }
 
 .form-row {
@@ -1656,7 +1682,6 @@ label {
 /* Skill input container */
 .skill-input-wrap {
   position: relative;
-  z-index: 1100;
   border: 1.5px solid var(--border);
   border-radius: var(--r-sm);
   background: var(--gray-50);
@@ -1738,6 +1763,83 @@ label {
   box-shadow: none;
 }
 
+/* Multi-select wrapper for skills input */
+.skill-multiselect-wrapper {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 140px;
+  gap: 4px;
+  position: relative;
+}
+
+.skill-dropdown-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  color: var(--gray-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--t);
+  flex-shrink: 0;
+}
+
+.skill-dropdown-btn:hover {
+  color: var(--indigo-600);
+}
+
+.skill-dropdown-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Multi-select dropdown styling */
+.skills-dropdown.show {
+  display: block;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.skills-dropdown .suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.skills-dropdown .suggestion-item::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--gray-300);
+  border-radius: 3px;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.skills-dropdown .suggestion-item.selected::before {
+  background: var(--indigo-600);
+  border-color: var(--indigo-600);
+  box-shadow: inset 0 0 0 2px var(--white);
+}
+
+.skills-dropdown .suggestion-item:hover {
+  background: var(--indigo-50);
+}
+
+/*suggestions dropdown*/
 /* Suggestions dropdown */
 .skills-suggestions {
   position: absolute;
@@ -2776,15 +2878,17 @@ input[type="text"]:not(.skill-input-wrap input):focus {
     width:14px;
     height:14px;
     border-radius:50%;
-    background:var(--indigo-600);
-    border:3px solid var(--indigo-100);
+    background:var(--surface);
+    border:3px solid var(--indigo-600);
     margin-top:4px;
+    box-sizing:border-box;
 }
 
 .roadmap-line{
     flex:1;
-    width:2px;
-    background:var(--border);
+    width:0;
+    border-left:2px dashed var(--border);
+    background:transparent;
     margin:4px 0;
 }
 
@@ -2856,7 +2960,13 @@ input[type="text"]:not(.skill-input-wrap input):focus {
 /* Make completed node visually */
 .roadmap-step.completed .roadmap-dot {
   background: var(--green-500);
+  border-color: var(--green-200);
   box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+}
+
+/* Make completed line solid green */
+.roadmap-step.completed .roadmap-line {
+  border-left: 2px solid var(--green-500);
 }
 
 /* Progress container */
@@ -3295,16 +3405,19 @@ input[type="text"]:not(.skill-input-wrap input):focus {
 .profile-card,
 .badge-card,
 .achievement-card,
+.history-card,
 .leaderboard-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 28px;
   padding: 28px;
+  box-shadow: var(--shadow-sm);
 }
 
 .profile-card-header,
 .badge-card-header,
 .achievement-card-header,
+.history-card-header,
 .leaderboard-card-header {
   display: flex;
   align-items: center;
@@ -3316,19 +3429,21 @@ input[type="text"]:not(.skill-input-wrap input):focus {
 .profile-label {
   display: block;
   margin-bottom: 8px;
-  color: rgba(148, 163, 184, 1);
+  color: var(--text-body);
   font-size: 0.92rem;
+  font-weight: 500;
 }
 
 .profile-card h3 {
   font-size: 3rem;
   margin: 0;
+  color: var(--text-heading);
 }
 
 .progress-meter {
   width: 100%;
   height: 16px;
-  background: rgba(148, 163, 184, 0.14);
+  background: var(--surface-hover);
   border-radius: 999px;
   overflow: hidden;
   margin-bottom: 20px;
@@ -3342,9 +3457,10 @@ input[type="text"]:not(.skill-input-wrap input):focus {
   width: 0;
   height: 100%;
   background: linear-gradient(120deg, #6366f1, #22c55e);
-  color: #fff;
+  color: #ffffff;
   font-size: 0.8rem;
   font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
   transition: width 0.4s ease;
 }
 
@@ -3366,7 +3482,7 @@ input[type="text"]:not(.skill-input-wrap input):focus {
   justify-content: space-between;
   gap: 12px;
   padding: 14px 0;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  border-bottom: 1px solid var(--border);
 }
 
 .progress-stats li:last-child,
@@ -3379,14 +3495,16 @@ input[type="text"]:not(.skill-input-wrap input):focus {
 .progress-stats strong,
 .leaderboard-list span,
 .achievement-item strong {
-  color: #e2e8f0;
+  color: var(--text-body);
+  font-weight: 500;
 }
 
 .progress-stats span,
 .leaderboard-list strong,
 .achievement-item span,
 .achievement-item small {
-  color: rgba(148, 163, 184, 1);
+  color: var(--text-heading);
+  font-weight: 700;
 }
 
 .progress-badge-grid {
@@ -3401,18 +3519,20 @@ input[type="text"]:not(.skill-input-wrap input):focus {
   gap: 12px;
   padding: 14px 16px;
   border-radius: 18px;
-  background: rgba(148, 163, 184, 0.06);
-  color: rgba(226, 232, 240, 1);
+  background: var(--surface-hover);
+  color: var(--text-heading);
+  border: 1px solid var(--border);
   transition: transform 0.2s ease, background 0.2s ease;
 }
 
 .progress-badge--unlocked {
   background: rgba(34, 197, 94, 0.12);
-  color: #d1fae5;
+  color: var(--text-heading);
+  border-color: rgba(34, 197, 94, 0.3);
 }
 
 .progress-badge--locked {
-  opacity: 0.6;
+  opacity: 0.7;
 }
 
 .badge-icon {
@@ -3422,7 +3542,7 @@ input[type="text"]:not(.skill-input-wrap input):focus {
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.14);
+  background: var(--surface-hover);
   font-size: 0.88rem;
 }
 
@@ -3442,7 +3562,7 @@ input[type="text"]:not(.skill-input-wrap input):focus {
 }
 
 .achievement-empty {
-  color: rgba(148, 163, 184, 1);
+  color: var(--text-light);
   padding: 16px 0;
 }
 
@@ -3452,17 +3572,19 @@ input[type="text"]:not(.skill-input-wrap input):focus {
   justify-content: center;
   gap: 8px;
   background: transparent;
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  color: #e2e8f0;
+  border: 1px solid var(--border);
+  color: var(--text-body);
   border-radius: 999px;
   padding: 12px 18px;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  font-weight: 500;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(148, 163, 184, 0.4);
+  background: var(--surface-hover);
+  border-color: var(--text-light);
+  color: var(--text-heading);
 }
 
 .btn-mark-complete {
@@ -3514,9 +3636,9 @@ input[type="text"]:not(.skill-input-wrap input):focus {
   color: #e6edf3;
 }
 
-/* =============================================================
+/* 
    SECTION 21: ERROR PAGES
-   ============================================================= */
+ */
 .error-page {
   min-height: 100vh;
   display: flex;
@@ -3579,9 +3701,9 @@ input[type="text"]:not(.skill-input-wrap input):focus {
   outline-offset: var(--focus-ring-offset);
 }
 
-/* =============================================================
+/* 
    SECTION 22: SCROLL NAVIGATION BUTTON
-   ============================================================= */
+ */
 #scroll-top-btn {
   position: fixed;
   bottom: 2rem;
@@ -3624,9 +3746,9 @@ input[type="text"]:not(.skill-input-wrap input):focus {
   }
 }
 
-/* =============================================================
+/* 
    SECTION 23: RESPONSIVE BREAKPOINTS
-   ============================================================= */
+ */
 @media (max-width: 1024px) {
   .hero-inner {
     grid-template-columns: 1fr;
@@ -3661,6 +3783,41 @@ input[type="text"]:not(.skill-input-wrap input):focus {
     row-gap: 40px;
   }
 }
+
+/* =============================================================
+   BUGFIX: Prevent hero visual cards from overlapping code preview
+   - Ensure the code preview always has layout space and higher stacking
+   - Slightly increase vertical gap between visual elements
+   - Reduce how far the stats section pulls up over the hero to avoid
+     accidental overlap on mid-sized viewports
+   ============================================================= */
+.hero-visual {
+  gap: 18px; /* slightly larger gap to avoid tight stacking */
+}
+
+.hero-visual-main {
+  position: relative;
+  z-index: 3; /* keep code preview above floating cards when necessary */
+  min-height: 220px; /* ensure preview has vertical space on narrow viewports */
+}
+
+.hero-visual-card {
+  position: relative;
+  z-index: 2;
+}
+
+/* Reduce aggressive negative pull of the following stats section which
+   can sometimes visually overlap hero content at certain widths. This
+   override is scoped to the immediate following section to minimize
+   layout changes elsewhere. */
+.hero + .stats-section {
+  margin-top: -20px;
+}
+
+@media (max-width: 1024px) {
+  .hero-visual-main { min-height: 260px; }
+}
+
 
 @media (max-width: 860px) {
   .features-grid {
@@ -3816,11 +3973,11 @@ input[type="text"]:not(.skill-input-wrap input):focus {
   }
 }
 
-/* =============================================================
+/* 
    SECTION 24: DARK MODE — COMPONENT-SPECIFIC OVERRIDES
    Only for cases where CSS variables alone cannot reach the target
    (e.g., border-trick chevrons, elements with inherited light values).
-   ============================================================= */
+    */
 
 /* Select chevron arrow uses border colours, not text colour */
 html[data-theme="dark"] .select-wrap::after {
@@ -3952,9 +4109,374 @@ html[data-theme="dark"] .btn-view-code-sm {
   border-color: rgba(99, 102, 241, 0.4);
 }
 
-/* =============================================================
+#scroll-top-btn.visible {
+    display: flex;
+}
+
+/* DARK MODE */
+body.dark-theme {
+  background: #0b1120;
+  color: #f8fafc;
+}
+
+/* NAVBAR */
+body.dark-theme .navbar {
+  background: rgba(10, 15, 35, 0.96);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+body.dark-theme .nav-link,
+body.dark-theme .nav-mobile-link {
+  color: rgba(255,255,255,0.82);
+}
+
+body.dark-theme .nav-link:hover,
+body.dark-theme .nav-mobile-link:hover {
+  color: white;
+}
+
+body.dark-theme .nav-logo {
+  color: white;
+}
+
+body.dark-theme .nav-logo-accent {
+  color: #facc15;
+}
+
+/* hamburger */
+
+body.dark-theme .nav-mobile-toggle span {
+  background: white;
+}
+
+body.dark-theme .nav-mobile-menu {
+  background: #131c31;
+}
+
+/* HERO */
+body.dark-theme .hero {
+  background:
+    radial-gradient(circle at top left,
+      rgba(99,102,241,0.22),
+      transparent 32%),
+    linear-gradient(
+      135deg,
+      #0f172a 0%,
+      #1e1b4b 55%,
+      #4c1d95 100%
+    );
+}
+
+body.dark-theme .hero-heading {
+  color: white;
+}
+
+body.dark-theme .hero-subtext {
+  color: rgba(255,255,255,0.78);
+}
+
+/* hero buttons */
+
+body.dark-theme .btn-hero-ghost {
+  color: white;
+  border-color: rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+}
+
+body.dark-theme .btn-hero-ghost:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+/* hero floating cards */
+
+body.dark-theme .hero-visual-card {
+  background: rgba(255,255,255,0.96);
+}
+
+body.dark-theme .hvc-title {
+  color: #111827;
+}
+
+body.dark-theme .hvc-sub {
+  color: #4b5563;
+}
+
+/* 
+   GENERAL SECTIONS */
+body.dark-theme .features-section,
+body.dark-theme .how-section,
+body.dark-theme .form-section,
+body.dark-theme .about-section,
+body.dark-theme .stats-section {
+  background: #0f172a;
+}
+
+body.dark-theme .skill-strip {
+  background: #111827;
+  border-color: rgba(255,255,255,0.05);
+}
+
+/*
+   TITLES + TEXT */
+body.dark-theme .section-title,
+body.dark-theme .section-sub,
+body.dark-theme .step-card h3,
+body.dark-theme .step-card p,
+body.dark-theme .stat-value,
+body.dark-theme .stat-label,
+body.dark-theme .footer-tagline,
+body.dark-theme .footer-col-title,
+body.dark-theme .footer-links-list a,
+body.dark-theme .footer-bottom p,
+body.dark-theme .footer-bottom-links a {
+  color: white;
+}
+
+body.dark-theme .section-eyebrow {
+  background: rgba(255,255,255,0.08);
+  color: #a5b4fc;
+}
+
+/* 
+   CARDS */
+body.dark-theme .stat-card,
+body.dark-theme .step-card,
+body.dark-theme .form-card {
+  background: #172033;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* 
+   FEATURE CARDS */
+body.dark-theme .feature-card--pink {
+  background: #3c2230;
+}
+
+body.dark-theme .feature-card--yellow {
+  background: #3c3422;
+}
+
+body.dark-theme .feature-card--purple {
+  background: #2d2440;
+}
+
+body.dark-theme .feature-card h3 {
+  color: white;
+}
+
+body.dark-theme .feature-card p {
+  color: rgba(255,255,255,0.8);
+}
+
+body.dark-theme .feature-card-link {
+  background: rgba(255,255,255,0.08);
+  color: white;
+  border-color: rgba(255,255,255,0.14);
+}
+
+/*
+   ABOUT SECTION */
+body.dark-theme .about-card {
+  background: #172033;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+body.dark-theme .about-card h3,
+body.dark-theme .about-card p {
+  color: white;
+}
+
+/* 
+   FORMS */
+body.dark-theme label {
+  color: rgba(255,255,255,0.9);
+}
+
+body.dark-theme input,
+body.dark-theme select,
+body.dark-theme textarea,
+body.dark-theme .skill-input-wrap {
+  background: #111827;
+  color: white;
+  border-color: rgba(255,255,255,0.08);
+}
+
+body.dark-theme input::placeholder,
+body.dark-theme textarea::placeholder {
+  color: rgba(255,255,255,0.45);
+}
+
+/* dropdown */
+
+body.dark-theme .skills-suggestions {
+  background: #172033;
+  border-color: rgba(255,255,255,0.08);
+}
+
+body.dark-theme .suggestion-item {
+  color: white;
+  border-bottom-color: rgba(255,255,255,0.04);
+}
+
+body.dark-theme .suggestion-item:hover,
+body.dark-theme .suggestion-item--active {
+  background: #243047;
+}
+
+/* github button */
+
+body.dark-theme #btn-show-github {
+  background: rgba(255,255,255,0.08);
+  color: white;
+}
+
+body.dark-theme #btn-show-github:hover {
+  background: rgba(255,255,255,0.14);
+}
+
+/* 
+   FOOTER */
+body.dark-theme .footer {
+  background: #0b1120;
+}
+
+body.dark-theme .footer-inner {
+  border-color: rgba(255,255,255,0.06);
+}
+
+body.dark-theme .footer-links-list a:hover,
+body.dark-theme .footer-bottom-links a:hover {
+  color: white;
+}
+
+/* skill strip text */
+
+body.dark-theme .skill-strip-label,
+body.dark-theme .ss-item {
+  color: rgba(255,255,255,0.82);
+}
+
+body.dark-theme .ss-sep {
+  background: rgba(255,255,255,0.22);
+}
+
+/* 
+   THEME TOGGLE BUTTON */
+.theme-toggle {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  cursor: pointer;
+
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  transition: all 0.25s ease;
+
+  padding: 0;
+  outline: none;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-2px);
+}
+
+/* icon styling */
+
+.theme-toggle svg,
+.theme-toggle i,
+.theme-toggle img {
+  width: 22px !important;
+  height: 22px !important;
+
+  color: #facc15 !important;
+  fill: #facc15 !important;
+
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+
+  display: block;
+  object-fit: contain;
+}
+
+/* 
+   DARK MODE TOGGLE */
+body.dark-theme .theme-toggle {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+body.dark-theme .theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* 
+   MOBILE / HAMBURGER MENU TOGGLE */
+.mobile-theme-toggle {
+  width: 100%;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  margin-bottom: 14px;
+
+  transition: all 0.25s ease;
+
+  padding: 0 16px;
+}
+
+.mobile-theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* icon inside mobile button */
+
+.mobile-theme-toggle svg,
+.mobile-theme-toggle i,
+.mobile-theme-toggle img {
+  width: 20px !important;
+  height: 20px !important;
+
+  color: #facc15 !important;
+  fill: #facc15 !important;
+
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* 
+   REMOVE EXTRA WHITE BACKGROUNDS */
+.theme-toggle *,
+.mobile-theme-toggle * {
+  background: transparent !important;
+  display: flex;
+}
+
+/*
    Dark Mode
-   ============================================================= */
+ */
 [data-theme="dark"] {
   --white: #0f1117;
   --gray-50: #161822;
@@ -4015,13 +4537,13 @@ html[data-theme="dark"] .btn-view-code-sm {
   }
 }
 
-/* ============================================================
+/* 
    WORKING DARK MODE
-   ============================================================ */
+ */
 
-/* =============================================================
+/* 
    CAREER ROADMAP COMPARISON PAGE
-   ============================================================= */
+    */
 
 .compare-page-body {
   background: var(--bg-secondary);
@@ -4133,6 +4655,11 @@ html[data-theme="dark"] .btn-view-code-sm {
   border-radius: var(--r-full);
   align-self: center;
   margin-bottom: 4px;
+}
+
+[data-theme="dark"] .compare-vs-badge {
+  background: rgba(79, 110, 247, 0.15);
+  color: #a5b4fc;
 }
 
 .compare-btn {
@@ -4528,4 +5055,16 @@ html[data-theme="dark"] .btn-view-code-sm {
 [data-theme="dark"] .compare-skill-chip--shared {
   background: rgba(16, 185, 129, 0.15);
   color: #6ee7b7;
+}
+
+[data-theme="dark"] .compare-tag--a,
+[data-theme="dark"] .compare-skill-chip--a {
+  background: rgba(79, 110, 247, 0.15);
+  color: #a5b4fc;
+}
+
+[data-theme="dark"] .compare-tag--b,
+[data-theme="dark"] .compare-skill-chip--b {
+  background: rgba(124, 58, 237, 0.15);
+  color: #c4b5fd;
 }
