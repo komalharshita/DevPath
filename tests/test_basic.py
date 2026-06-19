@@ -373,6 +373,7 @@ def test_get_recommendations_no_match_returns_empty():
     results = get_recommendations("Rust", "Advanced", "Games", "High").get("recommendations", [])
     # Rust and Games are not in the dataset so this should be empty or minimal
     assert isinstance(results, list)
+    assert len(results) == 0
 
 
 def test_get_recommendations_result_format():
