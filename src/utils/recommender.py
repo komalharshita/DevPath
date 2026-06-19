@@ -63,20 +63,30 @@ def parse_skills(skills_string):
         "JS, HTML5, CSS3"   -> ["javascript", "html", "css"]
     """
     stripped = skills_string.strip()
+    raw_skills = []
     if stripped.startswith("["):
         try:
             parsed = json.loads(stripped)
             if isinstance(parsed, list):
                 raw_skills = [str(s).strip().lower() for s in parsed if str(s).strip()]
-                return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
         except (json.JSONDecodeError, ValueError):
             pass
-    raw_skills = [
-        s.strip().lower()
-        for s in skills_string.split(",")
-        if s.strip()
-    ]
-    return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
+    if not raw_skills:
+        raw_skills = [
+            s.strip().lower()
+            for s in skills_string.split(",")
+            if s.strip()
+        ]
+    
+    seen = set()
+    deduped_skills = []
+    for skill in raw_skills:
+        normalized = SKILL_ALIASES.get(skill, skill)
+        if normalized not in seen:
+            seen.add(normalized)
+            deduped_skills.append(normalized)
+            
+    return deduped_skills
 
 def _tokenize(text):
     return re.findall(r"[a-z0-9]+", str(text).lower())
@@ -390,12 +400,12 @@ VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
 def validate_recommendation_inputs(skills, level, interest, time_availability):
     errors = []
 
-    if not skills or not skills.strip():
+    if not skills or not isinstance(skills, str) or not skills.strip():
         errors.append("Please enter at least one skill.")
     elif not parse_skills(skills):
         errors.append("Please enter at least one valid skill.")
 
-    if not level or not level.strip():
+    if not level or not isinstance(level, str) or not level.strip():
         errors.append("Please select an experience level.")
     elif level.strip().lower() not in VALID_LEVELS:
         errors.append("Invalid experience level. Choose Beginner, Intermediate, or Advanced.")
@@ -403,7 +413,7 @@ def validate_recommendation_inputs(skills, level, interest, time_availability):
     if not interest or not isinstance(interest, str) or not interest.strip():
         errors.append("Please select an area of interest.")
 
-    if not time_availability or not time_availability.strip():
+    if not time_availability or not isinstance(time_availability, str) or not time_availability.strip():
         errors.append("Please select your time availability.")
     elif time_availability.strip().lower() not in VALID_TIME_AVAILABILITY:
         errors.append("Invalid time availability. Choose Low, Medium, or High.")
