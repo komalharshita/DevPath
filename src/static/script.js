@@ -7,6 +7,7 @@
   function applyTheme(theme) {
     var isDark = theme === "dark";
     html.setAttribute("data-theme", theme);
+    document.body.classList.toggle("dark-theme", isDark);
     try {
       localStorage.setItem("theme", theme);
     } catch (err) {
