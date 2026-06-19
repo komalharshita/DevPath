@@ -127,6 +127,10 @@
         card.style.borderColor = "var(--border)";
       }
     });
+
+    if (typeof window.loadFilterPreferences === "function") {
+      window.loadFilterPreferences();
+    }
   });
 
   document.addEventListener("click", function (event) {
@@ -422,6 +426,69 @@ updateProfileWidgets();
   var SAVED_PROJECTS_KEY = "devpathSavedProjects";
   var hasSearched = false;
   var techStackSelect = document.getElementById("tech_stack");
+
+  function saveFilterPreferences() {
+    try {
+      var preferences = {
+        level: document.getElementById("level").value,
+        interest: document.getElementById("interest").value,
+        time: document.getElementById("time").value,
+        tech_stack: techStackSelect ? techStackSelect.value : "all"
+      };
+      localStorage.setItem("devpath_filters", JSON.stringify(preferences));
+    } catch (err) {
+      // Storage can be unavailable in private browsing
+    }
+  }
+
+  function loadFilterPreferences() {
+    try {
+      var saved = localStorage.getItem("devpath_filters");
+      if (!saved) return;
+      var preferences = JSON.parse(saved);
+      if (!preferences || typeof preferences !== "object") return;
+
+      var levelSelect = document.getElementById("level");
+      var interestSelect = document.getElementById("interest");
+      var timeSelect = document.getElementById("time");
+
+      var loaded = false;
+
+      if (preferences.level && levelSelect) {
+        levelSelect.value = preferences.level;
+        loaded = true;
+      }
+      if (preferences.interest && interestSelect) {
+        interestSelect.value = preferences.interest;
+        loaded = true;
+      }
+      if (preferences.time && timeSelect) {
+        timeSelect.value = preferences.time;
+        loaded = true;
+      }
+      if (preferences.tech_stack && techStackSelect) {
+        techStackSelect.value = preferences.tech_stack;
+        loaded = true;
+      }
+
+      if (loaded && submitBtn) {
+        submitBtn.click();
+      }
+    } catch (err) {
+      // Storage can be unavailable in private browsing
+    }
+  }
+
+  window.loadFilterPreferences = loadFilterPreferences;
+
+  // Attach change event listeners to primary filter inputs/dropdowns
+  var levelSelect = document.getElementById("level");
+  var interestSelect = document.getElementById("interest");
+  var timeSelect = document.getElementById("time");
+
+  if (levelSelect) levelSelect.addEventListener("change", saveFilterPreferences);
+  if (interestSelect) interestSelect.addEventListener("change", saveFilterPreferences);
+  if (timeSelect) timeSelect.addEventListener("change", saveFilterPreferences);
 
   function normalize(value) {
     return String(value || "").trim().toLowerCase();
@@ -814,6 +881,11 @@ updateProfileWidgets();
   }
 
   function resetFormAndState() {
+    try {
+      localStorage.removeItem("devpath_filters");
+    } catch (err) {
+      // Storage can be unavailable in private browsing
+    }
     form.reset();
     selectedSkills = [];
     renderSelectedChips();
@@ -904,6 +976,7 @@ updateProfileWidgets();
   });
   if (techStackSelect) {
     techStackSelect.addEventListener("change", function () {
+      saveFilterPreferences();
       if (hasSearched) {
         submitBtn.click();
       }
