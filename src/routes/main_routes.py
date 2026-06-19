@@ -18,7 +18,13 @@ from utils.learning_path import (
     AuthorizationError,
 )
 from config import Config
+from dotenv import load_dotenv
 import os
+from groq import Groq
+import json
+load_dotenv()  
+
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 # Interest categories that currently have no project recommendations available
 NO_PROJECT_INTERESTS = {
@@ -99,78 +105,155 @@ def health_check():
     }), 200
 
 
+def normalize_skills(skills):
+    if isinstance(skills, str):
+        skills = skills.split(",")
+
+    return [s.strip().lower() for s in skills if s.strip()]
+
+
+def get_ai_recommendations(skills, level, interest, time_availability):
+
+    prompt = f"""
+You are a project recommendation AI.
+
+Skills: {skills}
+Level: {level}
+Interest: {interest}
+Time: {time_availability}
+
+IMPORTANT:
+- Recommend projects based on the given skills.
+- If Kotlin is present, recommend Kotlin projects.
+- If GraphQL is present, recommend GraphQL projects.
+- Do not recommend unrelated technologies.
+- Return ONLY valid JSON.
+
+{{
+  "projects": [
+    {{
+      "title": "",
+      "description": "",
+      "tech_stack": [],
+      "level": "",
+      "time": ""
+    }}
+  ]
+}}
+"""
+
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {
+                "role": "system",
+                "content": "Return ONLY valid JSON. No markdown. No explanations."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.5
+    )
+
+    content = response.choices[0].message.content
+
+    content = (
+        content.replace("```json", "")
+        .replace("```", "")
+        .strip()
+    )
+
+    try:
+        data = json.loads(content)
+
+        projects = data.get("projects", [])
+
+        # Normalize projects for frontend
+        for i, project in enumerate(projects, start=1):
+
+            project["id"] = f"ai-{i}"
+
+            project["skills"] = project.get("tech_stack", [])
+
+            if not project.get("level"):
+                project["level"] = level
+
+            if not project.get("time"):
+                project["time"] = time_availability
+
+            if "interest" not in project:
+                project["interest"] = interest
+
+        return {
+            "projects": projects
+        }
+
+    except Exception as e:
+
+        print("GROQ JSON PARSE ERROR:", e)
+        print("RAW RESPONSE:", content)
+
+        return {
+            "projects": []
+        }
+
 @main.route("/api/recommend", methods=["POST"])
 def recommend():
-    """
-    Accept a JSON body with user inputs and return matching project recommendations.
 
-    Expected JSON fields:
-        skills   (str) - comma-separated list of skills
-        level    (str) - Beginner | Intermediate | Advanced
-        interest (str) - Web | Data | Education | Automation | Games
-        time     (str) - Low | Medium | High
-    """
     payload = request.get_json(silent=True)
 
     if not payload:
-        return jsonify({"error": "Request body must be valid JSON."}), 400
+        return jsonify({
+            "error": "Invalid JSON"
+        }), 400
 
-    # Reject non-string values (e.g. null, lists, numbers) before calling .strip()
-    string_fields = ("skills", "level", "interest", "time")
-    for field in string_fields:
-        value = payload.get(field)
-        if value is not None and not isinstance(value, str):
-            return jsonify({"error": f"'{field}' must be a string value."}), 400
-
-    skills            = (payload.get("skills") or "").strip()
-    level             = (payload.get("level") or "").strip()
-    interest          = (payload.get("interest") or "").strip()
+    skills = (payload.get("skills") or "").strip()
+    level = (payload.get("level") or "").strip()
+    interest = (payload.get("interest") or "").strip()
     time_availability = (payload.get("time") or "").strip()
 
-    # Validate before running the recommendation engine
-    errors = validate_recommendation_inputs(skills, level, interest, time_availability)
-    if errors:
-        # Return only the first error to keep the UI message clean
-        return jsonify({"error": errors[0]}), 400
-
-    if interest_has_no_projects(interest):
+    if not skills:
         return jsonify({
-            "projects": [],
-            "message": "No projects are currently available for this interest area. Please check back later."
+            "error": "Skills required"
+        }), 400
+
+    try:
+
+        ai_response = get_ai_recommendations(
+            skills,
+            level,
+            interest,
+            time_availability
+        )
+
+        projects = ai_response.get("projects", [])
+
+        # Ensure every project has an ID
+        for i, project in enumerate(projects, start=1):
+
+            if not isinstance(project, dict):
+                continue
+
+            project["id"] = project.get("id", f"ai-{i}")
+
+        print("FINAL PROJECTS:")
+        print(json.dumps(projects, indent=2))
+
+        return jsonify({
+            "source": "groq",
+            "projects": projects
         }), 200
 
-    recommendations_data = get_recommendations(skills, level, interest, time_availability)
-    results = recommendations_data.get("recommendations", [])
+    except Exception as e:
 
-    if not results:
+        print("RECOMMEND ERROR:", str(e))
+
         return jsonify({
-            "projects": [],
-            "message": (
-                "No projects matched your inputs. "
-                "Try different skills or broaden your interest area."
-            )
-        }), 200
-
-    # Ensure all projects have IDs in the response
-    projects_data = []
-    for project in results:
-        project_dict = dict(project)  # Convert to dict if needed
-        # Make sure ID is included
-        if 'id' not in project_dict:
-            project_dict['id'] = project.get('id', 0)
-        projects_data.append(project_dict)
-
-    # Return main recommendations, related, and progression
-    response_data = {
-        "projects": projects_data,
-        "related": [dict(p) for p in recommendations_data.get("related", [])],
-        "progression": [
-            {"project": dict(item["project"]), "gap_score": item["gap_score"]}
-            for item in recommendations_data.get("progression", [])
-        ]
-    }
-
-    return jsonify(response_data), 200
+            "error": str(e),
+            "projects": []
+        }), 500
 
 @main.route("/api/project/<int:project_id>/resources")
 def project_resources(project_id):
