@@ -1401,6 +1401,8 @@ html[data-theme="dark"] .theme-toggle-label::before {
 
 /* Colour-variant skill-strip items (upstream) */
 .ss-item-indigo {
+  display: inline-block;
+  white-space: nowrap;
   font-size: 0.88rem;
   font-weight: 600;
   color: var(--indigo-500);
@@ -1411,6 +1413,8 @@ html[data-theme="dark"] .theme-toggle-label::before {
 }
 
 .ss-item-green {
+  display: inline-block;
+  white-space: nowrap;
   font-size: 0.88rem;
   font-weight: 600;
   color: var(--green-500);
@@ -1421,6 +1425,8 @@ html[data-theme="dark"] .theme-toggle-label::before {
 }
 
 .ss-item-purple {
+  display: inline-block;
+  white-space: nowrap;
   font-size: 0.88rem;
   font-weight: 600;
   color: var(--purple-600);
@@ -1436,6 +1442,8 @@ html[data-theme="dark"] .theme-toggle-label::before {
 }
 
 .ss-item-pink {
+  display: inline-block;
+  white-space: nowrap;
   font-size: 0.88rem;
   font-weight: 600;
   color: var(--pink-500);

@@ -173,6 +173,20 @@ def test_each_project_has_required_fields():
             assert field in project, f"Project '{project.get('title')}' is missing field: {field}"
 
 
+def test_project_ids_are_unique():
+    """All projects in the active dataset must have unique IDs."""
+    projects = load_all_projects()
+    ids = [p["id"] for p in projects]
+    assert len(ids) == len(set(ids)), f"Duplicate project IDs found in dataset: {ids}"
+
+
+def test_project_titles_are_unique():
+    """All projects in the active dataset must have unique titles (case-insensitive)."""
+    projects = load_all_projects()
+    titles = [p["title"].lower().strip() for p in projects]
+    assert len(titles) == len(set(titles)), f"Duplicate project titles found in dataset: {titles}"
+
+
 def test_find_project_by_id_found():
     """find_project_by_id should return the correct project when the ID exists."""
     project = find_project_by_id(1)
@@ -231,6 +245,16 @@ def test_parse_skills_containing_commas():
     """parse_skills should preserve skill names containing commas when using JSON."""
     result = parse_skills('["HTML, CSS","JavaScript"]')
     assert result == ["html, css", "javascript"]
+
+
+def test_parse_skills_deduplicates_entries():
+    """parse_skills should deduplicate skill entries, including resolving aliases."""
+    result = parse_skills("python, python, py, html, HTML")
+    assert result == ["python", "html"]
+
+    # Test JSON array deduplication
+    result_json = parse_skills('["Python", "python", "py", "JS", "JavaScript"]')
+    assert result_json == ["python", "javascript"]
 
 
 def test_score_single_project_full_match():
@@ -432,6 +456,23 @@ def test_validate_all_missing():
     """All four fields missing should produce four errors."""
     errors = validate_recommendation_inputs("", "", "", "")
     assert len(errors) == 4
+
+
+def test_validate_invalid_time_and_non_string_inputs():
+    """validate_recommendation_inputs should handle invalid values and non-string types gracefully."""
+    # Test invalid time availability
+    errors = validate_recommendation_inputs("Python", "Beginner", "Web", "unknown_value")
+    assert len(errors) > 0
+    assert any("Invalid time availability" in e for e in errors)
+
+    # Test non-string types
+    errors = validate_recommendation_inputs(123, "Beginner", "Web", "Low")
+    assert len(errors) > 0
+    assert any("Please enter at least one skill" in e for e in errors)
+
+    errors = validate_recommendation_inputs("Python", ["Beginner"], "Web", "Low")
+    assert len(errors) > 0
+    assert any("Please select an experience level" in e for e in errors)
 
 
 # ============================================================
