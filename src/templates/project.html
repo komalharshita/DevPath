@@ -256,6 +256,13 @@
                         <p class="roadmap-step-text">
                             {{ step | replace("Step " ~ loop.index ~ ": ", "") }}
                         </p>
+                        <button type="button" class="btn-step-details-toggle" style="background:none; border:none; color:var(--accent); font-size:0.8rem; cursor:pointer; padding:0; margin-top:4px; display:inline-flex; align-items:center; gap:4px;">
+                            <span>Show Details</span>
+                            <svg class="chevron-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s;">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <div class="step-detailed-guidance" style="display:none; margin-top:8px; font-size:0.825rem; color:var(--text-muted); line-height:1.4;"></div>
                     </div>
                 </label>
             </div>

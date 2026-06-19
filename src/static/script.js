@@ -349,8 +349,24 @@ function updateProfileWidgets() {
   }
   if (completionBtn && typeof PROJECT_ID !== "undefined") {
     var completed = projectIsCompleted(PROJECT_ID);
-    completionBtn.textContent = completed ? "Project Completed" : "Mark Project Complete";
-    completionBtn.disabled = completed;
+    if (completed) {
+      completionBtn.textContent = "Project Completed";
+      completionBtn.disabled = true;
+    } else {
+      var checkboxes = document.querySelectorAll(".roadmap-checkbox");
+      var total = checkboxes.length;
+      var checkedCount = 0;
+      for (var i = 0; i < total; i++) {
+        if (checkboxes[i].checked) checkedCount++;
+      }
+      if (total > 0 && checkedCount === total) {
+        completionBtn.textContent = "Mark Project Complete";
+        completionBtn.disabled = false;
+      } else {
+        completionBtn.textContent = "Complete All Steps First";
+        completionBtn.disabled = true;
+      }
+    }
   }
 }
 
@@ -1021,8 +1037,8 @@ updateProfileWidgets();
 
   function updateRoadmapProgress() {
     if (!roadmapCheckboxes.length) return;
-    var completed = roadmapCheckboxes.filter(function (checkbox) { return checkbox.checked; }).length;
-    var percent = Math.round((completed / roadmapCheckboxes.length) * 100);
+    var completedCount = roadmapCheckboxes.filter(function (checkbox) { return checkbox.checked; }).length;
+    var percent = Math.round((completedCount / roadmapCheckboxes.length) * 100);
     roadmapCheckboxes.forEach(function (checkbox) {
       var step = checkbox.closest(".roadmap-step");
       if (step) step.classList.toggle("completed", checkbox.checked);
@@ -1030,6 +1046,26 @@ updateProfileWidgets();
     if (progressFill) progressFill.style.width = percent + "%";
     if (progressText) progressText.textContent = percent + "% completed";
     if (progressBar) progressBar.setAttribute("aria-valuenow", String(percent));
+
+    // Disable completion button unless all steps are completed
+    var completionBtn = document.getElementById("btn-mark-complete");
+    if (completionBtn && typeof PROJECT_ID !== "undefined") {
+      var isAlreadyCompleted = projectIsCompleted(PROJECT_ID);
+      if (isAlreadyCompleted) {
+        completionBtn.textContent = "Project Completed";
+        completionBtn.disabled = true;
+      } else {
+        var allChecked = completedCount === roadmapCheckboxes.length;
+        if (allChecked) {
+          completionBtn.textContent = "Mark Project Complete";
+          completionBtn.disabled = false;
+        } else {
+          completionBtn.textContent = "Complete All Steps First";
+          completionBtn.disabled = true;
+        }
+      }
+    }
+
     try {
       localStorage.setItem(roadmapStorageKey, JSON.stringify(roadmapCheckboxes.map(function (checkbox) {
         return checkbox.checked;
@@ -1047,6 +1083,51 @@ updateProfileWidgets();
     checkbox.addEventListener("change", updateRoadmapProgress);
   });
   updateRoadmapProgress();
+
+  // Initialize expandable roadmap details
+  var stepToggles = document.querySelectorAll(".btn-step-details-toggle");
+  var stepTexts = document.querySelectorAll(".roadmap-step-text");
+  var stepGuidances = document.querySelectorAll(".step-detailed-guidance");
+
+  var guidanceRules = [
+    { pattern: /set\s*up|folder|create|initialize/i, text: "Initialize your project workspace. Create a dedicated directory, initialize Git version control, and set up your configuration or main script files (e.g., main.py, index.html). Plan your module structure." },
+    { pattern: /design|structure|database|schema|model/i, text: "Determine the data entities and attributes. Write down the schema or dictionary layout, choose key-value pairs, and decide on database or memory storage mechanism." },
+    { pattern: /function|logic|write|implement|calculate|process/i, text: "Draft helper functions with clear inputs and outputs. Focus on clean implementation of core business logic first, keeping functions modular, clean, and testable." },
+    { pattern: /api|fetch|endpoint|route|request|http/i, text: "Implement routes/controllers for handling HTTP requests. Verify correct status codes, JSON formats, and integrate error handling for network or request failures." },
+    { pattern: /ui|interface|frontend|view|css|style|render|display/i, text: "Build a responsive interface using semantic HTML and clean styling. Design for mobile-first views and verify interactive component states (hover, focus, disabled)." },
+    { pattern: /test|bug|mock|assert|verify/i, text: "Write test cases (unit/integration) or manually test inputs to verify the code handles edge cases, empty values, and invalid format errors gracefully." }
+  ];
+
+  function getGuidanceText(stepText) {
+    for (var i = 0; i < guidanceRules.length; i++) {
+      if (guidanceRules[i].pattern.test(stepText)) {
+        return guidanceRules[i].text;
+      }
+    }
+    return "Break down this milestone into smaller tasks. Research best libraries or methods, implement a prototype, and review for performance and correctness.";
+  }
+
+  stepTexts.forEach(function (el, index) {
+    if (stepGuidances[index]) {
+      stepGuidances[index].textContent = getGuidanceText(el.textContent);
+    }
+  });
+
+  stepToggles.forEach(function (btn, index) {
+    btn.addEventListener("click", function (event) {
+      event.preventDefault();
+      var guidance = stepGuidances[index];
+      if (!guidance) return;
+      var isHidden = guidance.style.display === "none";
+      guidance.style.display = isHidden ? "block" : "none";
+      var label = btn.querySelector("span");
+      if (label) label.textContent = isHidden ? "Hide Details" : "Show Details";
+      var chevron = btn.querySelector(".chevron-icon");
+      if (chevron) {
+        chevron.style.transform = isHidden ? "rotate(180deg)" : "rotate(0deg)";
+      }
+    });
+  });
 
   if (completionBtn) {
     completionBtn.addEventListener("click", function () {
