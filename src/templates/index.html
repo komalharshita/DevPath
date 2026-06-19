@@ -985,19 +985,9 @@
                 <div class="select-wrap">
                   <select id="interest" name="interest">
                     <option value="" disabled selected>Select interest</option>
-                    <option value="Web">Web Development</option>
-                    <option value="Data">Data and Analytics</option>
-                    <option value="Education">Education Tools</option>
-                    <option value="Automation">Automation</option>
-                    <option value="Games">Games</option>
-                    <option value="Cybersecurity">CyberSecurity/Ethical Hacking</option>
-                    <option value="Devops">DevOps / Cloud Computing</option>
-                    <option value="Backend">Backend APIs</option>
-                    <option value="Tools">Developer Tools</option>
-                    <option value="Productivity">Productivity</option>
-                    <option value="Business Logic">Business Logic</option>
-                    <option value="Mobile">Mobile Development</option>
-                    <option value="Machine Learning/AI">Machine Learning/AI</option>
+                    {% for interest in available_interests %}
+                    <option value="{{ interest }}">{{ interest }}</option>
+                    {% endfor %}
                   </select>
                 </div>
                 <span class="form-hint">Pick the domain you want to explore such as Web Development, Automation, or Games.</span>

@@ -6,7 +6,7 @@
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
-from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats
+from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats, get_available_interests
 from utils.roadmap_comparer import load_all_career_roadmaps, compare_roadmaps
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
 from utils.learning_path import (
@@ -41,6 +41,7 @@ def index():
     try:
         stats = get_project_stats()
         available_levels = get_available_levels()
+        available_interests = get_available_interests()
     except Exception as e:
         # In development, we prefer rendering a fallback homepage rather than
         # aborting entirely. Log the error and use safe defaults so UI/layout
@@ -48,8 +49,9 @@ def index():
         print("Warning: failed to load project stats:", e)
         stats = {"total_projects": 0, "unique_skills": 0, "beginner_friendly": 0}
         available_levels = ["Beginner", "Intermediate", "Advanced"]
+        available_interests = []
 
-    return render_template("index.html", stats=stats, available_levels=available_levels, config=Config)
+    return render_template("index.html", stats=stats, available_levels=available_levels, available_interests=available_interests, config=Config)
 
 @main.route("/contact")
 def contact():

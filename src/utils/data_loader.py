@@ -94,7 +94,10 @@ def get_available_levels():
     projects = load_all_projects()
     return sorted({p["level"] for p in projects})
 
-
+def get_available_interests():
+    """Return all unique project interests."""
+    projects = load_all_projects()
+    return sorted({p["interest"] for p in projects if "interest" in p})
 def find_project_by_id(project_id):
     """Return the project whose 'id' matches project_id, or None."""
     for project in load_all_projects():
