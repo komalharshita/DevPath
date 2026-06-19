@@ -4128,10 +4128,6 @@ html[data-theme="dark"] .btn-view-code-sm {
   border-color: rgba(99, 102, 241, 0.4);
 }
 
-#scroll-top-btn.visible {
-    display: flex;
-}
-
 /* DARK MODE */
 body.dark-theme {
   background: #0b1120;

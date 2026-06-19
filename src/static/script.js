@@ -1058,25 +1058,17 @@ updateProfileWidgets();
 
 (function initScrollButton() {
   var button = document.getElementById("scroll-top-btn");
-  var icon = document.getElementById("scroll-btn-icon");
   if (!button) return;
-  var atBottom = false;
 
-  function nearBottom() {
-    return window.innerHeight + window.pageYOffset >= document.body.scrollHeight - 40;
-  }
+  var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function update() {
     button.classList.toggle("visible", window.pageYOffset > 200);
-    atBottom = nearBottom();
-    button.setAttribute("aria-label", atBottom ? "Scroll to top" : "Scroll to bottom");
-    button.title = atBottom ? "Scroll to top" : "Scroll to bottom";
-    if (icon) icon.innerHTML = atBottom ? '<polyline points="18 15 12 9 6 15"/>' : '<polyline points="6 9 12 15 18 9"/>';
   }
 
   window.addEventListener("scroll", update, { passive: true });
   button.addEventListener("click", function () {
-    window.scrollTo({ top: atBottom ? 0 : document.body.scrollHeight, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
   });
   update();
 })();
