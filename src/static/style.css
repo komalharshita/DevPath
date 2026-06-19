@@ -2039,10 +2039,10 @@ input[type="text"]:not(.skill-input-wrap input):focus {
   margin-top: 8px;
 }
 
-.btn-submit:hover {
+.btn-submit:hover:not(:disabled) {
   opacity: 0.93;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 28px rgba(35, 53, 194, 0.42);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 32px rgba(35, 53, 194, 0.6);
 }
 
 .btn-submit:focus-visible {
