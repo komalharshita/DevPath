@@ -262,11 +262,6 @@ function computeProgressPoints() {
     progress.codeOpens * POINTS_PER_CODE_OPEN +
     progress.completions * POINTS_PER_COMPLETION;
 }
-function computeProgressPoints() {
-  progress.points = progress.searches * POINTS_PER_SEARCH + progress.projectViews * POINTS_PER_VIEW +
-    progress.codeOpens * POINTS_PER_CODE_OPEN + progress.completions * POINTS_PER_COMPLETION;
-}
-
 function showAchievementToast(title, detail) {
   var toast = document.getElementById("achievement-toast");
   if (!toast) return;
