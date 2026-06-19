@@ -113,7 +113,6 @@ document.addEventListener("DOMContentLoaded", function () {
       modal.style.display = "flex";
       modal.setAttribute("aria-hidden", "false");
     });
-  });
 
   function closeModal() {
     modal.style.display = "none";
@@ -1284,7 +1283,7 @@ function openAiProjectModal(project) {
 
   function createTag(text, type) {
     var span = document.createElement("span");
-    span.className = "project-tag project-tag--" + type;
+    span.className = "project-tag project-tag--" + normalize(type).replace(/[^a-z0-9_-]/g, "-");
     span.textContent = text;
     return span;
   }
@@ -1528,7 +1527,10 @@ function openAiProjectModal(project) {
     for (var i = 0; i < list.length; i++) {
       if (list[i] === t) return t;
     }
-    return "";
+    resultsEmptyEl.style.display = "none";
+    resultsGrid.style.display = "grid";
+    projects.forEach(function (project) { resultsGrid.appendChild(buildProjectCard(project)); });
+    resultsSection.scrollIntoView({ behavior: "smooth" });
   }
 
   (function initFromQueryParams() {
@@ -1742,9 +1744,6 @@ function openAiProjectModal(project) {
   }
 })();
 
-// ============================================================
-// DETAIL PAGE
-// ============================================================
 (function initDetailPage() {
   if (typeof PROJECT_ID === "undefined") return;
   recordProjectView();

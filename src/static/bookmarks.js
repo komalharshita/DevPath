@@ -284,6 +284,27 @@ var DevPathBookmarks = (function () {
         renderPanel();
       });
     }
+
+    // Wire up detail page save button
+    var detailSaveBtn = document.getElementById("btn-save-project-detail");
+    if (detailSaveBtn && typeof PROJECT_ID !== "undefined") {
+      var projectObj = {
+        id: PROJECT_ID,
+        title: typeof PROJECT_TITLE !== "undefined" ? PROJECT_TITLE : "Project " + PROJECT_ID,
+        level: typeof PROJECT_LEVEL !== "undefined" ? PROJECT_LEVEL : "",
+        time: typeof PROJECT_TIME !== "undefined" ? PROJECT_TIME : "",
+        skills: typeof PROJECT_SKILLS !== "undefined" && Array.isArray(PROJECT_SKILLS) ? PROJECT_SKILLS : []
+      };
+
+      var savedState = isSaved(PROJECT_ID);
+      detailSaveBtn.classList.toggle("saved", savedState);
+      detailSaveBtn.setAttribute("aria-pressed", savedState ? "true" : "false");
+      _setButtonContent(detailSaveBtn, savedState);
+
+      detailSaveBtn.addEventListener("click", function () {
+        toggle(projectObj, detailSaveBtn);
+      });
+    }
   });
 
   /* ------------------------------------------------------------------ */
