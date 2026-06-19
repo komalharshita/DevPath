@@ -333,9 +333,42 @@ def _get_related(recommended_ids, all_projects, cluster_data):
 # Public API
 # ---------------------------------------------------------------------------
 
-def get_recommendations(skills_string, level, interest, time_availability):
+def project_matches_tech(project, tech_stack):
+    """
+    Check if a project matches the selected tech_stack using strict boundary checks.
+    """
+    if not tech_stack or tech_stack.lower() == "all":
+        return True
+        
+    tech_stack = tech_stack.lower().strip()
+    
+    if tech_stack == "jsp":
+        pattern = re.compile(r'\b(jsp|servlet|servlets)\b', re.IGNORECASE)
+    elif tech_stack == "java":
+        pattern = re.compile(r'\bjava\b', re.IGNORECASE)
+    elif tech_stack == "javascript":
+        pattern = re.compile(r'\b(javascript|js)\b', re.IGNORECASE)
+    else:
+        pattern = re.compile(rf'\b{re.escape(tech_stack)}\b', re.IGNORECASE)
+        
+    for skill in project.get("skills", []):
+        if pattern.search(skill):
+            return True
+            
+    for tech in project.get("tech_stack", []):
+        if pattern.search(tech):
+            return True
+            
+    return False
+
+
+def get_recommendations(skills_string, level, interest, time_availability, tech_stack="all"):
     user_skills = parse_skills(skills_string)
     all_projects = load_all_projects()
+    
+    if tech_stack and tech_stack.lower() != "all":
+        all_projects = [p for p in all_projects if project_matches_tech(p, tech_stack)]
+        
     scored_projects = []
     for project in all_projects:
         rule_score = score_single_project(
