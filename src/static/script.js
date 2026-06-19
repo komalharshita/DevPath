@@ -614,28 +614,9 @@ updateProfileWidgets();
     title.className = "project-card-title";
     title.textContent = project.title;
 
-    var desc = document.createElement("p");
-    desc.className = "project-card-desc";
-    var descText = document.createElement("span");
-    descText.className = "project-card-desc-text";
-    descText.textContent = truncate(project.description, 120);
-    desc.appendChild(descText);
-
-    if (project.description && project.description.length > 120) {
-      var expanded = false;
-      var readMore = document.createElement("button");
-      readMore.type = "button";
-      readMore.className = "read-more-btn";
-      readMore.textContent = "Read more";
-      readMore.setAttribute("aria-expanded", "false");
-      readMore.addEventListener("click", function () {
-        expanded = !expanded;
-        descText.textContent = expanded ? project.description : truncate(project.description, 120);
-        readMore.textContent = expanded ? "Read less" : "Read more";
-        readMore.setAttribute("aria-expanded", expanded ? "true" : "false");
-      });
-      desc.appendChild(readMore);
-    }
+    var desc = document.createElement("div");
+    desc.className = "project-card-description";
+    desc.textContent = project.description;
 
     var tags = document.createElement("div");
     tags.className = "project-card-tags";
