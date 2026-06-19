@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page Not Found — DevPath</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+  {% include 'partials/theme_head.html' %}
+  
+  <!-- Open Graph meta tags for social media sharing -->
+  <meta property="og:title" content="Page Not Found — DevPath" />
+  <meta property="og:description" content="The page you are looking for does not exist. Head back to DevPath to find your next coding project." />
+  <meta property="og:image" content="{{ config.get_og_image_url() }}" />
+  <meta property="og:url" content="{{ config.get_base_url() }}/" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">DevPath</a>
+      {% include 'partials/theme_toggle.html' %}
+    </div>
+  </nav>
+  <div class="error-page">
+    <div class="error-page-inner">
+      <div class="error-code">404</div>
+      <h1>Page Not Found</h1>
+      <p>The project or page you are looking for does not exist.</p>
+      <a href="/" class="btn-primary" style="display:inline-block;text-decoration:none;padding:14px 32px;">Back to Home</a>
+    </div>
+  </div>
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="/static/script.js"></script>
+</body>
+</html>

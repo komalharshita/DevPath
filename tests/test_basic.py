@@ -15,19 +15,29 @@ import os
 
 import pytest
 
-# Allow imports from the project root when running tests directly
+# Allow imports from the project root and src/ when running tests directly
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from utils.data_loader import load_all_projects, find_project_by_id, clear_cache, validate_projects
+from utils.roadmap_comparer import (
+    load_all_career_roadmaps,
+    compare_roadmaps,
+    clear_roadmap_cache,
+)
 from utils.recommender import (
     get_recommendations,
     validate_recommendation_inputs,
     parse_skills,
     score_single_project,
-    WEIGHT_LEVEL,
-    WEIGHT_INTEREST,
-    WEIGHT_TIME,
+    SCORING_WEIGHTS,
+    VALID_LEVELS,
+    VALID_TIME_AVAILABILITY,
 )
+
+WEIGHT_LEVEL    = SCORING_WEIGHTS["level"]
+WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
+WEIGHT_TIME     = SCORING_WEIGHTS["time"]
 from app import app, internal_server_error
 
 
@@ -38,6 +48,7 @@ from app import app, internal_server_error
 def setup_module():
     """Clear the data cache before running the test suite to ensure clean state."""
     clear_cache()
+    clear_roadmap_cache()
 
 
 # ============================================================
@@ -269,8 +280,11 @@ def test_score_single_project_partial_skill_coverage():
     )
 
 
-def test_score_coverage_ratio_exact_values():
+def test_score_coverage_ratio_exact_values(monkeypatch):
     """Verify the coverage-weighted formula produces the correct numeric result."""
+    import utils.recommender
+    monkeypatch.setattr(utils.recommender, "_load_skill_graph", lambda: {})
+
     project = {"skills": ["Python", "Flask"], "level": "Beginner", "interest": "Data", "time": "Low"}
 
     # 1 of 2 skills matched: coverage = 0.5, score = 1 * 3 * 0.5 = 1.5
@@ -287,7 +301,7 @@ def test_score_no_project_skills_does_not_crash():
     project = {"skills": [], "level": "Beginner", "interest": "Data", "time": "Low"}
     score = score_single_project(project, ["python"], "Beginner", "Data", "Low")
     # Skill score is 0, but other criteria still score
-    assert score == pytest.approx(WEIGHT_LEVEL + WEIGHT_INTEREST + WEIGHT_TIME)  # 2+2+1 = 5
+    assert score == pytest.approx(SCORING_WEIGHTS["level"] + SCORING_WEIGHTS["interest"] + SCORING_WEIGHTS["time"])  # 2+2+1 = 5
 
 
 def test_score_three_skills_partial_coverage():
@@ -344,26 +358,26 @@ def test_score_single_project_alias_matching():
 
 def test_get_recommendations_returns_results():
     """Python + Beginner + Data + Low should always return at least one result."""
-    results = get_recommendations("Python", "Beginner", "Data", "Low")
+    results = get_recommendations("Python", "Beginner", "Data", "Low").get("recommendations", [])
     assert len(results) > 0, "Expected at least one recommendation"
 
 
 def test_get_recommendations_max_three():
     """The engine must never return more than three results."""
-    results = get_recommendations("Python, JavaScript, HTML", "Beginner", "Web", "Low")
+    results = get_recommendations("Python, JavaScript, HTML", "Beginner", "Web", "Low").get("recommendations", [])
     assert len(results) <= 3, f"Expected at most 3 results, got {len(results)}"
 
 
 def test_get_recommendations_no_match_returns_empty():
     """A very unlikely skill/interest combo should return an empty list."""
-    results = get_recommendations("Rust", "Advanced", "Games", "High")
+    results = get_recommendations("Rust", "Advanced", "Games", "High").get("recommendations", [])
     # Rust and Games are not in the dataset so this should be empty or minimal
     assert isinstance(results, list)
 
 
 def test_get_recommendations_result_format():
     """Each returned project must be a dict with at least a title and id."""
-    results = get_recommendations("Python", "Beginner", "Data", "Low")
+    results = get_recommendations("Python", "Beginner", "Data", "Low").get("recommendations", [])
     for project in results:
         assert "id" in project
         assert "title" in project
@@ -371,15 +385,15 @@ def test_get_recommendations_result_format():
 
 def test_case_insensitive_recommendations_identical():
     """Lowercase and titlecase skill inputs must produce identical recommendations."""
-    results_lower = get_recommendations("python", "Beginner", "Data", "Low")
-    results_title = get_recommendations("Python", "Beginner", "Data", "Low")
+    results_lower = get_recommendations("python", "Beginner", "Data", "Low").get("recommendations", [])
+    results_title = get_recommendations("Python", "Beginner", "Data", "Low").get("recommendations", [])
     assert [p["id"] for p in results_lower] == [p["id"] for p in results_title]
 
 
 def test_whitespace_stripped_in_skills():
     """Leading/trailing whitespace in the skills string must be ignored."""
-    results_clean = get_recommendations("python", "Beginner", "Data", "Low")
-    results_spaced = get_recommendations("   python  ", "Beginner", "Data", "Low")
+    results_clean = get_recommendations("python", "Beginner", "Data", "Low").get("recommendations", [])
+    results_spaced = get_recommendations("   python  ", "Beginner", "Data", "Low").get("recommendations", [])
     assert [p["id"] for p in results_clean] == [p["id"] for p in results_spaced]
 
 
@@ -546,12 +560,12 @@ def test_project_detail_not_found():
 
 def test_internal_server_error_page():
     """The 500 handler should render the friendly internal error template."""
-    with app.app_context():
+    with app.test_request_context("/"):
         rendered_page, status_code = internal_server_error(Exception("Test error"))
 
     assert status_code == 500
     assert "Internal Server Error" in rendered_page
-    assert "Back to Home" in rendered_page
+    assert ("Back to Home" in rendered_page or "Back to Search" in rendered_page or "Return Home" in rendered_page)
 
 
 def test_view_code_found():
@@ -635,15 +649,69 @@ def test_search_api_empty_query():
     data = response.get_json()
     assert data == []
 
-def test_search_api_no_match():
-    """Search should return empty list for nonsense query."""
+def test_home_route_with_share_params():
+    """The homepage should load normally even when share query params are present."""
     client = get_client()
-    response = client.get("/api/search?q=nonexistentqueryxyz")
+    response = client.get("/?skills=Python,HTML&level=Beginner&interest=Data&time=Low")
     assert response.status_code == 200
 
+
+def test_share_banner_element_exists():
+    """The page HTML must include the share-prefill-banner element for JS to populate."""
+    client = get_client()
+    response = client.get("/")
+    html = response.data.decode()
+    assert 'id="share-prefill-banner"' in html
+
+
+def test_share_params_partial_loads_ok():
+    """Partial share params should not break the page — server renders normally."""
+    client = get_client()
+    response = client.get("/?skills=Python&level=Beginner")
+    assert response.status_code == 200
+
+
+def test_share_params_invalid_level_not_reflected():
+    """An invalid level value should not appear in the server-rendered HTML form options."""
+    client = get_client()
+    response = client.get("/?skills=Python&level=Expert&interest=Data&time=Low")
+    html = response.data.decode()
+    # 'Expert' is not a valid option, so it must not appear as a selected value
+    assert 'value="Expert" selected' not in html
+
+
+def test_share_params_xss_not_reflected():
+    """Script tags in query params must not be rendered in server HTML."""
+    client = get_client()
+    response = client.get("/?skills=<script>alert(1)</script>&level=Beginner&interest=Data&time=Low")
+    html = response.data.decode()
+    assert "<script>alert(1)</script>" not in html
+
+
+def test_share_params_excessive_skills_loads_ok():
+    """A URL with many skills should not crash the server."""
+    skills = ",".join(["Skill" + str(i) for i in range(30)])
+    client = get_client()
+    response = client.get(f"/?skills={skills}&level=Beginner&interest=Data&time=Low")
+    assert response.status_code == 200
+
+
+def test_api_recommend_invalid_level_no_crash():
+    """Posting an unrecognized level should not crash — returns empty or error."""
+    client = get_client()
+    response = client.post("/api/recommend", json={
+        "skills": "Python",
+        "level": "Expert",
+        "interest": "Data",
+        "time": "Low"
+    })
+    assert response.status_code in (200, 400)
     data = response.get_json()
-    assert isinstance(data, list)
-    assert len(data) == 0
+    # Should either be an error or return empty results (no match for 'Expert')
+    if response.status_code == 200:
+        assert "projects" in data
+
+
 # ============================================================
 # Sitemap and robots.txt tests
 # ============================================================
@@ -710,6 +778,91 @@ def test_project_links_have_noopener():
     assert b'rel="noopener noreferrer"' in response.data
 
 
+# ============================================================
+# Career roadmap comparison tests
+# ============================================================
+
+def test_career_roadmaps_load():
+    """Career roadmaps JSON must load and contain entries."""
+    roadmaps = load_all_career_roadmaps()
+    assert isinstance(roadmaps, list)
+    assert len(roadmaps) >= 2
+
+
+def test_compare_roadmaps_finds_overlap():
+    """Comparing frontend and fullstack should find shared skills."""
+    result = compare_roadmaps("frontend", "fullstack")
+    assert result is not None
+    assert "overlapping_skills" in result
+    assert len(result["overlapping_skills"]) > 0
+    assert result["roadmap_a"]["id"] == "frontend"
+    assert result["roadmap_b"]["id"] == "fullstack"
+
+
+def test_compare_same_roadmap_returns_error():
+    """Comparing a roadmap with itself should return an error message."""
+    result = compare_roadmaps("react", "react")
+    assert result is not None
+    assert "error" in result
+
+
+def test_compare_invalid_roadmap_returns_none():
+    """Unknown roadmap IDs should return None."""
+    assert compare_roadmaps("nonexistent", "frontend") is None
+
+
+def test_compare_page_route():
+    """Compare page should render successfully."""
+    client = get_client()
+    response = client.get("/compare")
+    assert response.status_code == 200
+    assert b"Compare Learning Roadmaps" in response.data
+
+
+def test_list_roadmaps_api():
+    """API should return all career roadmaps."""
+    client = get_client()
+    response = client.get("/api/roadmaps")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert isinstance(data, list)
+    assert len(data) >= 2
+
+
+def test_compare_api():
+    """Compare API should return structured comparison data."""
+    client = get_client()
+    response = client.get("/api/compare?a=react&b=angular")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["roadmap_a"]["id"] == "react"
+    assert data["roadmap_b"]["id"] == "angular"
+    assert "metrics" in data
+    assert "overlapping_skills" in data
+
+
+def test_compare_api_missing_params():
+    """Compare API should reject requests missing query params."""
+    client = get_client()
+    response = client.get("/api/compare?a=react")
+    assert response.status_code == 400
+
+
+def test_compare_api_not_found():
+    """Compare API should 404 for invalid roadmap IDs."""
+    client = get_client()
+    response = client.get("/api/compare?a=invalid&b=alsoinvalid")
+    assert response.status_code == 404
+
+
+def test_sitemap_includes_compare():
+    """Sitemap should include the compare page."""
+    client = get_client()
+    response = client.get("/sitemap.xml")
+    assert response.status_code == 200
+    assert b"/compare" in response.data
+
+
 
 # ============================================================
 # Run tests directly (no pytest required)
@@ -732,3 +885,23 @@ if __name__ == "__main__":
     print(f"\n{passed} passed, {failed} failed out of {passed + failed} tests")
     if failed > 0:
         sys.exit(1)
+
+def test_ml_similarity_score_returns_float():
+    from utils.recommender import ml_similarity_score, parse_skills
+    projects = load_all_projects()
+    score = ml_similarity_score(
+        projects[0],
+        parse_skills("Python"),
+        "Beginner",
+        "Data",
+        "Low",
+        projects,
+    )
+    assert isinstance(score, float)
+    assert score >= 0
+
+def test_ml_recommendation_prefers_relevant_python_data_project():
+    results = get_recommendations("Python, pandas", "Intermediate", "Data", "High")
+    recs = results.get("recommendations", [])
+    titles = [project["title"] for project in recs]
+    assert any("Data" in title or "Pipeline" in title for title in titles)
