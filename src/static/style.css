@@ -861,6 +861,10 @@ html[data-entry-anim="true"] .form-card form > .btn-submit              { animat
     display: none;
   }
 
+  .nav-links {
+    display: none;
+  }
+
   .nav-mobile-toggle {
     display: flex;
     margin-left: auto;
