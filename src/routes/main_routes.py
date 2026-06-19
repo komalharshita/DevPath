@@ -5,11 +5,17 @@
 
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response
 
-from utils.recommender import get_recommendations, validate_recommendation_inputs
-from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats
-from utils.roadmap_comparer import load_all_career_roadmaps, compare_roadmaps
-from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
-from utils.learning_path import (
+from services.project_service import (
+    get_recommendations,
+    validate_recommendation_inputs,
+    find_project_by_id,
+    load_all_projects,
+    get_available_levels,
+    get_project_stats,
+)
+from services.roadmap_service import load_all_career_roadmaps, compare_roadmaps
+from services.starter_code_service import read_starter_code, resolve_starter_file, get_starter_code_dir
+from services.learning_path_service import (
     create_learning_path,
     get_learning_path,
     update_learning_path,
@@ -189,7 +195,7 @@ def project_resources(project_id):
             ]
         }
     """
-    from utils.url_validator import validate_resources
+    from services.url_validator_service import validate_resources
 
     project = find_project_by_id(project_id)
     if not project:
