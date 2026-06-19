@@ -173,6 +173,39 @@ else:
                    f"overlap: {[p['title'] for p in overlap]}")
     else:
         print("  SKIP  no recommendations returned, skipping overlap check")
+        
+        
+    # ---------------------------------------------------------------------------
+# Progression (skill graph)
+# ---------------------------------------------------------------------------
+
+section("Skill graph progression")
+
+result_prog = get_recommendations("Python", "Intermediate", "Web", "High")
+
+if "progression" in result_prog:
+    passed("dict has 'progression' key")
+else:
+    failed("dict has 'progression' key", f"keys found: {list(result_prog.keys())}")
+
+prog = result_prog["progression"]
+if isinstance(prog, list):
+    passed(f"progression is a list  ({len(prog)} result(s))")
+else:
+    failed("progression is a list", f"got {type(prog)}")
+
+rec_ids = [p["id"] for p in result_prog["recommendations"]]
+overlap = [p for p in prog if p["project"]["id"] in rec_ids]
+if not overlap:
+    passed("progression projects don't repeat recommended ones")
+else:
+    failed("progression projects don't repeat recommended ones",
+           f"overlap: {[p['title'] for p in overlap]}")
+    
+if isinstance(prog, list):
+    passed(f"progression is a list  ({len(prog)} result(s))")
+    for p in prog:
+        print(f"        → {p['project']['title']}  (gap_score: {p['gap_score']})")
 
 # ---------------------------------------------------------------------------
 # Summary

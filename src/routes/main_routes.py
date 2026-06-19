@@ -139,7 +139,8 @@ def recommend():
             "message": "No projects are currently available for this interest area. Please check back later."
         }), 200
 
-    results = get_recommendations(skills, level, interest, time_availability)
+    recommendations_data = get_recommendations(skills, level, interest, time_availability)
+    results = recommendations_data.get("recommendations", [])
 
     if not results:
         return jsonify({
@@ -159,7 +160,17 @@ def recommend():
             project_dict['id'] = project.get('id', 0)
         projects_data.append(project_dict)
 
-    return jsonify({"projects": projects_data}), 200
+    # Return main recommendations, related, and progression
+    response_data = {
+        "projects": projects_data,
+        "related": [dict(p) for p in recommendations_data.get("related", [])],
+        "progression": [
+            {"project": dict(item["project"]), "gap_score": item["gap_score"]}
+            for item in recommendations_data.get("progression", [])
+        ]
+    }
+
+    return jsonify(response_data), 200
 
 @main.route("/api/project/<int:project_id>/resources")
 def project_resources(project_id):

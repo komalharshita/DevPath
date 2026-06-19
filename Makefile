@@ -19,10 +19,10 @@ install:
 	pip install -r requirements.txt
 
 run:
-	python app.py
+	python src/app.py
 
 test:
 	pytest tests/ -v
 
 lint:
-	flake8 . --max-line-length=120
+	flake8 src/ tests/ --max-line-length=120
