@@ -1,0 +1,527 @@
+# github_actions_pipeline.yml
+# ===========================
+# Project:    GitHub Actions CI/CD Pipeline
+# Difficulty: Intermediate
+# Skills:     YAML, GitHub Actions, CI/CD concepts, Linux shell
+# Time:       Medium (4-6 days)
+#
+# What you will build:
+#     A GitHub Actions workflow that automatically tests and deploys code
+#     when you push to GitHub. The pipeline will:
+#     - Trigger on push/pull request events
+#     - Run unit tests and code quality checks
+#     - Build and push Docker images
+#     - Deploy to a staging/production environment
+#     - Send notifications on success/failure
+#
+#     This project teaches CI/CD fundamentals: automated testing,
+#     containerisation, infrastructure as code (IaC), and deployment
+#     automation.
+#
+# How to use:
+#     1. Create a .github/workflows/ directory in your repo
+#     2. Save this file as ci_cd_pipeline.yml in that directory
+#     3. Commit and push to GitHub
+#     4. Go to repo → Actions tab to see pipeline runs
+#
+# Learning goals:
+#     - Understanding GitHub Actions syntax and structure
+#     - Writing workflow triggers and conditions
+#     - Running tests in isolated environments
+#     - Building and pushing Docker images to registries
+#     - Managing secrets (API keys, credentials) securely
+#     - Deploying applications automatically
+#     - Monitoring pipeline success/failure
+#     - Branching strategies and PR workflows
+#
+# Key concept — CI/CD in plain English:
+#     CI (Continuous Integration):
+#         Every time you push code, automated tests run immediately.
+#         If tests fail, you get instant feedback before merging.
+#         If all pass, the code is "integration-ready".
+#
+#     CD (Continuous Deployment):
+#         After tests pass, code is automatically deployed to production.
+#         No manual "release manager" steps — the system handles it.
+#
+#     Benefits:
+#         - Catch bugs early (before users see them)
+#         - Reduce manual work (testing, deployment)
+#         - Faster iteration (push → test → deploy in minutes)
+#         - Audit trail (every deployment logged)
+#
+# Workflow flow:
+#     Developer pushes code to main branch
+#         |
+#         v
+#     GitHub Actions detects push (trigger)
+#         |
+#         v
+#     Checkout code from repo
+#         |
+#         v
+#     Run unit tests (pytest, unittest, etc.)  [TODO]
+#         |
+#         v
+#     Run linting/code quality checks         [TODO]
+#         |
+#         v
+#     Build Docker image                       [TODO]
+#         |
+#         v
+#     Push image to registry (Docker Hub)      [TODO]
+#         |
+#         v
+#     Deploy to staging environment           [TODO]
+#         |
+#         v
+#     Run smoke tests on deployed app         [TODO]
+#         |
+#         v
+#     Send notification (success/failure)     [TODO]
+#
+# Roadmap:
+#     Step 1:  Understand YAML syntax and GitHub Actions basics
+#     Step 2:  Create the .github/workflows/ directory structure
+#     Step 3:  Define workflow name and triggers (on push, on PR)
+#     Step 4:  Add checkout action and Python setup
+#     Step 5:  Implement the test job (run pytest/unittest)
+#     Step 6:  Implement the lint job (code quality checks)
+#     Step 7:  Implement Docker build and push job
+#     Step 8:  Implement deployment job and notifications
+
+# This is a template — uncomment and customize sections as needed.
+
+name: CI/CD Pipeline
+
+# TRIGGER SECTION — When does this workflow run?
+# TODO: Customize these triggers for your use case.
+on:
+  # Run on push to main and develop branches
+  push:
+    branches:
+      - main
+      - develop
+    # Optional: Only run if certain files changed
+    # paths:
+    #   - 'src/**'
+    #   - 'tests/**'
+    #   - 'requirements.txt'
+
+  # Run on pull requests to main branch
+  pull_request:
+    branches:
+      - main
+
+  # Optional: Run on schedule (e.g., nightly tests)
+  # schedule:
+  #   - cron: '0 2 * * *'  # 2 AM UTC daily
+
+  # Optional: Allow manual trigger from GitHub UI
+  workflow_dispatch:
+
+
+# ENVIRONMENT VARIABLES
+# These are available to all jobs and steps
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: myapp
+  PYTHON_VERSION: '3.11'
+
+
+jobs:
+
+  # ========================================================================
+  # JOB 1: Run unit tests
+  # ========================================================================
+  # Purpose: Verify code changes don't break existing functionality
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    strategy:
+      # Run tests on multiple Python versions (optional)
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+
+    steps:
+      # Step 1: Checkout code from repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+        # TODO: Explain what checkout@v4 does:
+        #   - Clones the repo into the job's working directory
+        #   - v4 is the version (always use latest stable)
+        #   - This is required before running any commands on your code
+
+      # Step 2: Set up Python environment
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+        # TODO: Explain:
+        #   - Installs the specified Python version into the job
+        #   - ${{ matrix.python-version }} is substituted from the matrix above
+        #   - After this step, 'python' command is available
+
+      # Step 3: Cache pip packages (speeds up repeated runs)
+      - name: Cache pip packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          # TODO: Explain caching:
+          #   - First run: downloads and installs pip packages (slow)
+          #   - Subsequent runs: reuses cached packages (fast)
+          #   - 'key' changes when requirements.txt changes (invalidates cache)
+        # Optional: Uncomment if you want caching
+        # restore-keys: |
+        #   ${{ runner.os }}-pip-
+
+      # Step 4: Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+        # TODO: Write this script:
+        #   1. Upgrade pip to latest version
+        #   2. Install packages from requirements.txt
+        #   3. Install testing tools (pytest, pytest-cov)
+        # TODO: If you have a dev-requirements.txt, add:
+        #   pip install -r dev-requirements.txt
+
+      # Step 5: Run unit tests with coverage
+      - name: Run tests with pytest
+        run: |
+          # TODO: Run your test suite
+          # Option 1: Run all tests in ./tests/ directory
+          pytest tests/ -v --cov=src --cov-report=xml
+          # Option 2: Run tests in specific file
+          # pytest tests/test_main.py -v
+          # Option 3: Run tests matching a pattern
+          # pytest tests/test_*.py -v
+        # TODO: Explain pytest flags:
+        #   -v: verbose output (show each test name)
+        #   --cov=src: measure code coverage in src/ directory
+        #   --cov-report=xml: generate coverage report for later analysis
+
+      # Step 6: Upload coverage to external service (optional)
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+        # TODO: Explain:
+        #   - Uploads coverage reports to codecov.io
+        #   - Shows code coverage trends over time
+        #   - Requires linking GitHub repo to codecov.io (free)
+        # Uncomment if you use codecov
+        # continue-on-error: true  # Don't fail pipeline if upload fails
+
+
+  # ========================================================================
+  # JOB 2: Code quality checks
+  # ========================================================================
+  # Purpose: Enforce code style, catch common mistakes, check security
+
+  lint:
+    name: Lint & Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install linting tools
+        run: |
+          pip install --upgrade pip
+          pip install flake8 black isort pylint
+        # TODO: Explain each linter:
+        #   - flake8: checks PEP 8 style (spacing, naming, etc.)
+        #   - black: auto-formats code for consistency
+        #   - isort: sorts imports alphabetically
+        #   - pylint: advanced static analysis (catches bugs, complexity)
+
+      # Check code style with flake8
+      - name: Run flake8
+        run: |
+          # Check src/ and tests/ directories
+          flake8 src/ tests/ --max-line-length=100 --exclude=__pycache__
+          # TODO: Customize flake8 rules:
+          #   --max-line-length: allow longer lines if needed
+          #   --ignore=E501: ignore long lines
+          #   --exclude: skip certain directories
+        continue-on-error: true  # Don't fail on style warnings
+
+      # Check import sorting with isort
+      - name: Check import order
+        run: |
+          isort src/ tests/ --check-only --diff
+        # TODO: --check-only: don't modify files, just report
+        #       --diff: show what would be changed
+        continue-on-error: true
+
+      # Run pylint for deeper analysis
+      - name: Run pylint
+        run: |
+          pylint src/ --fail-under=8.0
+          # TODO: --fail-under=8.0: fail if score < 8.0
+        continue-on-error: true
+
+      # Optional: Security scanning
+      - name: Security check with bandit
+        run: |
+          pip install bandit
+          bandit -r src/ -f json -o bandit-report.json
+        # TODO: Explain bandit:
+        #   - Scans for common security vulnerabilities
+        #   - Checks: hardcoded passwords, SQL injection, etc.
+        continue-on-error: true
+
+
+  # ========================================================================
+  # JOB 3: Build and push Docker image
+  # ========================================================================
+  # Purpose: Create container image and push to registry
+
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    # Don't build on pull requests (optional — change as needed)
+    if: github.event_name == 'push'
+    # TODO: Explain 'if' conditions:
+    #   github.event_name: type of event ('push' or 'pull_request')
+    #   github.ref: current branch (e.g., 'refs/heads/main')
+    #   This prevents expensive Docker builds for every PR
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Docker Buildx (advanced multi-platform builds)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Login to Docker registry
+      - name: Log in to Docker Registry
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        # TODO: Explain secrets:
+        #   - Store sensitive values (usernames, tokens) in GitHub Secrets
+        #   - Go to repo → Settings → Secrets → New repository secret
+        #   - Never hardcode credentials in workflow files
+        #   - ${{ secrets.DOCKER_USERNAME }} substitutes the secret value
+
+      # Build and push Docker image
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        # TODO: Explain build-push-action:
+        #   - context: directory to build from (usually repo root)
+        #   - file: path to Dockerfile
+        #   - push: true = push to registry, false = only build locally
+        #   - tags: image names/versions to create
+        #   - github.sha: commit hash (unique identifier for this build)
+
+      # Alternative: Use Docker CLI directly (uncomment if needed)
+      # - name: Build and push (CLI version)
+      #   run: |
+      #     docker build -t ${{ env.REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest .
+      #     docker push ${{ env.REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+
+
+  # ========================================================================
+  # JOB 4: Deploy to staging environment
+  # ========================================================================
+  # Purpose: Automatically deploy passing code to a test environment
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [test, lint, build]  # Run only after test, lint, build succeed
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # TODO: Explain:
+    #   needs: [test, lint, build] — this job waits for those jobs to finish
+    #   if: only deploy when pushing to main branch (not develop or PRs)
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Deploy using your preferred method
+      - name: Deploy to staging environment
+        run: |
+          # TODO: Write your deployment script
+          # Option 1: SSH into server and pull latest image
+          # ssh -i ${{ secrets.STAGING_SSH_KEY }} user@staging-server.com << 'EOF'
+          #   cd /app
+          #   docker pull ${{ env.REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          #   docker-compose up -d
+          # EOF
+
+          # Option 2: Use Kubernetes kubectl
+          # kubectl set image deployment/myapp-staging \
+          #   myapp=${{ env.REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+          # Option 3: Use cloud provider CLI (e.g., gcloud, aws)
+          # gcloud run deploy myapp-staging \
+          #   --image ${{ env.REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest \
+          #   --region us-central1
+
+          echo "TODO: Implement staging deployment"
+        # TODO: Replace the echo with your actual deployment command
+
+      # Smoke test: Verify app is running
+      - name: Run smoke tests on staging
+        run: |
+          # TODO: Write simple checks to verify deployment succeeded
+          # Example:
+          # curl -f https://staging.myapp.com/health || exit 1
+          # curl -f https://staging.myapp.com/api/health || exit 1
+          echo "TODO: Implement smoke tests"
+        continue-on-error: true  # Don't fail if smoke tests fail
+
+
+  # ========================================================================
+  # JOB 5: Deploy to production
+  # ========================================================================
+  # Purpose: Deploy to production (optional, only on tags or manual trigger)
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    # TODO: Explain:
+    #   if: startsWith(github.ref, 'refs/tags')
+    #      Only deploy on tags (e.g., v1.0.0) not on regular commits
+    #   This prevents accidental production deployments
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to production
+        run: |
+          # TODO: Write production deployment (similar to staging)
+          echo "TODO: Implement production deployment"
+
+      - name: Post-deployment verification
+        run: |
+          # TODO: Run comprehensive tests on production
+          echo "TODO: Implement post-deployment verification"
+
+
+  # ========================================================================
+  # JOB 6: Send notifications
+  # ========================================================================
+  # Purpose: Notify team of pipeline success/failure
+
+  notify:
+    name: Send Notifications
+    runs-on: ubuntu-latest
+    needs: [test, lint, build]
+    if: always()  # Run even if previous jobs fail
+    # TODO: Explain always():
+    #   - Normally jobs skip if dependencies fail
+    #   - always() forces the job to run regardless
+    #   - Useful for notifications (always notify on failure)
+
+    steps:
+      - name: Determine workflow status
+        id: status
+        run: |
+          if [ "${{ needs.test.result }}" = "success" ] && \
+             [ "${{ needs.lint.result }}" = "success" ] && \
+             [ "${{ needs.build.result }}" = "success" ]; then
+            echo "status=✅ PASSED" >> $GITHUB_OUTPUT
+            echo "color=28a745" >> $GITHUB_OUTPUT
+          else
+            echo "status=❌ FAILED" >> $GITHUB_OUTPUT
+            echo "color=dc3545" >> $GITHUB_OUTPUT
+          fi
+        # TODO: Explain:
+        #   - Check if all jobs succeeded
+        #   - Set output variables for later steps
+        #   - $GITHUB_OUTPUT: GitHub Actions way to pass data between steps
+
+      # Slack notification (requires webhook)
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK }}
+          payload: |
+            {
+              "text": "Pipeline ${{ steps.status.outputs.status }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Pipeline ${{ steps.status.outputs.status }}*\n Repository: ${{ github.repository }}\n Branch: ${{ github.ref_name }}\n Commit: ${{ github.sha }}"
+                  }
+                }
+              ]
+            }
+        # TODO: Setup Slack webhook:
+        #   1. Go to Slack workspace → Apps → Create New App
+        #   2. Enable Incoming Webhooks
+        #   3. Create a webhook for your channel
+        #   4. Add to GitHub Secrets as SLACK_WEBHOOK
+        continue-on-error: true
+
+      # Email notification (GitHub built-in, but less reliable)
+      - name: Notify via GitHub Email
+        if: failure()
+        run: |
+          echo "TODO: Implement email notification"
+          # GitHub sends emails automatically on workflow failure
+          # Configure in repo → Settings → Actions → Email notifications
+
+
+# ============================================================================
+# TODO CHECKLIST FOR YOUR WORKFLOW
+# ============================================================================
+#
+# Before using this workflow in production:
+#
+# [ ] 1. Update Python version to match your project
+# [ ] 2. Create requirements.txt with all dependencies
+# [ ] 3. Write unit tests and put in ./tests/ directory
+# [ ] 4. Customize lint checks (flake8, pylint, black)
+# [ ] 5. Create a Dockerfile in repo root
+# [ ] 6. Add GitHub Secrets:
+#       Go to repo → Settings → Secrets → New repository secret
+#       - DOCKER_USERNAME
+#       - DOCKER_PASSWORD (or Docker token)
+#       - SLACK_WEBHOOK (for Slack notifications)
+#       - STAGING_SSH_KEY (if using SSH deploy)
+# [ ] 7. Update image name and registry
+# [ ] 8. Customize deployment commands (staging/production)
+# [ ] 9. Add smoke tests to verify deployment
+# [ ] 10. Test the workflow by pushing to a feature branch
+#
+# Once complete, commit and push this file to trigger the workflow!
+#
+# Useful GitHub Actions Marketplace:
+# - actions/checkout
+# - actions/setup-python
+# - docker/setup-buildx-action
+# - docker/build-push-action
+# - slackapi/slack-github-action
+# - peaceiris/actions-gh-pages
+# - actions/create-release
+# - actions/deploy-pages

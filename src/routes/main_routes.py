@@ -22,8 +22,6 @@ import os
 
 # Interest categories that currently have no project recommendations available
 NO_PROJECT_INTERESTS = {
-    "machine learning/ai",
-    "devops",
     "artificial intelligence",
     "cloud computing",
 }
