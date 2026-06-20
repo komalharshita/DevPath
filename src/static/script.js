@@ -930,11 +930,11 @@ updateProfileWidgets();
       var row = document.createElement("div");
       row.className = "code-line";
       var number = document.createElement("span");
-      number.className = "code-line-number";
+      number.className = "line-number";
       number.setAttribute("aria-hidden", "true");
       number.textContent = index + 1;
       var content = document.createElement("span");
-      content.className = "code-line-content";
+      content.className = "line-content";
       content.textContent = line;
       row.appendChild(number);
       row.appendChild(content);
@@ -987,7 +987,7 @@ updateProfileWidgets();
 
   if (btnCopyCode) {
     btnCopyCode.addEventListener("click", function () {
-      var code = Array.prototype.slice.call(codeContentEl.querySelectorAll(".code-line-content"))
+      var code = Array.prototype.slice.call(codeContentEl.querySelectorAll(".line-content"))
         .map(function (line) { return line.textContent; })
         .join("\n");
       if (!code) return;
