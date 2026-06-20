@@ -639,6 +639,7 @@ html[data-entry-anim="true"] .form-card form > .btn-submit              { animat
   display: flex;
   align-items: center;
   gap: 20px;
+  margin-left: auto;
 }
 
 .nav-link {
@@ -857,6 +858,10 @@ html[data-entry-anim="true"] .form-card form > .btn-submit              { animat
 }
 
 @media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+
   .nav-right {
     display: none;
   }

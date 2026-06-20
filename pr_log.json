@@ -1,0 +1,138 @@
+[
+  {
+    "issue": 710,
+    "pr": 960,
+    "url": "https://github.com/komalharshita/DevPath/pull/960",
+    "branch": "fix/issue-710-dedup-skills",
+    "status": "open",
+    "notes": "Deduplicated parsed skills in parse_skills() to prevent recommendation score inflation."
+  },
+  {
+    "issue": 702,
+    "pr": 961,
+    "url": "https://github.com/komalharshita/DevPath/pull/961",
+    "branch": "fix/issue-702-input-validation",
+    "status": "open",
+    "notes": "Added input type and value validation to validate_recommendation_inputs() to prevent unhandled ValueError/AttributeError 500 crashes."
+  },
+  {
+    "issue": 747,
+    "pr": 962,
+    "url": "https://github.com/komalharshita/DevPath/pull/962",
+    "branch": "fix/issue-747-unique-ids",
+    "status": "open",
+    "notes": "Added regression tests asserting that all projects in data/projects.json have unique IDs and titles."
+  },
+  {
+    "issue": 725,
+    "pr": 963,
+    "url": "https://github.com/komalharshita/DevPath/pull/963",
+    "branch": "fix/issue-725-skill-pill-overflow",
+    "status": "open",
+    "notes": "Added display: inline-block and white-space: nowrap to skill strip items in style.css to prevent mobile overflows."
+  },
+  {
+    "issue": 712,
+    "pr": 992,
+    "url": "https://github.com/komalharshita/DevPath/pull/992",
+    "branch": "fix/issue-712-clear-filters",
+    "status": "open",
+    "notes": "Fixed clear/reset filter event handling by ensuring unique button IDs and syncing JavaScript form reset calls."
+  },
+  {
+    "issue": 990,
+    "pr": 995,
+    "url": "https://github.com/komalharshita/DevPath/pull/995",
+    "branch": "fix/issue-990-skill-chips-json-format",
+    "status": "open",
+    "notes": "Fixed raw JSON formatting on skill chips when hydrated from localStorage."
+  },
+  {
+    "issue": 910,
+    "pr": 997,
+    "url": "https://github.com/komalharshita/DevPath/pull/997",
+    "branch": "fix/issue-910-nav-form-closing",
+    "status": "open",
+    "notes": "Corrected mismatched </div> closing tag with </form> tag for the navbar search form in index.html."
+  },
+  {
+    "issue": 931,
+    "pr": 998,
+    "url": "https://github.com/komalharshita/DevPath/pull/998",
+    "branch": "fix/issue-931-duplicate-starter-code",
+    "status": "open",
+    "notes": "Removed duplicate paragraph and button/link within the Starter Code Included feature card in index.html."
+  },
+  {
+    "issue": 726,
+    "pr": 999,
+    "url": "https://github.com/komalharshita/DevPath/pull/999",
+    "branch": "fix/issue-726-button-wrap",
+    "status": "open",
+    "notes": "Added form-actions layout container and styled btn-clear to match the submit button height, enabling mobile-stacked responsiveness."
+  },
+  {
+    "issue": 809,
+    "pr": 1000,
+    "url": "https://github.com/komalharshita/DevPath/pull/1000",
+    "branch": "fix/issue-809-theme-toggle",
+    "status": "open",
+    "notes": "Added body.dark-theme class toggling in script.js and inline script to enable dark mode styles throughout the application."
+  },
+  {
+    "issue": 786,
+    "pr": 1001,
+    "url": "https://github.com/komalharshita/DevPath/pull/1001",
+    "branch": "fix/issue-786-feature-button-contrast",
+    "status": "open",
+    "notes": "Fixed text contrast for feature card links in dark mode."
+  },
+  {
+    "issue": 782,
+    "pr": 1004,
+    "url": "https://github.com/komalharshita/DevPath/pull/1004",
+    "branch": "fix/issue-782-searchbar-alignment",
+    "status": "open",
+    "notes": "Fixed early-closing form tag to restore correct vertical flex alignment inside navbar."
+  },
+  {
+    "issue": 768,
+    "pr": 1007,
+    "url": "https://github.com/komalharshita/DevPath/pull/1007",
+    "branch": "fix/issue-768-recommender-threshold",
+    "status": "open",
+    "notes": "Added relevance threshold in get_recommendations() and updated pytest test case to verify empty results on unrelated skills."
+  },
+  {
+    "issue": 724,
+    "pr": 1008,
+    "url": "https://github.com/komalharshita/DevPath/pull/1008",
+    "branch": "fix/issue-724-hamburger-menu",
+    "status": "open",
+    "notes": "Corrected the unclosed form tag in index.html to prevent the mobile hamburger button from performing an implicit form submit."
+  },
+  {
+    "issue": 723,
+    "pr": 1009,
+    "url": "https://github.com/komalharshita/DevPath/pull/1009",
+    "branch": "fix/issue-723-theme-toggle",
+    "status": "open",
+    "notes": "Synchronized body.dark-theme class toggling in script.js and theme_head.html, updated SVG classes to icon-sun/icon-moon in partial, hid desktop links (.nav-links) on mobile, and added homepage desktop theme toggle."
+  },
+  {
+    "issue": 771,
+    "pr": 1010,
+    "url": "https://github.com/komalharshita/DevPath/pull/1010",
+    "branch": "fix/issue-771-lock-completed-btn",
+    "status": "open",
+    "notes": "Added collapsible details to roadmap steps in project.html, populated descriptions in script.js on load, and locked the completion button until all checkboxes are checked."
+  },
+  {
+    "issue": 761,
+    "pr": 1011,
+    "url": "https://github.com/komalharshita/DevPath/pull/1011",
+    "branch": "feat/issue-761-shareable-url",
+    "status": "open",
+    "notes": "Added query parameter encoding on form submit success, and query parsing/form auto-submit on page load to restore recommendations state."
+  }
+]
