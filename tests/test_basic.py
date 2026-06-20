@@ -480,20 +480,21 @@ def test_recommend_api_valid():
     assert len(data["projects"]) > 0
 
 
-def test_recommend_api_interest_not_available():
-    """The API should return no projects for blocked interest categories."""
+def test_recommend_api_interest_available():
+    """The API should return recommendations for Machine Learning/AI interest."""
     client = get_client()
     response = client.post("/api/recommend", json={
-        "skills": "Python, JavaScript",
-        "level": "Beginner",
+        "skills": "Python, scikit-learn",
+        "level": "Intermediate",
         "interest": "Machine Learning/AI",
-        "time": "Low"
+        "time": "High"
     })
     assert response.status_code == 200
     data = response.get_json()
-    assert data["projects"] == []
-    assert "message" in data
-    assert "no projects are currently available" in data["message"].lower()
+    assert len(data["projects"]) > 0
+    # Verify we recommend the AI Resume Analyzer
+    titles = [p["title"] for p in data["projects"]]
+    assert "AI Resume Analyzer" in titles
 
 
 def test_recommend_api_missing_field():

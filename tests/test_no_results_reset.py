@@ -45,9 +45,9 @@ def client():
 # ---------------------------------------------------------------------------
 
 NO_MATCH_PAYLOAD = {
-    "skills": "Python",
+    "skills": "Fortran",
     "level": "Advanced",
-    "interest": "Machine Learning/AI",
+    "interest": "Games",
     "time": "Low"
 }
 
