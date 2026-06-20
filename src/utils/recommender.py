@@ -28,10 +28,7 @@ SCORING_WEIGHTS = {
     "time": 1,
 }
 
-WEIGHT_SKILL = SCORING_WEIGHTS["skill"]
-WEIGHT_LEVEL = SCORING_WEIGHTS["level"]
-WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
-WEIGHT_TIME = SCORING_WEIGHTS["time"]
+
 
 VALID_INTERESTS = {
     "web", "data", "education", "automation", "games",
