@@ -35,9 +35,7 @@ from utils.recommender import (
     VALID_TIME_AVAILABILITY,
 )
 
-WEIGHT_LEVEL    = SCORING_WEIGHTS["level"]
-WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
-WEIGHT_TIME     = SCORING_WEIGHTS["time"]
+
 from app import app, internal_server_error
 
 
