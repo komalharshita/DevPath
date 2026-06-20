@@ -463,7 +463,7 @@
       "JavaScript"
     ],
     "level": "Intermediate",
-    "interest": "Data",
+    "interest": "Machine Learning/AI",
     "time": "High",
     "description": "A Flask web app that compares a resume against a job description using TF-IDF similarity and keyword extraction. Users upload a PDF or paste text, and the app returns a match score, a list of missing keywords, and actionable feedback — with no external AI API required.",
     "features": [
@@ -620,7 +620,7 @@
     "title": "File Organiser Script",
     "skills": ["Python"],
     "level": "Beginner",
-    "interest": "Automation",
+    "interest": "Devops",
     "time": "Low",
     "description": "A Python script that scans a folder and automatically sorts files into subfolders by type — images, documents, videos, code files. Great for learning os and shutil modules.",
     "features": [

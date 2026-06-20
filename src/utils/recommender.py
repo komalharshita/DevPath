@@ -19,8 +19,15 @@ _CLUSTERS_PATH = os.path.join(
 )
 
 VALID_LEVELS = {"beginner", "intermediate", "advanced"}
-VALID_INTERESTS = {"web", "data", "education", "automation", "games", "cybersecurity", "devops", "backend", "tools", "productivity", "business logic", "mobile", "machine learning/ai"}
+VALID_INTERESTS = {
+    "web", "data", "education", "automation", "games",
+    "cybersecurity", "devops", "mobile", "machine learning/ai",
+    "artificial intelligence", "cloud computing", "mobile app development",
+    "backend", "tools", "productivity", "business logic"
+}
 VALID_TIME_AVAILABILITY = {"low", "medium", "high"}
+VALID_TIMES = {"low", "medium", "high"}
+
 SCORING_WEIGHTS = {
     "skill": 3,
     "level": 2,
@@ -32,14 +39,6 @@ WEIGHT_SKILL = SCORING_WEIGHTS["skill"]
 WEIGHT_LEVEL = SCORING_WEIGHTS["level"]
 WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
 WEIGHT_TIME = SCORING_WEIGHTS["time"]
-
-VALID_INTERESTS = {
-    "web", "data", "education", "automation", "games",
-    "cybersecurity", "devops", "mobile", "machine learning/ai",
-    "artificial intelligence", "cloud computing", "mobile app development",
-    "backend", "tools", "productivity", "business logic"
-}
-VALID_TIMES = {"low", "medium", "high"}
 
 # Common aliases and abbreviations for skills
 # This improves recommendation accuracy by normalizing user input
@@ -337,6 +336,7 @@ def get_recommendations(skills_string, level, interest, time_availability):
     user_skills = parse_skills(skills_string)
     all_projects = load_all_projects()
     scored_projects = []
+    graph = _load_skill_graph()
     for project in all_projects:
         rule_score = score_single_project(
             project,
@@ -354,7 +354,13 @@ def get_recommendations(skills_string, level, interest, time_availability):
             all_projects,
         )
         final_score = rule_score + similarity_score
-        if final_score > 0:
+        
+        project_skills = [SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", [])]
+        matched_skills = sum(1 for skill in user_skills if skill in project_skills)
+        boost = gap_boost(user_skills, project_skills, graph)
+        is_relevant = (matched_skills > 0) or (boost > 0) or (similarity_score >= 0.15)
+        
+        if final_score > 0 and is_relevant:
             scored_projects.append({
                 "project": project,
                 "score": final_score,
@@ -378,13 +384,7 @@ def get_recommendations(skills_string, level, interest, time_availability):
         "progression": progression,
     }
 
-VALID_LEVELS = ["beginner", "intermediate", "advanced"]
-VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
 
-
-VALID_LEVELS = ["beginner", "intermediate", "advanced"]
-VALID_INTERESTS = ["data", "web", "backend", "cybersecurity", "games", "education", "automation"]
-VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
 
 
 def validate_recommendation_inputs(skills, level, interest, time_availability):

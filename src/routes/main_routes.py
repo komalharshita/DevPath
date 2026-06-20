@@ -20,17 +20,6 @@ from utils.learning_path import (
 from config import Config
 import os
 
-# Interest categories that currently have no project recommendations available
-NO_PROJECT_INTERESTS = {
-    "machine learning/ai",
-    "devops",
-    "artificial intelligence",
-    "cloud computing",
-}
-
-def interest_has_no_projects(interest):
-    return interest and interest.strip().lower() in NO_PROJECT_INTERESTS
-
 # Create the Blueprint that app.py will register
 main = Blueprint("main", __name__)
 
@@ -133,11 +122,7 @@ def recommend():
         # Return only the first error to keep the UI message clean
         return jsonify({"error": errors[0]}), 400
 
-    if interest_has_no_projects(interest):
-        return jsonify({
-            "projects": [],
-            "message": "No projects are currently available for this interest area. Please check back later."
-        }), 200
+
 
     recommendations_data = get_recommendations(skills, level, interest, time_availability)
     results = recommendations_data.get("recommendations", [])
