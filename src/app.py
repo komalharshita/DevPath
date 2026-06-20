@@ -17,6 +17,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from flask import Flask
+from flask_wtf.csrf import CSRFProtect
 from routes.main_routes import main
 from config import Config
 from errors.handlers import register_error_handlers
@@ -25,6 +26,9 @@ app = Flask(__name__)
 
 # Load config settings into Flask's internal config manager properly
 app.config.from_object(Config)
+
+# Enable CSRF protection for all state-changing requests
+csrf = CSRFProtect(app)
 
 # Register all routes defined in the main Blueprint (This handles your '/' route!)
 app.register_blueprint(main)

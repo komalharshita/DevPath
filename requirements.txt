@@ -8,6 +8,7 @@
 
 # Web framework (only runtime dependency)
 Flask==3.0.3
+Flask-WTF==1.2.2
 
 # Testing (optional but recommended for contributors)
 pytest==8.2.2

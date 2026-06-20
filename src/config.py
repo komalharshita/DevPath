@@ -9,6 +9,9 @@ import os
 class Config:
     """Base configuration class with sensible defaults."""
     
+    # Secret key for session signing and CSRF protection
+    SECRET_KEY = os.getenv("SECRET_KEY", "change-this-secret-in-production")
+    
     # Base URL for the application - used for OG tags and canonical URLs
     # Can be overridden via environment variable for different deployments
     BASE_URL = os.getenv("BASE_URL", "https://mydevpath-github.vercel.app")
