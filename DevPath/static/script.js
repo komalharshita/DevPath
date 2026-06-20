@@ -894,9 +894,6 @@ updateProfileWidgets();
   //takes the array of projects from the api and draws them on the page as cards
   //if array is empty it shows the "no results" message instead
   function renderResults(projects, message) {
-    console.log("Rendering results with projects:", projects);
-    console.log("Message:", message);
-    
     resultsSection.style.display = "block";
     resultsLoadingEl.style.display = "none";
     // Clear out any cards from a previous search before showing new ones
@@ -938,10 +935,6 @@ updateProfileWidgets();
     var card = document.createElement("div");
     card.className = "project-card";
 
-    // Console logging for debugging
-    console.log("Building card for project:", project);
-    console.log("Project ID:", project.id);
-
     // Title
     var title = document.createElement("h3");
     title.className = "project-card-title";
@@ -977,8 +970,6 @@ updateProfileWidgets();
     link.className = "btn-details";
     link.textContent = "View Full Project";
     link.href = "/project/" + project.id; //each project has a unique id
-    
-    console.log("Created link with href:", link.href);
 
     link.href = "/project/" + project.id;
     footer.appendChild(saveButton);
