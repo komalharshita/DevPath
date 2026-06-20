@@ -172,6 +172,40 @@ def print_summary(result: dict, projects: list[dict]) -> None:
     print()
 
 
+def validate_projects(projects: list[dict]) -> None:
+    """
+    Validate that all projects have unique IDs and all required fields.
+    Exits the script if any validation fails.
+    """
+    required_fields = ["id", "title", "skills", "level", "interest", "time"]
+    seen_ids = set()
+    duplicate_ids = set()
+    validation_errors = []
+
+    for index, project in enumerate(projects):
+        missing_fields = [field for field in required_fields if field not in project]
+        if missing_fields:
+            project_id = project.get("id")
+            identifier = f"ID {project_id}" if project_id is not None else f"index {index}"
+            validation_errors.append(
+                f"Project at {identifier} is missing required fields: {', '.join(missing_fields)}"
+            )
+        else:
+            pid = project["id"]
+            if pid in seen_ids:
+                duplicate_ids.add(pid)
+            seen_ids.add(pid)
+
+    if validation_errors:
+        for err in validation_errors:
+            print(err, file=sys.stderr)
+        sys.exit("Validation failed: Missing required fields in project records. No clusters.json was generated.")
+
+    if duplicate_ids:
+        print(f"Error: Duplicate project IDs detected: {sorted(list(duplicate_ids))}", file=sys.stderr)
+        sys.exit("Validation failed: Duplicate project IDs detected. No clusters.json was generated.")
+
+
 def main():
     # ------------------------------------------------------------------
     # 1. Load projects
@@ -180,6 +214,7 @@ def main():
         sys.exit(f"projects.json not found at: {PROJECTS_PATH}")
 
     projects = load_projects(PROJECTS_PATH)
+    validate_projects(projects)
 
     # ------------------------------------------------------------------
     # 2. Guard: need enough projects for clustering to be meaningful
