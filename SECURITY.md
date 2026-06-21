@@ -56,13 +56,13 @@ The following are out of scope:
 
 ### Development server
 
-`python app.py` starts Flask in debug mode. The debug server must never be
+`python src/app.py` starts Flask in debug mode. The debug server must never be
 exposed to the public internet. For production deployment, use a WSGI server
 such as Gunicorn behind a reverse proxy.
 
 ### Path traversal mitigation
 
-The `utils/file_server.py` module uses `os.path.basename()` to strip any
+The `src/utils/file_server.py` module uses `os.path.basename()` to strip any
 directory components from starter code paths before resolving them. This
 prevents a crafted `starter_code` value in `projects.json` from reading
 arbitrary files.
