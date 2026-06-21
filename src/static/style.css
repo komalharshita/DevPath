@@ -2826,50 +2826,6 @@ input[type="text"]:not(.skill-input-wrap input):focus {
   margin-top: 2px;
 }
 
-/* Roadmap timeline */
-.roadmap-timeline {
-  display: flex;
-  flex-direction: column;
-}
-
-.roadmap-step {
-  display: flex;
-  gap: 0;
-}
-
-.roadmap-marker {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-shrink: 0;
-  width: 36px;
-}
-
-.roadmap-dot {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--surface);
-  border: 2px solid var(--indigo-600);
-  position: relative;
-  z-index: 1;
-  margin-top: 4px;
-}
-
-.roadmap-step:first-child .roadmap-dot {
-  background: var(--indigo-600);
-  border-color: var(--indigo-100);
-  box-shadow: 0 0 0 3px var(--indigo-100);
-}
-
-.roadmap-line {
-  flex: 1;
-  width: 0;
-  border-left: 2px dashed var(--border);
-  margin: 4px 0;
-}
-
-.roadmap-step:last-child .roadmap-line { display: none; }
 /* Roadmap timeline structure */
 .roadmap-timeline{
     display:flex;
