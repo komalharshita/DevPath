@@ -53,11 +53,45 @@ if not errors:
     passed("valid inputs pass through cleanly")
 else:
     failed("valid inputs pass through cleanly", f"unexpected errors: {errors}")
+# Whitespace-only values should be rejected
 
+errors = validate_recommendation_inputs("   ", "Beginner", "Data", "Low")
+if errors:
+    passed("whitespace-only skills caught")
+else:
+    failed("whitespace-only skills caught", "expected an error, got none")
+
+errors = validate_recommendation_inputs("Python", "   ", "Data", "Low")
+if errors:
+    passed("whitespace-only level caught")
+else:
+    failed("whitespace-only level caught", "expected an error, got none")
 # ---------------------------------------------------------------------------
 # Return shape
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Partial / invalid payloads
+# ---------------------------------------------------------------------------
 
+section("Partial payloads")
+
+try:
+    result = get_recommendations("", "", "", "")
+    if isinstance(result, dict):
+        passed("empty payload handled safely")
+    else:
+        failed("empty payload handled safely", f"got {type(result)}")
+except Exception as e:
+    failed("empty payload handled safely", str(e))
+
+try:
+    result = get_recommendations("Python", "", "", "")
+    if isinstance(result, dict):
+        passed("partial payload handled safely")
+    else:
+        failed("partial payload handled safely", f"got {type(result)}")
+except Exception as e:
+    failed("partial payload handled safely", str(e))
 section("Return shape")
 
 result = get_recommendations("Python", "Beginner", "Data", "Low")
@@ -117,11 +151,51 @@ if isinstance(junk, list) and len(junk) == 0:
     passed("no-match input returns empty recommendations")
 else:
     failed("no-match input returns empty recommendations", f"got: {junk}")
+# Same input should produce same ordering
 
+first_run = get_recommendations(
+    "Python",
+    "Beginner",
+    "Data",
+    "Low"
+)["recommendations"]
+
+second_run = get_recommendations(
+    "Python",
+    "Beginner",
+    "Data",
+    "Low"
+)["recommendations"]
+
+if first_run == second_run:
+    passed("recommendation ordering is deterministic")
+else:
+    failed("recommendation ordering is deterministic",
+           "same input produced different results")
 # ---------------------------------------------------------------------------
 # Skill alias normalisation
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Invalid filter values
+# ---------------------------------------------------------------------------
 
+section("Invalid filter values")
+
+try:
+    invalid = get_recommendations(
+        "Python",
+        "SUPER_EXPERT",
+        "UNKNOWN_INTEREST",
+        "IMPOSSIBLE_TIME"
+    )
+
+    if isinstance(invalid, dict):
+        passed("invalid filter values handled safely")
+    else:
+        failed("invalid filter values handled safely",
+               f"got {type(invalid)}")
+except Exception as e:
+    failed("invalid filter values handled safely", str(e))
 section("Skill alias normalisation")
 
 js_results   = get_recommendations("js",         "Beginner", "Web", "Low")["recommendations"]
@@ -136,7 +210,21 @@ else:
 # ---------------------------------------------------------------------------
 # Related projects (soft — skipped if clusters.json missing)
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Cluster loading resilience
+# ---------------------------------------------------------------------------
 
+section("Cluster loading resilience")
+
+try:
+    clusters = _load_clusters()
+    if isinstance(clusters, dict):
+        passed("cluster data loads successfully")
+    else:
+        failed("cluster data loads successfully",
+               f"got {type(clusters)}")
+except Exception as e:
+    failed("cluster data loads successfully", str(e))
 section("Related projects (requires clusters.json)")
 
 clusters_path = os.path.join("data", "clusters.json")

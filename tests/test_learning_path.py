@@ -103,6 +103,11 @@ class TestCreateLearningPath:
         with pytest.raises(ValueError):
             create_learning_path("p1", "", {})
 
+    def test_create_whitespace_token_raises(self):
+        """Whitespace-only token should raise ValueError."""
+        with pytest.raises(ValueError):
+            create_learning_path("p1", "   ", {})
+
     def test_create_non_dict_data_raises(self):
         """Passing a list as data should raise ValueError."""
         with pytest.raises(ValueError):
@@ -172,6 +177,47 @@ class TestUpdateLearningPath:
         update_learning_path("token-stable", token, {"v": 2})
         # Original token still grants access
         assert get_learning_path("token-stable", token)["v"] == 2
+
+    def test_update_returns_isolated_storage(self):
+        """Mutating retrieved data should not mutate store after update."""
+        token = make_token()
+
+        create_learning_path(
+            "isolation-test",
+            token,
+            {"step": 1}
+        )
+
+        update_learning_path(
+            "isolation-test",
+            token,
+            {"step": 2}
+        )
+
+        data = get_learning_path(
+            "isolation-test",
+            token
+        )
+
+        data["step"] = 999
+
+        fresh = get_learning_path(
+            "isolation-test",
+            token
+        )
+
+        assert fresh["step"] == 2
+
+    def test_update_non_dict_data_raises(self):
+        """Updates must receive a dict payload."""
+        token = make_token()
+        create_learning_path("upd-invalid", token, {})
+        with pytest.raises(ValueError):
+            update_learning_path(
+                "upd-invalid",
+                token,
+                ["bad", "payload"]
+            )
 
 
 class TestPathExists:
@@ -256,6 +302,26 @@ class TestCreatePathRoute:
         )
         assert response.status_code == 400
 
+    def test_post_missing_body_returns_400(self):
+        client = get_client()
+        response = client.post(
+            "/api/learning-path/no-body",
+            headers={TOKEN_HEADER: make_token()}
+        )
+        assert response.status_code == 400
+
+    def test_post_malformed_json_returns_400(self):
+        client = get_client()
+
+        response = client.post(
+            "/api/learning-path/malformed",
+            data='{"step":1',
+            content_type="application/json",
+            headers={TOKEN_HEADER: make_token()}
+        )
+
+        assert response.status_code == 400
+
     def test_post_body_is_array_returns_400(self):
         client = get_client()
         response = client.post(
@@ -336,6 +402,24 @@ class TestReadPathRoute:
         self._seed("read-3", token, {})
         client = get_client()
         response = client.get("/api/learning-path/read-3")
+        assert response.status_code == 400
+
+    def test_get_whitespace_token_returns_400(self):
+        token = make_token()
+
+        self._seed(
+            "read-ws",
+            token,
+            {}
+        )
+
+        client = get_client()
+
+        response = client.get(
+            "/api/learning-path/read-ws",
+            headers={TOKEN_HEADER: "   "}
+        )
+
         assert response.status_code == 400
 
     def test_get_nonexistent_path_returns_404(self):
@@ -460,6 +544,26 @@ class TestUpdatePathRoute:
             content_type="text/plain",
             headers={TOKEN_HEADER: token},
         )
+        assert response.status_code == 400
+
+    def test_put_malformed_json_returns_400(self):
+        token = make_token()
+
+        self._seed(
+            "upd-bad-json",
+            token,
+            {}
+        )
+
+        client = get_client()
+
+        response = client.put(
+            "/api/learning-path/upd-bad-json",
+            data='{"step":1',
+            content_type="application/json",
+            headers={TOKEN_HEADER: token}
+        )
+
         assert response.status_code == 400
 
 
