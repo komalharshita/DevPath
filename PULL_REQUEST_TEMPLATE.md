@@ -49,7 +49,7 @@ Closes #
 
 1. Clone this branch: `git checkout your-branch-name`
 2. Install dependencies: `pip install -r requirements.txt`
-3. Run the app: `python app.py`
+3. Run the app: `python src/app.py`
 4. Open http://127.0.0.1:5000 and...
 5. Run the tests: `python tests/test_basic.py`
 
