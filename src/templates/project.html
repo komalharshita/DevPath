@@ -372,6 +372,29 @@
               <a href="/project/{{ project.id }}/download" class="btn-download-sm">Download</a>
             </div>
             <button id="btn-mark-complete" class="btn-ghost btn-mark-complete" type="button">Mark Project Complete</button>
+            <div class="project-feedback">
+  <p>Was this recommendation useful?</p>
+
+  <button
+    class="feedback-btn"
+    id="feedback-like"
+    data-project-id="{{ project.id }}"
+    data-feedback="up"
+  >
+    👍 Helpful
+  </button>
+
+  <button
+    class="feedback-btn"
+    id="feedback-dislike"
+    data-project-id="{{ project.id }}"
+    data-feedback="down"
+  >
+    👎 Not Helpful
+  </button>
+
+  <div id="feedback-message"></div>
+</div>
           </div>
 
         </aside>
