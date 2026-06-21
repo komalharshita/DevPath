@@ -45,7 +45,7 @@ Required tools:
 
 ```
 devpath/
-|-- app.py                  Entry point. Creates the Flask app. Do not add logic here.
+|-- src/app.py              Entry point. Creates the Flask app. Do not add logic here.
 |-- routes/
 |   |-- main_routes.py      All HTTP routes. Thin — no business logic.
 |-- utils/
@@ -104,7 +104,7 @@ pip install -r requirements.txt
 ### Step 4: Run the app
 
 ```bash
-python app.py
+python src/app.py
 ```
 
 Open http://127.0.0.1:5000 in your browser. You should see the DevPath homepage.
