@@ -36,7 +36,7 @@ The entry point. Its only jobs are:
 
 - Create the Flask app instance
 - Register the `main` Blueprint from `routes/`
-- Register the 404 and 500 error handlers
+- Register error handlers for 400, 403, 404, 405, 429, 500, and an unhandled Exception catch-all
 - Start the dev server when run directly
 
 No business logic, no data access, no file handling.
