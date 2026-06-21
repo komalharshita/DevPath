@@ -9,9 +9,28 @@ import json
 import os
 
 from utils.data_loader import load_all_projects
-
+from functools import lru_cache
+from collections import defaultdict
 MAX_RESULTS = 3
 MAX_RELATED = 3
+# ---------------------------------------------------------------------------
+# Global dataset cache + indexes
+# ---------------------------------------------------------------------------
+
+ALL_PROJECTS = load_all_projects()
+
+SKILL_INDEX = defaultdict(list)
+LEVEL_INDEX = defaultdict(list)
+INTEREST_INDEX = defaultdict(list)
+
+for project in ALL_PROJECTS:
+    
+    LEVEL_INDEX[project.get("level", "").lower()].append(project)
+
+    INTEREST_INDEX[project.get("interest", "").lower()].append(project)
+
+    for skill in project.get("skills", []):
+        SKILL_INDEX[skill.lower()].append(project)
 _CLUSTERS_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
     "data",
@@ -132,17 +151,44 @@ def _cosine_similarity(vec_a, vec_b):
         return 0
 
     return dot_product / (magnitude_a * magnitude_b)
+# Build TF-IDF corpus once after helper functions are defined
+_PROJECT_DOCUMENTS = [
+    _tokenize(_project_text(project))
+    for project in ALL_PROJECTS
+]
 
-def ml_similarity_score(project, user_skills, level, interest, time_availability, all_projects):
-    project_documents = [_tokenize(_project_text(p)) for p in all_projects]
-    user_tokens = _tokenize(_user_text(user_skills, level, interest, time_availability))
+GLOBAL_IDF = _idf(_PROJECT_DOCUMENTS)
+def ml_similarity_score(
+    project,
+    user_skills,
+    level,
+    interest,
+    time_availability,
+    all_projects,
+):
+    user_tokens = _tokenize(
+        _user_text(
+            user_skills,
+            level,
+            interest,
+            time_availability,
+        )
+    )
 
-    idf_scores = _idf(project_documents + [user_tokens])
+    user_vector = _tfidf_vector(
+        user_tokens,
+        GLOBAL_IDF,
+    )
 
-    user_vector = _tfidf_vector(user_tokens, idf_scores)
-    project_vector = _tfidf_vector(_tokenize(_project_text(project)), idf_scores)
+    project_vector = _tfidf_vector(
+        _tokenize(_project_text(project)),
+        GLOBAL_IDF,
+    )
 
-    return _cosine_similarity(user_vector, project_vector)
+    return _cosine_similarity(
+        user_vector,
+        project_vector,
+    )
 
 def score_single_project(project, user_skills, level, interest, time_availability):
     TIME_RANKS = ["low", "medium", "high"]
@@ -188,14 +234,20 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
 # Skill graph helpers
 # ---------------------------------------------------------------------------
 
+@lru_cache(maxsize=1)
 def _load_skill_graph():
-    """Load skill_graph.json from data/. Returns empty dict on failure."""
+    """
+    Load skill_graph.json once and cache it.
+    """
     path = os.path.join(
         os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-        "data", "skill_graph.json"
+        "data",
+        "skill_graph.json"
     )
+
     if not os.path.exists(path):
         return {}
+
     try:
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -280,16 +332,14 @@ def get_progression(user_skills, recommended_ids, all_projects, graph):
 # Clustering helpers
 # ---------------------------------------------------------------------------
 
+@lru_cache(maxsize=1)
 def _load_clusters():
     """
-    Load clusters.json if it exists.
-
-    Returns the parsed dict, or None if the file is missing or unreadable.
-    A missing file is a soft failure — the recommender still works,
-    it just won't return related projects.
+    Load clusters.json once and cache it.
     """
     if not os.path.exists(_CLUSTERS_PATH):
         return None
+
     try:
         with open(_CLUSTERS_PATH, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -332,12 +382,40 @@ def _get_related(recommended_ids, all_projects, cluster_data):
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
-
+@lru_cache(maxsize=256)
 def get_recommendations(skills_string, level, interest, time_availability):
     user_skills = parse_skills(skills_string)
-    all_projects = load_all_projects()
+    all_projects = ALL_PROJECTS
+
+    candidate_projects = []
+
+    seen_ids = set()
+
+    for skill in user_skills:
+        for project in SKILL_INDEX.get(skill.lower(), []):
+            pid = project.get("id")
+            if pid not in seen_ids:
+                seen_ids.add(pid)
+                candidate_projects.append(project)
+
+    for project in LEVEL_INDEX.get(level.lower(), []):
+        pid = project.get("id")
+        if pid not in seen_ids:
+            seen_ids.add(pid)
+            candidate_projects.append(project)
+
+    for project in INTEREST_INDEX.get(interest.lower(), []):
+        pid = project.get("id")
+        if pid not in seen_ids:
+            seen_ids.add(pid)
+            candidate_projects.append(project)
+
+    if not candidate_projects:
+        candidate_projects = all_projects
+
     scored_projects = []
-    for project in all_projects:
+
+    for project in candidate_projects:
         rule_score = score_single_project(
             project,
             user_skills,
@@ -346,32 +424,58 @@ def get_recommendations(skills_string, level, interest, time_availability):
             time_availability,
         )
         similarity_score = ml_similarity_score(
-            project,
-            user_skills,
-            level,
-            interest,
-            time_availability,
-            all_projects,
-        )
+    project,
+    user_skills,
+    level,
+    interest,
+    time_availability,
+    all_projects,
+)
+        final_score = rule_score
+
         final_score = rule_score + similarity_score
+
         if final_score > 0:
             scored_projects.append({
                 "project": project,
                 "score": final_score,
             })
-    # Sort projects in descending order so the
-    # most relevant recommendations appear first.
-    scored_projects.sort(key=lambda item: (item["score"], item["project"].get("id", 0)), reverse=True)
-    
-    top_projects = [item["project"] for item in scored_projects[:MAX_RESULTS]]
+
+    scored_projects.sort(
+        key=lambda item: (
+            item["score"],
+            item["project"].get("id", 0)
+        ),
+        reverse=True,
+    )
+
+    top_projects = [
+        item["project"]
+        for item in scored_projects[:MAX_RESULTS]
+    ]
+
     top_ids = [p["id"] for p in top_projects]
-    
+
     cluster_data = _load_clusters()
-    related = _get_related(top_ids, all_projects, cluster_data) if cluster_data else []
-    
+    related = (
+        _get_related(top_ids, all_projects, cluster_data)
+        if cluster_data
+        else []
+    )
+
     graph = _load_skill_graph()
-    progression = get_progression(user_skills, top_ids, all_projects, graph) if graph else []
-    
+
+    progression = (
+        get_progression(
+            user_skills,
+            top_ids,
+            all_projects,
+            graph,
+        )
+        if graph
+        else []
+    )
+
     return {
         "recommendations": top_projects,
         "related": related,
