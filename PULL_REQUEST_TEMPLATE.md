@@ -83,7 +83,7 @@ paste output here
 - [ ] I have read [CONTRIBUTING.md](../CONTRIBUTING.md) and followed all guidelines
 - [ ] My branch name follows the convention: `feat/`, `fix/`, `docs/`, `data/`, `style/`, `test/`
 - [ ] I have run `python tests/test_basic.py` and all 27 tests pass
-- [ ] I have run `flake8 .` locally and there are no errors
+- [ ] I have run `flake8 src/ tests/` locally and there are no errors
 - [ ] I have not introduced any `print()` or `console.log()` debug statements
 - [ ] Every new function I wrote has a docstring
 - [ ] I have not modified files outside the scope of the linked issue
