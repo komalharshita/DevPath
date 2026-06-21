@@ -55,13 +55,25 @@ Each route handler follows the same pattern:
 
 Routes defined:
 
-| Method | Path                          | Description                       |
-|--------|-------------------------------|-----------------------------------|
-| GET    | `/`                           | Render homepage                   |
-| POST   | `/api/recommend`              | Return matching project JSON      |
-| GET    | `/project/<id>`               | Render project detail page        |
-| GET    | `/project/<id>/code`          | Return starter code content JSON  |
-| GET    | `/project/<id>/download`      | Serve starter code as download    |
+| Method | Path                               | Description                          |
+|--------|------------------------------------|--------------------------------------|
+| GET    | `/`                                | Render homepage                      |
+| GET    | `/contact`                         | Render contact page                  |
+| GET    | `/compare`                         | Render roadmap comparison page       |
+| GET    | `/health`                          | Health check endpoint                |
+| POST   | `/api/recommend`                   | Return matching project JSON         |
+| GET    | `/project/<id>`                    | Render project detail page           |
+| GET    | `/project/<id>/code`               | Return starter code content JSON     |
+| GET    | `/project/<id>/download`           | Serve starter code as download       |
+| GET    | `/api/project/<id>/resources`      | Return project learning resources    |
+| GET    | `/api/roadmaps`                    | List all career roadmaps             |
+| GET    | `/api/compare`                     | JSON comparison data                 |
+| GET    | `/api/search?q=`                   | Search projects by keyword           |
+| GET    | `/sitemap.xml`                     | XML sitemap for SEO                  |
+| GET    | `/robots.txt`                      | Robots exclusion file                |
+| POST   | `/api/learning-path/<path_id>`     | Create a learning path               |
+| GET    | `/api/learning-path/<path_id>`     | Get learning path progress           |
+| PUT    | `/api/learning-path/<path_id>`     | Update learning path progress        |
 
 ---
 
