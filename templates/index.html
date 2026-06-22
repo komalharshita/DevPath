@@ -24,6 +24,10 @@
         <a href="#how-it-works" class="nav-link">How It Works</a>
         <a href="#features" class="nav-link">Features</a>
         <a href="#find-project" class="nav-link">Find Project</a>
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">
+          <span class="theme-toggle-icon">🌙</span>
+          <span class="theme-toggle-label">Dark</span>
+        </button>
         <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="nav-btn-outline">GitHub</a>
       </div>
       <!-- Mobile hamburger toggle -->
@@ -150,56 +154,56 @@
        Language / Skill Strip (visual trust element)
        ============================================================ -->
 
-<div class="skill-strip">
-  <div class="skill-strip-inner">
-    <span class="skill-strip-label">Supports skills including:</span>
-    <div class="skill-strip-items">
-      <span class="ss-item">Python</span>
-      <span class="ss-sep"></span>
+  <div class="skill-strip">
+    <div class="skill-strip-inner">
+      <span class="skill-strip-label">Supports skills including:</span>
+      <div class="skill-strip-items">
+        <span class="ss-item">Python</span>
+        <span class="ss-sep"></span>
 
-      <span class="ss-item">JavaScript</span>
-      <span class="ss-sep"></span>
+        <span class="ss-item">JavaScript</span>
+        <span class="ss-sep"></span>
 
-      <span class="ss-item">HTML / CSS</span>
-      <span class="ss-sep"></span>
+        <span class="ss-item">HTML / CSS</span>
+        <span class="ss-sep"></span>
 
-      <span class="ss-item">Flask</span>
-      <span class="ss-sep"></span>
+        <span class="ss-item">Flask</span>
+        <span class="ss-sep"></span>
 
-      <span class="ss-item">SQL</span>
-      <span class="ss-sep"></span>
+        <span class="ss-item">SQL</span>
+        <span class="ss-sep"></span>
 
-      <span class="ss-item">React</span>
-      <span class="ss-sep"></span>
+        <span class="ss-item">React</span>
+        <span class="ss-sep"></span>
 
-      <span class="ss-item">Node.js</span>
-      <span class="ss-sep"></span>
+        <span class="ss-item">Node.js</span>
+        <span class="ss-sep"></span>
 
-      <span class="ss-item">pandas</span>
-      <span class="ss-sep"></span>
+        <span class="ss-item">pandas</span>
+        <span class="ss-sep"></span>
 
-      <span class="ss-item">C++</span>
-      <span class="ss-sep"></span>
+        <span class="ss-item">C++</span>
+        <span class="ss-sep"></span>
 
-      <span class="ss-item">Java</span>
-      <span class="ss-sep"></span>
+        <span class="ss-item">Java</span>
+        <span class="ss-sep"></span>
 
-      <span class="ss-item">TypeScript</span>
-      <span class="ss-sep"></span>
+        <span class="ss-item">TypeScript</span>
+        <span class="ss-sep"></span>
 
-      <span class="ss-item">Go</span>
-      <span class="ss-sep"></span>
+        <span class="ss-item">Go</span>
+        <span class="ss-sep"></span>
 
-      <span class="ss-item">Rust</span>
-      <span class="ss-sep"></span>
+        <span class="ss-item">Rust</span>
+        <span class="ss-sep"></span>
 
-      <span class="ss-item">C#</span>
-      <span class="ss-sep"></span>
+        <span class="ss-item">C#</span>
+        <span class="ss-sep"></span>
 
-      <span class="ss-item">Kotlin</span>
+        <span class="ss-item">Kotlin</span>
+      </div>
     </div>
   </div>
-</div>
 
 
   <!-- ============================================================
@@ -324,15 +328,8 @@
               <div class="skill-input-wrap" id="skill-input-wrap">
                 <div class="skill-chips-selected" id="skill-chips-selected"></div>
                 <input type="text" id="skills-input" placeholder="Type a skill and press Enter..." autocomplete="off" />
-                <input
-                  type="text"
-                  id="skills-input"
-                  placeholder="Type a skill and press Enter..."
-                  autocomplete="off"
-                  aria-haspopup="listbox"
-                  aria-expanded="false"
-                  aria-controls="skills-suggestions"
-                />
+                <input type="text" id="skills-input" placeholder="Type a skill and press Enter..." autocomplete="off"
+                  aria-haspopup="listbox" aria-expanded="false" aria-controls="skills-suggestions" />
                 <div id="skills-suggestions" class="skills-suggestions"></div>
               </div>
               <!-- Hidden field holds the final comma-separated value -->
@@ -396,50 +393,50 @@
                     <option value="Games">Games</option>
                   </select>
                 </div>
-             
 
-              <span class="form-hint">
-                Pick the domain you want to explore such as Web Development, Automation, or Games.
-              </span>
-              <div class="form-error-msg" id="interest-error"></div>
+
+                <span class="form-hint">
+                  Pick the domain you want to explore such as Web Development, Automation, or Games.
+                </span>
+                <div class="form-error-msg" id="interest-error"></div>
+              </div>
             </div>
+
+            <!-- Time availability -->
+            <div class="form-group">
+              <label for="time">
+                Time Availability
+                <span class="tooltip"
+                  title="Estimate how much time you can realistically dedicate to building the project.">
+                  ⓘ
+                </span>
+              </label>
+              <div class="select-wrap">
+                <select id="time" name="time">
+                  <option value="" disabled selected>How much time can you commit?</option>
+                  <option value="Low">Low — a few hours total</option>
+                  <option value="Medium">Medium — across a weekend</option>
+                  <option value="High">High — a week or more</option>
+                </select>
+              </div>
+              <span class="form-hint">
+                Include coding, debugging, learning, and reviewing time in your estimate.
+              </span>
+              <div class="form-error-msg" id="time-error"></div>
+            </div>
+
+            <!-- General error (shown above the button) -->
+            <p class="form-error-general" id="form-error-general"></p>
+
+            <!-- Submit button -->
+            <button type="submit" class="btn-submit" id="submit-btn">
+              <span id="btn-label">Generate My Projects</span>
+              <span id="btn-loading" style="display:none;">Finding matches...</span>
+            </button>
+
+          </form>
         </div>
-
-        <!-- Time availability -->
-        <div class="form-group">
-          <label for="time">
-            Time Availability
-            <span class="tooltip"
-              title="Estimate how much time you can realistically dedicate to building the project.">
-              ⓘ
-            </span>
-          </label>
-          <div class="select-wrap">
-            <select id="time" name="time">
-              <option value="" disabled selected>How much time can you commit?</option>
-              <option value="Low">Low — a few hours total</option>
-              <option value="Medium">Medium — across a weekend</option>
-              <option value="High">High — a week or more</option>
-            </select>
-          </div>
-          <span class="form-hint">
-            Include coding, debugging, learning, and reviewing time in your estimate.
-          </span>
-          <div class="form-error-msg" id="time-error"></div>
-        </div>
-
-        <!-- General error (shown above the button) -->
-        <p class="form-error-general" id="form-error-general"></p>
-
-        <!-- Submit button -->
-        <button type="submit" class="btn-submit" id="submit-btn">
-          <span id="btn-label">Generate My Projects</span>
-          <span id="btn-loading" style="display:none;">Finding matches...</span>
-        </button>
-
-        </form>
       </div>
-    </div>
     </div>
   </section>
 
