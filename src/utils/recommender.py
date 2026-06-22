@@ -7,6 +7,7 @@ from collections import Counter
 
 import json
 import os
+from functools import lru_cache
 
 from utils.data_loader import load_all_projects
 
@@ -187,7 +188,7 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
 # ---------------------------------------------------------------------------
 # Skill graph helpers
 # ---------------------------------------------------------------------------
-
+@lru_cache(maxsize=1)
 def _load_skill_graph():
     """Load skill_graph.json from data/. Returns empty dict on failure."""
     path = os.path.join(
