@@ -33,6 +33,7 @@ from utils.recommender import (
     SCORING_WEIGHTS,
     VALID_LEVELS,
     VALID_TIME_AVAILABILITY,
+    SKILL_SYNONYMS,
 )
 
 WEIGHT_LEVEL    = SCORING_WEIGHTS["level"]
@@ -433,10 +434,64 @@ def test_validate_all_missing():
     errors = validate_recommendation_inputs("", "", "", "")
     assert len(errors) == 4
 
+def test_skill_synonym_matching():
+    """parse_skills must normalize common abbreviations to their canonical names.
 
-# ============================================================
-# HTTP route tests (using Flask test client)
-# ============================================================
+    Verifies that:
+    - "JS"     -> "javascript"
+    - "ReactJS" -> "react"
+    - "  ts  "  -> "typescript"  (extra whitespace stripped)
+    - trailing comma produces no empty entry
+    """
+    result = parse_skills("JS, ReactJS,  ts , ")
+    assert result == ["javascript", "react", "typescript"], (
+        f"Expected ['javascript', 'react', 'typescript'] but got {result}"
+    )
+
+
+def test_skill_synonym_matching_node():
+    """'node' and 'nodejs' must both resolve to 'node.js'."""
+    assert parse_skills("node")   == ["node.js"]
+    assert parse_skills("nodejs") == ["node.js"]
+
+
+def test_skill_synonym_matching_unknown_passthrough():
+    """Skills not present in SKILL_SYNONYMS must pass through unchanged."""
+    result = parse_skills("flutter, solidity")
+    assert result == ["flutter", "solidity"], (
+        f"Unknown skills should not be altered; got {result}"
+    )
+
+
+def test_skill_synonym_end_to_end_scoring():
+    """A user who inputs 'JS' must score the same as one who inputs 'javascript'.
+
+    This is the critical integration check: synonym normalisation in parse_skills
+    must translate all the way through score_single_project.
+    """
+    project = {
+        "skills": ["JavaScript"],
+        "level": "Beginner",
+        "interest": "Web",
+        "time": "Low",
+    }
+    score_abbrev   = score_single_project(project, parse_skills("JS"),         "Beginner", "Web", "Low")
+    score_canonical = score_single_project(project, parse_skills("JavaScript"), "Beginner", "Web", "Low")
+
+    assert score_abbrev > 0, "'JS' should score > 0 for a JavaScript project after synonym resolution"
+    assert score_abbrev == score_canonical, (
+        f"'JS' ({score_abbrev}) and 'javascript' ({score_canonical}) should produce identical scores"
+    )
+
+
+def test_skill_synonyms_dict_has_minimum_entries():
+    """SKILL_SYNONYMS must contain at least 10 entries to satisfy the issue requirement."""
+    assert len(SKILL_SYNONYMS) >= 10, (
+        f"Expected at least 10 synonym entries, found {len(SKILL_SYNONYMS)}"
+    )
+
+
+
 
 def get_client():
     """Return a Flask test client with testing mode enabled."""
