@@ -781,16 +781,35 @@ async function updatePortfolioAnalysis() {
       if (isSaved) saveBtn.classList.add("saved");
       saveBtn.setAttribute("aria-pressed", isSaved ? "true" : "false");
       DevPathBookmarks.setButtonContent(saveBtn, isSaved);
-      saveBtn.addEventListener("click", function () {
-        DevPathBookmarks.toggle(project, saveBtn);
+      // Keep your bookmarking code
+      // Save button logic
+      saveBtn.addEventListener("click", function(e) {
+        e.preventDefault();
+        var projectObj = {
+          id: project.id,
+          title: project.title,
+          level: project.level,
+          time: project.time,
+          skills: project.skills || []
+        };
+        DevPathBookmarks.toggle(projectObj, saveBtn);
       });
+
+      // Also keep recently-viewed tracking code
       footer.appendChild(saveBtn);
+      footer.appendChild(link);
     }
 
     var link = document.createElement("a");
     link.className = "btn-details";
     link.textContent = "View Full Project";
     link.href = "/project/" + project.id;
+    
+    link.addEventListener("click", function() {
+      if (typeof RecentlyViewed !== "undefined") {
+        RecentlyViewed.trackView(project);
+      }
+    });
     footer.appendChild(link);
 
     card.appendChild(title);
@@ -923,9 +942,11 @@ async function updatePortfolioAnalysis() {
     showMoreBtn.style.display = "none";
     allProjects = [];
     visibleProjectCount = PROJECTS_PER_LOAD;
+    if (typeof RecentlyViewed !== "undefined") {
+    RecentlyViewed.clearHistory();
+    }    
     if (skillsInput) skillsInput.focus();
-  }
-
+  }  
   var clearBtn = document.getElementById("clear-filters-btn");
   if (clearBtn) {
     clearBtn.addEventListener("click", resetFormAndState);
@@ -1099,6 +1120,17 @@ async function updatePortfolioAnalysis() {
 (function initDetailPage() {
   if (typeof PROJECT_ID === "undefined") return;
   recordProjectView();
+  
+if (typeof RecentlyViewed !== "undefined") {
+  var projectTitle = typeof PROJECT_TITLE !== "undefined" ? PROJECT_TITLE : "Project " + PROJECT_ID;
+  var projectInterest = document.querySelector("[data-project-interest]");
+  var interest = projectInterest ? projectInterest.getAttribute("data-project-interest") : "General";
+  RecentlyViewed.trackView({
+    id: PROJECT_ID,
+    title: projectTitle,
+    interest: interest
+  });
+  }
 
   var codePanel = document.getElementById("code-panel");
   var codePanelOverlay = document.getElementById("code-panel-overlay");
