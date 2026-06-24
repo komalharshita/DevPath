@@ -9,6 +9,7 @@ from utils.recommender import get_recommendations, validate_recommendation_input
 from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats
 from utils.roadmap_comparer import load_all_career_roadmaps, compare_roadmaps
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
+from utils.rate_limiter import rate_limit
 from utils.learning_path import (
     create_learning_path,
     get_learning_path,
@@ -100,6 +101,7 @@ def health_check():
 
 
 @main.route("/api/recommend", methods=["POST"])
+@rate_limit(max_requests=10, window_seconds=60)
 def recommend():
     """
     Accept a JSON body with user inputs and return matching project recommendations.
@@ -225,6 +227,7 @@ def view_code(project_id):
 
 
 @main.route("/project/<int:project_id>/download")
+@rate_limit(max_requests=20, window_seconds=60)
 def download_code(project_id):
     """Serve the starter code file as a downloadable attachment."""
     project = find_project_by_id(project_id)
@@ -269,6 +272,7 @@ def robots():
     return send_from_directory("static", "robots.txt", mimetype="text/plain")
 
 @main.route("/api/search")
+@rate_limit(max_requests=30, window_seconds=60)
 def search_projects():
     """Return projects matching the user's search query."""
 
@@ -321,6 +325,7 @@ def _extract_token(req):
 
 
 @main.route("/api/learning-path/<path_id>", methods=["POST"])
+@rate_limit(max_requests=10, window_seconds=60)
 def create_path(path_id):
     """Create a new learning path and bind it to the supplied token.
 
@@ -357,6 +362,7 @@ def create_path(path_id):
 
 
 @main.route("/api/learning-path/<path_id>", methods=["GET"])
+@rate_limit(max_requests=20, window_seconds=60)
 def read_path(path_id):
     """Return the data payload for a learning path.
 
@@ -386,6 +392,7 @@ def read_path(path_id):
 
 
 @main.route("/api/learning-path/<path_id>", methods=["PUT"])
+@rate_limit(max_requests=10, window_seconds=60)
 def update_path(path_id):
     """Overwrite the data payload for an existing learning path.
 
