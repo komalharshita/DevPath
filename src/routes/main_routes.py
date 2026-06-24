@@ -346,6 +346,11 @@ def create_path(path_id):
     if not isinstance(payload, dict):
         return jsonify({"error": "Request body must be a JSON object."}), 400
 
+    if len(request.data) > _MAX_DATA_BYTES:
+        return jsonify({
+            "error": f"Payload too large. Maximum allowed size is {_MAX_DATA_BYTES // 1024} KB."
+        }), 400
+
     try:
         create_learning_path(path_id, token, payload)
     except ValueError as exc:
@@ -411,6 +416,11 @@ def update_path(path_id):
 
     if not isinstance(payload, dict):
         return jsonify({"error": "Request body must be a JSON object."}), 400
+
+    if len(request.data) > _MAX_DATA_BYTES:
+        return jsonify({
+            "error": f"Payload too large. Maximum allowed size is {_MAX_DATA_BYTES // 1024} KB."
+        }), 400
 
     try:
         update_learning_path(path_id, token, payload)
