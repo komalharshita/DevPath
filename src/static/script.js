@@ -852,59 +852,62 @@ updateProfileWidgets();
   var modal = document.getElementById("github-modal-overlay");
   var openModalBtn = document.getElementById("btn-show-github");
   var closeModalBtn = document.getElementById("btn-close-github");
-  var fetchBtn = document.getElementById("btn-fetch-github");
-  var githubInput = document.getElementById("github-username");
   var errorMsg = document.getElementById("github-modal-error");
 
   function closeGithubModal() {
     modal.classList.remove("active");
-    githubInput.value = "";
-    errorMsg.textContent = "";
+    if (errorMsg) errorMsg.textContent = "";
   }
 
-  if (modal && openModalBtn && closeModalBtn && fetchBtn && githubInput && errorMsg) {
+  if (modal && openModalBtn && closeModalBtn && errorMsg) {
     openModalBtn.addEventListener("click", function () {
       modal.classList.add("active");
-      githubInput.focus();
     });
     closeModalBtn.addEventListener("click", closeGithubModal);
     modal.addEventListener("click", function (event) {
       if (event.target === modal) closeGithubModal();
     });
-    fetchBtn.addEventListener("click", function () {
-      var username = githubInput.value.trim();
-      errorMsg.textContent = "";
-      if (!username) {
-        errorMsg.textContent = "Please enter a GitHub username.";
-        return;
-      }
-      fetchBtn.disabled = true;
-      fetchBtn.textContent = "Syncing...";
-      fetch("https://api.github.com/users/" + encodeURIComponent(username) + "/repos?sort=updated&per_page=100")
-        .then(function (response) {
-          if (!response.ok) throw new Error(response.status === 404 ? "Username not found." : "Unable to fetch GitHub repositories.");
-          return response.json();
-        })
-        .then(function (repos) {
-          var languages = [];
-          repos.forEach(function (repo) {
-            if (repo.language && languages.indexOf(repo.language) === -1) languages.push(repo.language);
-          });
-          if (!languages.length) {
-            errorMsg.textContent = "No public languages found.";
-            return;
-          }
-          languages.forEach(window.addSkill);
-          closeGithubModal();
-        })
-        .catch(function (err) {
-          errorMsg.textContent = err.message || "Failed to fetch skills.";
-        })
-        .finally(function () {
-          fetchBtn.disabled = false;
-          fetchBtn.textContent = "Fetch Skills";
+  }
+
+  // Handle OAuth callback logic
+  var urlParams = new URLSearchParams(window.location.search);
+  var githubAuth = urlParams.get("github_auth");
+  
+  if (githubAuth === "success") {
+    // Optional: show some loading UI here if desired
+    fetch("/api/github/repos")
+      .then(function (response) {
+        if (!response.ok) throw new Error("Unable to fetch GitHub repositories.");
+        return response.json();
+      })
+      .then(function (repos) {
+        var languages = [];
+        repos.forEach(function (repo) {
+          if (repo.language && languages.indexOf(repo.language) === -1) languages.push(repo.language);
         });
-    });
+        if (!languages.length) {
+          if (modal && errorMsg) {
+            modal.classList.add("active");
+            errorMsg.textContent = "No public languages found in your GitHub repositories.";
+          }
+          return;
+        }
+        languages.forEach(window.addSkill);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      })
+      .catch(function (err) {
+        if (modal && errorMsg) {
+          modal.classList.add("active");
+          errorMsg.textContent = err.message || "Failed to fetch skills.";
+        }
+        window.history.replaceState({}, document.title, window.location.pathname);
+      });
+  } else if (githubAuth === "error") {
+    if (modal && errorMsg) {
+      modal.classList.add("active");
+      errorMsg.textContent = "GitHub authentication failed. Please try again.";
+    }
+    window.history.replaceState({}, document.title, window.location.pathname);
   }
 })();
 

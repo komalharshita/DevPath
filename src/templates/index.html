@@ -391,7 +391,7 @@
               d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </button>
-      </div>
+      </form>
 
       <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation"
         aria-expanded="false" aria-controls="nav-mobile-menu">
@@ -1218,19 +1218,15 @@
         Sync with GitHub
       </div>
 
-      <p class="sidebar-card-desc" style="margin-bottom: 20px;">Enter your username to import coding languages from your
-        top repositories into the skills list.<br /> Note: We use stars to determine top repositories</p>
+      <p class="sidebar-card-desc" style="margin-bottom: 20px;">Authenticate with GitHub to import coding languages from your
+        top repositories into the skills list.</p>
 
       <div class="form-group" style="margin-bottom: 20px;">
-        <div class="skill-input-wrap">
-          <span style="color:var(--gray-400); font-family:var(--font-mono); font-size:0.8rem; margin-left:8px;">@</span>
-          <input type="text" id="github-username" placeholder="username" style="border:none; outline:none; flex:1; padding:10px;">
-        </div>
         <div class="form-error-msg" id="github-modal-error"></div>
       </div>
 
       <div style="display: flex; gap: 12px;">
-        <button type="button" id="btn-fetch-github" class="btn-primary" style="flex: 2; padding: 10px; font-size: 0.85rem;">Fetch Skills</button>
+        <a href="/api/github/login" id="btn-fetch-github" class="btn-primary" style="flex: 2; padding: 10px; font-size: 0.85rem; text-align: center; text-decoration: none;">Authenticate</a>
         <button type="button" id="btn-close-github" class="btn-view-code-sm" style="flex: 1; border-color: var(--border); color: var(--text-body);">Cancel</button>
       </div>
     </div>
