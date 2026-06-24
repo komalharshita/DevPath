@@ -1929,7 +1929,7 @@ label {
   background: var(--indigo-700);
   border-color: var(--indigo-700);
   color: #ffffff;
-  transform: translateY(-3px);
+  transform: translateY(-5px);
 }
 
 .skill-chip:focus-visible {
