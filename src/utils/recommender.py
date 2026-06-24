@@ -52,6 +52,12 @@ SKILL_ALIASES = {
     "web dev": "javascript",
 }
 
+
+def _normalize_skill(s: str) -> str:
+    """Normalize a skill string: strip surrounding whitespace and lowercase."""
+    return s.strip().lower()
+
+
 def parse_skills(skills_string):
     """
     Convert a raw skills string into a normalized lowercase list.
@@ -67,12 +73,12 @@ def parse_skills(skills_string):
         try:
             parsed = json.loads(stripped)
             if isinstance(parsed, list):
-                raw_skills = [str(s).strip().lower() for s in parsed if str(s).strip()]
+                raw_skills = [_normalize_skill(str(s)) for s in parsed if str(s).strip()]
                 return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
         except (json.JSONDecodeError, ValueError):
             pass
     raw_skills = [
-        s.strip().lower()
+        _normalize_skill(s)
         for s in skills_string.split(",")
         if s.strip()
     ]
@@ -159,7 +165,7 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
     score = 0
 
     # Compare user's skills against the project's required skills
-    project_skills = [SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", [])]
+    project_skills = [SKILL_ALIASES.get(_normalize_skill(s), _normalize_skill(s)) for s in project.get("skills", [])]
     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
     if project_skills:
         coverage = matched_skills / len(project_skills)
@@ -261,7 +267,7 @@ def get_progression(user_skills, recommended_ids, all_projects, graph):
         if project["id"] in recommended_ids:
             continue
         project_skills = [
-            SKILL_ALIASES.get(s.lower(), s.lower())
+            SKILL_ALIASES.get(_normalize_skill(s), _normalize_skill(s))
             for s in project.get("skills", [])
         ]
         # Project skills must overlap with reachable skills
