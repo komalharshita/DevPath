@@ -1297,6 +1297,17 @@
   </script>
     
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+var currentPath = window.location.pathname;
+var allNavLinks = document.querySelectorAll('.nav-link, .nav-mobile-link');
+allNavLinks.forEach(function (link) {
+var href = link.getAttribute('href');
+if (href && href === currentPath) { link.classList.add('active'); }
+if (currentPath === '/' && href === '#home') { link.classList.add('active'); }
+});
+});
+</script>
 </body>
 
 </html>

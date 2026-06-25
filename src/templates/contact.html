@@ -93,5 +93,15 @@
         </div>
     </section>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+var currentPath = window.location.pathname;
+var allNavLinks = document.querySelectorAll('.nav-link, .nav-mobile-link');
+allNavLinks.forEach(function (link) {
+var href = link.getAttribute('href');
+if (href && href === currentPath) { link.classList.add('active'); }
+});
+});
+</script>
 </body>
 </html>
