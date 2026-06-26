@@ -188,8 +188,14 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
 # Skill graph helpers
 # ---------------------------------------------------------------------------
 
+_cached_skill_graph = None
+
 def _load_skill_graph():
     """Load skill_graph.json from data/. Returns empty dict on failure."""
+    global _cached_skill_graph
+    if _cached_skill_graph is not None:
+        return _cached_skill_graph
+
     path = os.path.join(
         os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
         "data", "skill_graph.json"
@@ -198,7 +204,8 @@ def _load_skill_graph():
         return {}
     try:
         with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
+            _cached_skill_graph = json.load(f)
+            return _cached_skill_graph
     except (json.JSONDecodeError, OSError):
         return {}
 
