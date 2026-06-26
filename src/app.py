@@ -20,11 +20,15 @@ from flask import Flask
 from routes.main_routes import main
 from config import Config
 from errors.handlers import register_error_handlers
+from models import db
 
 app = Flask(__name__)
 
 # Load config settings into Flask's internal config manager properly
 app.config.from_object(Config)
+
+# Initialize SQLAlchemy
+db.init_app(app)
 
 # Register all routes defined in the main Blueprint (This handles your '/' route!)
 app.register_blueprint(main)
