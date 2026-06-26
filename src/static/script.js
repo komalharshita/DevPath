@@ -811,6 +811,86 @@ updateProfileWidgets();
     });
   }
 
+  var HISTORY_STORAGE_KEY = "devpathRecentRecommendations";
+
+  function loadRecommendationsHistory() {
+    try {
+      var saved = localStorage.getItem(HISTORY_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch (err) {
+      console.warn("Unable to load recommendations history", err);
+      return [];
+    }
+  }
+
+  function saveRecommendationsHistory(history) {
+    try {
+      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
+    } catch (err) {
+      console.warn("Unable to save recommendations history", err);
+    }
+  }
+
+  function recordRecommendationsToHistory(projects) {
+    if (!projects || !projects.length) return;
+    var history = loadRecommendationsHistory();
+
+    for (var i = projects.length - 1; i >= 0; i--) {
+      var p = projects[i];
+      if (!p || !p.id) continue;
+      history = history.filter(function (item) {
+        return String(item.id) !== String(p.id);
+      });
+      history.unshift({
+        id: p.id,
+        title: p.title,
+        level: p.level,
+        interest: p.interest
+      });
+    }
+
+    history = history.slice(0, 5);
+    saveRecommendationsHistory(history);
+    renderRecommendationsHistory();
+  }
+
+  function renderRecommendationsHistory() {
+    var section = document.getElementById("recent-recommendations-section");
+    var list = document.getElementById("recent-recommendations-list");
+    if (!section || !list) return;
+
+    var history = loadRecommendationsHistory();
+    if (!history.length) {
+      section.style.display = "none";
+      list.innerHTML = "";
+      return;
+    }
+
+    section.style.display = "block";
+    list.innerHTML = history.map(function (project) {
+      var levelClass = "project-tag--" + project.level.toLowerCase();
+      return '<article class="saved-project-item">' +
+        '  <div>' +
+        '    <a href="/project/' + project.id + '">' + project.title + '</a>' +
+        '    <div style="margin-top: 4px; display: flex; gap: 6px;">' +
+        '      <span class="project-tag ' + levelClass + '" style="font-size: 0.7rem; padding: 2px 8px;">' + project.level + '</span>' +
+        '      <span class="project-tag project-tag--time" style="font-size: 0.7rem; padding: 2px 8px;">' + project.interest + '</span>' +
+        '    </div>' +
+        '  </div>' +
+        '</article>';
+    }).join("");
+  }
+
+  var clearHistoryBtn = document.getElementById("clear-history-btn");
+  if (clearHistoryBtn) {
+    clearHistoryBtn.addEventListener("click", function () {
+      saveRecommendationsHistory([]);
+      renderRecommendationsHistory();
+    });
+  }
+
+  renderRecommendationsHistory();
+
   form.addEventListener("submit", function (event) {
     event.preventDefault();
     clearAllErrors();
@@ -841,6 +921,7 @@ updateProfileWidgets();
         setLoadingState(false);
         recordSearch();
         renderResults(data.projects || [], data.message);
+        recordRecommendationsToHistory(data.projects || []);
       })
       .catch(function (err) {
         setLoadingState(false);
