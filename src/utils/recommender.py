@@ -4,6 +4,7 @@
 import math
 import re
 from collections import Counter
+import functools
 
 import json
 import os
@@ -78,8 +79,20 @@ def parse_skills(skills_string):
     ]
     return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
 
-def _tokenize(text):
-    return re.findall(r"[a-z0-9]+", str(text).lower())
+_nlp_model = None
+_project_embeddings_cache = {}
+
+def get_nlp_model():
+    """Lazily load the SentenceTransformer model to save startup time."""
+    global _nlp_model
+    if _nlp_model is None:
+        try:
+            from sentence_transformers import SentenceTransformer
+            _nlp_model = SentenceTransformer('all-MiniLM-L6-v2')
+        except Exception as e:
+            print(f"Error loading NLP model: {e}")
+            pass
+    return _nlp_model
 
 def _project_text(project):
     parts = [
@@ -95,54 +108,48 @@ def _project_text(project):
     return " ".join(parts)
 
 def _user_text(user_skills, level, interest, time_availability):
-    return " ".join(user_skills + [level, interest, time_availability])
+    return f"I am a {level} developer interested in {interest}. I have {time_availability} time. My skills are: {', '.join(user_skills)}."
 
-def _tf(tokens):
-    counts = Counter(tokens)
-    total = len(tokens) or 1
-    return {token: count / total for token, count in counts.items()}
+@functools.lru_cache(maxsize=128)
+def _get_user_embedding(user_text):
+    model = get_nlp_model()
+    if not model:
+        return None
+    return model.encode(user_text, convert_to_tensor=True)
 
-def _idf(documents):
-    total_docs = len(documents)
-    idf_scores = {}
+def _get_project_embedding(project):
+    model = get_nlp_model()
+    if not model:
+        return None
+        
+    pid = project.get("id")
+    if pid not in _project_embeddings_cache:
+        text = _project_text(project)
+        _project_embeddings_cache[pid] = model.encode(text, convert_to_tensor=True)
+        
+    return _project_embeddings_cache[pid]
 
-    all_tokens = set(token for doc in documents for token in set(doc))
+def ml_similarity_score(project, user_skills, level, interest, time_availability):
+    """
+    Computes semantic similarity between the user's profile and the project using NLP embeddings.
+    """
+    model = get_nlp_model()
+    if not model:
+        return 0.0
+        
+    user_str = _user_text(user_skills, level, interest, time_availability)
+    user_emb = _get_user_embedding(user_str)
+    proj_emb = _get_project_embedding(project)
+    
+    if user_emb is None or proj_emb is None:
+        return 0.0
+        
+    from sentence_transformers import util
+    cos_sim = util.cos_sim(user_emb, proj_emb)
+    
+    # cos_sim is a 2D tensor, get the scalar value
+    return cos_sim.item()
 
-    for token in all_tokens:
-        docs_with_token = sum(1 for doc in documents if token in doc)
-        idf_scores[token] = math.log((1 + total_docs) / (1 + docs_with_token)) + 1
-
-    return idf_scores
-
-def _tfidf_vector(tokens, idf_scores):
-    tf_scores = _tf(tokens)
-    return {
-        token: tf_scores[token] * idf_scores.get(token, 0)
-        for token in tf_scores
-    }
-
-def _cosine_similarity(vec_a, vec_b):
-    shared_tokens = set(vec_a) & set(vec_b)
-
-    dot_product = sum(vec_a[token] * vec_b[token] for token in shared_tokens)
-    magnitude_a = math.sqrt(sum(value ** 2 for value in vec_a.values()))
-    magnitude_b = math.sqrt(sum(value ** 2 for value in vec_b.values()))
-
-    if magnitude_a == 0 or magnitude_b == 0:
-        return 0
-
-    return dot_product / (magnitude_a * magnitude_b)
-
-def ml_similarity_score(project, user_skills, level, interest, time_availability, all_projects):
-    project_documents = [_tokenize(_project_text(p)) for p in all_projects]
-    user_tokens = _tokenize(_user_text(user_skills, level, interest, time_availability))
-
-    idf_scores = _idf(project_documents + [user_tokens])
-
-    user_vector = _tfidf_vector(user_tokens, idf_scores)
-    project_vector = _tfidf_vector(_tokenize(_project_text(project)), idf_scores)
-
-    return _cosine_similarity(user_vector, project_vector)
 
 def score_single_project(project, user_skills, level, interest, time_availability):
     TIME_RANKS = ["low", "medium", "high"]
@@ -351,7 +358,6 @@ def get_recommendations(skills_string, level, interest, time_availability):
             level,
             interest,
             time_availability,
-            all_projects,
         )
         final_score = rule_score + similarity_score
         if final_score > 0:

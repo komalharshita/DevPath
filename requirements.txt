@@ -9,6 +9,9 @@
 # Web framework (only runtime dependency)
 Flask==3.0.3
 
+# NLP Semantic Search Embeddings
+sentence-transformers==3.0.1
+
 # Testing (optional but recommended for contributors)
 pytest==8.2.2
 flake8==7.0.0

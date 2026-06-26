@@ -895,7 +895,6 @@ def test_ml_similarity_score_returns_float():
         "Beginner",
         "Data",
         "Low",
-        projects,
     )
     assert isinstance(score, float)
     assert score >= 0
