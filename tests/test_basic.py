@@ -449,6 +449,17 @@ def test_home_route():
     response = client.get("/")
     assert response.status_code == 200
 
+
+def test_explore_route():
+    """Explore route should return 200 OK and handle pagination."""
+    client = get_client()
+    response = client.get("/explore?page=1&per_page=5")
+    assert response.status_code == 200
+    html = response.data.decode("utf-8")
+    assert "Explore All Projects" in html
+    # The max per_page is 5, so there should be pagination controls or fewer items.
+    assert 'class="project-card"' in html
+
 def test_security_headers_present():
     """Security headers should be included in all responses."""
     client = get_client()
