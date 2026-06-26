@@ -3461,7 +3461,7 @@ input[type="text"]:not(.skill-input-wrap input):focus {
 
 .progress-meter {
   width: 100%;
-  height: 16px;
+  height: 20px;
   background: var(--surface-hover);
   border-radius: 999px;
   overflow: hidden;
@@ -5129,7 +5129,7 @@ body.dark-theme .theme-toggle:hover {
 .progress-meter {
   background: var(--gray-200);
   border-radius: 100px;
-  height: 8px;
+  height: 20px;
   overflow: hidden;
 }
 
@@ -5140,6 +5140,7 @@ body.dark-theme .theme-toggle:hover {
   display: block;
   width: 0%;
   transition: width 0.3s ease;
+  padding-left: 4px;
 }
 
 .stat-dashboard-footer {
