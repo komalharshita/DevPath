@@ -50,7 +50,10 @@ github = oauth.register(
 
 # Register blueprints
 from routes.auth_routes import auth_bp
+from routes.admin_routes import admin_bp
+
 app.register_blueprint(auth_bp, url_prefix='/auth')
+app.register_blueprint(admin_bp, url_prefix='/admin')
 
 # Register all routes defined in the main Blueprint (This handles your '/' route!)
 app.register_blueprint(main)

@@ -394,6 +394,9 @@
       </form>
       <div class="nav-links desktop-only" style="margin-left: auto; display: flex; align-items: center; gap: 1.5rem; padding-right: 1.5rem;">
         {% if current_user %}
+        {% if current_user.is_admin %}
+        <a href="/admin" class="nav-link" style="font-weight: 600; color: #4f46e5; text-decoration: none;">Admin</a>
+        {% endif %}
         <a href="/profile" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Profile</a>
         <a href="/auth/logout" class="nav-link" style="color: var(--text-muted); text-decoration: none;">Logout</a>
         {% else %}
@@ -426,6 +429,9 @@
       <a href="/compare" class="nav-mobile-link" role="menuitem">Compare</a>
       <a href="/contact" class="nav-mobile-link" role="menuitem">Contact</a>
       {% if current_user %}
+      {% if current_user.is_admin %}
+      <a href="/admin" class="nav-mobile-link" role="menuitem" style="color: #4f46e5;">Admin</a>
+      {% endif %}
       <a href="/profile" class="nav-mobile-link" role="menuitem">Profile</a>
       <a href="/auth/logout" class="nav-mobile-link" role="menuitem">Logout</a>
       {% else %}

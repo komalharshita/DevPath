@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if project %}Edit Project{% else %}New Project{% endif %} | DevPath Admin</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f9fafb; margin: 0; padding: 2rem; color: #111827; }
+    .container { max-width: 800px; margin: 0 auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .header { margin-bottom: 2rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 1rem; }
+    h1 { margin: 0; font-size: 1.5rem; }
+    .form-group { margin-bottom: 1.5rem; }
+    label { display: block; font-weight: 500; margin-bottom: 0.5rem; font-size: 0.875rem; color: #374151; }
+    input[type="text"], input[type="url"], select, textarea { width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; font-family: inherit; font-size: 0.875rem; }
+    input[type="text"]:focus, select:focus, textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 1px #2563eb; }
+    textarea { min-height: 100px; resize: vertical; }
+    .help-text { display: block; margin-top: 0.25rem; font-size: 0.75rem; color: #6b7280; }
+    .btn { display: inline-block; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 500; text-decoration: none; cursor: pointer; border: none; font-size: 0.875rem; }
+    .btn-primary { background-color: #2563eb; color: white; }
+    .btn-primary:hover { background-color: #1d4ed8; }
+    .btn-secondary { background-color: #f3f4f6; color: #374151; }
+    .btn-secondary:hover { background-color: #e5e7eb; }
+    .form-actions { display: flex; gap: 1rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; }
+    .row { display: flex; gap: 1rem; }
+    .col { flex: 1; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>{% if project %}Edit Project #{{ project.id }}{% else %}Create New Project{% endif %}</h1>
+    </div>
+
+    <form method="POST">
+      <div class="form-group">
+        <label for="title">Project Title</label>
+        <input type="text" id="title" name="title" required value="{{ project.title if project else '' }}" placeholder="e.g. Build a Web Scraper">
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <div class="form-group">
+            <label for="level">Difficulty Level</label>
+            <select id="level" name="level" required>
+              <option value="" disabled {% if not project %}selected{% endif %}>Select Level</option>
+              <option value="Beginner" {% if project and project.level == 'Beginner' %}selected{% endif %}>Beginner</option>
+              <option value="Intermediate" {% if project and project.level == 'Intermediate' %}selected{% endif %}>Intermediate</option>
+              <option value="Advanced" {% if project and project.level == 'Advanced' %}selected{% endif %}>Advanced</option>
+            </select>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-group">
+            <label for="time">Time Commitment</label>
+            <select id="time" name="time" required>
+              <option value="" disabled {% if not project %}selected{% endif %}>Select Time</option>
+              <option value="Low" {% if project and project.time == 'Low' %}selected{% endif %}>Low</option>
+              <option value="Medium" {% if project and project.time == 'Medium' %}selected{% endif %}>Medium</option>
+              <option value="High" {% if project and project.time == 'High' %}selected{% endif %}>High</option>
+            </select>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-group">
+            <label for="interest">Interest Area</label>
+            <input type="text" id="interest" name="interest" required value="{{ project.interest if project else '' }}" placeholder="e.g. Data, Web, CLI">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" required>{{ project.description if project else '' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="skills">Skills (comma-separated)</label>
+        <input type="text" id="skills" name="skills" value="{{ project.skills|join(', ') if project and project.skills else '' }}" placeholder="e.g. python, requests, beautifulsoup">
+        <span class="help-text">Used for the recommendation engine algorithm</span>
+      </div>
+
+      <div class="form-group">
+        <label for="tech_stack">Tech Stack (comma-separated)</label>
+        <input type="text" id="tech_stack" name="tech_stack" value="{{ project.tech_stack|join(', ') if project and project.tech_stack else '' }}" placeholder="e.g. Python, Beautiful Soup, Pandas">
+      </div>
+
+      <div class="form-group">
+        <label for="features">Features (comma-separated)</label>
+        <textarea id="features" name="features">{{ project.features|join(', ') if project and project.features else '' }}</textarea>
+        <span class="help-text">What will the user build? Each item becomes a bullet point.</span>
+      </div>
+
+      <div class="form-group">
+        <label for="roadmap">Roadmap (comma-separated)</label>
+        <textarea id="roadmap" name="roadmap">{{ project.roadmap|join(', ') if project and project.roadmap else '' }}</textarea>
+        <span class="help-text">Step-by-step instructions. Each item becomes a numbered list item.</span>
+      </div>
+
+      <div class="form-group">
+        <label for="resources">Resources (comma-separated URLs or Names)</label>
+        <textarea id="resources" name="resources">{{ project.resources|join(', ') if project and project.resources else '' }}</textarea>
+        <span class="help-text">Helpful links for the user to complete the project.</span>
+      </div>
+
+      <div class="form-group">
+        <label for="starter_code">Starter Code (GitHub Repository URL)</label>
+        <input type="url" id="starter_code" name="starter_code" value="{{ project.starter_code if project else '' }}" placeholder="https://github.com/...">
+        <span class="help-text">Leave blank if there is no starter code.</span>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save Project</button>
+        <a href="/admin" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
