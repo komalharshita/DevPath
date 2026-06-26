@@ -95,7 +95,9 @@ def _project_text(project):
     return " ".join(parts)
 
 def _user_text(user_skills, level, interest, time_availability):
-    return " ".join(user_skills + [level, interest, time_availability])
+    if isinstance(interest, str):
+        interest = [interest]
+    return " ".join(user_skills + [level] + interest + [time_availability])
 
 def _tf(tokens):
     counts = Counter(tokens)
@@ -145,6 +147,8 @@ def ml_similarity_score(project, user_skills, level, interest, time_availability
     return _cosine_similarity(user_vector, project_vector)
 
 def score_single_project(project, user_skills, level, interest, time_availability):
+    if isinstance(interest, str):
+        interest = [interest]
     TIME_RANKS = ["low", "medium", "high"]
 
     user_time    = time_availability.strip().lower()
@@ -171,9 +175,16 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
         score += SCORING_WEIGHTS["level"]
 
     p_interest = project.get("interest", "").lower()
-    u_interest = interest.lower()
-    # Use partial matching for interest as well
-    if p_interest == u_interest or (u_interest and u_interest in p_interest) or (p_interest and p_interest in u_interest):
+    
+    # Check if ANY of the user's multiple interests match the project interest
+    matched_interest = False
+    for u_interest in interest:
+        u_interest = u_interest.lower()
+        if p_interest == u_interest or (u_interest and u_interest in p_interest) or (p_interest and p_interest in u_interest):
+            matched_interest = True
+            break
+            
+    if matched_interest:
         score += SCORING_WEIGHTS["interest"]
 
     if project.get("time", "").lower() == time_availability.lower():
@@ -334,6 +345,8 @@ def _get_related(recommended_ids, all_projects, cluster_data):
 # ---------------------------------------------------------------------------
 
 def get_recommendations(skills_string, level, interest, time_availability):
+    if isinstance(interest, str):
+        interest = [interest]
     user_skills = parse_skills(skills_string)
     all_projects = load_all_projects()
     scored_projects = []
@@ -400,7 +413,9 @@ def validate_recommendation_inputs(skills, level, interest, time_availability):
     elif level.strip().lower() not in VALID_LEVELS:
         errors.append("Invalid experience level. Choose Beginner, Intermediate, or Advanced.")
 
-    if not interest or not isinstance(interest, str) or not interest.strip():
+    if isinstance(interest, str):
+        interest = [interest]
+    if not interest or not isinstance(interest, list) or len([i for i in interest if str(i).strip()]) == 0:
         errors.append("Please select an area of interest.")
 
     if not time_availability or not time_availability.strip():
