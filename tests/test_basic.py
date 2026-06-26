@@ -891,6 +891,32 @@ def test_compare_api_not_found():
     response = client.get("/api/compare?a=invalid&b=alsoinvalid")
     assert response.status_code == 404
 
+# ============================================================
+# Auth routes tests
+# ============================================================
+
+def test_login_redirect():
+    """Login route should redirect to GitHub."""
+    client = get_client()
+    response = client.get("/auth/login")
+    assert response.status_code == 302
+    assert "github.com/login/oauth/authorize" in response.headers["Location"]
+
+def test_logout_redirect():
+    """Logout route should redirect to homepage."""
+    client = get_client()
+    response = client.get("/auth/logout")
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/"
+
+def test_profile_unauthenticated_redirects_to_login():
+    """Profile route should redirect to login if unauthenticated."""
+    client = get_client()
+    response = client.get("/profile")
+    assert response.status_code == 302
+    assert "/auth/login" in response.headers["Location"]
+
+
 
 def test_sitemap_includes_compare():
     """Sitemap should include the compare page."""

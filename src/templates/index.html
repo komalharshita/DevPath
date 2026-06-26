@@ -391,6 +391,14 @@
               d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </button>
+      </form>
+      <div class="nav-links desktop-only" style="margin-left: auto; display: flex; align-items: center; gap: 1.5rem; padding-right: 1.5rem;">
+        {% if current_user %}
+        <a href="/profile" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Profile</a>
+        <a href="/auth/logout" class="nav-link" style="color: var(--text-muted); text-decoration: none;">Logout</a>
+        {% else %}
+        <a href="/auth/login" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Login with GitHub</a>
+        {% endif %}
       </div>
 
       <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation"
@@ -417,6 +425,12 @@
       <a href="#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
       <a href="/compare" class="nav-mobile-link" role="menuitem">Compare</a>
       <a href="/contact" class="nav-mobile-link" role="menuitem">Contact</a>
+      {% if current_user %}
+      <a href="/profile" class="nav-mobile-link" role="menuitem">Profile</a>
+      <a href="/auth/logout" class="nav-mobile-link" role="menuitem">Logout</a>
+      {% else %}
+      <a href="/auth/login" class="nav-mobile-link" role="menuitem">Login with GitHub</a>
+      {% endif %}
       <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
         class="nav-mobile-link" role="menuitem">GitHub</a>
       <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile"
