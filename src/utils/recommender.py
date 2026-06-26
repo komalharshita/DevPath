@@ -28,6 +28,16 @@ SCORING_WEIGHTS = {
     "time": 1,
 }
 
+SYNERGY_MAP = {
+    frozenset(["react", "node"]): 1.5,
+    frozenset(["react", "node.js"]): 1.5,
+    frozenset(["python", "django"]): 1.5,
+    frozenset(["python", "flask"]): 1.5,
+    frozenset(["html", "css", "javascript"]): 1.5,
+    frozenset(["vue", "node"]): 1.5,
+    frozenset(["angular", "node"]): 1.5,
+}
+
 WEIGHT_SKILL = SCORING_WEIGHTS["skill"]
 WEIGHT_LEVEL = SCORING_WEIGHTS["level"]
 WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
@@ -160,12 +170,22 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
 
     # Compare user's skills against the project's required skills
     project_skills = [SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", [])]
-    matched_skills = sum(1 for skill in user_skills if skill in project_skills)
+    matched_skills = [skill for skill in user_skills if skill in project_skills]
+    num_matched = len(matched_skills)
+    
+    skill_score = num_matched * SCORING_WEIGHTS["skill"]
     if project_skills:
-        coverage = matched_skills / len(project_skills)
-        score += matched_skills * SCORING_WEIGHTS["skill"] * coverage
-    else:
-        score += matched_skills * SCORING_WEIGHTS["skill"]
+        coverage = num_matched / len(project_skills)
+        skill_score *= coverage
+        
+    # Apply Synergy Multiplier
+    synergy_multiplier = 1.0
+    matched_set = set(matched_skills)
+    for synergy_group, multiplier in SYNERGY_MAP.items():
+        if synergy_group.issubset(matched_set):
+            synergy_multiplier = max(synergy_multiplier, multiplier)
+            
+    score += skill_score * synergy_multiplier
 
     if project.get("level", "").lower() == level.lower():
         score += SCORING_WEIGHTS["level"]
@@ -182,7 +202,7 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
     graph = _load_skill_graph()
     score += gap_boost(user_skills, project_skills, graph)
 
-    return score
+    return score, synergy_multiplier > 1.0
 
 # ---------------------------------------------------------------------------
 # Skill graph helpers
@@ -338,7 +358,7 @@ def get_recommendations(skills_string, level, interest, time_availability):
     all_projects = load_all_projects()
     scored_projects = []
     for project in all_projects:
-        rule_score = score_single_project(
+        rule_score, synergy_applied = score_single_project(
             project,
             user_skills,
             level,
@@ -355,8 +375,10 @@ def get_recommendations(skills_string, level, interest, time_availability):
         )
         final_score = rule_score + similarity_score
         if final_score > 0:
+            proj_copy = project.copy()
+            proj_copy["synergy_applied"] = synergy_applied
             scored_projects.append({
-                "project": project,
+                "project": proj_copy,
                 "score": final_score,
             })
     # Sort projects in descending order so the
