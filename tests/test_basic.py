@@ -47,6 +47,43 @@ from app import app, internal_server_error
 
 def setup_module():
     """Clear the data cache before running the test suite to ensure clean state."""
+    import tempfile
+    import os
+    db_fd, db_path = tempfile.mkstemp()
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+    app.config["TESTING"] = True
+    
+    # We must push app context to interact with db
+    ctx = app.app_context()
+    ctx.push()
+    
+    from models import db, Project
+    db.drop_all()
+    db.create_all()
+    
+    # Load from JSON once to seed in-memory db
+    import json
+    data_file = os.path.join(os.path.dirname(__file__), "..", "data", "projects.json")
+    with open(data_file, "r", encoding="utf-8") as f:
+        projects_data = json.load(f)
+        for p_data in projects_data:
+            project = Project(
+                id=p_data.get("id"),
+                title=p_data.get("title", ""),
+                level=p_data.get("level", "Beginner"),
+                interest=p_data.get("interest", ""),
+                time=p_data.get("time", "Low"),
+                description=p_data.get("description", ""),
+                skills=p_data.get("skills", []),
+                features=p_data.get("features", []),
+                tech_stack=p_data.get("tech_stack", []),
+                roadmap=p_data.get("roadmap", []),
+                resources=p_data.get("resources", []),
+                starter_code=p_data.get("starter_code")
+            )
+            db.session.add(project)
+        db.session.commit()
+
     clear_cache()
     clear_roadmap_cache()
 
@@ -584,6 +621,23 @@ def test_download_code_found():
     assert response.status_code == 200
 
 
+
+
+def test_project_progress_unauthenticated_get():
+    """GET project progress should return 401 if unauthenticated."""
+    client = get_client()
+    response = client.get("/api/project/1/progress")
+    assert response.status_code == 401
+    assert b"Unauthorized" in response.data
+
+def test_project_progress_unauthenticated_post():
+    """POST project progress should return 401 if unauthenticated."""
+    client = get_client()
+    response = client.post("/api/project/1/progress", json={"completed_steps": [True, False]})
+    assert response.status_code == 401
+    assert b"Unauthorized" in response.data
+
+
 def test_view_code_nested_path():
     """A project with a nested starter_code path should still return 200."""
     client = get_client()
@@ -854,6 +908,128 @@ def test_compare_api_not_found():
     response = client.get("/api/compare?a=invalid&b=alsoinvalid")
     assert response.status_code == 404
 
+# ============================================================
+# Auth routes tests
+# ============================================================
+
+def test_login_redirect():
+    """Login route should redirect to GitHub."""
+    client = get_client()
+    response = client.get("/auth/login")
+    assert response.status_code == 302
+    assert "github.com/login/oauth/authorize" in response.headers["Location"]
+
+def test_logout_redirect():
+    """Logout route should redirect to homepage."""
+    client = get_client()
+    response = client.get("/auth/logout")
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/"
+
+def test_profile_unauthenticated_redirects_to_login():
+    """Profile route should redirect to login if unauthenticated."""
+    client = get_client()
+    response = client.get("/profile")
+    assert response.status_code == 302
+    assert "/auth/login" in response.headers["Location"]
+
+
+# ============================================================
+# Admin routes tests
+# ============================================================
+
+def test_admin_forbidden_for_anonymous():
+    """Anonymous users should be redirected to login when accessing admin dashboard."""
+    client = get_client()
+    response = client.get("/admin/")
+    assert response.status_code == 302
+    assert "/auth/login" in response.headers["Location"]
+
+def test_admin_forbidden_for_normal_user():
+    """Normal users should get 403 Forbidden when accessing admin dashboard."""
+    with app.test_client() as client:
+        with client.session_transaction() as sess:
+            sess['user_id'] = 1  # Assuming user 1 is not admin
+        
+        # We need user 1 to exist in the DB
+        with app.app_context():
+            from models import db, User
+            if not db.session.get(User, 1):
+                user = User(id=1, github_id="123", username="testuser", is_admin=False)
+                db.session.add(user)
+                db.session.commit()
+                
+        response = client.get("/admin/")
+        assert response.status_code == 403
+
+def test_admin_crud():
+    """Admin users should be able to create, read, update, and delete projects."""
+    with app.test_client() as client:
+        with app.app_context():
+            from models import db, User, Project
+            # Create an admin user
+            admin = User(id=2, github_id="456", username="adminuser", is_admin=True)
+            db.session.add(admin)
+            db.session.commit()
+            
+        with client.session_transaction() as sess:
+            sess['user_id'] = 2
+            
+        # Create
+        response = client.post("/admin/projects/new", data={
+            "title": "Test Project",
+            "level": "Beginner",
+            "interest": "Web",
+            "time": "Low",
+            "description": "A test project",
+            "skills": "python, flask",
+            "tech_stack": "Python, Flask",
+            "features": "Feature 1, Feature 2",
+            "roadmap": "Step 1, Step 2",
+            "resources": "http://example.com",
+            "starter_code": ""
+        })
+        assert response.status_code == 302
+        assert "/admin" in response.headers["Location"]
+        
+        # Read
+        with app.app_context():
+            project = Project.query.filter_by(title="Test Project").first()
+            assert project is not None
+            assert project.level == "Beginner"
+            assert "python" in project.skills
+            project_id = project.id
+            
+        # Update
+        response = client.post(f"/admin/projects/{project_id}/edit", data={
+            "title": "Updated Test Project",
+            "level": "Intermediate",
+            "interest": "Data",
+            "time": "Medium",
+            "description": "Updated description",
+            "skills": "python, pandas",
+            "tech_stack": "Python, Pandas",
+            "features": "Feature 1",
+            "roadmap": "Step 1",
+            "resources": "",
+            "starter_code": ""
+        })
+        assert response.status_code == 302
+        
+        with app.app_context():
+            project = db.session.get(Project, project_id)
+            assert project.title == "Updated Test Project"
+            assert project.level == "Intermediate"
+            assert "pandas" in project.skills
+            
+        # Delete
+        response = client.post(f"/admin/projects/{project_id}/delete")
+        assert response.status_code == 302
+        
+        with app.app_context():
+            assert db.session.get(Project, project_id) is None
+
+
 
 def test_sitemap_includes_compare():
     """Sitemap should include the compare page."""
@@ -869,6 +1045,7 @@ def test_sitemap_includes_compare():
 # ============================================================
 
 if __name__ == "__main__":
+    setup_module()
     test_functions = [v for k, v in list(globals().items()) if k.startswith("test_")]
     passed = 0
     failed = 0

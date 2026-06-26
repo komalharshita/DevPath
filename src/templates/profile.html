@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Developer Profile - DevPath</title>
+  
+  <meta name="description" content="Manage your personalized DevPath developer profile." />
+  <meta name="theme-color" content="#ffffff" id="theme-color-meta" />
+
+  <!-- Preconnect to Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Import Inter font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Link to central stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  
+  <style>
+    .profile-header {
+      padding: 120px 0 60px 0;
+      text-align: center;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 1.5rem;
+      border: 4px solid var(--primary-light);
+    }
+    
+    .profile-name {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+    
+    .profile-meta {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+    }
+    
+    .profile-content {
+      padding: 60px 0;
+      min-height: 50vh;
+    }
+    
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .skills-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 3rem;
+    }
+    
+    .btn-danger {
+      background-color: transparent;
+      color: #ef4444;
+      border: 1px solid #ef4444;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 1rem;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-danger:hover {
+      background-color: #ef4444;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       Desktop & Mobile Navigation
+  ============================================================= -->
+  <nav class="navbar" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">DevPath</a>
+
+      <!-- Desktop center: search form -->
+      <form id="topic-search-form" class="navbar-search" role="search">
+        <input type="text" id="topic-search-input" class="navbar-search-input" placeholder="Search projects by topic, skill, or title..." aria-label="Search projects">
+        <button type="submit" class="navbar-search-btn" aria-label="Submit search">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </button>
+      </form>
+
+      <!-- Desktop right side -->
+      <div class="nav-actions">
+        <button class="theme-toggle" id="theme-toggle-desktop" aria-label="Toggle dark mode">
+          <svg class="sun-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+          <svg class="moon-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display: none;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+          </svg>
+        </button>
+        <a href="/auth/logout" class="btn-primary" style="padding: 0.5rem 1rem;">Logout</a>
+      </div>
+
+      <!-- Mobile hamburger toggle -->
+      <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-mobile-menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+
+    <!-- Mobile Navigation Menu -->
+    <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
+      <a href="/" class="nav-mobile-link" role="menuitem">Home</a>
+      <a href="/explore" class="nav-mobile-link" role="menuitem">Explore All</a>
+      <a href="/auth/logout" class="nav-mobile-link" role="menuitem">Logout</a>
+      <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile" role="menuitem" style="text-align: left; width: 100%; display: flex; align-items: center; justify-content: space-between;">
+        <span>Toggle Theme</span>
+        <svg class="sun-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        <svg class="moon-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display: none;"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ============================================================
+       Profile Header
+  ============================================================= -->
+  <header class="profile-header">
+    <div class="container">
+      {% if user.avatar_url %}
+      <img src="{{ user.avatar_url }}" alt="{{ user.username }}'s avatar" class="profile-avatar">
+      {% else %}
+      <div class="profile-avatar" style="background: var(--primary); display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 3rem; font-weight: 700;">
+        {{ user.username[0] | upper }}
+      </div>
+      {% endif %}
+      <h1 class="profile-name">{{ user.username }}</h1>
+      <p class="profile-meta">GitHub Developer Profile</p>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       Main Content
+  ============================================================= -->
+  <main class="profile-content container">
+    <h2 class="section-title">Saved Skills</h2>
+    {% if user.saved_skills %}
+    <div class="skills-list">
+      {% for skill in user.saved_skills %}
+      <span class="project-tag project-tag--skill">{{ skill }}</span>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p style="color: var(--text-muted); margin-bottom: 3rem;">You haven't saved any skills yet. Your search history will automatically populate this section over time.</p>
+    {% endif %}
+
+    <h2 class="section-title">Bookmarked Projects</h2>
+    {% if bookmarked_projects %}
+    <div class="results-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+      {% for project in bookmarked_projects %}
+      <div class="project-card">
+        <h3 class="project-card-title">{{ project.title }}</h3>
+        <p class="project-card-desc"><span class="project-card-desc-text">{{ project.description | truncate(120) }}</span></p>
+        <div class="project-card-tags">
+          <span class="project-tag project-tag--{{ project.level | lower | replace(' ', '-') }}">{{ project.level }}</span>
+          <span class="project-tag project-tag--time">Time: {{ project.time }}</span>
+        </div>
+        <div class="project-card-footer">
+          <a href="/project/{{ project.id }}" class="btn-view-project" style="flex: 1; text-align: center;">View Project &rarr;</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p style="color: var(--text-muted);">You haven't bookmarked any projects yet. Go explore the catalog to find your next challenge!</p>
+    <a href="/explore" class="btn-primary" style="display: inline-block; margin-top: 1rem;">Explore Projects</a>
+    {% endif %}
+
+    <div style="margin-top: 4rem; border-top: 1px solid var(--border); padding-top: 2rem;">
+      <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main);">Account Management</h3>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">You are currently authenticated via GitHub OAuth.</p>
+      <a href="/auth/logout" class="btn-danger">Sign Out</a>
+    </div>
+  </main>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

@@ -453,6 +453,7 @@
     var PROJECT_LEVEL = {{ project.level | tojson }};
     var PROJECT_TIME = {{ project.time | tojson }};
     var PROJECT_SKILLS = {{ project.skills | tojson }};
+    var USER_LOGGED_IN = {{ 'true' if session.get('user_id') else 'false' }};
   </script>
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
   <script src="/static/script.js"></script>
