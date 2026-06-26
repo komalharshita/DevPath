@@ -378,13 +378,7 @@ def get_recommendations(skills_string, level, interest, time_availability):
         "progression": progression,
     }
 
-VALID_LEVELS = ["beginner", "intermediate", "advanced"]
-VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
 
-
-VALID_LEVELS = ["beginner", "intermediate", "advanced"]
-VALID_INTERESTS = ["data", "web", "backend", "cybersecurity", "games", "education", "automation"]
-VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
 
 
 def validate_recommendation_inputs(skills, level, interest, time_availability):
