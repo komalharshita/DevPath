@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | DevPath</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f9fafb; margin: 0; padding: 2rem; color: #111827; }
+    .container { max-width: 1200px; margin: 0 auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    h1 { margin: 0; font-size: 1.5rem; }
+    .btn { display: inline-block; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 500; text-decoration: none; cursor: pointer; border: none; font-size: 0.875rem; }
+    .btn-primary { background-color: #2563eb; color: white; }
+    .btn-primary:hover { background-color: #1d4ed8; }
+    .btn-danger { background-color: #dc2626; color: white; }
+    .btn-danger:hover { background-color: #b91c1c; }
+    .btn-secondary { background-color: #f3f4f6; color: #374151; }
+    .btn-secondary:hover { background-color: #e5e7eb; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    th { font-weight: 600; color: #6b7280; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    td { font-size: 0.875rem; }
+    .actions { display: flex; gap: 0.5rem; }
+    form { display: inline; }
+    .badge { padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; background-color: #e0e7ff; color: #4338ca; }
+    .pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>Projects Dashboard</h1>
+        <p style="color: #6b7280; margin-top: 0.25rem; font-size: 0.875rem;">Manage the DevPath projects database.</p>
+      </div>
+      <div style="display: flex; gap: 1rem;">
+        <a href="/" class="btn btn-secondary">Back to Site</a>
+        <a href="/admin/projects/new" class="btn btn-primary">+ New Project</a>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Level</th>
+          <th>Interest</th>
+          <th>Time</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for project in pagination.items %}
+        <tr>
+          <td>#{{ project.id }}</td>
+          <td style="font-weight: 500;">{{ project.title }}</td>
+          <td><span class="badge">{{ project.level }}</span></td>
+          <td>{{ project.interest }}</td>
+          <td>{{ project.time }}</td>
+          <td class="actions">
+            <a href="/project/{{ project.id }}" target="_blank" class="btn btn-secondary">View</a>
+            <a href="/admin/projects/{{ project.id }}/edit" class="btn btn-primary" style="background-color: #4f46e5;">Edit</a>
+            <form action="/admin/projects/{{ project.id }}/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this project?');">
+              <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="pagination">
+      <div>
+        Showing {{ pagination.first }} to {{ pagination.last }} of {{ pagination.total }} projects
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        {% if pagination.has_prev %}
+          <a href="{{ url_for('admin.dashboard', page=pagination.prev_num) }}" class="btn btn-secondary">Previous</a>
+        {% else %}
+          <span class="btn btn-secondary" style="opacity: 0.5; cursor: not-allowed;">Previous</span>
+        {% endif %}
+        
+        {% if pagination.has_next %}
+          <a href="{{ url_for('admin.dashboard', page=pagination.next_num) }}" class="btn btn-secondary">Next</a>
+        {% else %}
+          <span class="btn btn-secondary" style="opacity: 0.5; cursor: not-allowed;">Next</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

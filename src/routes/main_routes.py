@@ -3,7 +3,7 @@
 # Each route is kept thin: it validates input, calls a utility function,
 # and returns a response. No business logic lives here.
 
-from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response
+from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response, redirect, url_for
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
 from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats
@@ -207,8 +207,32 @@ def project_detail(project_id):
     project = find_project_by_id(project_id)
     if not project:
         abort(404)
-    return render_template("project.html", project=project, config=Config)
+        
+    return render_template("project.html", project=project, config=Config, og_url=Config.get_base_url() + "/project/" + str(project_id))
 
+@main.route("/profile")
+def profile():
+    from flask import session
+    from models import db, User
+    from utils.data_loader import find_project_by_id
+    
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('auth.login'))
+        
+    user = db.session.get(User, user_id)
+    if not user:
+        session.pop('user_id', None)
+        return redirect(url_for('auth.login'))
+        
+    # Hydrate bookmarked projects
+    bookmarked_projects = []
+    for pid in user.bookmarked_projects:
+        p = find_project_by_id(pid)
+        if p:
+            bookmarked_projects.append(p)
+            
+    return render_template("profile.html", user=user, bookmarked_projects=bookmarked_projects)
 
 @main.route("/project/<int:project_id>/code")
 def view_code(project_id):
