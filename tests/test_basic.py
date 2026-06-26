@@ -1013,6 +1013,35 @@ def test_admin_crud():
             assert db.session.get(Project, project_id) is None
 
 
+# ============================================================
+# GitHub Export tests
+# ============================================================
+
+def test_export_github_unauthenticated():
+    """Unauthenticated users should be redirected to login when trying to export."""
+    client = get_client()
+    response = client.post("/project/1/export_github")
+    assert response.status_code == 302
+    assert "/auth/login" in response.headers["Location"]
+
+def test_export_github_missing_starter_code():
+    """Exporting a project without starter code should redirect back to the project."""
+    with app.test_client() as client:
+        with client.session_transaction() as sess:
+            sess['github_token'] = {'access_token': 'dummy_token'}
+            
+        # Assuming project 2 does not have starter code or we make a fake one
+        with app.app_context():
+            from models import db, Project
+            p = Project(id=999, title="No Code", level="Beg", interest="Web", time="Low", description="Desc")
+            db.session.add(p)
+            db.session.commit()
+            
+        response = client.post("/project/999/export_github")
+        assert response.status_code == 302
+        assert "/project/999" in response.headers["Location"]
+
+
 
 def test_sitemap_includes_compare():
     """Sitemap should include the compare page."""

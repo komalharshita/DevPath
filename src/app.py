@@ -45,7 +45,7 @@ github = oauth.register(
     authorize_url='https://github.com/login/oauth/authorize',
     authorize_params=None,
     api_base_url='https://api.github.com/',
-    client_kwargs={'scope': 'read:user'},
+    client_kwargs={'scope': 'read:user public_repo'},
 )
 
 # Register blueprints
