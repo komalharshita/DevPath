@@ -79,7 +79,7 @@ def parse_skills(skills_string):
     return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
 
 def _tokenize(text):
-    return re.findall(r"[a-z0-9]+", str(text).lower())
+    return re.findall(r"[a-z0-9\+#\.-]+", str(text).lower())
 
 def _project_text(project):
     parts = [
