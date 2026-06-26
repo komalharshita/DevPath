@@ -158,26 +158,36 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
 
     score = 0
 
+    weight_skill = SCORING_WEIGHTS["skill"]
+    weight_level = SCORING_WEIGHTS["level"]
+    weight_interest = SCORING_WEIGHTS["interest"]
+    weight_time = SCORING_WEIGHTS["time"]
+
+    # Dynamically adjust weights for true beginners
+    if len(user_skills) == 0:
+        weight_level += 2
+        weight_interest += 2
+
     # Compare user's skills against the project's required skills
     project_skills = [SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", [])]
     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
     if project_skills:
         coverage = matched_skills / len(project_skills)
-        score += matched_skills * SCORING_WEIGHTS["skill"] * coverage
+        score += matched_skills * weight_skill * coverage
     else:
-        score += matched_skills * SCORING_WEIGHTS["skill"]
+        score += matched_skills * weight_skill
 
     if project.get("level", "").lower() == level.lower():
-        score += SCORING_WEIGHTS["level"]
+        score += weight_level
 
     p_interest = project.get("interest", "").lower()
     u_interest = interest.lower()
     # Use partial matching for interest as well
     if p_interest == u_interest or (u_interest and u_interest in p_interest) or (p_interest and p_interest in u_interest):
-        score += SCORING_WEIGHTS["interest"]
+        score += weight_interest
 
     if project.get("time", "").lower() == time_availability.lower():
-        score += SCORING_WEIGHTS["time"]
+        score += weight_time
         
     graph = _load_skill_graph()
     score += gap_boost(user_skills, project_skills, graph)
