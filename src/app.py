@@ -20,11 +20,38 @@ from flask import Flask
 from routes.main_routes import main
 from config import Config
 from errors.handlers import register_error_handlers
+from models import db
+from authlib.integrations.flask_client import OAuth
+from flask import session
 
 app = Flask(__name__)
 
 # Load config settings into Flask's internal config manager properly
 app.config.from_object(Config)
+
+# Initialize SQLAlchemy
+db.init_app(app)
+
+with app.app_context():
+    db.create_all()
+
+# Initialize OAuth
+oauth = OAuth(app)
+github = oauth.register(
+    name='github',
+    client_id=app.config.get("GITHUB_CLIENT_ID"),
+    client_secret=app.config.get("GITHUB_CLIENT_SECRET"),
+    access_token_url='https://github.com/login/oauth/access_token',
+    access_token_params=None,
+    authorize_url='https://github.com/login/oauth/authorize',
+    authorize_params=None,
+    api_base_url='https://api.github.com/',
+    client_kwargs={'scope': 'read:user'},
+)
+
+# Register blueprints
+from routes.auth_routes import auth_bp
+app.register_blueprint(auth_bp, url_prefix='/auth')
 
 # Register all routes defined in the main Blueprint (This handles your '/' route!)
 app.register_blueprint(main)
@@ -33,6 +60,16 @@ app.register_blueprint(main)
 # and any unhandled Exception).  Must be called after Blueprint registration
 # so Blueprint-level error handlers take precedence where defined.
 register_error_handlers(app)
+
+@app.context_processor
+def inject_user():
+    """Make current_user available to all templates."""
+    user_id = session.get('user_id')
+    current_user = None
+    if user_id:
+        from models import User
+        current_user = db.session.get(User, user_id)
+    return dict(current_user=current_user)
 
 
 @app.after_request
