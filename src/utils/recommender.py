@@ -245,11 +245,17 @@ def gap_boost(user_skills, project_skills, graph):
     return round(boost, 3)
 
 
-def get_progression(user_skills, recommended_ids, all_projects, graph):
+def get_progression(user_skills, recommended_ids, all_projects, graph, level, time_availability):
     """
     Return projects that are 1 hop away from user's current skills
-    but were NOT already recommended.
+    but were NOT already recommended, applying level and time filters.
     """
+    TIME_RANKS = ["low", "medium", "high"]
+    LEVEL_RANKS = ["beginner", "intermediate", "advanced"]
+    
+    user_time = time_availability.strip().lower()
+    user_level = level.strip().lower()
+
     # Find all 1-hop reachable skills
     reachable = set()
     for skill in user_skills:
@@ -259,6 +265,18 @@ def get_progression(user_skills, recommended_ids, all_projects, graph):
     progression = []
     for project in all_projects:
         if project["id"] in recommended_ids:
+            continue
+            
+        project_time = project.get("time", "").strip().lower()
+        if project_time not in TIME_RANKS or user_time not in TIME_RANKS:
+            continue
+        if TIME_RANKS.index(project_time) > TIME_RANKS.index(user_time):
+            continue
+            
+        project_level = project.get("level", "").strip().lower()
+        if project_level not in LEVEL_RANKS or user_level not in LEVEL_RANKS:
+            continue
+        if LEVEL_RANKS.index(project_level) > LEVEL_RANKS.index(user_level):
             continue
         project_skills = [
             SKILL_ALIASES.get(s.lower(), s.lower())
@@ -370,7 +388,7 @@ def get_recommendations(skills_string, level, interest, time_availability):
     related = _get_related(top_ids, all_projects, cluster_data) if cluster_data else []
     
     graph = _load_skill_graph()
-    progression = get_progression(user_skills, top_ids, all_projects, graph) if graph else []
+    progression = get_progression(user_skills, top_ids, all_projects, graph, level, time_availability) if graph else []
     
     return {
         "recommendations": top_projects,
