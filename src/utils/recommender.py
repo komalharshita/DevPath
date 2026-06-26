@@ -133,7 +133,11 @@ def _cosine_similarity(vec_a, vec_b):
 
     return dot_product / (magnitude_a * magnitude_b)
 
-def ml_similarity_score(project, user_skills, level, interest, time_availability, all_projects):
+def ml_similarity_score(project, user_skills, level, interest, time_availability, all_projects, precomputed_idf=None, precomputed_user_vector=None):
+    if precomputed_idf is not None and precomputed_user_vector is not None:
+        project_vector = _tfidf_vector(_tokenize(_project_text(project)), precomputed_idf)
+        return _cosine_similarity(precomputed_user_vector, project_vector)
+
     project_documents = [_tokenize(_project_text(p)) for p in all_projects]
     user_tokens = _tokenize(_user_text(user_skills, level, interest, time_availability))
 
@@ -336,6 +340,13 @@ def _get_related(recommended_ids, all_projects, cluster_data):
 def get_recommendations(skills_string, level, interest, time_availability):
     user_skills = parse_skills(skills_string)
     all_projects = load_all_projects()
+
+    # Precompute TF-IDF documents and user vector to avoid O(N^2) complexity
+    project_documents = [_tokenize(_project_text(p)) for p in all_projects]
+    user_tokens = _tokenize(_user_text(user_skills, level, interest, time_availability))
+    idf_scores = _idf(project_documents + [user_tokens])
+    user_vector = _tfidf_vector(user_tokens, idf_scores)
+
     scored_projects = []
     for project in all_projects:
         rule_score = score_single_project(
@@ -352,6 +363,8 @@ def get_recommendations(skills_string, level, interest, time_availability):
             interest,
             time_availability,
             all_projects,
+            precomputed_idf=idf_scores,
+            precomputed_user_vector=user_vector
         )
         final_score = rule_score + similarity_score
         if final_score > 0:
