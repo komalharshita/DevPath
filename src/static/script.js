@@ -626,13 +626,20 @@ updateProfileWidgets();
       var readMore = document.createElement("button");
       readMore.type = "button";
       readMore.className = "read-more-btn";
-      readMore.textContent = "Read more";
+      readMore.setAttribute("aria-label", "Read full description for " + project.title);
       readMore.setAttribute("aria-expanded", "false");
+      var readMoreLabel = document.createElement("span");
+      readMoreLabel.textContent = "Read more";
+      readMore.appendChild(readMoreLabel);
       readMore.addEventListener("click", function () {
         expanded = !expanded;
         descText.textContent = expanded ? project.description : truncate(project.description, 120);
-        readMore.textContent = expanded ? "Read less" : "Read more";
+        readMoreLabel.textContent = expanded ? "Read less" : "Read more";
         readMore.setAttribute("aria-expanded", expanded ? "true" : "false");
+        readMore.setAttribute(
+          "aria-label",
+          (expanded ? "Collapse description for " : "Read full description for ") + project.title
+        );
       });
       desc.appendChild(readMore);
     }
