@@ -158,3 +158,76 @@
   font-size: 0.75rem;
   color: var(--gray-600);
 }
+/* Project card footer layout */
+.project-card-footer {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border, #e5e7eb);
+}
+
+/* Save button */
+.btn-save-project {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 0.875rem;
+  background: var(--gray-100, #f3f4f6);
+  color: var(--text-body, #374151);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-save-project:hover {
+  background: var(--gray-200, #e5e7eb);
+  border-color: var(--accent, #6366f1);
+  color: var(--accent, #6366f1);
+}
+
+.btn-save-project.saved {
+  background: var(--accent, #6366f1);
+  color: white;
+  border-color: var(--accent, #6366f1);
+}
+
+.btn-save-project.saved:hover {
+  background: var(--accent-dark, #4f46e5);
+  border-color: var(--accent-dark, #4f46e5);
+}
+
+.btn-save-project svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+
+.btn-save-project.saved svg {
+  fill: currentColor;
+}
+
+/* View details link */
+.btn-details {
+  flex: 1;
+  padding: 0.5rem 0.875rem;
+  background: none;
+  color: var(--accent, #6366f1);
+  border: 1px solid var(--accent, #6366f1);
+  border-radius: 0.5rem;
+  text-decoration: none;
+  text-align: center;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-details:hover {
+  background: var(--accent, #6366f1);
+  color: white;
+}
