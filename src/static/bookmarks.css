@@ -31,6 +31,113 @@
    ------------------------------------------------------------------ */
 .saved-projects-panel {
   display: none;
+  margin-top: 3rem;
+  padding: 2rem;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.saved-projects-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+}
+
+.saved-projects-header h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-heading, #1f2937);
+}
+
+.saved-projects-header p {
+  font-size: 0.875rem;
+  color: var(--text-muted, #6b7280);
+  margin: 0.25rem 0 0 0;
+}
+
+.saved-projects-count {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted, #6b7280);
+  background: var(--gray-100, #f3f4f6);
+  padding: 0.375rem 0.875rem;
+  border-radius: 2rem;
+  white-space: nowrap;
+}
+
+.saved-projects-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.saved-project-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--gray-50, #f9fafb);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.saved-project-item:hover {
+  background: var(--gray-100, #f3f4f6);
+  border-color: var(--accent, #6366f1);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+  transform: translateY(-2px);
+}
+
+.saved-project-item a {
+  font-weight: 600;
+  color: var(--accent, #6366f1);
+  text-decoration: none;
+  transition: color 0.2s;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.saved-project-item a:hover {
+  color: var(--accent-dark, #4f46e5);
+  text-decoration: underline;
+}
+
+.saved-project-item span {
+  font-size: 0.8rem;
+  color: var(--text-muted, #6b7280);
+}
+
+.saved-project-remove {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--text-muted, #6b7280);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.saved-project-remove:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.saved-projects-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted, #6b7280);
+  font-style: italic;
 }
 
 /* ------------------------------------------------------------------
