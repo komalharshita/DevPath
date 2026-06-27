@@ -1,0 +1,13 @@
+{
+  "python": ["flask", "pandas", "requests"],
+  "javascript": ["node.js", "html", "css"],
+  "html": ["css", "javascript"],
+  "css": ["javascript"],
+  "flask": ["javascript", "html", "css"],
+  "pandas": ["requests"],
+  "node.js": ["javascript"],
+  "java": ["spring", "sql"],
+  "requests": [],
+  "spring": [],
+  "sql": []
+}

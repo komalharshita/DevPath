@@ -6,7 +6,7 @@ import os
 import threading
 
 ROADMAPS_FILE = os.path.join(
-    os.path.dirname(__file__), "..", "data", "career_roadmaps.json"
+    os.path.dirname(__file__), "..", "..", "data", "career_roadmaps.json"
 )
 _roadmaps_cache = None
 _cache_lock = threading.Lock()
