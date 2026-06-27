@@ -286,6 +286,7 @@ function updateProfileWidgets() {
   var pointsEl = document.getElementById("progress-points");
   var statsEl = document.getElementById("progress-stats");
   var meterFill = document.getElementById("progress-meter-fill");
+  var meterLabel = document.getElementById("progress-meter-label");
   var badgesEl = document.getElementById("progress-badges");
   var achievementList = document.getElementById("achievement-list");
   var leaderboardList = document.getElementById("leaderboard-list");
@@ -304,7 +305,7 @@ function updateProfileWidgets() {
     var percentage = Math.min(100, Math.round((progress.points / PROGRESS_MAX_POINTS) * 100));
     meterFill.style.width = percentage + "%";
     meterFill.setAttribute("aria-valuenow", String(percentage));
-    meterFill.textContent = percentage + "%";
+    if (meterLabel) meterLabel.textContent = percentage + "%";
   }
   if (badgesEl) {
     var badges = [

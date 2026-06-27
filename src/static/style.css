@@ -5126,6 +5126,16 @@ body.dark-theme .theme-toggle:hover {
   margin: 0.75rem 0;
 }
 
+.progress-meter-label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  text-align: right;
+}
+
 .progress-meter {
   background: var(--gray-200);
   border-radius: 100px;
@@ -5138,6 +5148,7 @@ body.dark-theme .theme-toggle:hover {
   height: 100%;
   border-radius: 100px;
   display: block;
+  min-width: 0;
   width: 0%;
   transition: width 0.3s ease;
 }

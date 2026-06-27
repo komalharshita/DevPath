@@ -119,6 +119,16 @@
       margin: 0.75rem 0;
     }
 
+    .progress-meter-label {
+      display: block;
+      margin-bottom: 0.4rem;
+      color: var(--text-muted, #6b7280);
+      font-size: 0.75rem;
+      font-weight: 700;
+      line-height: 1;
+      text-align: right;
+    }
+
     .progress-meter {
       background: var(--gray-200, #e5e7eb);
       border-radius: 100px;
@@ -131,6 +141,7 @@
       height: 100%;
       border-radius: 100px;
       display: block;
+      min-width: 0;
       width: 0%;
       transition: width 0.3s ease;
     }
@@ -605,8 +616,9 @@
           </div>
           <div class="stat-dashboard-value" id="progress-points">0</div>
           <div class="stat-dashboard-progress">
+            <span class="progress-meter-label" id="progress-meter-label">0%</span>
             <div class="progress-meter">
-              <span class="progress-meter-fill" id="progress-meter-fill" style="width: 0%;" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">0%</span>
+              <span class="progress-meter-fill" id="progress-meter-fill" style="width: 0%;" role="progressbar" aria-label="Points progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></span>
             </div>
           </div>
           <div class="stat-dashboard-footer">
