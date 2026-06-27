@@ -1921,7 +1921,7 @@ label {
   border-radius: var(--r-full);
   padding: 5px 14px;
   cursor: pointer;
-  transition: background var(--t), border-color var(--t), color var(--t);
+  transition: background var(--t), border-color var(--t), color var(--t), transform 0.3s ease;
 }
 
 .skill-chip:hover,
@@ -1929,6 +1929,7 @@ label {
   background: var(--indigo-700);
   border-color: var(--indigo-700);
   color: #ffffff;
+  transform: translateY(-5px);
 }
 
 .skill-chip:focus-visible {
