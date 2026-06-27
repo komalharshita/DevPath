@@ -110,6 +110,10 @@
   /* Accent shortcuts (components reference these) */
   --accent:       var(--indigo-600);
   --accent-hover: var(--indigo-700);
+  --tag-beginner-text: #065f46;
+  --tag-intermediate-text: #78350f;
+  --tag-advanced-bg: #fee2e2;
+  --tag-advanced-text: #7f1d1d;
 }
 
 /* =============================================================
