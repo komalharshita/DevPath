@@ -5380,3 +5380,59 @@ body.dark-theme .theme-toggle:hover {
   background: rgba(124, 58, 237, 0.15);
   color: #c4b5fd;
 }
+/* Extra small screens (360px - budget Android devices) */
+/* Extra small screens (360px - budget Android devices) */
+@media (max-width: 380px) {
+  /* Project cards — reduce padding & margins */
+  .project-card {
+    padding: 20px; /* Reduced from 30px 28px */
+    gap: 12px; /* Reduced from 16px */
+  }
+
+  /* Results grid — single column */
+  .results-grid {
+    grid-template-columns: 1fr;
+    gap: 16px; /* Reduced from 26px */
+  }
+
+  /* Tags — ensure wrap & visibility */
+  .project-card-tags {
+    gap: 6px; /* Reduced from 7px */
+    margin-bottom: 8px;
+  }
+
+  .project-tag {
+    font-size: 0.7rem; /* Reduced from 0.74rem */
+    padding: 3px 9px; /* Reduced from 3px 11px */
+    white-space: nowrap; /* Prevent text wrap */
+  }
+
+  /* Action buttons — full width, readable text */
+  .btn-save-project,
+  .btn-details {
+    padding: 10px 14px; /* Reduced from 11px 18px */
+    font-size: 0.82rem; /* Reduced from 0.88rem */
+    width: 100%;
+  }
+
+  .project-card-footer {
+    gap: 8px; /* Reduced from 10px */
+    padding-top: 6px; /* Reduced from 8px */
+  }
+
+  /* Card title — smaller on tiny screens */
+  .project-card-title {
+    font-size: 0.95rem; /* Reduced from 1.08rem */
+  }
+
+  /* Card description — tighter line height */
+  .project-card-desc {
+    font-size: 0.82rem; /* Reduced from 0.88rem */
+    line-height: 1.6; /* Slightly tighter */
+  }
+
+  /* Container padding */
+  .container {
+    padding: 0 16px; /* Reduced from 32px */
+  }
+}
