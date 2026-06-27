@@ -169,6 +169,142 @@
   });
 })();
 
+(function initNavbarScrollState() {
+  var navbar = document.getElementById("navbar");
+  if (!navbar) return;
+
+  function update() {
+    navbar.classList.toggle("navbar--scrolled", window.pageYOffset > 16);
+  }
+
+  window.addEventListener("scroll", update, { passive: true });
+  update();
+})();
+
+(function initNavActiveStates() {
+  var links = Array.prototype.slice.call(document.querySelectorAll(".nav-link[href^='#'], .nav-mobile-link[href^='#']"));
+  if (!links.length) return;
+
+  var sectionMap = links.reduce(function (map, link) {
+    var id = link.getAttribute("href");
+    var section = id && document.querySelector(id);
+    if (section) map[id] = section;
+    return map;
+  }, {});
+  var sections = Object.keys(sectionMap).map(function (id) { return sectionMap[id]; });
+  if (!sections.length) return;
+
+  function setActive(id) {
+    links.forEach(function (link) {
+      var active = link.getAttribute("href") === id;
+      link.classList.toggle("active", active);
+      if (active) link.setAttribute("aria-current", "page");
+      else link.removeAttribute("aria-current");
+    });
+  }
+
+  links.forEach(function (link) {
+    link.addEventListener("click", function () {
+      setActive(link.getAttribute("href"));
+    });
+  });
+
+  if (!("IntersectionObserver" in window)) {
+    setActive("#home");
+    return;
+  }
+
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      setActive("#" + entry.target.id);
+    });
+  }, {
+    rootMargin: "-35% 0px -55% 0px",
+    threshold: 0.01
+  });
+
+  sections.forEach(function (section) { observer.observe(section); });
+  setActive("#home");
+})();
+
+(function initScrollReveal() {
+  var revealSelector = [
+    ".stats-section .stat-card",
+    ".progress-section",
+    ".how-section .section-eyebrow",
+    ".how-section .section-title",
+    ".how-section .section-sub",
+    ".how-section .step-card",
+    ".features-section .section-eyebrow",
+    ".features-section .section-title",
+    ".features-section .section-sub",
+    ".features-section .feature-card",
+    ".form-section .section-eyebrow",
+    ".form-section .section-title",
+    ".form-section .section-sub",
+    ".form-card-outer",
+    ".results-section .section-eyebrow",
+    ".results-section .section-title",
+    ".results-section .section-sub",
+    ".project-card",
+    ".saved-projects-panel",
+    ".cta-section .cta-inner",
+    ".contact-reveal"
+  ].join(",");
+
+  var prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var observer = null;
+
+  function markRevealed(element) {
+    element.classList.add("reveal-on-scroll", "is-revealed");
+  }
+
+  function prepare(element, index) {
+    if (!element || element.classList.contains("reveal-on-scroll")) return;
+    element.classList.add("reveal-on-scroll");
+    element.style.setProperty("--reveal-delay", Math.min(index * 55, 220) + "ms");
+    if (prefersReducedMotion || !observer) {
+      markRevealed(element);
+      return;
+    }
+    observer.observe(element);
+  }
+
+  function observeTree(root) {
+    var scope = root || document;
+    var elements = Array.prototype.slice.call(scope.querySelectorAll(revealSelector));
+    if (scope.nodeType === 1 && scope.matches && scope.matches(revealSelector)) {
+      elements.unshift(scope);
+    }
+    elements.forEach(prepare);
+  }
+
+  if ("IntersectionObserver" in window && !prefersReducedMotion) {
+    observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-revealed");
+        observer.unobserve(entry.target);
+      });
+    }, {
+      threshold: 0.14,
+      rootMargin: "0px 0px -8% 0px"
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () { observeTree(document); });
+  } else {
+    observeTree(document);
+  }
+
+  window.DevPathReveal = {
+    observeTree: observeTree,
+    reveal: markRevealed
+  };
+})();
+
 var POINTS_PER_SEARCH     = 5;
 var POINTS_PER_VIEW       = 10;
 var POINTS_PER_CODE_OPEN  = 15;
@@ -690,6 +826,7 @@ updateProfileWidgets();
     resultsEmptyEl.style.display = "none";
     resultsGrid.style.display = "grid";
     projects.forEach(function (project) { resultsGrid.appendChild(buildProjectCard(project)); });
+    if (window.DevPathReveal) window.DevPathReveal.observeTree(resultsSection);
     resultsSection.scrollIntoView({ behavior: "smooth" });
   }
 

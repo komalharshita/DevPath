@@ -391,6 +391,20 @@
               d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </button>
+      </form>
+
+      <div class="nav-right">
+        <div class="nav-links" aria-label="Homepage sections">
+          <a href="#home" class="nav-link active">Home</a>
+          <a href="#how-it-works" class="nav-link">How It Works</a>
+          <a href="#features" class="nav-link">Features</a>
+          <a href="#the-project" class="nav-link">Find Project</a>
+        </div>
+
+        <div class="nav-actions">
+          <a href="/compare" class="nav-btn-outline">Compare</a>
+          {% include 'partials/theme_toggle.html' %}
+        </div>
       </div>
 
       <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation"
@@ -414,7 +428,7 @@
       <a href="#home" class="nav-mobile-link" role="menuitem">Home</a>
       <a href="#how-it-works" class="nav-mobile-link" role="menuitem">How It Works</a>
       <a href="#features" class="nav-mobile-link" role="menuitem">Features</a>
-      <a href="#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
+      <a href="#the-project" class="nav-mobile-link" role="menuitem">Find Project</a>
       <a href="/compare" class="nav-mobile-link" role="menuitem">Compare</a>
       <a href="/contact" class="nav-mobile-link" role="menuitem">Contact</a>
       <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
@@ -826,7 +840,7 @@
           <a href="#the-project" class="feature-card-link">Get starter code</a>
           <p>Download a working template for every project. Skip the blank-page problem and start building immediately.
           </p>
-          <a href="#find-project" class="feature-card-link">Get starter code</a>
+          <a href="#the-project" class="feature-card-link">Get starter code</a>
         </div>
       </div>
     </div>
@@ -1094,7 +1108,7 @@
           </div>
           <h3>No Projects Found</h3>
           <p id="empty-message">Try adjusting your skills or selecting a different interest area.</p>
-          <button class="btn-try-again" onclick="document.getElementById('find-project').scrollIntoView({behavior:'smooth'})">Try Different Inputs</button>
+          <button class="btn-try-again" onclick="document.getElementById('the-project').scrollIntoView({behavior:'smooth'})">Try Different Inputs</button>
         </div>
       </div>
 
@@ -1174,7 +1188,7 @@
           <li><a href="#how-it-works">How It Works</a></li>
           <li><a href="#features">Features</a></li>
           <li><a href="#the-project">Find Project</a></li>
-          <li><a href="#find-project">Find Project</a></li>
+          <li><a href="#the-project">Find Project</a></li>
           <li><a href="/contact">Contact Us</a></li>
         </ul>
       </div>
