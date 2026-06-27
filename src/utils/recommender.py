@@ -9,6 +9,7 @@ import json
 import os
 
 from utils.data_loader import load_all_projects
+# Import config - handle path for both direct imports and test imports
 
 MAX_RESULTS = 3
 MAX_RELATED = 3
@@ -21,17 +22,6 @@ _CLUSTERS_PATH = os.path.join(
 VALID_LEVELS = {"beginner", "intermediate", "advanced"}
 VALID_INTERESTS = {"web", "data", "education", "automation", "games", "cybersecurity", "devops", "backend", "tools", "productivity", "business logic", "mobile", "machine learning/ai"}
 VALID_TIME_AVAILABILITY = {"low", "medium", "high"}
-SCORING_WEIGHTS = {
-    "skill": 3,
-    "level": 2,
-    "interest": 2,
-    "time": 1,
-}
-
-WEIGHT_SKILL = SCORING_WEIGHTS["skill"]
-WEIGHT_LEVEL = SCORING_WEIGHTS["level"]
-WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
-WEIGHT_TIME = SCORING_WEIGHTS["time"]
 
 VALID_INTERESTS = {
     "web", "data", "education", "automation", "games",
@@ -146,6 +136,15 @@ def ml_similarity_score(project, user_skills, level, interest, time_availability
 
 def score_single_project(project, user_skills, level, interest, time_availability):
     TIME_RANKS = ["low", "medium", "high"]
+    
+    import sys
+    import os
+    if os.path.dirname(os.path.dirname(os.path.abspath(__file__))) not in sys.path:
+        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from src.config import get_recommendation_weights
+    
+    # Load weights from config
+    weights = get_recommendation_weights()
 
     user_time    = time_availability.strip().lower()
     project_time = project.get("time", "").strip().lower()
@@ -163,21 +162,21 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
     if project_skills:
         coverage = matched_skills / len(project_skills)
-        score += matched_skills * SCORING_WEIGHTS["skill"] * coverage
+        score += matched_skills * weights["skill"] * coverage
     else:
-        score += matched_skills * SCORING_WEIGHTS["skill"]
+        score += matched_skills * weights["skill"]
 
     if project.get("level", "").lower() == level.lower():
-        score += SCORING_WEIGHTS["level"]
+        score += weights["level"]
 
     p_interest = project.get("interest", "").lower()
     u_interest = interest.lower()
     # Use partial matching for interest as well
     if p_interest == u_interest or (u_interest and u_interest in p_interest) or (p_interest and p_interest in u_interest):
-        score += SCORING_WEIGHTS["interest"]
+        score += weights["interest"]
 
     if project.get("time", "").lower() == time_availability.lower():
-        score += SCORING_WEIGHTS["time"]
+        score += weights["time"]
         
     graph = _load_skill_graph()
     score += gap_boost(user_skills, project_skills, graph)
