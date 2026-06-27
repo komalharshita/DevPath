@@ -18,6 +18,7 @@ import logging
 import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from app import app
 from utils.error_logger import log_exception

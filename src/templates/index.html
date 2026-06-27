@@ -859,14 +859,12 @@
             </div>
             <button type="button" class="share-prefill-banner-close" id="share-prefill-banner-close" aria-label="Dismiss banner">&times;</button>
           </div>
-          <form id="recommend-form" novalidate onsubmit="event.preventDefault()">
             <div class="form-group">
               <div class="form-label-row" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
                 <label for="skills-input">
                   Your Skills
                   <button type="button" class="tooltip" aria-label="Skills help" aria-describedby="skills-tooltip">
                     <span aria-hidden="true">ⓘ</span>
-  <span aria-hidden="true">ⓘ</span>
                     <span id="skills-tooltip" class="tooltip-text" role="tooltip">
                       Add technologies, programming languages, or tools you know like Python, React, Git, SQL, etc.
                     </span>
@@ -876,8 +874,8 @@
                 
                 <!-- Reset button and Inline GitHub Trigger -->
                 <div style="display: flex; gap: 3px; align-items: center;">
-                   <button type="reset" id="clear-filters-btn" class="btn-clear" style="padding: 4px 12px; font-size: 0.75rem;">
-                    Clear Filters
+                   <button type="reset" id="reset-form-btn" class="btn-clear" style="padding: 4px 12px; font-size: 0.75rem;">
+                    Reset
                   </button>
                 <div class="github-inline-trigger" id="github-trigger-wrap" style="line-height: 1.2;">
                   <button type="button" id="btn-show-github" class="resource-link"
@@ -907,10 +905,6 @@
                   </button>
                 </div>
                 <div id="skills-suggestions" class="skills-suggestions skills-dropdown" style="display: none; max-height: 250px; overflow-y: auto; border: 1px solid var(--color-border); border-top: none; background: white; position: absolute; width: 100%; margin-top: -2px; z-index: 10;"></div>
-                <input type="text" id="skills-input" placeholder="Type a skill and press Enter..." autocomplete="off" />
-                <input type="text" id="skills-input" placeholder="Type a skill and press Enter..."
-                  autocomplete="off" aria-haspopup="listbox" aria-expanded="false" aria-controls="skills-suggestions" />
-                <div id="skills-suggestions" class="skills-suggestions"></div>
 
               </div>
               <input type="hidden" id="skills" name="skills" />
@@ -1030,6 +1024,8 @@
               <div class="form-error-msg" id="time-error"></div>
             </div>
 
+            <div class="form-error-msg" id="form-error-general"></div>
+
             <div class="form-actions">
               <button type="submit" class="btn-submit" id="submit-btn">
                 <span id="btn-label">Generate My Projects</span>
@@ -1039,9 +1035,6 @@
                 <span>Clear Filters</span>
               </button>
             </div>
-              <span id="btn-loading" style="display:none;">Finding matches...</span>
-            </button>
-        </div>
 
           </form>
         </div>
@@ -1276,6 +1269,7 @@
   </button>
 
   <script src="/static/script.js"></script>
+  <script src="/static/bookmarks.js"></script>
   
   <script>
     // Tab switching for leaderboard/achievements (adds to your existing JS)
@@ -1303,9 +1297,6 @@
   </script>
     
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
-
-  <script src="/static/script.js"></script>
-  </script>
 </body>
 
 </html>
