@@ -58,6 +58,7 @@
   {% include 'partials/theme_head.html' %}
   <link rel="stylesheet" href="/static/style.css" />
   <link rel="stylesheet" href="/static/bookmarks.css" />
+  <link rel="stylesheet" href="/static/recently-viewed.css" />
   <link
     href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet" />
@@ -1100,6 +1101,17 @@
 
       <div class="results-grid" id="results-grid"></div>
 
+      <div class="recently-viewed-panel" id="recently-viewed-panel">
+        <div class="recently-viewed-header">
+          <div>
+            <h3>Recently Viewed</h3>
+            <p>Projects you've checked out recently.</p>
+          </div>
+          <span class="recently-viewed-count" id="recently-viewed-count">0 viewed</span>
+        </div>
+        <div class="recently-viewed-list" id="recently-viewed-list"></div>
+      </div>
+
       <div class="saved-projects-panel" id="saved-projects-panel">
         <div class="saved-projects-header">
           <div>
@@ -1270,6 +1282,7 @@
 
   <script src="/static/script.js"></script>
   <script src="/static/bookmarks.js"></script>
+  <script src="/static/recently-viewed.js"></script>
   
   <script>
     // Tab switching for leaderboard/achievements (adds to your existing JS)
@@ -1297,6 +1310,10 @@
   </script>
     
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="/static/data/skills.js"></script>
+  <script src="/static/bookmarks.js"></script>     <!-- BEFORE script.js -->
+  <script src="/static/recently-viewed.js"></script>
+  <script src="/static/script.js"></script>
 </body>
 
 </html>
