@@ -22,7 +22,7 @@
     </nav>
 
     <section class="hero" style="min-height: 100vh; display:flex; align-items:center; justify-content:center; text-align:center;">
-        <div class="hero-content" style="max-width: 700px; width:100%;">
+        <div class="hero-content contact-reveal" style="max-width: 700px; width:100%;">
             <div class="hero-badge">
                 Contact DevPath
             </div>
@@ -35,7 +35,7 @@
                 We'd love to hear from you and improve DevPath together.
             </p>
 
-            <div style="
+            <div class="contact-panel" style="
                 background: rgba(255,255,255,0.06);
                 box-shadow: 0 8px 32px rgba(0,0,0,0.2);
                 border: 1px solid rgba(255,255,255,0.1);
@@ -72,7 +72,7 @@
                 
             </div>
 
-            <div style="margin-top: 2rem; display:flex; justify-content:center; align-items:center; gap:1.5rem; flex-wrap:wrap;">
+            <div class="contact-reveal" style="margin-top: 2rem; display:flex; justify-content:center; align-items:center; gap:1.5rem; flex-wrap:wrap;">
                 <a href="https://github.com/komalharshita/DevPath"
                    target="_blank"
                    class="btn-primary">
@@ -93,5 +93,6 @@
         </div>
     </section>
 
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
