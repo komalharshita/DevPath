@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Completion certificate generation for finished learning paths (#1220)
+- PDF certificate download with jsPDF integration
+- Public certificate verification system using UUID codes
+- Database storage for certificate tracking and validation
+- Certificate routes for generation, download, and verification
 - "Share My Result" button on results page that copies a pre-filled URL to clipboard (#411)
 - Auto-fill form and trigger recommendations when opening a shared URL (#411)
 - Initial CHANGELOG.md setup for tracking project history
