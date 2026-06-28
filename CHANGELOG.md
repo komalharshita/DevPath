@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Community discussion threads per learning path (#1218)
+- Thread creation, comments, and moderation endpoints
+- Search functionality for discussion threads
 - Offline mode with service worker caching for recently visited paths (#1219)
 - Service worker for intelligent caching and offline fallback
 - Offline detection banner with connection status feedback
