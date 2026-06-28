@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Progress tracking dashboard with visual charts (#1216)
+- Circular progress ring showing completion percentage
+- Weekly activity bar chart (last 7 days)
+- Streak counter with flame emoji
+- Per-path progress tracking
 - Bookmarking system for resources and topics (#1217)
 - localStorage bookmarks for guests, database bookmarks for authenticated users
 - Popular bookmarks endpoint for trending resources
