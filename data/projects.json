@@ -802,5 +802,219 @@
       "Python os module: https://docs.python.org/3/library/os.html"
     ],
     "starter_code": "starter_code/course_tracker.py"
-  }
-]
+  },
+  {
+  "id": 23,
+  "title": "Spam Email Classifier",
+  "skills": ["Python"],
+  "level": "Beginner",
+  "interest": "Machine Learning/AI",
+  "time": "Medium",
+  "description": "A machine learning project that classifies emails as spam or not spam using text processing and feature extraction techniques. Learn text preprocessing, TF-IDF vectorization, and classification models.",
+  "features": [
+    "Load and clean email datasets",
+    "Convert text into numerical features using TF-IDF",
+    "Train and evaluate a spam classifier",
+    "Predict whether new emails are spam or not"
+  ],
+  "tech_stack": [
+    "Python",
+    "pandas",
+    "scikit-learn"
+  ],
+  "roadmap": [
+    "Step 1: Load the email dataset using pandas",
+    "Step 2: Clean and preprocess email text",
+    "Step 3: Split the dataset into training and testing sets",
+    "Step 4: Convert text into TF-IDF features",
+    "Step 5: Train a classification model",
+    "Step 6: Evaluate model accuracy and precision",
+    "Step 7: Predict labels for new emails"
+  ],
+  "resources": [
+    "scikit-learn documentation: https://scikit-learn.org/stable/",
+    "Pandas documentation: https://pandas.pydata.org/docs/",
+    "Machine Learning Crash Course: https://developers.google.com/machine-learning/crash-course"
+  ],
+  "starter_code": "starter_code/spam_classifier.py"
+},
+{
+  "id": 24,
+  "title": "House Price Predictor",
+  "skills": ["Python"],
+  "level": "Intermediate",
+  "interest": "Machine Learning/AI",
+  "time": "High",
+  "description": "Build a regression model that predicts house prices using historical housing data. Learn feature engineering, model evaluation, and data visualization.",
+  "features": [
+    "Load housing datasets",
+    "Perform feature engineering",
+    "Train a regression model",
+    "Predict house prices for new properties"
+  ],
+  "tech_stack": [
+    "Python",
+    "pandas",
+    "scikit-learn",
+    "matplotlib"
+  ],
+  "roadmap": [
+    "Step 1: Load and inspect the housing dataset",
+    "Step 2: Handle missing values and clean data",
+    "Step 3: Select important features",
+    "Step 4: Split data into training and testing sets",
+    "Step 5: Train a regression model",
+    "Step 6: Evaluate prediction performance",
+    "Step 7: Visualize predictions and errors",
+    "Step 8: Predict prices for custom inputs"
+  ],
+  "resources": [
+    "scikit-learn regression guide: https://scikit-learn.org/stable/supervised_learning.html",
+    "Pandas documentation: https://pandas.pydata.org/docs/",
+    "Matplotlib tutorials: https://matplotlib.org/stable/tutorials"
+  ],
+  "starter_code": "starter_code/house_price_predictor.py"
+},
+{
+  "id": 25,
+  "title": "Image Classification App",
+  "skills": ["Python"],
+  "level": "Intermediate",
+  "interest": "Machine Learning/AI",
+  "time": "High",
+  "description": "Create an image classification application capable of recognizing image categories using deep learning techniques.",
+  "features": [
+    "Load and preprocess image datasets",
+    "Train a deep learning model",
+    "Classify uploaded images",
+    "Display prediction confidence scores"
+  ],
+  "tech_stack": [
+    "Python",
+    "TensorFlow",
+    "OpenCV"
+  ],
+  "roadmap": [
+    "Step 1: Load image dataset",
+    "Step 2: Resize and normalize images",
+    "Step 3: Build a neural network model",
+    "Step 4: Train the model",
+    "Step 5: Evaluate model performance",
+    "Step 6: Save the trained model",
+    "Step 7: Create image prediction functionality",
+    "Step 8: Test with custom images"
+  ],
+  "resources": [
+    "TensorFlow documentation: https://www.tensorflow.org/learn",
+    "OpenCV tutorials: https://docs.opencv.org/master/d9/df8/tutorial_root.html",
+    "TensorFlow image classification guide: https://www.tensorflow.org/tutorials/images/classification"
+  ],
+  "starter_code": "starter_code/image_classifier.py"
+},
+{
+  "id": 26,
+  "title": "Dockerized Flask Application",
+  "skills": ["Python", "Docker"],
+  "level": "Beginner",
+  "interest": "DevOps",
+  "time": "Medium",
+  "description": "Learn containerization by packaging a Flask application with Docker and running it in isolated environments.",
+  "features": [
+    "Create a Dockerfile",
+    "Build Docker images",
+    "Run containers locally",
+    "Expose application ports"
+  ],
+  "tech_stack": [
+    "Python",
+    "Flask",
+    "Docker"
+  ],
+  "roadmap": [
+    "Step 1: Create a simple Flask application",
+    "Step 2: Write a Dockerfile",
+    "Step 3: Build the Docker image",
+    "Step 4: Run the container locally",
+    "Step 5: Configure environment variables",
+    "Step 6: Expose the application port",
+    "Step 7: Test containerized deployment"
+  ],
+  "resources": [
+    "Docker official docs: https://docs.docker.com/",
+    "Flask quickstart: https://flask.palletsprojects.com/quickstart/",
+    "Docker getting started guide: https://docs.docker.com/get-started/"
+  ],
+  "starter_code": "starter_code/docker_flask_app.py"
+},
+{
+  "id": 27,
+  "title": "CI/CD Pipeline with GitHub Actions",
+  "skills": ["Git", "GitHub"],
+  "level": "Intermediate",
+  "interest": "DevOps",
+  "time": "Medium",
+  "description": "Automate testing and deployment workflows using GitHub Actions and learn modern CI/CD practices.",
+  "features": [
+    "Run tests automatically",
+    "Validate pull requests",
+    "Build deployment workflows",
+    "Monitor workflow execution"
+  ],
+  "tech_stack": [
+    "GitHub Actions",
+    "YAML",
+    "Git"
+  ],
+  "roadmap": [
+    "Step 1: Create a GitHub repository",
+    "Step 2: Configure workflow triggers",
+    "Step 3: Add dependency installation steps",
+    "Step 4: Add automated testing",
+    "Step 5: Configure build jobs",
+    "Step 6: Add deployment stages",
+    "Step 7: Monitor workflow execution"
+  ],
+  "resources": [
+    "GitHub Actions documentation: https://docs.github.com/actions",
+    "CI/CD concepts: https://www.redhat.com/en/topics/devops/what-is-ci-cd",
+    "YAML tutorial: https://www.yaml.org/start.html"
+  ],
+  "starter_code": "starter_code/github_actions_pipeline.yml"
+},
+{
+  "id": 28,
+  "title": "Kubernetes Deployment Manager",
+  "skills": ["Docker", "Linux"],
+  "level": "Advanced",
+  "interest": "DevOps",
+  "time": "High",
+  "description": "Deploy and manage containerized applications using Kubernetes while learning scaling, services, and deployments.",
+  "features": [
+    "Create deployment manifests",
+    "Scale applications",
+    "Monitor running pods",
+    "Expose applications using services"
+  ],
+  "tech_stack": [
+    "Kubernetes",
+    "Docker",
+    "Linux"
+  ],
+  "roadmap": [
+    "Step 1: Install a local Kubernetes cluster",
+    "Step 2: Create deployment manifests",
+    "Step 3: Deploy applications to the cluster",
+    "Step 4: Configure Kubernetes services",
+    "Step 5: Scale deployments",
+    "Step 6: Monitor pods and logs",
+    "Step 7: Update container images",
+    "Step 8: Test application availability"
+  ],
+  "resources": [
+    "Kubernetes documentation: https://kubernetes.io/docs/",
+    "Kubernetes tutorials: https://kubernetes.io/docs/tutorials/",
+    "Docker documentation: https://docs.docker.com/"
+  ],
+  "starter_code": "starter_code/kubernetes_manager.yaml"
+}
+  ]
