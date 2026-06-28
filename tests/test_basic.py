@@ -41,9 +41,7 @@ WEIGHT_TIME     = SCORING_WEIGHTS["time"]
 from app import app, internal_server_error
 
 
-# ============================================================
 # Test setup
-# ============================================================
 
 def setup_module():
     """Clear the data cache before running the test suite to ensure clean state."""
@@ -51,9 +49,7 @@ def setup_module():
     clear_roadmap_cache()
 
 
-# ============================================================
 # Data loader tests
-# ============================================================
 
 def test_projects_json_loads():
     """The data file must exist and contain at least one project."""
@@ -186,9 +182,7 @@ def test_find_project_by_id_missing():
     assert result is None, "Expected None for a non-existent project ID"
 
 
-# ============================================================
 # Recommender utility tests
-# ============================================================
 
 def test_parse_skills_basic():
     """parse_skills should split on commas and lowercase each entry."""
@@ -397,9 +391,7 @@ def test_whitespace_stripped_in_skills():
     assert [p["id"] for p in results_clean] == [p["id"] for p in results_spaced]
 
 
-# ============================================================
 # Input validation tests
-# ============================================================
 
 def test_validate_all_valid():
     """No errors should be returned when all fields are provided."""
@@ -434,9 +426,7 @@ def test_validate_all_missing():
     assert len(errors) == 4
 
 
-# ============================================================
 # HTTP route tests (using Flask test client)
-# ============================================================
 
 def get_client():
     """Return a Flask test client with testing mode enabled."""
@@ -712,9 +702,7 @@ def test_api_recommend_invalid_level_no_crash():
         assert "projects" in data
 
 
-# ============================================================
 # Sitemap and robots.txt tests
-# ============================================================
 
 def test_sitemap_returns_200():
     """The /sitemap.xml route must return HTTP 200."""
@@ -778,9 +766,7 @@ def test_project_links_have_noopener():
     assert b'rel="noopener noreferrer"' in response.data
 
 
-# ============================================================
 # Career roadmap comparison tests
-# ============================================================
 
 def test_career_roadmaps_load():
     """Career roadmaps JSON must load and contain entries."""
@@ -862,6 +848,92 @@ def test_sitemap_includes_compare():
     assert response.status_code == 200
     assert b"/compare" in response.data
 
+
+
+# Learning path API tests
+#
+# _store in utils/learning_path.py is a module-level dict that persists
+# for the lifetime of the test process — there's no fixture that clears
+# it between tests (unlike clear_cache() for projects). Each test below
+# uses its own unique path_id to avoid colliding with paths created by
+# other tests or previous runs.
+
+def test_create_learning_path_succeeds_within_size_limit():
+    """A reasonably small payload should be created successfully."""
+    client = get_client()
+    response = client.post(
+        "/api/learning-path/test-create-within-limit",
+        json={"notes": "a small, well within the 64KB limit"},
+        headers={"X-Learning-Path-Token": "test-token-within-limit"},
+    )
+    assert response.status_code == 201, f"Expected 201, got {response.status_code}: {response.get_json()}"
+    data = response.get_json()
+    assert data["path_id"] == "test-create-within-limit"
+
+
+def test_create_learning_path_oversized_payload_rejected():
+    """POST /api/learning-path/<id> must return 400 when the raw body exceeds 64KB."""
+    client = get_client()
+    oversized_payload = {"notes": "x" * (70 * 1024)}  # ~70KB, over the 64KB limit
+
+    response = client.post(
+        "/api/learning-path/test-create-oversized",
+        json=oversized_payload,
+        headers={"X-Learning-Path-Token": "test-token-create-oversized"},
+    )
+    assert response.status_code == 400, f"Expected 400, got {response.status_code}: {response.get_json()}"
+    data = response.get_json()
+    assert "error" in data
+    assert "size limit" in data["error"].lower()
+
+
+def test_update_learning_path_oversized_payload_rejected():
+    """PUT /api/learning-path/<id> must return 400 when the raw body exceeds 64KB."""
+    client = get_client()
+    path_id = "test-update-oversized"
+    token = "test-token-update-oversized"
+
+    # Create a small, valid path first so there's something to update.
+    create_response = client.post(
+        f"/api/learning-path/{path_id}",
+        json={"notes": "initial small payload"},
+        headers={"X-Learning-Path-Token": token},
+    )
+    assert create_response.status_code == 201
+
+    oversized_payload = {"notes": "x" * (70 * 1024)}
+    response = client.put(
+        f"/api/learning-path/{path_id}",
+        json=oversized_payload,
+        headers={"X-Learning-Path-Token": token},
+    )
+    assert response.status_code == 400, f"Expected 400, got {response.status_code}: {response.get_json()}"
+    data = response.get_json()
+    assert "error" in data
+    assert "size limit" in data["error"].lower()
+
+
+def test_update_learning_path_within_limit_succeeds():
+    """A reasonably small update payload should succeed normally, unaffected by the size guard."""
+    client = get_client()
+    path_id = "test-update-within-limit"
+    token = "test-token-update-within-limit"
+
+    create_response = client.post(
+        f"/api/learning-path/{path_id}",
+        json={"notes": "initial"},
+        headers={"X-Learning-Path-Token": token},
+    )
+    assert create_response.status_code == 201
+
+    response = client.put(
+        f"/api/learning-path/{path_id}",
+        json={"notes": "updated, still small"},
+        headers={"X-Learning-Path-Token": token},
+    )
+    assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.get_json()}"
+    data = response.get_json()
+    assert data["path_id"] == path_id
 
 
 # ============================================================

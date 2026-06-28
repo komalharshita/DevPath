@@ -42,9 +42,6 @@ def index():
         stats = get_project_stats()
         available_levels = get_available_levels()
     except Exception as e:
-        # In development, we prefer rendering a fallback homepage rather than
-        # aborting entirely. Log the error and use safe defaults so UI/layout
-        # checks can proceed.
         print("Warning: failed to load project stats:", e)
         stats = {"total_projects": 0, "unique_skills": 0, "beginner_friendly": 0}
         available_levels = ["Beginner", "Intermediate", "Advanced"]
@@ -115,7 +112,6 @@ def recommend():
     if not payload:
         return jsonify({"error": "Request body must be valid JSON."}), 400
 
-    # Reject non-string values (e.g. null, lists, numbers) before calling .strip()
     string_fields = ("skills", "level", "interest", "time")
     for field in string_fields:
         value = payload.get(field)
@@ -127,10 +123,8 @@ def recommend():
     interest          = (payload.get("interest") or "").strip()
     time_availability = (payload.get("time") or "").strip()
 
-    # Validate before running the recommendation engine
     errors = validate_recommendation_inputs(skills, level, interest, time_availability)
     if errors:
-        # Return only the first error to keep the UI message clean
         return jsonify({"error": errors[0]}), 400
 
     if interest_has_no_projects(interest):
@@ -151,16 +145,13 @@ def recommend():
             )
         }), 200
 
-    # Ensure all projects have IDs in the response
     projects_data = []
     for project in results:
-        project_dict = dict(project)  # Convert to dict if needed
-        # Make sure ID is included
+        project_dict = dict(project)
         if 'id' not in project_dict:
             project_dict['id'] = project.get('id', 0)
         projects_data.append(project_dict)
 
-    # Return main recommendations, related, and progression
     response_data = {
         "projects": projects_data,
         "related": [dict(p) for p in recommendations_data.get("related", [])],
@@ -174,21 +165,7 @@ def recommend():
 
 @main.route("/api/project/<int:project_id>/resources")
 def project_resources(project_id):
-    """Return the validated resource list for a project.
-
-    Each resource is parsed from its raw "Label: URL" string format and
-    returned as a structured object so the frontend can render broken
-    links differently from valid ones.
-
-    Response shape:
-        {
-            "project_id": 1,
-            "resources": [
-                {"label": "Python official docs", "url": "https://docs.python.org", "valid": true},
-                {"label": "Broken link", "url": "not-a-url", "valid": false}
-            ]
-        }
-    """
+    """Return the validated resource list for a project."""
     from utils.url_validator import validate_resources
 
     project = find_project_by_id(project_id)
@@ -244,7 +221,6 @@ def download_code(project_id):
 def sitemap():
     """
     Generate and return a sitemap.xml for search engine indexing.
-    Includes the homepage and all individual project detail pages.
     """
     base = request.host_url.rstrip("/")
     projects = load_all_projects()
@@ -282,7 +258,6 @@ def search_projects():
 
     for project in projects:
 
-        # Combine searchable project fields into one lowercase string
         searchable_text = " ".join([
             project.get("title", ""),
             project.get("description", ""),
@@ -298,7 +273,6 @@ def search_projects():
     return jsonify(filtered_projects)
 
 
-# ---------------------------------------------------------------------------
 # Learning path API
 #
 # Endpoints for reading and writing a user's learning path data.  Every
@@ -309,7 +283,9 @@ def search_projects():
 #
 # Token transport: the X-Learning-Path-Token request header.
 # Path identity:   the <path_id> URL segment (opaque, UUID-like string).
-# ---------------------------------------------------------------------------
+#
+# Payload size: requests are also rejected with 400 if the raw body
+# exceeds _MAX_DATA_BYTES, enforced by _payload_too_large() below.
 
 _TOKEN_HEADER = "X-Learning-Path-Token"
 _MAX_DATA_BYTES = 64 * 1024  # 64 KB — guard against oversized payloads
@@ -318,6 +294,17 @@ _MAX_DATA_BYTES = 64 * 1024  # 64 KB — guard against oversized payloads
 def _extract_token(req):
     """Return the bearer token from the request header, or None if absent."""
     return req.headers.get(_TOKEN_HEADER, "").strip() or None
+
+
+def _payload_too_large(req):
+    """
+    Return True if the raw request body exceeds _MAX_DATA_BYTES.
+
+    Checked against the raw body (req.get_data()) rather than the parsed
+    JSON so that oversized requests are rejected before the (potentially
+    expensive) JSON parse even happens.
+    """
+    return len(req.get_data()) > _MAX_DATA_BYTES
 
 
 @main.route("/api/learning-path/<path_id>", methods=["POST"])
@@ -330,14 +317,21 @@ def create_path(path_id):
 
     Request body (JSON):
         Any JSON object representing the initial learning-path state.
+        Must not exceed _MAX_DATA_BYTES (64 KB).
 
     Response 201:  {"path_id": "<path_id>", "message": "Learning path created."}
-    Response 400:  malformed request body or invalid path_id / token format.
+    Response 400:  malformed request body, invalid path_id / token format,
+                   or payload exceeds the size limit.
     Response 409:  a learning path with this path_id already exists.
     """
     token = _extract_token(request)
     if not token:
         return jsonify({"error": f"'{_TOKEN_HEADER}' header is required."}), 400
+
+    if _payload_too_large(request):
+        return jsonify({
+            "error": f"Request payload exceeds the {_MAX_DATA_BYTES // 1024}KB size limit."
+        }), 400
 
     payload = request.get_json(silent=True)
     if payload is None:
@@ -395,15 +389,22 @@ def update_path(path_id):
 
     Request body (JSON):
         Any JSON object representing the new learning-path state.
+        Must not exceed _MAX_DATA_BYTES (64 KB).
 
     Response 200:  {"path_id": "<path_id>", "message": "Learning path updated."}
-    Response 400:  malformed request body, missing token, or invalid format.
+    Response 400:  malformed request body, missing token, invalid format,
+                   or payload exceeds the size limit.
     Response 403:  token does not match the owner token.
     Response 404:  no learning path found for this path_id.
     """
     token = _extract_token(request)
     if not token:
         return jsonify({"error": f"'{_TOKEN_HEADER}' header is required."}), 400
+
+    if _payload_too_large(request):
+        return jsonify({
+            "error": f"Request payload exceeds the {_MAX_DATA_BYTES // 1024}KB size limit."
+        }), 400
 
     payload = request.get_json(silent=True)
     if payload is None:
