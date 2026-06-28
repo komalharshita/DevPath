@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Bookmarking system for resources and topics (#1217)
+- localStorage bookmarks for guests, database bookmarks for authenticated users
+- Popular bookmarks endpoint for trending resources
 - Community discussion threads per learning path (#1218)
 - Thread creation, comments, and moderation endpoints
 - Search functionality for discussion threads
