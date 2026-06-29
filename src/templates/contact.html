@@ -5,6 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us - DevPath</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .glass-panel {
+            background: rgba(255,255,255,0.06);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 2rem;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+        }
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            max-width: 800px;
+            margin: 2rem auto 0;
+            text-align: left;
+        }
+        @media (min-width: 768px) {
+            .contact-grid {
+                grid-template-columns: 1fr 1.5fr;
+            }
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            color: #d1d5db;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .form-input, .form-textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+        }
+        .contact-info-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .contact-info-list li {
+            color: #d1d5db;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+    </style>
 </head>
 <body>
 
@@ -22,7 +84,7 @@
     </nav>
 
     <section class="hero" style="min-height: 100vh; display:flex; align-items:center; justify-content:center; text-align:center;">
-        <div class="hero-content" style="max-width: 700px; width:100%;">
+        <div class="hero-content" style="max-width: 800px; width:100%; padding: 2rem;">
             <div class="hero-badge">
                 Contact DevPath
             </div>
@@ -35,44 +97,54 @@
                 We'd love to hear from you and improve DevPath together.
             </p>
 
-            <div style="
-                background: rgba(255,255,255,0.06);
-                box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-                border: 1px solid rgba(255,255,255,0.1);
-                padding: 2rem;
-                border-radius: 16px;
-                max-width: 500px;
-                margin: 2rem auto 0;
-                transform: translateX(20px);
-                backdrop-filter: blur(10px);
-                text-align:center;
-            ">
-                <h3 style="color: white; margin-bottom: 1rem;">
-                    Contact Information
-                </h3>
+            <div class="contact-grid">
+                <!-- Contact Information -->
+                <div class="glass-panel" style="display: flex; flex-direction: column; justify-content: center;">
+                    <h3 style="color: white; margin-bottom: 1.5rem; font-size: 1.5rem;">
+                        Contact Information
+                    </h3>
+                    <ul class="contact-info-list">
+                        <li>
+                            <span style="font-size: 1.2rem;">📧</span> support@devpath.dev
+                        </li>
+                        <li>
+                            <span style="font-size: 1.2rem;">🌐</span> GitHub Community Support
+                        </li>
+                        <li>
+                            <span style="font-size: 1.2rem;">💡</span> Open to feedback, suggestions, and contributions
+                        </li>
+                    </ul>
+                </div>
 
-                <p style="color: #d1d5db; margin-bottom: 1rem;">
-                    📧 support@devpath.dev
-                </p>
-
-                <p style="color: #d1d5db; margin-bottom: 1rem;">
-                    🌐 GitHub Community Support
-                </p>
-
-                <p style="color: #d1d5db;">
-                    💡 Open to feedback, suggestions, and contributions
-                </p>
+                <!-- Contact Form -->
+                <div class="glass-panel">
+                    <form action="https://api.web3forms.com/submit" method="POST">
+                        <!-- Replace with your actual Web3Forms access key -->
+                        <input type="hidden" name="access_key" value="5886c0b3-7787-464c-a6a2-ed73a1926f60">
+                        
+                        <div class="form-group">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" id="name" name="name" class="form-input" placeholder="Your Name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" id="email" name="email" class="form-input" placeholder="you@example.com" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea id="message" name="message" class="form-textarea" rows="4" placeholder="How can we help you?" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary" style="width: 100%; border: none; cursor: pointer; justify-content: center;">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
             </div>
 
-            
-
-            <div class="contact-info" style="margin-top: 3rem auto 0 auto;">
-                
-
-                
-            </div>
-
-            <div style="margin-top: 2rem; display:flex; justify-content:center; align-items:center; gap:1.5rem; flex-wrap:wrap;">
+            <div style="margin-top: 3rem; display:flex; justify-content:center; align-items:center; gap:1.5rem; flex-wrap:wrap;">
                 <a href="https://github.com/komalharshita/DevPath"
                    target="_blank"
                    class="btn-primary">
