@@ -417,6 +417,20 @@ updateProfileWidgets();
   var availableSkills = (typeof skills !== "undefined" && Array.isArray(skills))
     ? skills.map(function (item) { return item.label; }).filter(Boolean)
     : quickPickChips.map(function (chip) { return chip.getAttribute("data-skill"); });
+
+  // Initialize Fuse.js if loaded via CDN (fuse.basic.min.js)
+  var fuse = null;
+  try {
+    if (typeof Fuse !== 'undefined' && Array.isArray(availableSkills)) {
+      fuse = new Fuse(availableSkills, {
+        includeScore: true,
+        threshold: 0.36,
+        ignoreLocation: true
+      });
+    }
+  } catch (err) {
+    fuse = null;
+  }
   var activeSuggestionIndex = -1;
   var visibleSuggestions = [];
 
@@ -512,6 +526,15 @@ updateProfileWidgets();
   function filteredSkills(query) {
     var q = normalize(query);
     if (!q) return [];
+    // Use Fuse.js fuzzy search when available for better suggestions
+    if (fuse) {
+      try {
+        var results = fuse.search(q).map(function (r) { return r && r.item ? r.item : r; });
+        return results.filter(function (s) { return !isSelected(s); }).slice(0, 8);
+      } catch (err) {
+        // Fall back to simple filtering on error
+      }
+    }
     return availableSkills.filter(function (skill) {
       return normalize(skill).indexOf(q) !== -1 && !isSelected(skill);
     }).slice(0, 8);
