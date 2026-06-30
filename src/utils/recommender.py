@@ -144,7 +144,7 @@ def ml_similarity_score(project, user_skills, level, interest, time_availability
 
     return _cosine_similarity(user_vector, project_vector)
 
-def score_single_project(project, user_skills, level, interest, time_availability):
+def score_single_project(project, user_skills, level, interest, time_availability, graph=None ):
     TIME_RANKS = ["low", "medium", "high"]
 
     user_time    = time_availability.strip().lower()
@@ -179,7 +179,9 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
     if project.get("time", "").lower() == time_availability.lower():
         score += SCORING_WEIGHTS["time"]
         
-    graph = _load_skill_graph()
+    if graph is None:
+        graph = _load_skill_graph()
+        
     score += gap_boost(user_skills, project_skills, graph)
 
     return score
@@ -336,6 +338,7 @@ def _get_related(recommended_ids, all_projects, cluster_data):
 def get_recommendations(skills_string, level, interest, time_availability):
     user_skills = parse_skills(skills_string)
     all_projects = load_all_projects()
+    graph = _load_skill_graph()
     scored_projects = []
     for project in all_projects:
         rule_score = score_single_project(
@@ -344,6 +347,7 @@ def get_recommendations(skills_string, level, interest, time_availability):
             level,
             interest,
             time_availability,
+            graph,
         )
         similarity_score = ml_similarity_score(
             project,
@@ -369,7 +373,6 @@ def get_recommendations(skills_string, level, interest, time_availability):
     cluster_data = _load_clusters()
     related = _get_related(top_ids, all_projects, cluster_data) if cluster_data else []
     
-    graph = _load_skill_graph()
     progression = get_progression(user_skills, top_ids, all_projects, graph) if graph else []
     
     return {
