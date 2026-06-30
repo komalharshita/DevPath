@@ -422,3 +422,94 @@ def update_path(path_id):
         return jsonify({"error": "Forbidden: invalid token for this path."}), 403
 
     return jsonify({"path_id": path_id, "message": "Learning path updated."}), 200
+
+
+# ---------------------------------------------------------------------------
+# Auth API
+#
+# Simple register / login / logout / me endpoints.
+# On login the client gets back a session token + the user's learning-path ID
+# so it can immediately sync progress via the /api/learning-path/* endpoints.
+# ---------------------------------------------------------------------------
+
+from utils.auth import (
+    register_user, login_user, get_user_from_token,
+    get_user_path_id, logout_user, AuthError
+)
+
+
+@main.route("/api/auth/register", methods=["POST"])
+def auth_register():
+    """Create a new account from a JSON body of {username, password}.
+
+    Response 201: {"token", "username", "path_id"}
+    Response 400: validation error or duplicate username
+    """
+    payload = request.get_json(silent=True)
+    if not payload:
+        return jsonify({"error": "Request body must be valid JSON."}), 400
+
+    username = (payload.get("username") or "").strip()
+    password = (payload.get("password") or "").strip()
+
+    try:
+        token = register_user(username, password)
+    except AuthError as e:
+        return jsonify({"error": str(e)}), 400
+
+    path_id = get_user_path_id(username.lower())
+    return jsonify(
+        {"token": token, "username": username.lower(), "path_id": path_id}
+    ), 201
+
+
+@main.route("/api/auth/login", methods=["POST"])
+def auth_login():
+    """Validate credentials from a JSON body of {username, password}.
+
+    Response 200: {"token", "username", "path_id"}
+    Response 401: invalid username or password
+    """
+    payload = request.get_json(silent=True)
+    if not payload:
+        return jsonify({"error": "Request body must be valid JSON."}), 400
+
+    username = (payload.get("username") or "").strip()
+    password = (payload.get("password") or "").strip()
+
+    try:
+        token = login_user(username, password)
+    except AuthError as e:
+        return jsonify({"error": str(e)}), 401
+
+    path_id = get_user_path_id(username.lower())
+    return jsonify(
+        {"token": token, "username": username.lower(), "path_id": path_id}
+    ), 200
+
+
+@main.route("/api/auth/logout", methods=["POST"])
+def auth_logout():
+    """Invalidate the session token sent in the X-Auth-Token header.
+
+    Response 200 always, even if the token is missing or already invalid.
+    """
+    token = request.headers.get("X-Auth-Token", "").strip()
+    if token:
+        logout_user(token)
+    return jsonify({"message": "Logged out."}), 200
+
+
+@main.route("/api/auth/me", methods=["GET"])
+def auth_me():
+    """Return the signed-in username and path_id for the given session token.
+
+    Response 200: {"username", "path_id"}
+    Response 401: missing or invalid X-Auth-Token header
+    """
+    token = request.headers.get("X-Auth-Token", "").strip()
+    username = get_user_from_token(token)
+    if not username:
+        return jsonify({"error": "Not authenticated."}), 401
+    path_id = get_user_path_id(username)
+    return jsonify({"username": username, "path_id": path_id}), 200
