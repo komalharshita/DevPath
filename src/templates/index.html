@@ -376,6 +376,15 @@
     <div class="nav-inner">
       <a href="/" class="nav-logo">Dev<span class="nav-logo-accent">Path</span></a>
 
+      <div class="nav-links">
+        <a href="#how-it-works" class="nav-link">How It Works</a>
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#find-project" class="nav-link">Find Project</a>
+        <a href="/compare" class="nav-link">Compare</a>
+        <a href="/contact" class="nav-link">Contact</a>
+        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-link">GitHub</a>
+      </div>
+
       <form id="topic-search-form" class="navbar-search" role="search">
         <input
           type="search"
@@ -391,6 +400,14 @@
               d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </button>
+      </form>
+
+      <div class="nav-right">
+        <div class="nav-actions">
+          {% include 'partials/theme_toggle.html' %}
+          <button id="auth-nav-btn" type="button" class="nav-btn-outline">Sign In</button>
+          <button id="auth-logout-btn" type="button" class="nav-btn-outline auth-hidden">Dashboard</button>
+        </div>
       </div>
 
       <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation"
@@ -592,7 +609,7 @@
     <div class="container">
       <div class="section-eyebrow">Your DevPath Profile</div>
       <h2 class="section-title">Track Progress, Unlock Badges, and See Your Growth</h2>
-      <p class="section-sub">Local progress is saved in your browser so you can build momentum without signing in.</p>
+      <p class="section-sub" id="progress-section-sub">Sign in to sync your progress across devices. Local progress is saved in your browser.</p>
 
       <div class="stats-dashboard-grid">
         <div class="stat-dashboard-card points-card">
@@ -1270,6 +1287,7 @@
 
   <script src="/static/script.js"></script>
   <script src="/static/bookmarks.js"></script>
+  <script src="/static/auth.js"></script>
   
   <script>
     // Tab switching for leaderboard/achievements (adds to your existing JS)
