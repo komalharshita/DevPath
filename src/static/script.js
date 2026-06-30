@@ -587,7 +587,6 @@ updateProfileWidgets();
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "none";
       resultsGrid.innerHTML = "";
-      resultsEmptyEl.style.display = "none";
       resultsSection.scrollIntoView({ behavior: "smooth" });
     } else {
       resultsLoadingEl.style.display = "none";
