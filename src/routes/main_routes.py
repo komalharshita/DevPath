@@ -145,10 +145,7 @@ def recommend():
     if not results:
         return jsonify({
             "projects": [],
-            "message": (
-                "No projects matched your inputs. "
-                "Try different skills or broaden your interest area."
-            )
+            "message": recommendations_data.get("message") or "No projects matched your inputs. Try different skills or broaden your interest area."
         }), 200
 
     # Ensure all projects have IDs in the response
