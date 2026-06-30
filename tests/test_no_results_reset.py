@@ -143,6 +143,37 @@ def test_alternating_no_match_and_match(client):
             assert len(r.get_json()["projects"]) > 0, f"Iteration {i}: expected results"
 
 
+def test_diagnostic_empty_state_suggestions(client):
+    """Unsupported skill must return a diagnostic suggestion containing the skill name and alternatives."""
+    payload = {
+        "skills": "Rust",
+        "level": "Beginner",
+        "interest": "Web",
+        "time": "Low"
+    }
+    response = client.post("/api/recommend", json=payload)
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["projects"] == []
+    assert "No projects match 'Rust'" in data["message"]
+    assert "Python" in data["message"] or "JavaScript" in data["message"] or "HTML" in data["message"]
+
+
+def test_diagnostic_time_availability_blocker(client):
+    """If matching projects require higher time availability than selected, diagnostic must suggest higher time."""
+    payload = {
+        "skills": "Java",
+        "level": "Beginner",
+        "interest": "Backend",
+        "time": "Low"
+    }
+    response = client.post("/api/recommend", json=payload)
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["projects"] == []
+    assert "No projects match 'Low' time availability" in data["message"]
+
+
 # ---------------------------------------------------------------------------
 # HTML landmark presence — JS selectors must resolve
 # ---------------------------------------------------------------------------

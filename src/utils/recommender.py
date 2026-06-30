@@ -333,6 +333,97 @@ def _get_related(recommended_ids, all_projects, cluster_data):
 # Public API
 # ---------------------------------------------------------------------------
 
+def get_diagnostics(user_skills, level, interest, time_availability, all_projects):
+    """
+    Generate a helpful diagnostic message when no projects are recommended,
+    explaining the most likely cause and suggesting valid alternatives.
+    """
+    # 1. Check for completely unmatched user skills
+    all_project_skills = set()
+    for p in all_projects:
+        for s in p.get("skills", []):
+            all_project_skills.add(SKILL_ALIASES.get(s.lower(), s.lower()))
+            
+    unmatched_skills = [s for s in user_skills if s not in all_project_skills]
+    if unmatched_skills:
+        skill_counts = Counter()
+        for p in all_projects:
+            for s in p.get("skills", []):
+                skill_counts[SKILL_ALIASES.get(s.lower(), s.lower())] += 1
+        popular_skills = [s.title() for s, _ in skill_counts.most_common(3)]
+        
+        def format_skill(s):
+            if s.upper() in ["HTML", "CSS", "JS", "SQL", "AWS", "ETL", "API", "REST", "JSON"]:
+                return s.upper()
+            if s.lower() == "cpp":
+                return "C++"
+            return s.title()
+            
+        unmatched_str = ", ".join(f"'{format_skill(s)}'" for s in unmatched_skills)
+        if len(popular_skills) > 1:
+            popular_str = ", ".join(popular_skills[:-1]) + ", or " + popular_skills[-1]
+        else:
+            popular_str = popular_skills[0] if popular_skills else "other skills"
+        return f"No projects match {unmatched_str}. Try {popular_str}."
+
+    # 2. Check if the interest area has no projects at all
+    all_interests = set(p.get("interest", "").lower() for p in all_projects if p.get("interest"))
+    if interest.lower() not in all_interests:
+        popular_interests = sorted(list(set(p.get("interest", "").title() for p in all_projects if p.get("interest"))))[:3]
+        if len(popular_interests) > 1:
+            popular_int_str = ", ".join(popular_interests[:-1]) + ", or " + popular_interests[-1]
+        else:
+            popular_int_str = popular_interests[0] if popular_interests else "other categories"
+        return f"No projects match the interest '{interest.title()}'. Try {popular_int_str}."
+
+    # 3. Check if time constraint is the blocker
+    matching_level_and_interest = []
+    for p in all_projects:
+        p_level = p.get("level", "").lower()
+        p_interest = p.get("interest", "").lower()
+        u_level = level.lower()
+        u_interest = interest.lower()
+        
+        level_match = (p_level == u_level)
+        interest_match = (p_interest == u_interest or u_interest in p_interest or p_interest in u_interest)
+        if level_match and interest_match:
+            matching_level_and_interest.append(p)
+            
+    if matching_level_and_interest:
+        TIME_RANKS = ["low", "medium", "high"]
+        user_time = time_availability.strip().lower()
+        time_blockers = []
+        for p in matching_level_and_interest:
+            p_time = p.get("time", "").strip().lower()
+            if p_time in TIME_RANKS and user_time in TIME_RANKS:
+                if TIME_RANKS.index(p_time) > TIME_RANKS.index(user_time):
+                    time_blockers.append(p.get("time", "").title())
+        if time_blockers:
+            suggested_times = sorted(list(set(time_blockers)), key=lambda x: TIME_RANKS.index(x.lower()))
+            if len(suggested_times) > 1:
+                suggested_times_str = ", ".join(suggested_times[:-1]) + ", or " + suggested_times[-1]
+            else:
+                suggested_times_str = suggested_times[0]
+            return f"No projects match '{time_availability.title()}' time availability. Try choosing {suggested_times_str} time."
+
+    # 4. Check if experience level is the blocker for this interest
+    matching_interest_only = []
+    for p in all_projects:
+        p_interest = p.get("interest", "").lower()
+        u_interest = interest.lower()
+        if p_interest == u_interest or u_interest in p_interest or p_interest in u_interest:
+            matching_interest_only.append(p)
+    if matching_interest_only:
+        levels_available = sorted(list(set(p.get("level", "").title() for p in matching_interest_only)))
+        if len(levels_available) > 1:
+            levels_str = ", ".join(levels_available[:-1]) + ", or " + levels_available[-1]
+        else:
+            levels_str = levels_available[0]
+        return f"No projects match '{level.title()}' level for interest '{interest.title()}'. Try choosing {levels_str}."
+
+    return "No projects matched your inputs. Try different skills or broaden your interest area."
+
+
 def get_recommendations(skills_string, level, interest, time_availability):
     user_skills = parse_skills(skills_string)
     all_projects = load_all_projects()
@@ -372,19 +463,19 @@ def get_recommendations(skills_string, level, interest, time_availability):
     graph = _load_skill_graph()
     progression = get_progression(user_skills, top_ids, all_projects, graph) if graph else []
     
+    message = None
+    if not top_projects:
+        message = get_diagnostics(user_skills, level, interest, time_availability, all_projects)
+        
     return {
         "recommendations": top_projects,
         "related": related,
         "progression": progression,
+        "message": message,
     }
 
-VALID_LEVELS = ["beginner", "intermediate", "advanced"]
-VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
-
-
-VALID_LEVELS = ["beginner", "intermediate", "advanced"]
-VALID_INTERESTS = ["data", "web", "backend", "cybersecurity", "games", "education", "automation"]
-VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
+# NOTE: VALID_LEVELS, VALID_INTERESTS, and VALID_TIME_AVAILABILITY are
+# defined at the top of this module. Do not redefine them here.
 
 
 def validate_recommendation_inputs(skills, level, interest, time_availability):
