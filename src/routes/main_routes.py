@@ -18,6 +18,8 @@ from utils.learning_path import (
     AuthorizationError,
 )
 from config import Config
+from flask import jsonify
+from utils.portfolio_analyzer import analyze_portfolio
 import os
 
 # Interest categories that currently have no project recommendations available
@@ -422,3 +424,33 @@ def update_path(path_id):
         return jsonify({"error": "Forbidden: invalid token for this path."}), 403
 
     return jsonify({"path_id": path_id, "message": "Learning path updated."}), 200
+@main.route("/api/portfolio-analysis", methods=["POST"])
+def portfolio_analysis():
+    """
+    Analyze the user's completed projects and return
+    portfolio diversity information.
+    """
+
+    payload = request.get_json(silent=True)
+
+    if payload is None:
+        return jsonify({"error": "Invalid JSON payload"}), 400
+
+    print(payload)
+
+    completed_ids = payload.get("completed_projects", [])
+
+    if not isinstance(completed_ids, list):
+        return jsonify({"error": "'completed_projects' must be a list"}), 400
+
+    all_projects = load_all_projects()
+
+    completed_projects = [
+        project
+        for project in all_projects
+        if project["id"] in completed_ids
+    ]
+
+    result = analyze_portfolio(completed_projects)
+
+    return jsonify(result), 200

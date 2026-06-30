@@ -39,7 +39,7 @@ def is_valid_url(url: str) -> bool:
     """
     if not url or not isinstance(url, str):
         return False
-    return bool(_URL_RE.match(url.strip()))
+    return bool(URL_RE.match(url.strip()))
 
 
 def parse_resource(raw: str) -> dict:

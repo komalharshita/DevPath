@@ -384,17 +384,52 @@ function recordCodeOpen() {
 
 function recordCompletion(projectId, projectTitle) {
   if (!projectId || projectIsCompleted(projectId)) return;
-  progress.completedProjects.push({ id: projectId, title: projectTitle || "Project " + projectId });
+
+  progress.completedProjects.push({
+    id: projectId,
+    title: projectTitle || "Project " + projectId
+  });
+
   progress.completions = progress.completedProjects.length;
+
   computeProgressPoints();
   tryUnlockBadges();
   saveProgressState();
   updateProfileWidgets();
+
+  // Analyze portfolio after completion
+  updatePortfolioAnalysis();
 }
-
 loadProgressState();
+updatePortfolioAnalysis();
 updateProfileWidgets();
+async function updatePortfolioAnalysis() {
 
+    const completedIds = progress.completedProjects.map(project => project.id);
+
+    try {
+
+        const response = await fetch("/api/portfolio-analysis", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                completed_projects: completedIds
+            })
+        });
+
+        const result = await response.json();
+        renderPortfolioAnalysis(result);
+
+        // Exposed for debugging / other widgets that may want the raw data
+        window.portfolioAnalysis = result;
+    } catch (error) {
+
+        console.error("Portfolio Analysis Error:", error);
+
+    }
+}
 (function initIndexPage() {
   var form = document.getElementById("recommend-form");
   if (!form) return;
@@ -1080,3 +1115,88 @@ updateProfileWidgets();
   });
   update();
 })();
+function renderPortfolioAnalysis(result) {
+
+  var container = document.getElementById("portfolio-analysis-container");
+  if (!container) return;
+
+  var hasCompleted = progress.completedProjects && progress.completedProjects.length > 0;
+
+  if (!hasCompleted) {
+    container.innerHTML =
+      '<div class="portfolio-card portfolio-card--empty">' +
+        '<div class="portfolio-empty-icon">📊</div>' +
+        '<h3>No completed projects yet</h3>' +
+        '<p>Mark a project complete from its project page and your portfolio diversity score will show up here.</p>' +
+      '</div>';
+    return;
+  }
+
+  var score = typeof result.score === "number" ? result.score : 0;
+  var scoreTier =
+    score >= 80 ? "excellent" :
+    score >= 50 ? "good" : "low";
+
+  var scoreLabel =
+    score >= 80 ? "Well-rounded portfolio" :
+    score >= 50 ? "Good progress, room to grow" :
+    "Let's diversify your portfolio";
+
+  var categories = Array.isArray(result.categories) ? result.categories : [];
+  var recommendations = Array.isArray(result.recommendations) ? result.recommendations : [];
+
+  var categoryCards = categories.map(function (cat) {
+    var stateClass = cat.covered ? "is-covered" : "is-missing";
+    var statusIcon = cat.covered
+      ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+      : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+
+    return (
+      '<div class="portfolio-cat-card ' + stateClass + '">' +
+        '<span class="portfolio-cat-icon">' + cat.icon + '</span>' +
+        '<span class="portfolio-cat-name">' + cat.name + '</span>' +
+        '<span class="portfolio-cat-status">' + statusIcon + '</span>' +
+      '</div>'
+    );
+  }).join("");
+
+  var recommendationCards = recommendations.length
+    ? recommendations.map(function (rec) {
+        return (
+          '<div class="portfolio-rec-card">' +
+            '<span class="portfolio-rec-icon">' + rec.icon + '</span>' +
+            '<div class="portfolio-rec-text">' +
+              '<span class="portfolio-rec-category">' + rec.category + '</span>' +
+              '<span class="portfolio-rec-title">' + rec.title + '</span>' +
+            '</div>' +
+          '</div>'
+        );
+      }).join("")
+    : '<p class="portfolio-rec-empty">You\u2019ve covered every domain we track. Amazing work!</p>';
+
+  container.innerHTML =
+    '<div class="portfolio-card">' +
+      '<div class="portfolio-summary">' +
+        '<div class="portfolio-gauge portfolio-gauge--' + scoreTier + '" style="--score:' + score + ';">' +
+          '<div class="portfolio-gauge-inner">' +
+            '<span class="portfolio-gauge-value">' + score + '</span>' +
+            '<span class="portfolio-gauge-max">/ 100</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="portfolio-summary-text">' +
+          '<span class="portfolio-summary-eyebrow">Diversity Score</span>' +
+          '<h3>' + scoreLabel + '</h3>' +
+          '<p>' + (result.covered_count != null ? result.covered_count : categories.filter(function(c){return c.covered;}).length) +
+            ' of ' + (result.total_categories || categories.length) +
+            ' skill domains covered across your completed projects.</p>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="portfolio-cat-grid">' + categoryCards + '</div>' +
+
+      '<div class="portfolio-recommendations">' +
+        '<h4>🚀 Recommended Next Projects</h4>' +
+        '<div class="portfolio-rec-grid">' + recommendationCards + '</div>' +
+      '</div>' +
+    '</div>';
+}

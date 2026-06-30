@@ -5380,3 +5380,234 @@ body.dark-theme .theme-toggle:hover {
   background: rgba(124, 58, 237, 0.15);
   color: #c4b5fd;
 }
+.portfolio-analysis-section{
+  padding: 80px 0;
+}
+
+.portfolio-card{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow: var(--shadow-md);
+}
+
+.portfolio-card--empty{
+  text-align: center;
+  padding: 56px 32px;
+}
+
+.portfolio-empty-icon{
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.portfolio-card--empty h3{
+  color: var(--text-heading);
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.portfolio-card--empty p{
+  color: var(--text-body);
+  max-width: 420px;
+  margin: 0 auto;
+  font-size: 15px;
+}
+
+/* ---- Summary row: gauge + headline ---- */
+.portfolio-summary{
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+
+.portfolio-gauge{
+  --ring-color: var(--indigo-500);
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: conic-gradient(var(--ring-color) calc(var(--score) * 3.6deg), var(--gray-200) 0deg);
+}
+
+.portfolio-gauge--good{ --ring-color: var(--orange-500); }
+.portfolio-gauge--low{ --ring-color: var(--red-500); }
+
+.portfolio-gauge-inner{
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.portfolio-gauge-value{
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-heading);
+}
+
+.portfolio-gauge-max{
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+.portfolio-summary-text{
+  flex: 1;
+  min-width: 220px;
+}
+
+.portfolio-summary-eyebrow{
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--indigo-500);
+  margin-bottom: 6px;
+}
+
+.portfolio-summary-text h3{
+  font-size: 22px;
+  color: var(--text-heading);
+  margin: 0 0 8px;
+}
+
+.portfolio-summary-text p{
+  color: var(--text-body);
+  font-size: 15px;
+  margin: 0;
+}
+
+/* ---- Category grid ---- */
+.portfolio-cat-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.portfolio-cat-card{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+
+.portfolio-cat-card.is-covered{
+  border-color: rgba(16, 185, 129, 0.35);
+  background: var(--green-100);
+}
+
+.portfolio-cat-card.is-missing{
+  opacity: 0.75;
+}
+
+.portfolio-cat-icon{
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.portfolio-cat-name{
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.portfolio-cat-status{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.portfolio-cat-card.is-covered .portfolio-cat-status{
+  color: #fff;
+  background: var(--green-500);
+}
+
+.portfolio-cat-card.is-missing .portfolio-cat-status{
+  color: var(--text-light);
+  background: var(--gray-200);
+}
+
+/* ---- Recommendations ---- */
+.portfolio-recommendations h4{
+  font-size: 16px;
+  color: var(--text-heading);
+  margin: 0 0 14px;
+}
+
+.portfolio-rec-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.portfolio-rec-card{
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--indigo-50);
+}
+
+.portfolio-rec-icon{
+  font-size: 20px;
+  line-height: 1;
+}
+
+.portfolio-rec-text{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.portfolio-rec-category{
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--indigo-500);
+}
+
+.portfolio-rec-title{
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.portfolio-rec-empty{
+  color: var(--text-body);
+  font-size: 14px;
+}
+
+@media (max-width: 640px){
+  .portfolio-card{
+    padding: 24px;
+  }
+  .portfolio-summary{
+    gap: 20px;
+  }
+}
