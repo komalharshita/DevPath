@@ -18,7 +18,7 @@ import re
 
 # Matches http:// or https:// followed by a domain and optional path.
 # Intentionally strict: rejects bare domains, ftp://, mailto:, etc.
-URL_RE = re.compile(
+_URL_RE = re.compile(
         r'^https?://'                      # scheme
         r'(?:(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}|localhost)'  # domain
         r'(?::\d+)?'                       # optional port
