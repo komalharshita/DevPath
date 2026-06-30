@@ -872,26 +872,41 @@ updateProfileWidgets();
       if (event.target === modal) closeGithubModal();
     });
     fetchBtn.addEventListener("click", function () {
-      var username = githubInput.value.trim();
+      var rawInput = githubInput.value.trim();
       errorMsg.textContent = "";
-      if (!username) {
+      if (!rawInput) {
         errorMsg.textContent = "Please enter a GitHub username.";
         return;
       }
+
+      // Accept full GitHub URLs like https://github.com/snpathaks as well as bare usernames
+      var username = rawInput
+        .replace(/^https?:\/\/(www\.)?github\.com\//i, "")
+        .replace(/\/.*$/, "")   // strip any trailing path segments
+        .trim();
+
+      if (!username) {
+        errorMsg.textContent = "Please enter a valid GitHub username.";
+        return;
+      }
+
       fetchBtn.disabled = true;
       fetchBtn.textContent = "Syncing...";
-      fetch("https://api.github.com/users/" + encodeURIComponent(username) + "/repos?sort=updated&per_page=100")
+
+      // Use our server-side proxy so we stay within connect-src 'self' CSP
+      fetch("/api/github-skills/" + encodeURIComponent(username))
         .then(function (response) {
-          if (!response.ok) throw new Error(response.status === 404 ? "Username not found." : "Unable to fetch GitHub repositories.");
-          return response.json();
-        })
-        .then(function (repos) {
-          var languages = [];
-          repos.forEach(function (repo) {
-            if (repo.language && languages.indexOf(repo.language) === -1) languages.push(repo.language);
+          return response.json().then(function (data) {
+            if (!response.ok) {
+              throw new Error(data.error || "Unable to fetch GitHub repositories.");
+            }
+            return data;
           });
+        })
+        .then(function (data) {
+          var languages = data.languages || [];
           if (!languages.length) {
-            errorMsg.textContent = "No public languages found.";
+            errorMsg.textContent = "No public languages found for this user.";
             return;
           }
           languages.forEach(window.addSkill);

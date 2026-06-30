@@ -19,6 +19,10 @@ from utils.learning_path import (
 )
 from config import Config
 import os
+import urllib.request
+import urllib.error
+import json as _json
+import re as _re
 
 # Interest categories that currently have no project recommendations available
 NO_PROJECT_INTERESTS = {
@@ -422,3 +426,77 @@ def update_path(path_id):
         return jsonify({"error": "Forbidden: invalid token for this path."}), 403
 
     return jsonify({"path_id": path_id, "message": "Learning path updated."}), 200
+
+
+# ---------------------------------------------------------------------------
+# GitHub Skills Proxy
+#
+# The browser cannot call api.github.com directly because our Content-Security
+# Policy restricts connect-src to 'self'. This server-side proxy fetches the
+# user's public repositories and returns the unique languages found, so the
+# frontend only ever talks to our own origin.
+# ---------------------------------------------------------------------------
+
+_GITHUB_USERNAME_RE = _re.compile(r'^[A-Za-z0-9][A-Za-z0-9-]{0,38}$')
+
+
+@main.route("/api/github-skills/<username>", methods=["GET"])
+def github_skills_proxy(username):
+    """Fetch public repository languages for a GitHub user and return them.
+
+    Acts as a server-side proxy so the browser never calls api.github.com
+    directly (which our own CSP would block).
+
+    Response 200: {"languages": ["Python", "JavaScript", ...]}
+    Response 400: invalid username format.
+    Response 404: GitHub user not found.
+    Response 502: upstream GitHub API error.
+    """
+    # Validate username format to prevent SSRF / abusive calls
+    if not _GITHUB_USERNAME_RE.match(username):
+        return jsonify({"error": "Invalid GitHub username format."}), 400
+
+    url = (
+        f"https://api.github.com/users/{username}/repos"
+        "?sort=pushed&per_page=100"
+    )
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "DevPath-App/1.0",
+    }
+    # Use a GitHub token when available to raise the rate limit from
+    # 60 req/hour (unauthenticated) to 5,000 req/hour (authenticated).
+    # Set the GITHUB_TOKEN environment variable to enable this.
+    gh_token = os.environ.get("GITHUB_TOKEN", "")
+    if gh_token:
+        headers["Authorization"] = f"Bearer {gh_token}"
+
+    req = urllib.request.Request(url, headers=headers)
+
+    try:
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            repos = _json.loads(resp.read().decode())
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            return jsonify({"error": "GitHub user not found."}), 404
+        if exc.code == 403:
+            return jsonify({
+                "error": (
+                    "GitHub rate limit reached. Please try again in a minute, "
+                    "or ask the site admin to configure a GITHUB_TOKEN."
+                )
+            }), 429
+        return jsonify({"error": "GitHub API error."}), 502
+    except Exception:
+        return jsonify({"error": "Could not reach GitHub. Please try again."}), 502
+
+    # Collect unique non-null languages
+    seen = set()
+    languages = []
+    for repo in repos:
+        lang = repo.get("language")
+        if lang and lang not in seen:
+            seen.add(lang)
+            languages.append(lang)
+
+    return jsonify({"languages": languages}), 200
