@@ -24,6 +24,14 @@ def _wants_json():
     if request.path.startswith("/api/"):
         return True
 
+    # No explicit Accept header (e.g. a bare test_request_context call) —
+    # default to HTML rather than relying on accept_mimetypes comparison,
+    # which can resolve differently across Werkzeug versions when the
+    # header is absent.
+    accept_header = request.headers.get("Accept", "")
+    if not accept_header or accept_header == "*/*":
+        return False
+
     return (
         request.accept_mimetypes["application/json"]
         >
