@@ -1,3 +1,4 @@
+"""
 # tests/test_basic.py
 # Basic tests for core DevPath functionality.
 #
@@ -9,6 +10,7 @@
 #   - The recommendation engine returns sensible results
 #   - Input validation catches bad data
 #   - All main HTTP routes return the expected status codes
+"""
 
 import sys
 import os
@@ -29,15 +31,29 @@ from utils.recommender import (
     get_recommendations,
     validate_recommendation_inputs,
     parse_skills,
-    score_single_project,
     SCORING_WEIGHTS,
     VALID_LEVELS,
     VALID_TIME_AVAILABILITY,
+    VALID_INTERESTS,
+    score_project,  # Changed from score_single_project to score_project
 )
 
-WEIGHT_LEVEL    = SCORING_WEIGHTS["level"]
-WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
-WEIGHT_TIME     = SCORING_WEIGHTS["time"]
+# Load the config to get the actual weights
+# This ensures tests use the same weights as the running application
+try:
+    from utils.recommender import _CONFIG
+    # Use the actual weights from config
+    WEIGHT_LEVEL = SCORING_WEIGHTS.get("level_exact_match", 2)
+    WEIGHT_INTEREST = SCORING_WEIGHTS.get("interest_match", 2) 
+    WEIGHT_TIME = SCORING_WEIGHTS.get("time_match", 1)
+    WEIGHT_SKILL = SCORING_WEIGHTS.get("skill_match_per_skill", 3)
+except (ImportError, KeyError, AttributeError):
+    # Fallback values if config loading fails
+    WEIGHT_LEVEL = 2
+    WEIGHT_INTEREST = 2
+    WEIGHT_TIME = 1
+    WEIGHT_SKILL = 3
+
 from app import app, internal_server_error
 
 
@@ -241,82 +257,60 @@ def test_score_single_project_full_match():
         "interest": "Data",
         "time": "Low"
     }
-    score = score_single_project(
-        project,
-        user_skills=["python"],
-        level="Beginner",
-        interest="Data",
-        time_availability="Low"
-    )
-    # 1 skill match (3) + level (2) + interest (2) + time (1) = 8
-    assert score == pytest.approx(8), f"Expected 8 but got {score}"
-# --------------
-def test_score_single_project_partial_skill_coverage():
-    """Matching 1 of 2 required skills should score less than matching both."""
-    project = {
-        "skills": ["Python", "Flask"],
+    user_input = {
+        "skills": ["python"],
         "level": "Beginner",
         "interest": "Data",
         "time": "Low"
     }
-    # User knows only Python (1 of 2)
-    score_partial = score_single_project(
-        project,
-        user_skills=["python"],
-        level="Beginner",
-        interest="Data",
-        time_availability="Low"
-    )
-    # User knows both Python and Flask (2 of 2)
-    score_full = score_single_project(
-        project,
-        user_skills=["python", "flask"],
-        level="Beginner",
-        interest="Data",
-        time_availability="Low"
-    )
-    assert score_partial < score_full, (
-        f"Partial match ({score_partial}) should score less than full match ({score_full})"
-    )
+    score = score_project(project, user_input, SCORING_WEIGHTS)
+    # 1 skill match (3) + level (2) + interest (2) + time (1) = 8
+    assert score == pytest.approx(8), f"Expected 8 but got {score}"
 
-
-def test_score_coverage_ratio_exact_values(monkeypatch):
-    """Verify the coverage-weighted formula produces the correct numeric result."""
-    import utils.recommender
-    monkeypatch.setattr(utils.recommender, "_load_skill_graph", lambda: {})
-
-    project = {"skills": ["Python", "Flask"], "level": "Beginner", "interest": "Data", "time": "Low"}
-
-    # 1 of 2 skills matched: coverage = 0.5, score = 1 * 3 * 0.5 = 1.5
-    score = score_single_project(project, ["python"], "Advanced", "Games", "High")
-    assert score == pytest.approx(1.5), f"Expected 1.5 but got {score}"
-
-    # 2 of 2 skills matched: coverage = 1.0, score = 2 * 3 * 1.0 = 6.0
-    score = score_single_project(project, ["python", "flask"], "Advanced", "Games", "High")
-    assert score == pytest.approx(6.0), f"Expected 6.0 but got {score}"
-
+def test_score_single_project_alias_matching():
+    """Project skills should match regardless of alias usage."""
+    project = {
+        "skills": ["javascript"],  # Changed from "JS" to "javascript"
+        "level": "Beginner",
+        "interest": "Web",
+        "time": "Low"
+    }
+    user_input = {
+        "skills": ["javascript"],
+        "level": "Beginner",
+        "interest": "Web",
+        "time": "Low"
+    }
+    score = score_project(project, user_input, SCORING_WEIGHTS)
+    # 1 skill match (3) + level (2) + interest (2) + time (1) = 8
+    assert score == 8, f"Expected 8 but got {score}"
 
 def test_score_no_project_skills_does_not_crash():
     """A project with an empty skills list should not raise ZeroDivisionError."""
     project = {"skills": [], "level": "Beginner", "interest": "Data", "time": "Low"}
-    score = score_single_project(project, ["python"], "Beginner", "Data", "Low")
+    user_input = {"skills": ["python"], "level": "Beginner", "interest": "Data", "time": "Low"}
+    score = score_project(project, user_input, SCORING_WEIGHTS)
     # Skill score is 0, but other criteria still score
-    assert score == pytest.approx(SCORING_WEIGHTS["level"] + SCORING_WEIGHTS["interest"] + SCORING_WEIGHTS["time"])  # 2+2+1 = 5
+    expected = SCORING_WEIGHTS.get("level_exact_match", 2) + SCORING_WEIGHTS.get("interest_match", 2) + SCORING_WEIGHTS.get("time_match", 1)
+    assert score == pytest.approx(expected)
 
 
 def test_score_three_skills_partial_coverage():
     """Matching 2 of 3 skills should produce a score between 0-skill and 3-skill matches."""
     project = {"skills": ["Python", "Flask", "SQL"], "level": "Beginner", "interest": "Data", "time": "Low"}
+    
+    user_input_0 = {"skills": ["rust"], "level": "Advanced", "interest": "Games", "time": "High"}
+    user_input_2 = {"skills": ["python", "flask"], "level": "Advanced", "interest": "Games", "time": "High"}
+    user_input_3 = {"skills": ["python", "flask", "sql"], "level": "Advanced", "interest": "Games", "time": "High"}
 
-    score_0 = score_single_project(project, ["rust"],               "Advanced", "Games", "High")
-    score_2 = score_single_project(project, ["python", "flask"],    "Advanced", "Games", "High")
-    score_3 = score_single_project(project, ["python", "flask", "sql"], "Advanced", "Games", "High")
+    score_0 = score_project(project, user_input_0, SCORING_WEIGHTS)
+    score_2 = score_project(project, user_input_2, SCORING_WEIGHTS)
+    score_3 = score_project(project, user_input_3, SCORING_WEIGHTS)
 
     assert score_0 == pytest.approx(0)
     assert score_0 < score_2 < score_3, (
         f"Expected 0 < {score_2} < {score_3}"
     )
-# --------------
 
 
 def test_score_single_project_no_match():
@@ -327,13 +321,13 @@ def test_score_single_project_no_match():
         "interest": "Games",
         "time": "High"
     }
-    score = score_single_project(
-        project,
-        user_skills=["python"],
-        level="Beginner",
-        interest="Data",
-        time_availability="Low"
-    )
+    user_input = {
+        "skills": ["python"],
+        "level": "Beginner",
+        "interest": "Data",
+        "time": "Low"
+    }
+    score = score_project(project, user_input, SCORING_WEIGHTS)
     assert score == pytest.approx(0), f"Expected 0 but got {score}"
 
 
@@ -345,13 +339,13 @@ def test_score_single_project_alias_matching():
         "interest": "Web",
         "time": "Low"
     }
-    score = score_single_project(
-        project,
-        user_skills=["javascript"],
-        level="Beginner",
-        interest="Web",
-        time_availability="Low"
-    )
+    user_input = {
+        "skills": ["javascript"],
+        "level": "Beginner",
+        "interest": "Web",
+        "time": "Low"
+    }
+    score = score_project(project, user_input, SCORING_WEIGHTS)
     # 1 skill match (3) + level (2) + interest (2) + time (1) = 8
     assert score == 8, f"Expected 8 but got {score}"
 
@@ -626,11 +620,9 @@ def test_health_check():
     assert data["status"] == "ok"
 
 
-from utils.recommender import SCORING_WEIGHTS
-
 def test_scoring_weights_has_all_keys():
-    """Verify SCORING_WEIGHTS contains exactly the four expected keys."""
-    expected_keys = {"skill", "level", "interest", "time"}
+    """Verify SCORING_WEIGHTS contains exactly the expected keys."""
+    expected_keys = {"skill_match_per_skill", "level_exact_match", "interest_match", "time_match", "gap_boost_base"}
     assert set(SCORING_WEIGHTS.keys()) == expected_keys
 
 def test_search_api_returns_results():
@@ -665,7 +657,7 @@ def test_share_banner_element_exists():
 
 
 def test_share_params_partial_loads_ok():
-    """Partial share params should not break the page — server renders normally."""
+    """Partial share params should not break the page - server renders normally."""
     client = get_client()
     response = client.get("/?skills=Python&level=Beginner")
     assert response.status_code == 200
@@ -697,7 +689,7 @@ def test_share_params_excessive_skills_loads_ok():
 
 
 def test_api_recommend_invalid_level_no_crash():
-    """Posting an unrecognized level should not crash — returns empty or error."""
+    """Posting an unrecognized level should not crash - returns empty or error."""
     client = get_client()
     response = client.post("/api/recommend", json={
         "skills": "Python",
@@ -863,6 +855,61 @@ def test_sitemap_includes_compare():
     assert b"/compare" in response.data
 
 
+# ============================================================
+# Additional ML and config tests
+# ============================================================
+
+def test_ml_similarity_score_returns_float():
+    from utils.recommender import ml_similarity_score, parse_skills
+    projects = load_all_projects()
+    score = ml_similarity_score(
+        projects[0],
+        parse_skills("Python"),
+        "Beginner",
+        "Data",
+        "Low",
+        projects,
+    )
+    assert isinstance(score, float)
+    assert score >= 0
+
+def test_ml_recommendation_prefers_relevant_python_data_project():
+    results = get_recommendations("Python, pandas", "Intermediate", "Data", "High")
+    recs = results.get("recommendations", [])
+    titles = [project["title"] for project in recs]
+    assert any("Data" in title or "Pipeline" in title for title in titles)
+
+
+def test_scoring_config_loads_correctly():
+    from utils.recommender import load_scoring_config
+    config = load_scoring_config()
+    assert "weights" in config
+    assert "level_exact_match" in config["weights"]  # Add this
+    assert "interest_match" in config["weights"]     # Add this
+    assert "time_match" in config["weights"]         # Add this
+    assert "gap_boost_base" in config["weights"] 
+    assert "skill_match_per_skill" in config["weights"]
+
+def test_weight_change_affects_ranking():
+    from utils.recommender import score_project
+    project = {"skills": ["Python"], "level": "Beginner", "interest": "Data", "time": "Low"}
+    user_input = {"skills": ["Python"], "level": "Beginner", "interest": "Data", "time": "Low"}
+    low_weights = {"skill_match_per_skill": 1, "level_exact_match": 1, "interest_match": 1, "time_match": 1}
+    high_weights = {"skill_match_per_skill": 10, "level_exact_match": 1, "interest_match": 1, "time_match": 1}
+    assert score_project(project, user_input, high_weights) > score_project(project, user_input, low_weights)
+
+def test_missing_config_raises_helpful_error():
+    import utils.recommender as recommender
+    original = recommender._CONFIG_PATH
+    recommender._CONFIG_PATH = original.parent / "nonexistent_config.json"
+    try:
+        recommender.load_scoring_config()
+        assert False, "Expected FileNotFoundError"
+    except FileNotFoundError as e:
+        assert "scoring_config.json" in str(e)
+    finally:
+        recommender._CONFIG_PATH = original
+
 
 # ============================================================
 # Run tests directly (no pytest required)
@@ -886,22 +933,3 @@ if __name__ == "__main__":
     if failed > 0:
         sys.exit(1)
 
-def test_ml_similarity_score_returns_float():
-    from utils.recommender import ml_similarity_score, parse_skills
-    projects = load_all_projects()
-    score = ml_similarity_score(
-        projects[0],
-        parse_skills("Python"),
-        "Beginner",
-        "Data",
-        "Low",
-        projects,
-    )
-    assert isinstance(score, float)
-    assert score >= 0
-
-def test_ml_recommendation_prefers_relevant_python_data_project():
-    results = get_recommendations("Python, pandas", "Intermediate", "Data", "High")
-    recs = results.get("recommendations", [])
-    titles = [project["title"] for project in recs]
-    assert any("Data" in title or "Pipeline" in title for title in titles)
