@@ -18,8 +18,8 @@ from utils.learning_path import (
     AuthorizationError,
 )
 from config import Config
+from extensions import limiter
 import os
-
 # Interest categories that currently have no project recommendations available
 NO_PROJECT_INTERESTS = {
     "machine learning/ai",
@@ -100,6 +100,7 @@ def health_check():
 
 
 @main.route("/api/recommend", methods=["POST"])
+@limiter.limit(Config.RECOMMEND_RATE_LIMIT)
 def recommend():
     """
     Accept a JSON body with user inputs and return matching project recommendations.

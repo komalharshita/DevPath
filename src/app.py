@@ -20,15 +20,23 @@ from flask import Flask
 from routes.main_routes import main
 from config import Config
 from errors.handlers import register_error_handlers
-
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 app = Flask(__name__)
 
 # Load config settings into Flask's internal config manager properly
 app.config.from_object(Config)
+# Configure request rate limiting
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=[],
+)
 
+limiter.init_app(app)
 # Register all routes defined in the main Blueprint (This handles your '/' route!)
 app.register_blueprint(main)
-
+# Make limiter accessible from the Blueprint module if needed
+app.limiter = limiter
 # Register the global error boundary (handles 400, 403, 404, 405, 429, 500,
 # and any unhandled Exception).  Must be called after Blueprint registration
 # so Blueprint-level error handlers take precedence where defined.
