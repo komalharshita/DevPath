@@ -241,7 +241,7 @@ def test_score_single_project_full_match():
         "interest": "Data",
         "time": "Low"
     }
-    score = score_single_project(
+    score, _ = score_single_project(
         project,
         user_skills=["python"],
         level="Beginner",
@@ -288,18 +288,18 @@ def test_score_coverage_ratio_exact_values(monkeypatch):
     project = {"skills": ["Python", "Flask"], "level": "Beginner", "interest": "Data", "time": "Low"}
 
     # 1 of 2 skills matched: coverage = 0.5, score = 1 * 3 * 0.5 = 1.5
-    score = score_single_project(project, ["python"], "Advanced", "Games", "High")
+    score, _ = score_single_project(project, ["python"], "Advanced", "Games", "High")
     assert score == pytest.approx(1.5), f"Expected 1.5 but got {score}"
 
     # 2 of 2 skills matched: coverage = 1.0, score = 2 * 3 * 1.0 = 6.0
-    score = score_single_project(project, ["python", "flask"], "Advanced", "Games", "High")
+    score, _ = score_single_project(project, ["python", "flask"], "Advanced", "Games", "High")
     assert score == pytest.approx(6.0), f"Expected 6.0 but got {score}"
 
 
 def test_score_no_project_skills_does_not_crash():
     """A project with an empty skills list should not raise ZeroDivisionError."""
     project = {"skills": [], "level": "Beginner", "interest": "Data", "time": "Low"}
-    score = score_single_project(project, ["python"], "Beginner", "Data", "Low")
+    score, _ = score_single_project(project, ["python"], "Beginner", "Data", "Low")
     # Skill score is 0, but other criteria still score
     assert score == pytest.approx(SCORING_WEIGHTS["level"] + SCORING_WEIGHTS["interest"] + SCORING_WEIGHTS["time"])  # 2+2+1 = 5
 
@@ -308,9 +308,9 @@ def test_score_three_skills_partial_coverage():
     """Matching 2 of 3 skills should produce a score between 0-skill and 3-skill matches."""
     project = {"skills": ["Python", "Flask", "SQL"], "level": "Beginner", "interest": "Data", "time": "Low"}
 
-    score_0 = score_single_project(project, ["rust"],               "Advanced", "Games", "High")
-    score_2 = score_single_project(project, ["python", "flask"],    "Advanced", "Games", "High")
-    score_3 = score_single_project(project, ["python", "flask", "sql"], "Advanced", "Games", "High")
+    score_0, _ = score_single_project(project, ["rust"],               "Advanced", "Games", "High")
+    score_2, _ = score_single_project(project, ["python", "flask"],    "Advanced", "Games", "High")
+    score_3, _ = score_single_project(project, ["python", "flask", "sql"], "Advanced", "Games", "High")
 
     assert score_0 == pytest.approx(0)
     assert score_0 < score_2 < score_3, (
@@ -327,7 +327,7 @@ def test_score_single_project_no_match():
         "interest": "Games",
         "time": "High"
     }
-    score = score_single_project(
+    score, _ = score_single_project(
         project,
         user_skills=["python"],
         level="Beginner",
@@ -345,7 +345,7 @@ def test_score_single_project_alias_matching():
         "interest": "Web",
         "time": "Low"
     }
-    score = score_single_project(
+    score, _ = score_single_project(
         project,
         user_skills=["javascript"],
         level="Beginner",

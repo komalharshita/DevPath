@@ -5380,3 +5380,55 @@ body.dark-theme .theme-toggle:hover {
   background: rgba(124, 58, 237, 0.15);
   color: #c4b5fd;
 }
+
+.project-match-explanation {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-color);
+  opacity: 0.85;
+  background: var(--bg-hover);
+  padding: 10px 12px;
+  border-radius: 6px;
+  border-left: 3px solid var(--primary-color);
+  margin-top: 15px;
+  margin-bottom: 15px;
+  line-height: 1.4;
+}
+.explanation-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--primary-color);
+}
+
+.project-match-score {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 0.8rem;
+}
+.score-label {
+  font-weight: 600;
+  color: var(--text-body);
+  white-space: nowrap;
+}
+.score-value {
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.score-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.score-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}

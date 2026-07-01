@@ -167,22 +167,36 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
     else:
         score += matched_skills * SCORING_WEIGHTS["skill"]
 
+    level_match = False
     if project.get("level", "").lower() == level.lower():
         score += SCORING_WEIGHTS["level"]
+        level_match = True
 
+    interest_match = False
     p_interest = project.get("interest", "").lower()
     u_interest = interest.lower()
     # Use partial matching for interest as well
     if p_interest == u_interest or (u_interest and u_interest in p_interest) or (p_interest and p_interest in u_interest):
         score += SCORING_WEIGHTS["interest"]
+        interest_match = True
 
+    time_match = False
     if project.get("time", "").lower() == time_availability.lower():
         score += SCORING_WEIGHTS["time"]
-        
+        time_match = True
+
     graph = _load_skill_graph()
     score += gap_boost(user_skills, project_skills, graph)
 
-    return score
+    matched_skills_list = [skill for skill in user_skills if skill in project_skills]
+    match_details = {
+        "matched_skills": matched_skills_list,
+        "level": level_match,
+        "interest": interest_match,
+        "time": time_match
+    }
+
+    return score, match_details
 
 # ---------------------------------------------------------------------------
 # Skill graph helpers
@@ -338,13 +352,18 @@ def get_recommendations(skills_string, level, interest, time_availability):
     all_projects = load_all_projects()
     scored_projects = []
     for project in all_projects:
-        rule_score = score_single_project(
+        score_result = score_single_project(
             project,
             user_skills,
             level,
             interest,
             time_availability,
         )
+        if isinstance(score_result, tuple):
+            rule_score, match_details = score_result
+        else:
+            rule_score, match_details = score_result, {}
+
         similarity_score = ml_similarity_score(
             project,
             user_skills,
@@ -358,12 +377,83 @@ def get_recommendations(skills_string, level, interest, time_availability):
             scored_projects.append({
                 "project": project,
                 "score": final_score,
+                "match_details": match_details
             })
     # Sort projects in descending order so the
     # most relevant recommendations appear first.
     scored_projects.sort(key=lambda item: (item["score"], item["project"].get("id", 0)), reverse=True)
     
-    top_projects = [item["project"] for item in scored_projects[:MAX_RESULTS]]
+    top_projects = []
+    for item in scored_projects[:MAX_RESULTS]:
+        proj = item["project"].copy()
+        
+        # Calculate theoretical max score for THIS project
+        project_skills_count = len(proj.get("skills", []))
+        theoretical_max = (project_skills_count * SCORING_WEIGHTS["skill"]) + \
+                          SCORING_WEIGHTS["level"] + \
+                          SCORING_WEIGHTS["interest"] + \
+                          SCORING_WEIGHTS["time"] + 1.0  # +1.0 for max ML similarity
+                          
+        if theoretical_max == 0:
+            theoretical_max = 1.0
+            
+        project_percentage = item["score"] / theoretical_max
+        match_score = round(4.0 + (project_percentage * 6.0), 1)
+        
+        # Ensure it stays exactly within 4.0 to 10.0
+        proj["match_score"] = min(max(match_score, 4.0), 10.0)
+        
+        match_details = item.get("match_details", {})
+        
+        # Construct distinct explanation
+        import random
+        
+        matched_skills_list = match_details.get("matched_skills", [])
+        skills_str = ""
+        if matched_skills_list:
+            skills_str = ", ".join(matched_skills_list[:3])
+            if len(matched_skills_list) > 3:
+                skills_str += f", and {len(matched_skills_list) - 3} more"
+        
+        # Determine components
+        has_skills = bool(skills_str)
+        has_level = bool(match_details.get("level"))
+        has_interest = bool(match_details.get("interest"))
+        
+        # Build dynamic parts
+        parts = []
+        if has_skills:
+            parts.append(f"utilizes your skills in {skills_str}")
+        if has_level:
+            parts.append("fits your current experience level")
+        if has_interest:
+            parts.append("aligns closely with your interests")
+            
+        project_title = proj.get("title", "this project")
+            
+        if not parts:
+            explanation = f"We highly recommend '{project_title}' based on your overall profile."
+        else:
+            # Join the parts naturally
+            if len(parts) == 1:
+                reasons = parts[0]
+            elif len(parts) == 2:
+                reasons = f"{parts[0]} and {parts[1]}"
+            else:
+                reasons = f"{parts[0]}, {parts[1]}, and {parts[2]}"
+                
+            templates = [
+                f"'{project_title}' is a great match because it {reasons}.",
+                f"We recommend '{project_title}' as it {reasons}.",
+                f"Based on your profile, '{project_title}' stands out because it {reasons}.",
+                f"Dive into '{project_title}'! It's an excellent choice that {reasons}.",
+                f"This project, '{project_title}', is ideal for you since it {reasons}."
+            ]
+            explanation = random.choice(templates)
+            
+        proj["match_explanation"] = explanation
+        top_projects.append(proj)
+        
     top_ids = [p["id"] for p in top_projects]
     
     cluster_data = _load_clusters()
@@ -379,13 +469,8 @@ def get_recommendations(skills_string, level, interest, time_availability):
     }
 
 VALID_LEVELS = ["beginner", "intermediate", "advanced"]
-VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
-
-
-VALID_LEVELS = ["beginner", "intermediate", "advanced"]
 VALID_INTERESTS = ["data", "web", "backend", "cybersecurity", "games", "education", "automation"]
 VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
-
 
 def validate_recommendation_inputs(skills, level, interest, time_availability):
     errors = []
