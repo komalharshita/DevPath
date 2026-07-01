@@ -333,7 +333,7 @@ def _get_related(recommended_ids, all_projects, cluster_data):
 # Public API
 # ---------------------------------------------------------------------------
 
-def get_recommendations(skills_string, level, interest, time_availability):
+def get_recommendations(skills_string, level, interest, time_availability,  max_results=None):
     user_skills = parse_skills(skills_string)
     all_projects = load_all_projects()
     scored_projects = []
@@ -363,9 +363,12 @@ def get_recommendations(skills_string, level, interest, time_availability):
     # most relevant recommendations appear first.
     scored_projects.sort(key=lambda item: (item["score"], item["project"].get("id", 0)), reverse=True)
     
-    top_projects = [item["project"] for item in scored_projects[:MAX_RESULTS]]
+    if max_results is None:
+        top_projects = [item["project"] for item in scored_projects]
+    else:
+        top_projects = [item["project"] for item in scored_projects[:max_results]]
     top_ids = [p["id"] for p in top_projects]
-    
+
     cluster_data = _load_clusters()
     related = _get_related(top_ids, all_projects, cluster_data) if cluster_data else []
     

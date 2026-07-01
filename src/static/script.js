@@ -404,6 +404,7 @@ updateProfileWidgets();
   var btnLoading = document.getElementById("btn-loading");
   var resultsSection = document.getElementById("results-section");
   var resultsGrid = document.getElementById("results-grid");
+  var showMoreBtn = document.getElementById("show-more-btn");
   var resultsLoadingEl = document.getElementById("results-loading");
   var resultsEmptyEl = document.getElementById("results-empty");
   var emptyMessageEl = document.getElementById("empty-message");
@@ -674,11 +675,17 @@ updateProfileWidgets();
     return card;
   }
 
+  var allProjects = [];
+  var visibleProjectCount = 3;
+
+  var PROJECTS_PER_LOAD = 3;
+
   function renderResults(projects, message) {
     resultsSection.style.display = "block";
     resultsLoadingEl.style.display = "none";
     resultsGrid.innerHTML = "";
     if (!projects || projects.length === 0) {
+      showMoreBtn.style.display = "none";
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "block";
       if (emptyMessageEl) {
@@ -692,6 +699,19 @@ updateProfileWidgets();
     projects.forEach(function (project) { resultsGrid.appendChild(buildProjectCard(project)); });
     resultsSection.scrollIntoView({ behavior: "smooth" });
   }
+  if (showMoreBtn) {
+      showMoreBtn.addEventListener("click", function () {
+        visibleProjectCount += PROJECTS_PER_LOAD;
+        
+        renderResults(
+          allProjects.slice(0, visibleProjectCount)
+        );
+        
+        if (visibleProjectCount >= allProjects.length) {
+          showMoreBtn.style.display = "none";
+        }
+      });
+    }
 
   skillsInput.setAttribute("role", "combobox");
   skillsInput.setAttribute("aria-expanded", "false");
@@ -774,6 +794,9 @@ updateProfileWidgets();
     clearAllErrors();
     hideSuggestions();
     resultsSection.style.display = "none";
+    showMoreBtn.style.display = "none";
+    allProjects = [];
+    visibleProjectCount = PROJECTS_PER_LOAD;
     if (skillsInput) skillsInput.focus();
   }
 
@@ -840,7 +863,20 @@ updateProfileWidgets();
       .then(function (data) {
         setLoadingState(false);
         recordSearch();
-        renderResults(data.projects || [], data.message);
+        
+        allProjects = data.projects || [];
+        visibleProjectCount = PROJECTS_PER_LOAD;
+
+        renderResults(
+          allProjects.slice(0, visibleProjectCount),
+          data.message
+        );
+
+        if (allProjects.length > visibleProjectCount) {
+          showMoreBtn.style.display = "inline-block";
+        } else {
+          showMoreBtn.style.display = "none";
+        }
       })
       .catch(function (err) {
         setLoadingState(false);

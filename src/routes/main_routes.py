@@ -139,7 +139,7 @@ def recommend():
             "message": "No projects are currently available for this interest area. Please check back later."
         }), 200
 
-    recommendations_data = get_recommendations(skills, level, interest, time_availability)
+    recommendations_data = get_recommendations(skills, level, interest, time_availability, max_results=None)
     results = recommendations_data.get("recommendations", [])
 
     if not results:
