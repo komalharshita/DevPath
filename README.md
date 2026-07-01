@@ -462,3 +462,5 @@ MIT — see [LICENSE](LICENSE)
 <br/>
 
 </div>
+
+Tune recommendations by editing `data/scoring_config.json` — no Python code changes required.
