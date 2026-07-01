@@ -6,6 +6,11 @@ import logging
 
 from utils.url_validator import is_valid_url, parse_resource
 
+try:
+    from utils.db_loader import load_projects_from_db
+except ImportError:
+    load_projects_from_db = None
+
 DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "..", "data", "projects.json")
 
 logger = logging.getLogger("devpath.data_loader")
@@ -83,8 +88,23 @@ def load_all_projects():
     """
     global _projects_cache
     if _projects_cache is None:
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            _projects_cache = json.load(f)
+        
+        # Try SQLite first
+        if load_projects_from_db is not None:
+            try:
+                _projects_cache = load_projects_from_db()
+            except Exception as e:
+                logger.warning(
+                    "SQLite load failed (%s). Falling back to projects.json.",
+                    e,
+                )
+                _projects_cache = None
+        
+        # Fallback to JSON
+        if _projects_cache is None:
+            with open(DATA_FILE, "r", encoding="utf-8") as f:
+                _projects_cache = json.load(f)
+        
         validate_projects(_projects_cache)
     return _projects_cache
 

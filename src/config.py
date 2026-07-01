@@ -19,6 +19,17 @@ class Config:
     
     # OG image path (relative to static folder)
     OG_IMAGE_PATH = "/static/og-banner.png"
+
+    # SQLite database location
+    DB_PATH = os.getenv(
+        "DB_PATH",
+        os.path.join(
+            os.path.dirname(__file__),
+            "..",
+            "data",
+            "projects.db",
+        ),
+    )
     
     @classmethod
     def get_og_image_url(cls):
