@@ -17,21 +17,22 @@ _CLUSTERS_PATH = os.path.join(
     "data",
     "clusters.json",
 )
+_SCORING_CONFIG_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+    "config",
+    "scoring_weights.json",
+)
 
-VALID_LEVELS = {"beginner", "intermediate", "advanced"}
-VALID_INTERESTS = {"web", "data", "education", "automation", "games", "cybersecurity", "devops", "backend", "tools", "productivity", "business logic", "mobile", "machine learning/ai"}
-VALID_TIME_AVAILABILITY = {"low", "medium", "high"}
-SCORING_WEIGHTS = {
+DEFAULT_SCORING_WEIGHTS = {
     "skill": 3,
     "level": 2,
     "interest": 2,
     "time": 1,
 }
 
-WEIGHT_SKILL = SCORING_WEIGHTS["skill"]
-WEIGHT_LEVEL = SCORING_WEIGHTS["level"]
-WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
-WEIGHT_TIME = SCORING_WEIGHTS["time"]
+VALID_LEVELS = {"beginner", "intermediate", "advanced"}
+VALID_INTERESTS = {"web", "data", "education", "automation", "games", "cybersecurity", "devops", "backend", "tools", "productivity", "business logic", "mobile", "machine learning/ai"}
+VALID_TIME_AVAILABILITY = {"low", "medium", "high"}
 
 VALID_INTERESTS = {
     "web", "data", "education", "automation", "games",
@@ -77,6 +78,31 @@ def parse_skills(skills_string):
         if s.strip()
     ]
     return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
+def load_scoring_weights():
+    """
+    Load scoring weights from config/scoring_weights.json.
+
+    Falls back to DEFAULT_SCORING_WEIGHTS if the file is missing,
+    malformed, or incomplete.
+    """
+    if not os.path.exists(_SCORING_CONFIG_PATH):
+        return DEFAULT_SCORING_WEIGHTS.copy()
+
+    try:
+        with open(_SCORING_CONFIG_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        weights = DEFAULT_SCORING_WEIGHTS.copy()
+
+        for key in DEFAULT_SCORING_WEIGHTS:
+            value = data.get(key)
+            if isinstance(value, (int, float)):
+                weights[key] = value
+
+        return weights
+
+    except (json.JSONDecodeError, OSError, TypeError):
+        return DEFAULT_SCORING_WEIGHTS.copy()
 
 def _tokenize(text):
     return re.findall(r"[a-z0-9]+", str(text).lower())
@@ -143,7 +169,47 @@ def ml_similarity_score(project, user_skills, level, interest, time_availability
     project_vector = _tfidf_vector(_tokenize(_project_text(project)), idf_scores)
 
     return _cosine_similarity(user_vector, project_vector)
+def score_skills(project_skills, user_skills, weights):
+    matched_skills = sum(
+        1 for skill in user_skills
+        if skill in project_skills
+    )
 
+    if project_skills:
+        coverage = matched_skills / len(project_skills)
+        return matched_skills * weights["skill"] * coverage
+
+    return matched_skills * weights["skill"]
+
+
+def score_level(project_level, user_level, weights):
+    return (
+        weights["level"]
+        if project_level.lower() == user_level.lower()
+        else 0
+    )
+
+
+def score_interest(project_interest, user_interest, weights):
+    p_interest = project_interest.lower()
+    u_interest = user_interest.lower()
+
+    if (
+        p_interest == u_interest
+        or (u_interest and u_interest in p_interest)
+        or (p_interest and p_interest in u_interest)
+    ):
+        return weights["interest"]
+
+    return 0
+
+
+def score_time(project_time, user_time, weights):
+    return (
+        weights["time"]
+        if project_time.lower() == user_time.lower()
+        else 0
+    )
 def score_single_project(project, user_skills, level, interest, time_availability):
     TIME_RANKS = ["low", "medium", "high"]
 
@@ -157,27 +223,32 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
         return 0
 
     score = 0
-
+    weights = load_scoring_weights()
     # Compare user's skills against the project's required skills
     project_skills = [SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", [])]
-    matched_skills = sum(1 for skill in user_skills if skill in project_skills)
-    if project_skills:
-        coverage = matched_skills / len(project_skills)
-        score += matched_skills * SCORING_WEIGHTS["skill"] * coverage
-    else:
-        score += matched_skills * SCORING_WEIGHTS["skill"]
+    score += score_skills(
+    project_skills,
+    user_skills,
+    weights,
+)
 
-    if project.get("level", "").lower() == level.lower():
-        score += SCORING_WEIGHTS["level"]
+    score += score_level(
+    project.get("level", ""),
+    level,
+    weights,
+)
 
-    p_interest = project.get("interest", "").lower()
-    u_interest = interest.lower()
-    # Use partial matching for interest as well
-    if p_interest == u_interest or (u_interest and u_interest in p_interest) or (p_interest and p_interest in u_interest):
-        score += SCORING_WEIGHTS["interest"]
+    score += score_interest(
+    project.get("interest", ""),
+    interest,
+    weights,
+)
 
-    if project.get("time", "").lower() == time_availability.lower():
-        score += SCORING_WEIGHTS["time"]
+    score += score_time(
+    project.get("time", ""),
+    time_availability,
+    weights,
+)
         
     graph = _load_skill_graph()
     score += gap_boost(user_skills, project_skills, graph)
