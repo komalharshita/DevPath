@@ -23,6 +23,8 @@ from errors.handlers import register_error_handlers
 
 app = Flask(__name__)
 
+app.secret_key = os.environ.get("SECRET_KEY", "dev-only-fallback-change-in-prod")
+
 # Load config settings into Flask's internal config manager properly
 app.config.from_object(Config)
 

@@ -463,7 +463,8 @@ MIT — see [LICENSE](LICENSE)
 <br/>
 
 </div>
-T e s t   c o n t r i b u t i o n  
+T e s t   c o n t r i b u t i o n 
+ 
  
 =======
 <div align="center">
@@ -933,3 +934,6 @@ MIT — see [LICENSE](LICENSE)
 
 Tune recommendations by editing `data/scoring_config.json` — no Python code changes required.
 >>>>>>> feat/configurable-scoring-weights
+
+- **Bookmarks**: Save projects locally via 🔖 on any project page; view them at `/bookmarks`.
+- **Recently Viewed**: Your last 5 viewed projects appear on the homepage (tracked server-side per session).

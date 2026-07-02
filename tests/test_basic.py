@@ -933,3 +933,30 @@ if __name__ == "__main__":
     if failed > 0:
         sys.exit(1)
 
+
+def test_recently_viewed_tracks_last_five():
+    with app.test_client() as client:
+        for pid in [1, 2, 3, 4, 5, 6]:
+            client.get(f"/project/{pid}")
+        resp = client.get("/api/recently-viewed")
+        data = resp.get_json()
+        assert len(data) <= 5
+
+def test_recently_viewed_revisit_moves_to_front():
+    with app.test_client() as client:
+        client.get("/project/1")
+        client.get("/project/2")
+        client.get("/project/1")  # revisit
+        resp = client.get("/api/recently-viewed")
+        data = resp.get_json()
+        assert data[0]["id"] == 1
+
+def test_bookmarks_page_loads():
+    with app.test_client() as client:
+        resp = client.get("/bookmarks")
+        assert resp.status_code == 200
+
+def test_project_detail_404_for_invalid_id():
+    with app.test_client() as client:
+        resp = client.get("/project/999999")
+        assert resp.status_code == 404
