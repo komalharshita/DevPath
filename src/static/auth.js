@@ -492,18 +492,22 @@
     }).join("");
   }
 
-  // ---- nav UI ----
+ // ---- nav UI ----
 
-  // Show/hide the Sign In button and Dashboard button in the navbar
-  // based on current sign-in state.
+  // Show/hide the Sign In button and Dashboard button in both the desktop
+  // navbar and the mobile menu based on current sign-in state.
   function updateNavUI() {
-    var signInBtn  = document.getElementById("auth-nav-btn");
-    var dashBtn    = document.getElementById("auth-logout-btn");
+    var signInBtn       = document.getElementById("auth-nav-btn");
+    var dashBtn         = document.getElementById("auth-logout-btn");
+    var signInBtnMobile = document.getElementById("auth-nav-btn-mobile");
+    var dashBtnMobile   = document.getElementById("auth-logout-btn-mobile");
     if (!signInBtn) return;
 
     var loggedIn = isLoggedIn();
     signInBtn.classList.toggle("auth-hidden", loggedIn);
-    if (dashBtn) dashBtn.classList.toggle("auth-hidden", !loggedIn);
+    if (dashBtn)         dashBtn.classList.toggle("auth-hidden", !loggedIn);
+    if (signInBtnMobile) signInBtnMobile.classList.toggle("auth-hidden", loggedIn);
+    if (dashBtnMobile)   dashBtnMobile.classList.toggle("auth-hidden", !loggedIn);
   }
 
   // Update the progress section subtitle to reflect sign-in state.
@@ -524,11 +528,19 @@
     updateNavUI();
     updateSubtitle();
 
+    // Desktop buttons
     var signInBtn = document.getElementById("auth-nav-btn");
     if (signInBtn) signInBtn.onclick = openModal;
 
     var dashBtn = document.getElementById("auth-logout-btn");
     if (dashBtn) dashBtn.onclick = openDashboard;
+
+    // Mobile menu buttons — same actions as desktop
+    var signInBtnMobile = document.getElementById("auth-nav-btn-mobile");
+    if (signInBtnMobile) signInBtnMobile.onclick = openModal;
+
+    var dashBtnMobile = document.getElementById("auth-logout-btn-mobile");
+    if (dashBtnMobile) dashBtnMobile.onclick = openDashboard;
   });
 
 })();
