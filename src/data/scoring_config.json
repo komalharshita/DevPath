@@ -1,0 +1,15 @@
+﻿{
+  "version": "1.0",
+  "weights": {
+    "skill_match_per_skill": 3,
+    "level_exact_match": 2,
+    "level_adjacent_match": 1,
+    "interest_match": 2,
+    "time_match": 1,
+    "gap_boost_base": 1.0
+  },
+  "result_count": 3,
+  "minimum_score_threshold": 1,
+  "max_hops": 3,
+  "ml_similarity_weight": 0.5
+}
