@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Your Saved Projects — DevPath{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="bookmarks-header">
+    <h1>📚 Your Saved Projects</h1>
+    <p class="bookmarks-subtitle">Projects you've bookmarked for later reference.</p>
+  </div>
+
+  <div id="bookmarks-container" class="results-grid">
+    <!-- Projects will be rendered here by JavaScript -->
+    <div id="bookmarks-empty" style="display:none;" class="bookmarks-empty">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+      </svg>
+      <h2>No saved projects yet</h2>
+      <p>Browse project recommendations and hit the 🔖 button to save projects you're interested in.</p>
+      <a href="/" class="btn-primary">Browse Projects</a>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const container = document.getElementById("bookmarks-container");
+  const empty = document.getElementById("bookmarks-empty");
+  
+  // Get bookmarks from localStorage
+  const bookmarks = BookmarkManager.getAll();
+  
+  if (bookmarks.length === 0) {
+    empty.style.display = "block";
+    return;
+  }
+  
+  // Fetch full project details for each bookmarked id
+  const projectIds = bookmarks.map(b => b.id);
+  
+  // Option 1: Fetch each project individually
+  const fetchPromises = projectIds.map(id => 
+    fetch(`/api/project/${id}`)
+      .then(r => r.json())
+      .catch(() => null)
+  );
+  
+  Promise.all(fetchPromises)
+    .then(projects => {
+      // Filter out any null responses (failed fetches)
+      const validProjects = projects.filter(p => p !== null);
+      
+      if (validProjects.length === 0) {
+        empty.style.display = "block";
+        return;
+      }
+      
+      // Render each project using the card helper
+      // Option A: If renderProjectCard exists in global scope
+      if (typeof renderProjectCard === 'function') {
+        validProjects.forEach(project => {
+          const card = renderProjectCard(project);
+          container.appendChild(card);
+        });
+      } 
+      // Option B: Fallback rendering
+      else {
+        validProjects.forEach(project => {
+          const card = createProjectCard(project);
+          container.appendChild(card);
+        });
+      }
+    })
+    .catch(error => {
+      console.error("Failed to load bookmarks:", error);
+      empty.style.display = "block";
+      empty.innerHTML = `
+        <h2>Error loading bookmarks</h2>
+        <p>There was a problem loading your saved projects. Please try again.</p>
+      `;
+    });
+});
+
+// Helper function to create project card (fallback if renderProjectCard doesn't exist)
+function createProjectCard(project) {
+  const card = document.createElement('div');
+  card.className = 'project-card';
+  card.innerHTML = `
+    <div class="project-card-header">
+      <h3><a href="/project/${project.id}">${project.title}</a></h3>
+      <button class="bookmark-btn-sm" data-project-id="${project.id}" aria-label="Remove bookmark">
+        🔖
+      </button>
+    </div>
+    <div class="project-card-body">
+      <p class="project-card-description">${project.description || ''}</p>
+      <div class="project-card-meta">
+        <span class="badge badge--${project.level?.toLowerCase()}">${project.level || ''}</span>
+        <span class="badge badge--${project.interest?.toLowerCase()}">${project.interest || ''}</span>
+      </div>
+      <div class="project-card-skills">
+        ${(project.skills || []).map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+      </div>
+    </div>
+  `;
+  
+  // Add remove bookmark functionality
+  const removeBtn = card.querySelector('.bookmark-btn-sm');
+  removeBtn.addEventListener('click', () => {
+    BookmarkManager.remove(project.id);
+    card.remove();
+    // Update badge count
+    BookmarkManager._updateBadge();
+    // Show empty state if no bookmarks left
+    if (BookmarkManager.getAll().length === 0) {
+      document.getElementById('bookmarks-empty').style.display = 'block';
+    }
+  });
+  
+  return card;
+}
+</script>
+
+<style>
+/* Add to your CSS file or inline */
+.bookmarks-header {
+  margin: 2rem 0 1.5rem;
+}
+
+.bookmarks-header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.bookmarks-subtitle {
+  color: var(--text-secondary, #64748b);
+}
+
+.bookmarks-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  background: var(--bg-secondary, #f8fafc);
+  border-radius: 12px;
+  min-height: 300px;
+}
+
+.bookmarks-empty svg {
+  margin-bottom: 1.5rem;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.bookmarks-empty h2 {
+  margin-bottom: 0.5rem;
+}
+
+.bookmarks-empty p {
+  color: var(--text-secondary, #64748b);
+  margin-bottom: 1.5rem;
+}
+
+.project-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.bookmark-btn-sm {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.bookmark-btn-sm:hover {
+  background: var(--bg-hover, #f1f5f9);
+}
+</style>
+{% endblock %}

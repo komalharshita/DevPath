@@ -200,6 +200,9 @@ html[data-theme="dark"] {
   /* Intentionally NOT covered by .theme-ready to keep icon swap instant. */
 }
 
+.bookmark-btn.bookmarked .bookmark-icon { opacity: 1; }
+.bookmark-btn { cursor: pointer; }
+
 .theme-toggle:hover {
   background: rgba(255, 255, 255, 0.18);
   border-color: rgba(255, 255, 255, 0.4);

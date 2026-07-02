@@ -1,16 +1,65 @@
+"""
 # utils/recommender.py
 # Contains all recommendation logic: scoring and filtering projects.
+"""
 
 import math
 import re
 from collections import Counter
-
+from pathlib import Path
 import json
 import os
 
 from utils.data_loader import load_all_projects
 
-MAX_RESULTS = 3
+# =============================================================================
+# Configuration loader
+# =============================================================================
+
+_CONFIG_PATH = Path(__file__).parent.parent / "data" / "scoring_config.json"
+
+def load_scoring_config() -> dict:
+    """
+    Load scoring weights and thresholds from data/scoring_config.json.
+    
+    Returns:
+        dict: Configuration dictionary with weights and thresholds.
+    
+    Raises:
+        FileNotFoundError: If config file doesn't exist.
+    """
+    if not _CONFIG_PATH.exists():
+        raise FileNotFoundError(
+            f"Scoring config not found at {_CONFIG_PATH}. "
+            "Copy data/scoring_config.json.example if it's missing, "
+            "or restore data/scoring_config.json."
+        )
+    with open(_CONFIG_PATH, encoding='utf-8-sig') as f:  # Changed from 'utf-8' to 'utf-8-sig'
+        return json.load(f)
+
+# Load config once at module level
+try:
+    _CONFIG = load_scoring_config()
+    SCORING_WEIGHTS = _CONFIG.get("weights", {})
+    MIN_SCORE_THRESHOLD = _CONFIG.get("minimum_score_threshold", 1)
+    MAX_RESULTS = _CONFIG.get("result_count", 3)
+    MAX_HOPS = _CONFIG.get("max_hops", 3)
+    ML_SIMILARITY_WEIGHT = _CONFIG.get("ml_similarity_weight", 0.5)
+except FileNotFoundError:
+    # Fallback defaults if config file is missing (shouldn't happen in production)
+    SCORING_WEIGHTS = {
+        "skill_match_per_skill": 3,
+        "level_exact_match": 2,
+        "interest_match": 2,
+        "time_match": 1,
+        "gap_boost_base": 1.0
+    }
+    MIN_SCORE_THRESHOLD = 1
+    MAX_RESULTS = 3
+    MAX_HOPS = 3
+    ML_SIMILARITY_WEIGHT = 0.5
+    print(f"Warning: Scoring config not found at {_CONFIG_PATH}. Using defaults.")
+
 MAX_RELATED = 3
 _CLUSTERS_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
@@ -19,30 +68,15 @@ _CLUSTERS_PATH = os.path.join(
 )
 
 VALID_LEVELS = {"beginner", "intermediate", "advanced"}
-VALID_INTERESTS = {"web", "data", "education", "automation", "games", "cybersecurity", "devops", "backend", "tools", "productivity", "business logic", "mobile", "machine learning/ai"}
-VALID_TIME_AVAILABILITY = {"low", "medium", "high"}
-SCORING_WEIGHTS = {
-    "skill": 3,
-    "level": 2,
-    "interest": 2,
-    "time": 1,
-}
-
-WEIGHT_SKILL = SCORING_WEIGHTS["skill"]
-WEIGHT_LEVEL = SCORING_WEIGHTS["level"]
-WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
-WEIGHT_TIME = SCORING_WEIGHTS["time"]
-
 VALID_INTERESTS = {
-    "web", "data", "education", "automation", "games",
-    "cybersecurity", "devops", "mobile", "machine learning/ai",
-    "artificial intelligence", "cloud computing", "mobile app development",
-    "backend", "tools", "productivity", "business logic"
+    "web", "data", "education", "automation", "games", 
+    "cybersecurity", "devops", "backend", "tools", "productivity", 
+    "business logic", "mobile", "machine learning/ai",
+    "artificial intelligence", "cloud computing", "mobile app development"
 }
-VALID_TIMES = {"low", "medium", "high"}
+VALID_TIME_AVAILABILITY = {"low", "medium", "high"}
 
 # Common aliases and abbreviations for skills
-# This improves recommendation accuracy by normalizing user input
 SKILL_ALIASES = {
     "js": "javascript",
     "py": "python",
@@ -51,6 +85,7 @@ SKILL_ALIASES = {
     "c++": "cpp",
     "web dev": "javascript",
 }
+
 
 def parse_skills(skills_string):
     """
@@ -78,8 +113,10 @@ def parse_skills(skills_string):
     ]
     return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
 
+
 def _tokenize(text):
     return re.findall(r"[a-z0-9]+", str(text).lower())
+
 
 def _project_text(project):
     parts = [
@@ -94,13 +131,16 @@ def _project_text(project):
     ]
     return " ".join(parts)
 
+
 def _user_text(user_skills, level, interest, time_availability):
     return " ".join(user_skills + [level, interest, time_availability])
+
 
 def _tf(tokens):
     counts = Counter(tokens)
     total = len(tokens) or 1
     return {token: count / total for token, count in counts.items()}
+
 
 def _idf(documents):
     total_docs = len(documents)
@@ -114,12 +154,14 @@ def _idf(documents):
 
     return idf_scores
 
+
 def _tfidf_vector(tokens, idf_scores):
     tf_scores = _tf(tokens)
     return {
         token: tf_scores[token] * idf_scores.get(token, 0)
         for token in tf_scores
     }
+
 
 def _cosine_similarity(vec_a, vec_b):
     shared_tokens = set(vec_a) & set(vec_b)
@@ -133,6 +175,7 @@ def _cosine_similarity(vec_a, vec_b):
 
     return dot_product / (magnitude_a * magnitude_b)
 
+
 def ml_similarity_score(project, user_skills, level, interest, time_availability, all_projects):
     project_documents = [_tokenize(_project_text(p)) for p in all_projects]
     user_tokens = _tokenize(_user_text(user_skills, level, interest, time_availability))
@@ -144,45 +187,70 @@ def ml_similarity_score(project, user_skills, level, interest, time_availability
 
     return _cosine_similarity(user_vector, project_vector)
 
-def score_single_project(project, user_skills, level, interest, time_availability):
+
+def score_project(project: dict, user_input: dict, weights: dict) -> int:
+    """
+    Score a single project based on user input and configuration weights.
+    
+    Args:
+        project: Project dictionary with skills, level, interest, time
+        user_input: User input dict with skills, level, interest, time
+        weights: Scoring weights from config
+    
+    Returns:
+        int: Score for the project
+    """
+    score = 0
+    
+    # Skills match
+    user_skills = set(s.lower() for s in user_input.get("skills", []))
+    project_skills = set(s.lower() for s in project.get("skills", []))
+    
+    # Number of matching skills × weight per skill
+    score += len(user_skills & project_skills) * weights.get("skill_match_per_skill", 3)
+    
+    # Level match
+    if project.get("level", "").lower() == user_input.get("level", "").lower():
+        score += weights.get("level_exact_match", 2)
+    
+    # Interest match
+    if project.get("interest", "").lower() == user_input.get("interest", "").lower():
+        score += weights.get("interest_match", 2)
+    
+    # Time match
+    if project.get("time", "").lower() == user_input.get("time", "").lower():
+        score += weights.get("time_match", 1)
+    
+    return score
+
+
+def _score_with_time_filter(project, user_input, weights):
+    """
+    Apply time availability filtering then score the project.
+    If time doesn't match, return 0.
+    """
     TIME_RANKS = ["low", "medium", "high"]
-
-    user_time    = time_availability.strip().lower()
+    
+    user_time = user_input.get("time", "").strip().lower()
     project_time = project.get("time", "").strip().lower()
-
-    # If the project needs more time than the user has, exclude it.
+    
+    # Time availability filtering
     if project_time not in TIME_RANKS or user_time not in TIME_RANKS:
         return 0
     if TIME_RANKS.index(project_time) > TIME_RANKS.index(user_time):
         return 0
-
-    score = 0
-
-    # Compare user's skills against the project's required skills
-    project_skills = [SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", [])]
-    matched_skills = sum(1 for skill in user_skills if skill in project_skills)
-    if project_skills:
-        coverage = matched_skills / len(project_skills)
-        score += matched_skills * SCORING_WEIGHTS["skill"] * coverage
-    else:
-        score += matched_skills * SCORING_WEIGHTS["skill"]
-
-    if project.get("level", "").lower() == level.lower():
-        score += SCORING_WEIGHTS["level"]
-
-    p_interest = project.get("interest", "").lower()
-    u_interest = interest.lower()
-    # Use partial matching for interest as well
-    if p_interest == u_interest or (u_interest and u_interest in p_interest) or (p_interest and p_interest in u_interest):
-        score += SCORING_WEIGHTS["interest"]
-
-    if project.get("time", "").lower() == time_availability.lower():
-        score += SCORING_WEIGHTS["time"]
-        
+    
+    # Base score
+    score = score_project(project, user_input, weights)
+    
+    # Add graph-based boost if available
     graph = _load_skill_graph()
+    user_skills = [s.lower() for s in user_input.get("skills", [])]
+    project_skills = [s.lower() for s in project.get("skills", [])]
     score += gap_boost(user_skills, project_skills, graph)
-
+    
     return score
+
 
 # ---------------------------------------------------------------------------
 # Skill graph helpers
@@ -203,7 +271,7 @@ def _load_skill_graph():
         return {}
 
 
-def _hops_to_skill(target, user_skills, graph, max_hops=3):
+def _hops_to_skill(target, user_skills, graph, max_hops=MAX_HOPS):
     """
     BFS from every known user skill — find minimum hops to reach target.
     Returns None if unreachable within max_hops.
@@ -237,11 +305,13 @@ def gap_boost(user_skills, project_skills, graph):
     Returns total boost score (float).
     """
     boost = 0.0
+    gap_boost_base = SCORING_WEIGHTS.get("gap_boost_base", 1.0)
+    
     for skill in project_skills:
         if skill not in user_skills:
             hops = _hops_to_skill(skill, user_skills, graph)
             if hops and hops > 0:
-                boost += 1.0 / hops
+                boost += gap_boost_base / hops
     return round(boost, 3)
 
 
@@ -304,10 +374,9 @@ def _get_related(recommended_ids, all_projects, cluster_data):
 
     Returns up to MAX_RELATED project dicts.
     """
-    clusters = cluster_data.get("clusters", {})  # {str(pid): cid}
-    members  = cluster_data.get("members",  {})  # {str(cid): [pid, ...]}
+    clusters = cluster_data.get("clusters", {})
+    members = cluster_data.get("members", {})
 
-    # Collect which clusters the recommended projects belong to.
     relevant_cluster_ids = set()
     for pid in recommended_ids:
         cid = clusters.get(str(pid))
@@ -317,7 +386,6 @@ def _get_related(recommended_ids, all_projects, cluster_data):
     if not relevant_cluster_ids:
         return []
 
-    # Gather candidate IDs from those clusters, excluding already recommended.
     candidate_ids = []
     for cid in relevant_cluster_ids:
         for pid in members.get(cid, []):
@@ -334,17 +402,38 @@ def _get_related(recommended_ids, all_projects, cluster_data):
 # ---------------------------------------------------------------------------
 
 def get_recommendations(skills_string, level, interest, time_availability):
+    """
+    Get project recommendations based on user input.
+    
+    Args:
+        skills_string: Comma-separated or JSON array of skills
+        level: User experience level
+        interest: User's area of interest
+        time_availability: User's available time
+    
+    Returns:
+        dict: Contains recommendations, related projects, and progression
+    """
+    # Parse user input
     user_skills = parse_skills(skills_string)
+    user_input = {
+        "skills": user_skills,
+        "level": level,
+        "interest": interest,
+        "time": time_availability
+    }
+    
+    # Load configuration
+    weights = SCORING_WEIGHTS
+    
     all_projects = load_all_projects()
     scored_projects = []
+    
     for project in all_projects:
-        rule_score = score_single_project(
-            project,
-            user_skills,
-            level,
-            interest,
-            time_availability,
-        )
+        # Rule-based scoring with time filter
+        rule_score = _score_with_time_filter(project, user_input, weights)
+        
+        # ML similarity score
         similarity_score = ml_similarity_score(
             project,
             user_skills,
@@ -353,22 +442,28 @@ def get_recommendations(skills_string, level, interest, time_availability):
             time_availability,
             all_projects,
         )
-        final_score = rule_score + similarity_score
-        if final_score > 0:
+        
+        # Combine scores with ML weight from config
+        final_score = rule_score + (ML_SIMILARITY_WEIGHT * similarity_score)
+        
+        if final_score >= MIN_SCORE_THRESHOLD:
             scored_projects.append({
                 "project": project,
                 "score": final_score,
             })
-    # Sort projects in descending order so the
-    # most relevant recommendations appear first.
+    
+    # Sort projects by score descending
     scored_projects.sort(key=lambda item: (item["score"], item["project"].get("id", 0)), reverse=True)
     
+    # Get top recommendations
     top_projects = [item["project"] for item in scored_projects[:MAX_RESULTS]]
     top_ids = [p["id"] for p in top_projects]
     
+    # Get related projects from clusters
     cluster_data = _load_clusters()
     related = _get_related(top_ids, all_projects, cluster_data) if cluster_data else []
     
+    # Get progression projects
     graph = _load_skill_graph()
     progression = get_progression(user_skills, top_ids, all_projects, graph) if graph else []
     
@@ -378,16 +473,20 @@ def get_recommendations(skills_string, level, interest, time_availability):
         "progression": progression,
     }
 
-VALID_LEVELS = ["beginner", "intermediate", "advanced"]
-VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
 
-
-VALID_LEVELS = ["beginner", "intermediate", "advanced"]
-VALID_INTERESTS = ["data", "web", "backend", "cybersecurity", "games", "education", "automation"]
-VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
+# Validation functions
+VALID_LEVELS_LIST = ["beginner", "intermediate", "advanced"]
+VALID_INTERESTS_LIST = ["data", "web", "backend", "cybersecurity", "games", "education", "automation"]
+VALID_TIME_AVAILABILITY_LIST = ["low", "medium", "high"]
 
 
 def validate_recommendation_inputs(skills, level, interest, time_availability):
+    """
+    Validate user inputs for recommendation.
+    
+    Returns:
+        list: List of error messages, empty if all valid.
+    """
     errors = []
 
     if not skills or not skills.strip():
@@ -397,7 +496,7 @@ def validate_recommendation_inputs(skills, level, interest, time_availability):
 
     if not level or not level.strip():
         errors.append("Please select an experience level.")
-    elif level.strip().lower() not in VALID_LEVELS:
+    elif level.strip().lower() not in VALID_LEVELS_LIST:
         errors.append("Invalid experience level. Choose Beginner, Intermediate, or Advanced.")
 
     if not interest or not isinstance(interest, str) or not interest.strip():
@@ -405,7 +504,39 @@ def validate_recommendation_inputs(skills, level, interest, time_availability):
 
     if not time_availability or not time_availability.strip():
         errors.append("Please select your time availability.")
-    elif time_availability.strip().lower() not in VALID_TIME_AVAILABILITY:
+    elif time_availability.strip().lower() not in VALID_TIME_AVAILABILITY_LIST:
         errors.append("Invalid time availability. Choose Low, Medium, or High.")
 
     return errors
+
+
+def recommend(user_input: dict) -> list:
+    """
+    Alternative API for recommendations using dict input.
+    This maintains backward compatibility with existing imports.
+    
+    Args:
+        user_input: Dict with keys: skills, level, interest, time
+    
+    Returns:
+        list: List of recommended project dictionaries
+    """
+    config = load_scoring_config()
+    weights = config["weights"]
+    
+    # Parse skills if provided as string
+    skills = user_input.get("skills", "")
+    if isinstance(skills, str):
+        parsed_skills = parse_skills(skills)
+    else:
+        parsed_skills = skills
+    
+    # Convert to format expected by get_recommendations
+    result = get_recommendations(
+        skills_string=", ".join(parsed_skills) if isinstance(skills, str) else skills,
+        level=user_input.get("level", ""),
+        interest=user_input.get("interest", ""),
+        time_availability=user_input.get("time", "")
+    )
+    
+    return result["recommendations"]
