@@ -16,6 +16,7 @@ import sys
 import os
 
 import pytest
+import unittest
 
 # Allow imports from the project root and src/ when running tests directly
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -491,7 +492,7 @@ def test_recommend_api_interest_not_available():
 
 
 def test_recommend_api_missing_field():
-    """The API should return 400 when a required field is missing."""
+    """The API should return 400/422 when a required field is missing."""
     client = get_client()
     response = client.post("/api/recommend", json={
         "skills": "",
@@ -499,12 +500,12 @@ def test_recommend_api_missing_field():
         "interest": "Data",
         "time": "Low"
     })
-    assert response.status_code in (400, 415)
-    assert "error" in response.get_json()
+    assert response.status_code in (400, 415, 422)
+    assert "error" in response.get_json() or "errors" in response.get_json()
 
 
 def test_recommend_api_null_field():
-    """The API should return 400 when a field is explicitly set to null."""
+    """The API should return 400/422 when a field is explicitly set to null."""
     client = get_client()
     response = client.post("/api/recommend", json={
         "skills": None,
@@ -512,23 +513,23 @@ def test_recommend_api_null_field():
         "interest": "Web",
         "time": "Low"
     })
-    assert response.status_code == 400
+    assert response.status_code in (400, 422)
     data = response.get_json()
-    assert "error" in data
+    assert "error" in data or "errors" in data
 
 
 def test_recommend_api_non_string_field():
-    """The API should return 400 when a field is a non-string type (e.g. a list)."""
+    """The API should return 400/422 when a field is a non-string type (e.g. a list)."""
     client = get_client()
     response = client.post("/api/recommend", json={
-        "skills": ["Python", "HTML"],
-        "level": "Beginner",
+        "skills": ["Python"],
+        "level": ["Beginner"],
         "interest": "Web",
         "time": "Low"
     })
-    assert response.status_code == 400
+    assert response.status_code in (400, 422)
     data = response.get_json()
-    assert "error" in data
+    assert "error" in data or "errors" in data
 
 
 def test_recommend_api_empty_body():
@@ -622,7 +623,7 @@ def test_health_check():
 
 def test_scoring_weights_has_all_keys():
     """Verify SCORING_WEIGHTS contains exactly the expected keys."""
-    expected_keys = {"skill_match_per_skill", "level_exact_match", "interest_match", "time_match", "gap_boost_base"}
+    expected_keys = {"skill_match_per_skill", "level_exact_match", "interest_match", "time_match", "gap_boost_base", "level_adjacent_match"}
     assert set(SCORING_WEIGHTS.keys()) == expected_keys
 
 def test_search_api_returns_results():
@@ -697,7 +698,7 @@ def test_api_recommend_invalid_level_no_crash():
         "interest": "Data",
         "time": "Low"
     })
-    assert response.status_code in (200, 400)
+    assert response.status_code in (200, 400, 422)
     data = response.get_json()
     # Should either be an error or return empty results (no match for 'Expert')
     if response.status_code == 200:
@@ -960,3 +961,181 @@ def test_project_detail_404_for_invalid_id():
     with app.test_client() as client:
         resp = client.get("/project/999999")
         assert resp.status_code == 404
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NEW TESTS — Issue #1231: API schema validation and structured error responses
+# These 5 tests verify the new behaviour added in feat/api-schema-validation
+# ─────────────────────────────────────────────────────────────────────────────
+
+class TestAPISchemaValidation(unittest.TestCase):
+    """Tests for POST /api/recommend request validation and response structure."""
+
+    def setUp(self):
+        """Create a test client before each test."""
+        # Import app here so it picks up the same Blueprint as production
+        from app import app
+        app.config["TESTING"] = True
+        self.client = app.test_client()
+
+    def _post_recommend(self, payload, content_type="application/json"):
+        """Helper: POST to /api/recommend with a JSON payload."""
+        return self.client.post(
+            "/api/recommend",
+            json=payload,
+            content_type=content_type,
+        )
+
+    # ── Test 1 ───────────────────────────────────────────────────────────────
+    def test_empty_skills_returns_422(self):
+        """
+        POST /api/recommend with an empty skills list must return HTTP 422.
+        The response must include 'success': false and an 'errors' list
+        that mentions the 'skills' field.
+        """
+        response = self._post_recommend({
+            "skills":   [],
+            "level":    "Beginner",
+            "interest": "Web",
+            "time":     "Low"
+        })
+
+        self.assertEqual(response.status_code, 422,
+            "Empty skills list should return 422 Unprocessable Entity")
+
+        data = response.get_json()
+        self.assertFalse(data["success"],
+            "'success' must be False on validation error")
+        self.assertIn("errors", data,
+            "Response must include 'errors' list on 422")
+        self.assertEqual(data["code"], "VALIDATION_ERROR",
+            "'code' must be 'VALIDATION_ERROR'")
+        # At least one error mentions 'skills'
+        self.assertTrue(any("skills" in e for e in data["errors"]),
+            "At least one error must mention 'skills'")
+
+    # ── Test 2 ───────────────────────────────────────────────────────────────
+    def test_invalid_level_returns_422(self):
+        """
+        POST /api/recommend with an invalid 'level' value must return HTTP 422.
+        Valid values are: Beginner, Intermediate, Advanced.
+        """
+        response = self._post_recommend({
+            "skills":   ["Python"],
+            "level":    "Expert",        # Invalid — not in VALID_LEVELS
+            "interest": "Data",
+            "time":     "Medium"
+        })
+
+        self.assertEqual(response.status_code, 422,
+            "Invalid level should return 422 Unprocessable Entity")
+
+        data = response.get_json()
+        self.assertFalse(data["success"])
+        self.assertIn("errors", data)
+        self.assertTrue(any("level" in e for e in data["errors"]),
+            "At least one error must mention 'level'")
+
+    # ── Test 3 ───────────────────────────────────────────────────────────────
+    def test_valid_request_returns_200_with_structured_response(self):
+        """
+        A fully valid POST /api/recommend must return HTTP 200
+        with a structured response: {"success": true, "count": N, "results": [...]}
+        """
+        response = self._post_recommend({
+            "skills":   ["Python"],
+            "level":    "Beginner",
+            "interest": "Web",
+            "time":     "Low"
+        })
+
+        self.assertEqual(response.status_code, 200,
+            "Valid request must return 200 OK")
+
+        data = response.get_json()
+        self.assertIsNotNone(data, "Response must be valid JSON")
+
+        # Check required top-level keys
+        self.assertIn("success", data, "Response must have 'success' key")
+        self.assertIn("count",   data, "Response must have 'count' key")
+        self.assertIn("results", data, "Response must have 'results' key")
+
+        # Check types
+        self.assertTrue(data["success"],   "'success' must be True on 200 response")
+        self.assertIsInstance(data["count"],   int,  "'count' must be an integer")
+        self.assertIsInstance(data["results"], list, "'results' must be a list")
+
+        # count must match len(results)
+        self.assertEqual(data["count"], len(data["results"]),
+            "'count' must equal the length of 'results'")
+
+    # ── Test 4 ───────────────────────────────────────────────────────────────
+    def test_non_json_body_returns_400(self):
+        """
+        POST /api/recommend with a non-JSON body (plain text, form data, etc.)
+        must return HTTP 400 with code 'INVALID_CONTENT_TYPE'.
+        """
+        response = self.client.post(
+            "/api/recommend",
+            data="this is not json",
+            content_type="text/plain",   # Wrong content type
+        )
+
+        self.assertEqual(response.status_code, 400,
+            "Non-JSON body must return 400 Bad Request")
+
+        data = response.get_json()
+        self.assertIsNotNone(data, "Error response must still be valid JSON")
+        self.assertFalse(data["success"])
+        self.assertEqual(data["code"], "INVALID_CONTENT_TYPE",
+            "'code' must be 'INVALID_CONTENT_TYPE' for non-JSON body")
+
+    # ── Test 5 ───────────────────────────────────────────────────────────────
+    def test_validate_projects_script_catches_missing_field(self):
+        """
+        The scripts/validate_projects.py validator must detect a project
+        entry that is missing a required field (e.g., 'roadmap').
+        This test verifies the validator logic directly (no subprocess).
+        """
+        import json
+        import tempfile
+        import os
+        from scripts.validate_projects import validate_projects
+
+        # Create a temporary projects.json with one incomplete entry
+        incomplete_projects = [
+            {
+                "id": 999,
+                "title": "Test Project",
+                "skills": ["Python"],
+                "level": "Beginner",
+                "interest": "Automation",
+                "time": "Low",
+                "description": "A test project",
+                # Missing: "roadmap" and "resources" — intentionally incomplete
+            }
+        ]
+
+        # Write to a temp file and validate it
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".json", delete=False, encoding="utf-8"
+        ) as f:
+            json.dump(incomplete_projects, f)
+            temp_path = f.name
+
+        try:
+            errors = validate_projects(temp_path)
+            self.assertTrue(len(errors) > 0,
+                "Validator must find errors in an incomplete project")
+            # At least one error mentions the missing field
+            combined = " ".join(errors)
+            self.assertTrue(
+                "roadmap" in combined or "resources" in combined,
+                "Error message must mention the missing field name"
+            )
+        finally:
+            os.unlink(temp_path)   # Clean up temp file
+
+
+if __name__ == "__main__":
+    unittest.main()
