@@ -3,7 +3,7 @@
 # Each route is kept thin: it validates input, calls a utility function,
 # and returns a response. No business logic lives here.
 
-from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response
+from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response, session
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
 from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats
@@ -203,11 +203,45 @@ def project_resources(project_id):
 
 @main.route("/project/<int:project_id>")
 def project_detail(project_id):
-    """Render the full detail page for a single project."""
+    """Render the full detail page for a single project and track recently viewed."""
     project = find_project_by_id(project_id)
     if not project:
         abort(404)
+    
+    # ============================================================
+    # Recently Viewed Tracking (Session-based)
+    # ============================================================
+    # Get existing recently viewed list from session
+    recently_viewed = session.get("recently_viewed", [])
+    
+    # Remove current project_id if it exists (to avoid duplicates)
+    recently_viewed = [pid for pid in recently_viewed if pid != project_id]
+    
+    # Add current project_id to the front
+    recently_viewed = [project_id] + recently_viewed
+    
+    # Keep only the last 5 viewed projects
+    session["recently_viewed"] = recently_viewed[:5]
+    
     return render_template("project.html", project=project, config=Config)
+
+
+@main.route("/api/recently-viewed")
+def recently_viewed():
+    """
+    API endpoint to get recently viewed projects.
+    Returns JSON list of project objects.
+    """
+    # Get project IDs from session
+    ids = session.get("recently_viewed", [])
+    
+    # Fetch each project by ID
+    projects = [find_project_by_id(pid) for pid in ids]
+    
+    # Filter out any None values (in case a project was deleted)
+    projects = [p for p in projects if p is not None]
+    
+    return jsonify(projects)
 
 
 @main.route("/project/<int:project_id>/code")
@@ -422,3 +456,8 @@ def update_path(path_id):
         return jsonify({"error": "Forbidden: invalid token for this path."}), 403
 
     return jsonify({"path_id": path_id, "message": "Learning path updated."}), 200
+
+@main.route("/bookmarks")
+def bookmarks_page():
+    """Render the bookmarks page."""
+    return render_template("bookmarks.html", config=Config)

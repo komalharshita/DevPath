@@ -1,0 +1,31 @@
+# .github/workflows/validate_projects.yml
+#
+# This GitHub Actions workflow runs on every pull request.
+# It ensures that all projects in data/projects.json have the required fields.
+# If any project is missing a field, the PR is blocked from merging.
+
+name: Validate Projects Data
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "data/projects.json"      # Only runs when this file changes
+      - "scripts/validate_projects.py"  # Or when the validator itself changes
+
+jobs:
+  validate:
+    name: Check projects.json structure
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run project validator
+        run: python scripts/validate_projects.py

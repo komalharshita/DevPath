@@ -1080,3 +1080,74 @@ updateProfileWidgets();
   });
   update();
 })();
+
+const BOOKMARKS_KEY = "devpath_bookmarks";
+const MAX_BOOKMARKS = 10;
+
+const BookmarkManager = {
+  getAll() {
+    try {
+      return JSON.parse(localStorage.getItem(BOOKMARKS_KEY) || "[]");
+    } catch (e) {
+      console.error("Corrupt bookmark data, resetting:", e);
+      localStorage.removeItem(BOOKMARKS_KEY);
+      return [];
+    }
+  },
+
+  add(project) {
+    const bookmarks = this.getAll();
+    if (bookmarks.find(b => b.id === project.id)) return;
+    if (bookmarks.length >= MAX_BOOKMARKS) bookmarks.shift();
+    bookmarks.push({ id: project.id, title: project.title, savedAt: Date.now() });
+    localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(bookmarks));
+    this._updateBadge();
+  },
+
+  remove(projectId) {
+    const filtered = this.getAll().filter(b => b.id !== projectId);
+    localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(filtered));
+    this._updateBadge();
+  },
+
+  isBookmarked(projectId) {
+    return this.getAll().some(b => b.id === projectId);
+  },
+
+  _updateBadge() {
+    const count = this.getAll().length;
+    const badge = document.getElementById("bookmark-count");
+    if (badge) badge.textContent = count > 0 ? count : "";
+  }
+};
+
+function initBookmarkButton() {
+  const btn = document.getElementById("bookmark-btn");
+  if (!btn) return;
+
+  const projectId = parseInt(btn.dataset.projectId, 10);
+  const projectTitle = btn.dataset.projectTitle;
+
+  const syncButtonState = () => {
+    const saved = BookmarkManager.isBookmarked(projectId);
+    btn.classList.toggle("bookmarked", saved);
+    btn.querySelector(".bookmark-label").textContent = saved ? "Saved" : "Save Project";
+    btn.setAttribute("aria-pressed", saved ? "true" : "false");
+  };
+
+  btn.addEventListener("click", () => {
+    if (BookmarkManager.isBookmarked(projectId)) {
+      BookmarkManager.remove(projectId);
+    } else {
+      BookmarkManager.add({ id: projectId, title: projectTitle });
+    }
+    syncButtonState();
+  });
+
+  syncButtonState();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  initBookmarkButton();
+  BookmarkManager._updateBadge();
+});

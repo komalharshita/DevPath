@@ -365,6 +365,28 @@
     [data-theme="dark"] .badge-mini {
       background: #374151;
     }
+
+    /* ============================================
+       RECENTLY VIEWED SECTION STYLES
+       ============================================ */
+    .recently-viewed-section {
+      padding: 2rem 0 3rem;
+      border-bottom: 1px solid var(--border, #e5e7eb);
+    }
+
+    .recently-viewed-section .section-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .recently-viewed-section .section-header h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .recently-viewed-section .section-subtitle {
+      color: var(--text-muted, #6b7280);
+      font-size: 0.95rem;
+    }
   </style>
 </head>
 
@@ -417,6 +439,7 @@
       <a href="#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
       <a href="/compare" class="nav-mobile-link" role="menuitem">Compare</a>
       <a href="/contact" class="nav-mobile-link" role="menuitem">Contact</a>
+      <a href="/bookmarks" class="nav-mobile-link" role="menuitem">Bookmarks</a>
       <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
         class="nav-mobile-link" role="menuitem">GitHub</a>
       <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile"
@@ -1043,6 +1066,21 @@
   </section>
 
   <!-- ============================================================
+       RECENTLY VIEWED SECTION (NEW)
+       ============================================================ -->
+  <section id="recently-viewed-section" style="display:none;" class="recently-viewed-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>🕐 Recently Viewed</h2>
+        <p class="section-subtitle">Continue where you left off.</p>
+      </div>
+      <div id="recently-viewed-container" class="results-grid">
+        <!-- Projects will be rendered here by JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
        Results Section
        ============================================================ -->
   <section class="results-section" id="results-section" style="display:none;" aria-live="polite" aria-atomic="false">
@@ -1176,6 +1214,7 @@
           <li><a href="#the-project">Find Project</a></li>
           <li><a href="#find-project">Find Project</a></li>
           <li><a href="/contact">Contact Us</a></li>
+          <li><a href="/bookmarks">Bookmarks</a></li>
         </ul>
       </div>
 
@@ -1258,6 +1297,26 @@
     .btn-clear:hover {
       background-color: #e5e7eb;
     }
+
+    /* Recently viewed section styles */
+    .recently-viewed-section {
+      padding: 2rem 0 3rem;
+      border-bottom: 1px solid var(--border, #e5e7eb);
+    }
+
+    .recently-viewed-section .section-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .recently-viewed-section .section-header h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .recently-viewed-section .section-subtitle {
+      color: var(--text-muted, #6b7280);
+      font-size: 0.95rem;
+    }
   </style>
 
   <script src="/static/data/skills.js"></script>
@@ -1294,6 +1353,63 @@
         });
       });
     });
+
+    // ============================================================
+    // Recently Viewed - Fetch and render on page load
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+      fetch('/api/recently-viewed')
+        .then(response => {
+          if (!response.ok) throw new Error('Failed to fetch recently viewed');
+          return response.json();
+        })
+        .then(projects => {
+          const section = document.getElementById('recently-viewed-section');
+          const container = document.getElementById('recently-viewed-container');
+          
+          if (!projects || projects.length === 0) {
+            section.style.display = 'none';
+            return;
+          }
+          
+          section.style.display = 'block';
+          
+          // Render each project card
+          projects.forEach(project => {
+            const card = createRecentlyViewedCard(project);
+            container.appendChild(card);
+          });
+        })
+        .catch(error => {
+          console.error('Failed to load recently viewed:', error);
+          document.getElementById('recently-viewed-section').style.display = 'none';
+        });
+    });
+
+    // Helper function to create a project card for recently viewed
+    function createRecentlyViewedCard(project) {
+      const card = document.createElement('div');
+      card.className = 'project-card';
+      card.innerHTML = `
+        <a href="/project/${project.id}" class="project-card-link">
+          <div class="project-card-header">
+            <h3>${project.title}</h3>
+          </div>
+          <div class="project-card-body">
+            <p class="project-card-description">${project.description ? project.description.substring(0, 120) + (project.description.length > 120 ? '...' : '') : ''}</p>
+            <div class="project-card-meta">
+              <span class="badge badge--${project.level?.toLowerCase()}">${project.level || ''}</span>
+              <span class="badge badge--${project.interest?.toLowerCase()}">${project.interest || ''}</span>
+            </div>
+            <div class="project-card-skills">
+              ${(project.skills || []).slice(0, 4).map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+              ${(project.skills || []).length > 4 ? `<span class="skill-tag">+${(project.skills || []).length - 4}</span>` : ''}
+            </div>
+          </div>
+        </a>
+      `;
+      return card;
+    }
   </script>
     
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>

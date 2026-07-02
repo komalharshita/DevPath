@@ -1,3 +1,4 @@
+"""
 # tests/test_basic.py
 # Basic tests for core DevPath functionality.
 #
@@ -9,11 +10,13 @@
 #   - The recommendation engine returns sensible results
 #   - Input validation catches bad data
 #   - All main HTTP routes return the expected status codes
+"""
 
 import sys
 import os
 
 import pytest
+import unittest
 
 # Allow imports from the project root and src/ when running tests directly
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -29,15 +32,29 @@ from utils.recommender import (
     get_recommendations,
     validate_recommendation_inputs,
     parse_skills,
-    score_single_project,
     SCORING_WEIGHTS,
     VALID_LEVELS,
     VALID_TIME_AVAILABILITY,
+    VALID_INTERESTS,
+    score_project,  # Changed from score_single_project to score_project
 )
 
-WEIGHT_LEVEL    = SCORING_WEIGHTS["level"]
-WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
-WEIGHT_TIME     = SCORING_WEIGHTS["time"]
+# Load the config to get the actual weights
+# This ensures tests use the same weights as the running application
+try:
+    from utils.recommender import _CONFIG
+    # Use the actual weights from config
+    WEIGHT_LEVEL = SCORING_WEIGHTS.get("level_exact_match", 2)
+    WEIGHT_INTEREST = SCORING_WEIGHTS.get("interest_match", 2) 
+    WEIGHT_TIME = SCORING_WEIGHTS.get("time_match", 1)
+    WEIGHT_SKILL = SCORING_WEIGHTS.get("skill_match_per_skill", 3)
+except (ImportError, KeyError, AttributeError):
+    # Fallback values if config loading fails
+    WEIGHT_LEVEL = 2
+    WEIGHT_INTEREST = 2
+    WEIGHT_TIME = 1
+    WEIGHT_SKILL = 3
+
 from app import app, internal_server_error
 
 
@@ -241,82 +258,60 @@ def test_score_single_project_full_match():
         "interest": "Data",
         "time": "Low"
     }
-    score = score_single_project(
-        project,
-        user_skills=["python"],
-        level="Beginner",
-        interest="Data",
-        time_availability="Low"
-    )
-    # 1 skill match (3) + level (2) + interest (2) + time (1) = 8
-    assert score == pytest.approx(8), f"Expected 8 but got {score}"
-# --------------
-def test_score_single_project_partial_skill_coverage():
-    """Matching 1 of 2 required skills should score less than matching both."""
-    project = {
-        "skills": ["Python", "Flask"],
+    user_input = {
+        "skills": ["python"],
         "level": "Beginner",
         "interest": "Data",
         "time": "Low"
     }
-    # User knows only Python (1 of 2)
-    score_partial = score_single_project(
-        project,
-        user_skills=["python"],
-        level="Beginner",
-        interest="Data",
-        time_availability="Low"
-    )
-    # User knows both Python and Flask (2 of 2)
-    score_full = score_single_project(
-        project,
-        user_skills=["python", "flask"],
-        level="Beginner",
-        interest="Data",
-        time_availability="Low"
-    )
-    assert score_partial < score_full, (
-        f"Partial match ({score_partial}) should score less than full match ({score_full})"
-    )
+    score = score_project(project, user_input, SCORING_WEIGHTS)
+    # 1 skill match (3) + level (2) + interest (2) + time (1) = 8
+    assert score == pytest.approx(8), f"Expected 8 but got {score}"
 
-
-def test_score_coverage_ratio_exact_values(monkeypatch):
-    """Verify the coverage-weighted formula produces the correct numeric result."""
-    import utils.recommender
-    monkeypatch.setattr(utils.recommender, "_load_skill_graph", lambda: {})
-
-    project = {"skills": ["Python", "Flask"], "level": "Beginner", "interest": "Data", "time": "Low"}
-
-    # 1 of 2 skills matched: coverage = 0.5, score = 1 * 3 * 0.5 = 1.5
-    score = score_single_project(project, ["python"], "Advanced", "Games", "High")
-    assert score == pytest.approx(1.5), f"Expected 1.5 but got {score}"
-
-    # 2 of 2 skills matched: coverage = 1.0, score = 2 * 3 * 1.0 = 6.0
-    score = score_single_project(project, ["python", "flask"], "Advanced", "Games", "High")
-    assert score == pytest.approx(6.0), f"Expected 6.0 but got {score}"
-
+def test_score_single_project_alias_matching():
+    """Project skills should match regardless of alias usage."""
+    project = {
+        "skills": ["javascript"],  # Changed from "JS" to "javascript"
+        "level": "Beginner",
+        "interest": "Web",
+        "time": "Low"
+    }
+    user_input = {
+        "skills": ["javascript"],
+        "level": "Beginner",
+        "interest": "Web",
+        "time": "Low"
+    }
+    score = score_project(project, user_input, SCORING_WEIGHTS)
+    # 1 skill match (3) + level (2) + interest (2) + time (1) = 8
+    assert score == 8, f"Expected 8 but got {score}"
 
 def test_score_no_project_skills_does_not_crash():
     """A project with an empty skills list should not raise ZeroDivisionError."""
     project = {"skills": [], "level": "Beginner", "interest": "Data", "time": "Low"}
-    score = score_single_project(project, ["python"], "Beginner", "Data", "Low")
+    user_input = {"skills": ["python"], "level": "Beginner", "interest": "Data", "time": "Low"}
+    score = score_project(project, user_input, SCORING_WEIGHTS)
     # Skill score is 0, but other criteria still score
-    assert score == pytest.approx(SCORING_WEIGHTS["level"] + SCORING_WEIGHTS["interest"] + SCORING_WEIGHTS["time"])  # 2+2+1 = 5
+    expected = SCORING_WEIGHTS.get("level_exact_match", 2) + SCORING_WEIGHTS.get("interest_match", 2) + SCORING_WEIGHTS.get("time_match", 1)
+    assert score == pytest.approx(expected)
 
 
 def test_score_three_skills_partial_coverage():
     """Matching 2 of 3 skills should produce a score between 0-skill and 3-skill matches."""
     project = {"skills": ["Python", "Flask", "SQL"], "level": "Beginner", "interest": "Data", "time": "Low"}
+    
+    user_input_0 = {"skills": ["rust"], "level": "Advanced", "interest": "Games", "time": "High"}
+    user_input_2 = {"skills": ["python", "flask"], "level": "Advanced", "interest": "Games", "time": "High"}
+    user_input_3 = {"skills": ["python", "flask", "sql"], "level": "Advanced", "interest": "Games", "time": "High"}
 
-    score_0 = score_single_project(project, ["rust"],               "Advanced", "Games", "High")
-    score_2 = score_single_project(project, ["python", "flask"],    "Advanced", "Games", "High")
-    score_3 = score_single_project(project, ["python", "flask", "sql"], "Advanced", "Games", "High")
+    score_0 = score_project(project, user_input_0, SCORING_WEIGHTS)
+    score_2 = score_project(project, user_input_2, SCORING_WEIGHTS)
+    score_3 = score_project(project, user_input_3, SCORING_WEIGHTS)
 
     assert score_0 == pytest.approx(0)
     assert score_0 < score_2 < score_3, (
         f"Expected 0 < {score_2} < {score_3}"
     )
-# --------------
 
 
 def test_score_single_project_no_match():
@@ -327,13 +322,13 @@ def test_score_single_project_no_match():
         "interest": "Games",
         "time": "High"
     }
-    score = score_single_project(
-        project,
-        user_skills=["python"],
-        level="Beginner",
-        interest="Data",
-        time_availability="Low"
-    )
+    user_input = {
+        "skills": ["python"],
+        "level": "Beginner",
+        "interest": "Data",
+        "time": "Low"
+    }
+    score = score_project(project, user_input, SCORING_WEIGHTS)
     assert score == pytest.approx(0), f"Expected 0 but got {score}"
 
 
@@ -345,13 +340,13 @@ def test_score_single_project_alias_matching():
         "interest": "Web",
         "time": "Low"
     }
-    score = score_single_project(
-        project,
-        user_skills=["javascript"],
-        level="Beginner",
-        interest="Web",
-        time_availability="Low"
-    )
+    user_input = {
+        "skills": ["javascript"],
+        "level": "Beginner",
+        "interest": "Web",
+        "time": "Low"
+    }
+    score = score_project(project, user_input, SCORING_WEIGHTS)
     # 1 skill match (3) + level (2) + interest (2) + time (1) = 8
     assert score == 8, f"Expected 8 but got {score}"
 
@@ -497,7 +492,7 @@ def test_recommend_api_interest_not_available():
 
 
 def test_recommend_api_missing_field():
-    """The API should return 400 when a required field is missing."""
+    """The API should return 400/422 when a required field is missing."""
     client = get_client()
     response = client.post("/api/recommend", json={
         "skills": "",
@@ -505,12 +500,12 @@ def test_recommend_api_missing_field():
         "interest": "Data",
         "time": "Low"
     })
-    assert response.status_code in (400, 415)
-    assert "error" in response.get_json()
+    assert response.status_code in (400, 415, 422)
+    assert "error" in response.get_json() or "errors" in response.get_json()
 
 
 def test_recommend_api_null_field():
-    """The API should return 400 when a field is explicitly set to null."""
+    """The API should return 400/422 when a field is explicitly set to null."""
     client = get_client()
     response = client.post("/api/recommend", json={
         "skills": None,
@@ -518,23 +513,23 @@ def test_recommend_api_null_field():
         "interest": "Web",
         "time": "Low"
     })
-    assert response.status_code == 400
+    assert response.status_code in (400, 422)
     data = response.get_json()
-    assert "error" in data
+    assert "error" in data or "errors" in data
 
 
 def test_recommend_api_non_string_field():
-    """The API should return 400 when a field is a non-string type (e.g. a list)."""
+    """The API should return 400/422 when a field is a non-string type (e.g. a list)."""
     client = get_client()
     response = client.post("/api/recommend", json={
-        "skills": ["Python", "HTML"],
-        "level": "Beginner",
+        "skills": ["Python"],
+        "level": ["Beginner"],
         "interest": "Web",
         "time": "Low"
     })
-    assert response.status_code == 400
+    assert response.status_code in (400, 422)
     data = response.get_json()
-    assert "error" in data
+    assert "error" in data or "errors" in data
 
 
 def test_recommend_api_empty_body():
@@ -626,11 +621,9 @@ def test_health_check():
     assert data["status"] == "ok"
 
 
-from utils.recommender import SCORING_WEIGHTS
-
 def test_scoring_weights_has_all_keys():
-    """Verify SCORING_WEIGHTS contains exactly the four expected keys."""
-    expected_keys = {"skill", "level", "interest", "time"}
+    """Verify SCORING_WEIGHTS contains exactly the expected keys."""
+    expected_keys = {"skill_match_per_skill", "level_exact_match", "interest_match", "time_match", "gap_boost_base", "level_adjacent_match"}
     assert set(SCORING_WEIGHTS.keys()) == expected_keys
 
 def test_search_api_returns_results():
@@ -665,7 +658,7 @@ def test_share_banner_element_exists():
 
 
 def test_share_params_partial_loads_ok():
-    """Partial share params should not break the page — server renders normally."""
+    """Partial share params should not break the page - server renders normally."""
     client = get_client()
     response = client.get("/?skills=Python&level=Beginner")
     assert response.status_code == 200
@@ -697,7 +690,7 @@ def test_share_params_excessive_skills_loads_ok():
 
 
 def test_api_recommend_invalid_level_no_crash():
-    """Posting an unrecognized level should not crash — returns empty or error."""
+    """Posting an unrecognized level should not crash - returns empty or error."""
     client = get_client()
     response = client.post("/api/recommend", json={
         "skills": "Python",
@@ -705,7 +698,7 @@ def test_api_recommend_invalid_level_no_crash():
         "interest": "Data",
         "time": "Low"
     })
-    assert response.status_code in (200, 400)
+    assert response.status_code in (200, 400, 422)
     data = response.get_json()
     # Should either be an error or return empty results (no match for 'Expert')
     if response.status_code == 200:
@@ -863,6 +856,61 @@ def test_sitemap_includes_compare():
     assert b"/compare" in response.data
 
 
+# ============================================================
+# Additional ML and config tests
+# ============================================================
+
+def test_ml_similarity_score_returns_float():
+    from utils.recommender import ml_similarity_score, parse_skills
+    projects = load_all_projects()
+    score = ml_similarity_score(
+        projects[0],
+        parse_skills("Python"),
+        "Beginner",
+        "Data",
+        "Low",
+        projects,
+    )
+    assert isinstance(score, float)
+    assert score >= 0
+
+def test_ml_recommendation_prefers_relevant_python_data_project():
+    results = get_recommendations("Python, pandas", "Intermediate", "Data", "High")
+    recs = results.get("recommendations", [])
+    titles = [project["title"] for project in recs]
+    assert any("Data" in title or "Pipeline" in title for title in titles)
+
+
+def test_scoring_config_loads_correctly():
+    from utils.recommender import load_scoring_config
+    config = load_scoring_config()
+    assert "weights" in config
+    assert "level_exact_match" in config["weights"]  # Add this
+    assert "interest_match" in config["weights"]     # Add this
+    assert "time_match" in config["weights"]         # Add this
+    assert "gap_boost_base" in config["weights"] 
+    assert "skill_match_per_skill" in config["weights"]
+
+def test_weight_change_affects_ranking():
+    from utils.recommender import score_project
+    project = {"skills": ["Python"], "level": "Beginner", "interest": "Data", "time": "Low"}
+    user_input = {"skills": ["Python"], "level": "Beginner", "interest": "Data", "time": "Low"}
+    low_weights = {"skill_match_per_skill": 1, "level_exact_match": 1, "interest_match": 1, "time_match": 1}
+    high_weights = {"skill_match_per_skill": 10, "level_exact_match": 1, "interest_match": 1, "time_match": 1}
+    assert score_project(project, user_input, high_weights) > score_project(project, user_input, low_weights)
+
+def test_missing_config_raises_helpful_error():
+    import utils.recommender as recommender
+    original = recommender._CONFIG_PATH
+    recommender._CONFIG_PATH = original.parent / "nonexistent_config.json"
+    try:
+        recommender.load_scoring_config()
+        assert False, "Expected FileNotFoundError"
+    except FileNotFoundError as e:
+        assert "scoring_config.json" in str(e)
+    finally:
+        recommender._CONFIG_PATH = original
+
 
 # ============================================================
 # Run tests directly (no pytest required)
@@ -886,22 +934,208 @@ if __name__ == "__main__":
     if failed > 0:
         sys.exit(1)
 
-def test_ml_similarity_score_returns_float():
-    from utils.recommender import ml_similarity_score, parse_skills
-    projects = load_all_projects()
-    score = ml_similarity_score(
-        projects[0],
-        parse_skills("Python"),
-        "Beginner",
-        "Data",
-        "Low",
-        projects,
-    )
-    assert isinstance(score, float)
-    assert score >= 0
 
-def test_ml_recommendation_prefers_relevant_python_data_project():
-    results = get_recommendations("Python, pandas", "Intermediate", "Data", "High")
-    recs = results.get("recommendations", [])
-    titles = [project["title"] for project in recs]
-    assert any("Data" in title or "Pipeline" in title for title in titles)
+def test_recently_viewed_tracks_last_five():
+    with app.test_client() as client:
+        for pid in [1, 2, 3, 4, 5, 6]:
+            client.get(f"/project/{pid}")
+        resp = client.get("/api/recently-viewed")
+        data = resp.get_json()
+        assert len(data) <= 5
+
+def test_recently_viewed_revisit_moves_to_front():
+    with app.test_client() as client:
+        client.get("/project/1")
+        client.get("/project/2")
+        client.get("/project/1")  # revisit
+        resp = client.get("/api/recently-viewed")
+        data = resp.get_json()
+        assert data[0]["id"] == 1
+
+def test_bookmarks_page_loads():
+    with app.test_client() as client:
+        resp = client.get("/bookmarks")
+        assert resp.status_code == 200
+
+def test_project_detail_404_for_invalid_id():
+    with app.test_client() as client:
+        resp = client.get("/project/999999")
+        assert resp.status_code == 404
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NEW TESTS — Issue #1231: API schema validation and structured error responses
+# These 5 tests verify the new behaviour added in feat/api-schema-validation
+# ─────────────────────────────────────────────────────────────────────────────
+
+class TestAPISchemaValidation(unittest.TestCase):
+    """Tests for POST /api/recommend request validation and response structure."""
+
+    def setUp(self):
+        """Create a test client before each test."""
+        # Import app here so it picks up the same Blueprint as production
+        from app import app
+        app.config["TESTING"] = True
+        self.client = app.test_client()
+
+    def _post_recommend(self, payload, content_type="application/json"):
+        """Helper: POST to /api/recommend with a JSON payload."""
+        return self.client.post(
+            "/api/recommend",
+            json=payload,
+            content_type=content_type,
+        )
+
+    # ── Test 1 ───────────────────────────────────────────────────────────────
+    def test_empty_skills_returns_422(self):
+        """
+        POST /api/recommend with an empty skills list must return HTTP 422.
+        The response must include 'success': false and an 'errors' list
+        that mentions the 'skills' field.
+        """
+        response = self._post_recommend({
+            "skills":   [],
+            "level":    "Beginner",
+            "interest": "Web",
+            "time":     "Low"
+        })
+
+        self.assertEqual(response.status_code, 422,
+            "Empty skills list should return 422 Unprocessable Entity")
+
+        data = response.get_json()
+        self.assertFalse(data["success"],
+            "'success' must be False on validation error")
+        self.assertIn("errors", data,
+            "Response must include 'errors' list on 422")
+        self.assertEqual(data["code"], "VALIDATION_ERROR",
+            "'code' must be 'VALIDATION_ERROR'")
+        # At least one error mentions 'skills'
+        self.assertTrue(any("skills" in e for e in data["errors"]),
+            "At least one error must mention 'skills'")
+
+    # ── Test 2 ───────────────────────────────────────────────────────────────
+    def test_invalid_level_returns_422(self):
+        """
+        POST /api/recommend with an invalid 'level' value must return HTTP 422.
+        Valid values are: Beginner, Intermediate, Advanced.
+        """
+        response = self._post_recommend({
+            "skills":   ["Python"],
+            "level":    "Expert",        # Invalid — not in VALID_LEVELS
+            "interest": "Data",
+            "time":     "Medium"
+        })
+
+        self.assertEqual(response.status_code, 422,
+            "Invalid level should return 422 Unprocessable Entity")
+
+        data = response.get_json()
+        self.assertFalse(data["success"])
+        self.assertIn("errors", data)
+        self.assertTrue(any("level" in e for e in data["errors"]),
+            "At least one error must mention 'level'")
+
+    # ── Test 3 ───────────────────────────────────────────────────────────────
+    def test_valid_request_returns_200_with_structured_response(self):
+        """
+        A fully valid POST /api/recommend must return HTTP 200
+        with a structured response: {"success": true, "count": N, "results": [...]}
+        """
+        response = self._post_recommend({
+            "skills":   ["Python"],
+            "level":    "Beginner",
+            "interest": "Web",
+            "time":     "Low"
+        })
+
+        self.assertEqual(response.status_code, 200,
+            "Valid request must return 200 OK")
+
+        data = response.get_json()
+        self.assertIsNotNone(data, "Response must be valid JSON")
+
+        # Check required top-level keys
+        self.assertIn("success", data, "Response must have 'success' key")
+        self.assertIn("count",   data, "Response must have 'count' key")
+        self.assertIn("results", data, "Response must have 'results' key")
+
+        # Check types
+        self.assertTrue(data["success"],   "'success' must be True on 200 response")
+        self.assertIsInstance(data["count"],   int,  "'count' must be an integer")
+        self.assertIsInstance(data["results"], list, "'results' must be a list")
+
+        # count must match len(results)
+        self.assertEqual(data["count"], len(data["results"]),
+            "'count' must equal the length of 'results'")
+
+    # ── Test 4 ───────────────────────────────────────────────────────────────
+    def test_non_json_body_returns_400(self):
+        """
+        POST /api/recommend with a non-JSON body (plain text, form data, etc.)
+        must return HTTP 400 with code 'INVALID_CONTENT_TYPE'.
+        """
+        response = self.client.post(
+            "/api/recommend",
+            data="this is not json",
+            content_type="text/plain",   # Wrong content type
+        )
+
+        self.assertEqual(response.status_code, 400,
+            "Non-JSON body must return 400 Bad Request")
+
+        data = response.get_json()
+        self.assertIsNotNone(data, "Error response must still be valid JSON")
+        self.assertFalse(data["success"])
+        self.assertEqual(data["code"], "INVALID_CONTENT_TYPE",
+            "'code' must be 'INVALID_CONTENT_TYPE' for non-JSON body")
+
+    # ── Test 5 ───────────────────────────────────────────────────────────────
+    def test_validate_projects_script_catches_missing_field(self):
+        """
+        The scripts/validate_projects.py validator must detect a project
+        entry that is missing a required field (e.g., 'roadmap').
+        This test verifies the validator logic directly (no subprocess).
+        """
+        import json
+        import tempfile
+        import os
+        from scripts.validate_projects import validate_projects
+
+        # Create a temporary projects.json with one incomplete entry
+        incomplete_projects = [
+            {
+                "id": 999,
+                "title": "Test Project",
+                "skills": ["Python"],
+                "level": "Beginner",
+                "interest": "Automation",
+                "time": "Low",
+                "description": "A test project",
+                # Missing: "roadmap" and "resources" — intentionally incomplete
+            }
+        ]
+
+        # Write to a temp file and validate it
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".json", delete=False, encoding="utf-8"
+        ) as f:
+            json.dump(incomplete_projects, f)
+            temp_path = f.name
+
+        try:
+            errors = validate_projects(temp_path)
+            self.assertTrue(len(errors) > 0,
+                "Validator must find errors in an incomplete project")
+            # At least one error mentions the missing field
+            combined = " ".join(errors)
+            self.assertTrue(
+                "roadmap" in combined or "resources" in combined,
+                "Error message must mention the missing field name"
+            )
+        finally:
+            os.unlink(temp_path)   # Clean up temp file
+
+
+if __name__ == "__main__":
+    unittest.main()

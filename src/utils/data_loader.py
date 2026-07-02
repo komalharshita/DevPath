@@ -1,8 +1,11 @@
 # utils/data_loader.py
 import json
 import os
+import re 
 import threading
-import logging
+import logging# Add this near the top of data_loader.py, after the imports
+
+_URL_RE = re.compile(r'^https?://[^\s]+$')
 
 from utils.url_validator import is_valid_url, parse_resource
 
