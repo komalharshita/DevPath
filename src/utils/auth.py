@@ -42,10 +42,11 @@ def _init_db():
     with _connect() as conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
-                username TEXT PRIMARY KEY,
-                pw_hash  TEXT NOT NULL,
-                salt     TEXT NOT NULL,
-                path_id  TEXT NOT NULL
+                username   TEXT PRIMARY KEY,
+                pw_hash    TEXT NOT NULL,
+                salt       TEXT NOT NULL,
+                path_id    TEXT NOT NULL,
+                path_token TEXT NOT NULL DEFAULT ''
             )
         """)
         conn.execute("""
@@ -80,17 +81,18 @@ def register_user(username, password):
     if not password or len(password) < 4:
         raise AuthError("Password must be at least 4 characters.")
 
-    salt    = secrets.token_hex(16)
-    pw_hash = _hash_password(password, salt)
-    path_id = "user-" + secrets.token_urlsafe(16)
-    token   = secrets.token_urlsafe(32)
+    salt       = secrets.token_hex(16)
+    pw_hash    = _hash_password(password, salt)
+    path_id    = "user-" + secrets.token_urlsafe(16)
+    path_token = secrets.token_urlsafe(32)  # permanent, never rotates
+    token      = secrets.token_urlsafe(32)  # session token, rotates on login
 
     try:
         with _connect() as conn:
             conn.execute(
-                "INSERT INTO users (username, pw_hash, salt, path_id) "
-                "VALUES (?, ?, ?, ?)",
-                (username, pw_hash, salt, path_id)
+                "INSERT INTO users (username, pw_hash, salt, path_id, path_token) "
+                "VALUES (?, ?, ?, ?, ?)",
+                (username, pw_hash, salt, path_id, path_token)
             )
             conn.execute(
                 "INSERT INTO sessions (token, username) VALUES (?, ?)",
@@ -153,6 +155,22 @@ def get_user_path_id(username):
             ((username or "").strip().lower(),)
         ).fetchone()
     return row["path_id"] if row else None
+
+def get_user_path_token(username):
+    """Return the permanent learning-path token for a user, or None.
+
+    Unlike the session token, this token never rotates. It is the token
+    that was used to create the learning-path entry and must be used for
+    all subsequent learning-path API calls for this account.
+    """
+    if not username:
+        return None
+    with _connect() as conn:
+        row = conn.execute(
+            "SELECT path_token FROM users WHERE username = ?",
+            ((username or "").strip().lower(),)
+        ).fetchone()
+    return row["path_token"] if row else None
 
 def logout_user(token):
     """Delete the session for a token, if it exists. No-op on empty token."""
