@@ -62,9 +62,10 @@ def add_security_headers(response):
 # Expose the 500 handler at module level so existing tests can import it
 # directly:  from app import app, internal_server_error
 def internal_server_error(error):
-    """Proxy kept for backward compatibility with test_basic.py."""
     from errors.handlers import internal_server_error as _handler
-    return _handler(error)
+
+    with app.app_context():
+        return _handler(error)
 
 
 if __name__ == "__main__":
