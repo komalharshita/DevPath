@@ -781,9 +781,9 @@ html[data-entry-anim="true"] .form-card form > .btn-submit              { animat
   left: 0;
   width: 100%;
   height: 100vh;
+  overflow-y: auto;
   padding: 100px 32px 20px;
   background: var(--indigo-900);
-
   border-top: 1px solid rgba(255,255,255,0.06);
   z-index: 9999;
 }
@@ -840,6 +840,23 @@ html[data-entry-anim="true"] .form-card form > .btn-submit              { animat
 }
 
 .nav-mobile-link:last-child {
+  border-bottom: none;
+}
+
+/* Auth buttons in the mobile menu need browser button defaults reset
+   so they match the link styling of the other nav-mobile-link items. */
+button.nav-mobile-link {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+button.nav-mobile-link:last-child {
   border-bottom: none;
 }
 
