@@ -111,18 +111,66 @@
     interceptBookmarks();
   });
 
-  // Merge a progress object pulled from the server into window.progress
-  // and refresh the on-page widgets that depend on it.
-  function applyServerProgress(serverData) {
-    if (!serverData || !window.progress) return;
-    window.progress = Object.assign(window.progress, serverData);
-    if (Array.isArray(serverData.viewedProjects))    window.progress.viewedProjects    = serverData.viewedProjects;
-    if (Array.isArray(serverData.completedProjects)) window.progress.completedProjects = serverData.completedProjects;
-    if (Array.isArray(serverData.achievements))      window.progress.achievements      = serverData.achievements;
-    if (serverData.badges) window.progress.badges = Object.assign(window.progress.badges || {}, serverData.badges);
-    if (typeof window.computeProgressPoints === "function") window.computeProgressPoints();
-    if (typeof window.updateProfileWidgets  === "function") window.updateProfileWidgets();
+// Merge a progress object pulled from the server into window.progress
+// and refresh the on-page widgets that depend on it.
+//
+// This must be a non-destructive merge: script.js may have already
+// recorded an action (view, search, code open, completion) on this very
+// page load, before this pull finished and before saveProgressState was
+// overridden below. A naive overwrite would stomp that fresh progress
+// with the older server copy. Instead we OR badges, union arrays, and
+// take the max of counters, then push the corrected result back up.
+function applyServerProgress(serverData) {
+  if (!serverData || !window.progress) return;
+  var p = window.progress;
+
+  function unionArrays(a, b, keyFn) {
+    var seen = {};
+    var out = [];
+    (a || []).concat(b || []).forEach(function(item) {
+      var k = keyFn ? keyFn(item) : item;
+      if (!seen[k]) { seen[k] = true; out.push(item); }
+    });
+    return out;
   }
+
+  if (Array.isArray(serverData.viewedProjects)) {
+    p.viewedProjects = unionArrays(p.viewedProjects, serverData.viewedProjects);
+    p.projectViews = p.viewedProjects.length;
+  }
+  if (Array.isArray(serverData.completedProjects)) {
+    p.completedProjects = unionArrays(p.completedProjects, serverData.completedProjects,
+      function(item) { return item && item.id ? item.id : item; });
+    p.completions = p.completedProjects.length;
+  }
+  if (Array.isArray(serverData.achievements)) {
+    p.achievements = unionArrays(p.achievements, serverData.achievements,
+      function(item) { return item.title; }).slice(0, 5);
+  }
+
+  // Badges: a badge earned either locally or on the server stays earned.
+  if (serverData.badges) {
+    p.badges = p.badges || {};
+    Object.keys(serverData.badges).forEach(function(key) {
+      p.badges[key] = !!p.badges[key] || !!serverData.badges[key];
+    });
+  }
+
+  // searches/codeOpens don't have arrays to union from, so take the max
+  // of local (this page's session) vs server (other sessions/devices).
+  ["searches", "codeOpens"].forEach(function(key) {
+    if (typeof serverData[key] === "number") {
+      p[key] = Math.max(p[key] || 0, serverData[key]);
+    }
+  });
+
+  if (typeof window.computeProgressPoints === "function") window.computeProgressPoints();
+  if (typeof window.updateProfileWidgets  === "function") window.updateProfileWidgets();
+
+  // Push the corrected, merged state back to the server immediately so
+  // this page's freshly-earned progress is never silently lost.
+  if (typeof window.saveProgressState === "function") window.saveProgressState();
+}
 
   // ---- block saves + badges when signed out ----
 
