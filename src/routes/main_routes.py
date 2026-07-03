@@ -320,34 +320,42 @@ def _extract_token(req):
     return req.headers.get(_TOKEN_HEADER, "").strip() or None
 
 
+def _resolve_owner(req):
+    """Resolve the session token in the request into a stable owner key.
+
+    auth.js sends the login session token in the X-Learning-Path-Token
+    header. Session tokens rotate on every login, but a learning path must
+    stay accessible across logins, so we translate the token into the
+    permanent username and use *that* as the ownership key stored/checked
+    in learning_path.py — never the raw, rotating token itself.
+
+    Returns (owner, error_response). error_response is None on success.
+    """
+    token = _extract_token(req)
+    if not token:
+        return None, (jsonify({"error": f"'{_TOKEN_HEADER}' header is required."}), 400)
+
+    username = get_user_from_token(token)
+    if not username:
+        return None, (jsonify({"error": "Invalid or expired session."}), 401)
+
+    return username, None
+
+
 @main.route("/api/learning-path/<path_id>", methods=["POST"])
 def create_path(path_id):
-    """Create a new learning path and bind it to the supplied token.
-
-    Request headers:
-        X-Learning-Path-Token  (required) - the secret token chosen by the
-                               client (should be a random UUID or similar).
-
-    Request body (JSON):
-        Any JSON object representing the initial learning-path state.
-
-    Response 201:  {"path_id": "<path_id>", "message": "Learning path created."}
-    Response 400:  malformed request body or invalid path_id / token format.
-    Response 409:  a learning path with this path_id already exists.
-    """
-    token = _extract_token(request)
-    if not token:
-        return jsonify({"error": f"'{_TOKEN_HEADER}' header is required."}), 400
+    owner, err = _resolve_owner(request)
+    if err:
+        return err
 
     payload = request.get_json(silent=True)
     if payload is None:
         return jsonify({"error": "Request body must be valid JSON."}), 400
-
     if not isinstance(payload, dict):
         return jsonify({"error": "Request body must be a JSON object."}), 400
 
     try:
-        create_learning_path(path_id, token, payload)
+        create_learning_path(path_id, owner, payload)
     except ValueError as exc:
         return jsonify({"error": str(exc)}), 400
     except PathAlreadyExistsError:
@@ -358,23 +366,12 @@ def create_path(path_id):
 
 @main.route("/api/learning-path/<path_id>", methods=["GET"])
 def read_path(path_id):
-    """Return the data payload for a learning path.
-
-    Request headers:
-        X-Learning-Path-Token  (required) - the token associated with this
-                               path when it was created.
-
-    Response 200:  {"path_id": "<path_id>", "data": { ... }}
-    Response 400:  token header missing or path_id format invalid.
-    Response 403:  token does not match the owner token.
-    Response 404:  no learning path found for this path_id.
-    """
-    token = _extract_token(request)
-    if not token:
-        return jsonify({"error": f"'{_TOKEN_HEADER}' header is required."}), 400
+    owner, err = _resolve_owner(request)
+    if err:
+        return err
 
     try:
-        data = get_learning_path(path_id, token)
+        data = get_learning_path(path_id, owner)
     except ValueError as exc:
         return jsonify({"error": str(exc)}), 400
     except PathNotFoundError:
@@ -387,33 +384,18 @@ def read_path(path_id):
 
 @main.route("/api/learning-path/<path_id>", methods=["PUT"])
 def update_path(path_id):
-    """Overwrite the data payload for an existing learning path.
-
-    Request headers:
-        X-Learning-Path-Token  (required) - the token associated with this
-                               path when it was created.
-
-    Request body (JSON):
-        Any JSON object representing the new learning-path state.
-
-    Response 200:  {"path_id": "<path_id>", "message": "Learning path updated."}
-    Response 400:  malformed request body, missing token, or invalid format.
-    Response 403:  token does not match the owner token.
-    Response 404:  no learning path found for this path_id.
-    """
-    token = _extract_token(request)
-    if not token:
-        return jsonify({"error": f"'{_TOKEN_HEADER}' header is required."}), 400
+    owner, err = _resolve_owner(request)
+    if err:
+        return err
 
     payload = request.get_json(silent=True)
     if payload is None:
         return jsonify({"error": "Request body must be valid JSON."}), 400
-
     if not isinstance(payload, dict):
         return jsonify({"error": "Request body must be a JSON object."}), 400
 
     try:
-        update_learning_path(path_id, token, payload)
+        update_learning_path(path_id, owner, payload)
     except ValueError as exc:
         return jsonify({"error": str(exc)}), 400
     except PathNotFoundError:
@@ -422,3 +404,92 @@ def update_path(path_id):
         return jsonify({"error": "Forbidden: invalid token for this path."}), 403
 
     return jsonify({"path_id": path_id, "message": "Learning path updated."}), 200
+
+
+# ---------------------------------------------------------------------------
+# Auth API
+#
+# Simple register / login / logout / me endpoints.
+# On login the client gets back a session token + the user's learning-path ID
+# so it can immediately sync progress via the /api/learning-path/* endpoints.
+# ---------------------------------------------------------------------------
+from utils.auth import (
+    register_user, login_user, get_user_from_token,
+    get_user_path_id, get_user_path_token, logout_user, AuthError
+)
+
+@main.route("/api/auth/register", methods=["POST"])
+def auth_register():
+    """Create a new account from a JSON body of {username, password}.
+
+    Response 201: {"token", "username", "path_id"}
+    Response 400: validation error or duplicate username
+    """
+    payload = request.get_json(silent=True)
+    if not payload:
+        return jsonify({"error": "Request body must be valid JSON."}), 400
+
+    username = (payload.get("username") or "").strip()
+    password = (payload.get("password") or "").strip()
+
+    try:
+        token = register_user(username, password)
+    except AuthError as e:
+        return jsonify({"error": str(e)}), 400
+
+    path_id = get_user_path_id(username.lower())
+    return jsonify(
+        {"token": token, "username": username.lower(), "path_id": path_id}
+    ), 201
+
+
+@main.route("/api/auth/login", methods=["POST"])
+def auth_login():
+    """Validate credentials from a JSON body of {username, password}.
+
+    Response 200: {"token", "username", "path_id"}
+    Response 401: invalid username or password
+    """
+    payload = request.get_json(silent=True)
+    if not payload:
+        return jsonify({"error": "Request body must be valid JSON."}), 400
+
+    username = (payload.get("username") or "").strip()
+    password = (payload.get("password") or "").strip()
+
+    try:
+        token = login_user(username, password)
+    except AuthError as e:
+        return jsonify({"error": str(e)}), 401
+
+    path_id = get_user_path_id(username.lower())
+    return jsonify(
+        {"token": token, "username": username.lower(), "path_id": path_id}
+    ), 200
+
+
+@main.route("/api/auth/logout", methods=["POST"])
+def auth_logout():
+    """Invalidate the session token sent in the X-Auth-Token header.
+
+    Response 200 always, even if the token is missing or already invalid.
+    """
+    token = request.headers.get("X-Auth-Token", "").strip()
+    if token:
+        logout_user(token)
+    return jsonify({"message": "Logged out."}), 200
+
+
+@main.route("/api/auth/me", methods=["GET"])
+def auth_me():
+    """Return the signed-in username and path_id for the given session token.
+
+    Response 200: {"username", "path_id"}
+    Response 401: missing or invalid X-Auth-Token header
+    """
+    token = request.headers.get("X-Auth-Token", "").strip()
+    username = get_user_from_token(token)
+    if not username:
+        return jsonify({"error": "Not authenticated."}), 401
+    path_id = get_user_path_id(username)
+    return jsonify({"username": username, "path_id": path_id}), 200

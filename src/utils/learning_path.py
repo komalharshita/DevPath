@@ -8,10 +8,8 @@
 # must present the same token; requests with a missing or wrong token are
 # rejected with a 403 status before any data is returned or modified.
 #
-# Storage is intentionally in-memory so the module has no external
-# dependencies beyond the Python standard library.  Data does not survive
-# an application restart, which is acceptable for this project's scope and
-# is clearly documented in the API contract.
+# Storage is SQLite-backed (same devpath.db used by utils/auth.py) so
+# progress survives an application restart.
 #
 # Public surface:
 #   create_learning_path(path_id, token, data)  -> None   (raises on conflict)
@@ -25,15 +23,44 @@
 #   PathAlreadyExistsError – path_id is already registered (on create)
 #   AuthorizationError   – token does not match the stored token
 
+import json
+import os
 import re
 import secrets
+import sqlite3
 
 # ---------------------------------------------------------------------------
-# Module-level storage
+# Database setup — shares devpath.db with utils/auth.py
 # ---------------------------------------------------------------------------
 
-# Map of path_id -> {"token": str, "data": dict}
-_store: dict = {}
+_DB_PATH = os.getenv(
+    "DEVPATH_DB",
+    os.path.join(os.path.dirname(__file__), "..", "..", "devpath.db")
+)
+
+
+def _connect():
+    """Open a new SQLite connection with row access by column name."""
+    conn = sqlite3.connect(_DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def _init_db():
+    """Create the learning_paths table if it doesn't already exist."""
+    with _connect() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS learning_paths (
+                path_id TEXT PRIMARY KEY,
+                token   TEXT NOT NULL,
+                data    TEXT NOT NULL
+            )
+        """)
+        conn.commit()
+
+
+# init on import
+_init_db()
 
 # Maximum byte length accepted for a path_id to prevent abuse
 _MAX_PATH_ID_LEN = 128
@@ -112,12 +139,17 @@ def create_learning_path(path_id: str, token: str, data: dict) -> None:
     _validate_token(token)
     _validate_data(data)
 
-    if path_id in _store:
+    try:
+        with _connect() as conn:
+            conn.execute(
+                "INSERT INTO learning_paths (path_id, token, data) VALUES (?, ?, ?)",
+                (path_id, token, json.dumps(data))
+            )
+            conn.commit()
+    except sqlite3.IntegrityError:
         raise PathAlreadyExistsError(
             f"A learning path with id '{path_id}' already exists."
         )
-
-    _store[path_id] = {"token": token, "data": dict(data)}
 
 
 def get_learning_path(path_id: str, token: str) -> dict:
@@ -131,19 +163,22 @@ def get_learning_path(path_id: str, token: str) -> dict:
     _validate_path_id(path_id)
     _validate_token(token)
 
-    if path_id not in _store:
+    with _connect() as conn:
+        row = conn.execute(
+            "SELECT token, data FROM learning_paths WHERE path_id = ?", (path_id,)
+        ).fetchone()
+
+    if not row:
         raise PathNotFoundError(
             f"No learning path found with id '{path_id}'."
         )
 
-    stored = _store[path_id]
-    if not _tokens_equal(stored["token"], token):
+    if not _tokens_equal(row["token"], token):
         raise AuthorizationError(
             "The provided token does not match the owner token for this path."
         )
 
-    # Return a copy so callers cannot mutate the stored state directly
-    return dict(stored["data"])
+    return json.loads(row["data"])
 
 
 def update_learning_path(path_id: str, token: str, data: dict) -> None:
@@ -160,18 +195,26 @@ def update_learning_path(path_id: str, token: str, data: dict) -> None:
     _validate_token(token)
     _validate_data(data)
 
-    if path_id not in _store:
-        raise PathNotFoundError(
-            f"No learning path found with id '{path_id}'."
-        )
+    with _connect() as conn:
+        row = conn.execute(
+            "SELECT token FROM learning_paths WHERE path_id = ?", (path_id,)
+        ).fetchone()
 
-    stored = _store[path_id]
-    if not _tokens_equal(stored["token"], token):
-        raise AuthorizationError(
-            "The provided token does not match the owner token for this path."
-        )
+        if not row:
+            raise PathNotFoundError(
+                f"No learning path found with id '{path_id}'."
+            )
 
-    stored["data"] = dict(data)
+        if not _tokens_equal(row["token"], token):
+            raise AuthorizationError(
+                "The provided token does not match the owner token for this path."
+            )
+
+        conn.execute(
+            "UPDATE learning_paths SET data = ? WHERE path_id = ?",
+            (json.dumps(data), path_id)
+        )
+        conn.commit()
 
 
 def path_exists(path_id: str) -> bool:
@@ -182,7 +225,11 @@ def path_exists(path_id: str) -> bool:
     """
     if not isinstance(path_id, str):
         return False
-    return path_id in _store
+    with _connect() as conn:
+        row = conn.execute(
+            "SELECT 1 FROM learning_paths WHERE path_id = ?", (path_id,)
+        ).fetchone()
+    return row is not None
 
 
 def _clear_all() -> None:
@@ -191,4 +238,6 @@ def _clear_all() -> None:
     This function exists solely for test isolation.  It must not be called
     from application code.
     """
-    _store.clear()
+    with _connect() as conn:
+        conn.execute("DELETE FROM learning_paths")
+        conn.commit()

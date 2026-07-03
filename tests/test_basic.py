@@ -869,13 +869,25 @@ def test_sitemap_includes_compare():
 # ============================================================
 
 if __name__ == "__main__":
+    import inspect
+
     test_functions = [v for k, v in list(globals().items()) if k.startswith("test_")]
     passed = 0
     failed = 0
 
     for fn in test_functions:
         try:
-            fn()
+            params = inspect.signature(fn).parameters
+            if "monkeypatch" in params:
+                # Manual runner has no pytest fixture injection — build a real
+                # MonkeyPatch instance ourselves and undo it after the test.
+                mp = pytest.MonkeyPatch()
+                try:
+                    fn(mp)
+                finally:
+                    mp.undo()
+            else:
+                fn()
             print(f"  PASS  {fn.__name__}")
             passed += 1
         except Exception as exc:

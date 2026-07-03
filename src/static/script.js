@@ -478,6 +478,13 @@ updateProfileWidgets();
     if (skillsInput) skillsInput.focus();
   };
 
+  window.clearSkills = function clearSkills() {
+    selectedSkills = [];
+    renderSelectedChips();
+    syncSkillsHiddenInput();
+    updateQuickPickState();
+  };
+
   function removeSkill(skill) {
     selectedSkills = selectedSkills.filter(function (item) { return normalize(item) !== normalize(skill); });
     renderSelectedChips();
