@@ -18,6 +18,7 @@ from utils.learning_path import (
     AuthorizationError,
 )
 from config import Config
+from utils.feedback_store import save_feedback
 import os
 
 # Interest categories that currently have no project recommendations available
@@ -171,7 +172,47 @@ def recommend():
     }
 
     return jsonify(response_data), 200
+@main.route("/api/feedback", methods=["POST"])
+def submit_feedback():
+    """
+    Store recommendation feedback for future ranking improvements.
 
+    Expected JSON:
+    {
+        "project_id": 123,
+        "feedback": "like"
+    }
+
+    feedback values:
+        like
+        dislike
+    """
+    payload = request.get_json(silent=True)
+
+    if payload is None:
+        return jsonify({"error": "Request body must be valid JSON."}), 400
+
+    project_id = payload.get("project_id")
+    feedback = (payload.get("feedback") or "").strip().lower()
+
+    if not isinstance(project_id, int):
+        return jsonify({"error": "'project_id' must be an integer."}), 400
+
+    if feedback not in {"like", "dislike"}:
+        return jsonify({
+            "error": "'feedback' must be either 'like' or 'dislike'."
+        }), 400
+
+    project = find_project_by_id(project_id)
+
+    if not project:
+        return jsonify({"error": "Project not found."}), 404
+
+    save_feedback(project_id, feedback)
+
+    return jsonify({
+        "message": "Feedback recorded successfully."
+    }), 201
 @main.route("/api/project/<int:project_id>/resources")
 def project_resources(project_id):
     """Return the validated resource list for a project.

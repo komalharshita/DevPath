@@ -16,7 +16,7 @@ import os
 # Ensure the 'src' directory is in the python path for Vercel and root-level execution
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from flask import Flask
+from flask import Flask, request, jsonify
 from routes.main_routes import main
 from config import Config
 from errors.handlers import register_error_handlers

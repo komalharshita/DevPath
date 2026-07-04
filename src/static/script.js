@@ -1054,6 +1054,49 @@ updateProfileWidgets();
       showAchievementToast("Project completed", "Nice work finishing this project.");
     });
   }
+  var likeBtn = document.getElementById("feedback-like");
+var dislikeBtn = document.getElementById("feedback-dislike");
+var feedbackMessage = document.getElementById("feedback-message");
+
+function submitFeedback(type) {
+  fetch("/api/feedback", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      project_id: PROJECT_ID,
+      feedback: type
+    })
+  })
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function() {
+    if (feedbackMessage) {
+      feedbackMessage.textContent =
+        "Thanks for your feedback!";
+    }
+  })
+  .catch(function() {
+    if (feedbackMessage) {
+      feedbackMessage.textContent =
+        "Failed to save feedback.";
+    }
+  });
+}
+
+if (likeBtn) {
+  likeBtn.addEventListener("click", function () {
+    submitFeedback("like");
+  });
+}
+
+if (dislikeBtn) {
+  dislikeBtn.addEventListener("click", function () {
+    submitFeedback("dislike");
+  });
+}
 })();
 
 (function initScrollButton() {
