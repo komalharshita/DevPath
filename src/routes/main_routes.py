@@ -127,6 +127,10 @@ def recommend():
     interest          = (payload.get("interest") or "").strip()
     time_availability = (payload.get("time") or "").strip()
 
+    # Explicitly check if skills string field is empty to prevent underlying scoring engine crashes
+    if not skills:
+        return jsonify({"error": "Please enter at least one skill to get recommendations."}), 400
+
     # Package arguments cleanly into a dictionary expected by the utility methods
     user_input_dict = {
         "skills": skills,
@@ -178,21 +182,7 @@ def recommend():
 
 @main.route("/api/project/<int:project_id>/resources")
 def project_resources(project_id):
-    """Return the validated resource list for a project.
-
-    Each resource is parsed from its raw "Label: URL" string format and
-    returned as a structured object so the frontend can render broken
-    links differently from valid ones.
-
-    Response shape:
-        {
-            "project_id": 1,
-            "resources": [
-                {"label": "Python official docs", "url": "https://docs.python.org", "valid": true},
-                {"label": "Broken link", "url": "not-a-url", "valid": false}
-            ]
-        }
-    """
+    """Return the validated resource list for a project."""
     from utils.url_validator import validate_resources
 
     project = find_project_by_id(project_id)
@@ -246,10 +236,7 @@ def download_code(project_id):
 
 @main.route("/sitemap.xml")
 def sitemap():
-    """
-    Generate and return a sitemap.xml for search engine indexing.
-    Includes the homepage and all individual project detail pages.
-    """
+    """Generate and return a sitemap.xml for search engine indexing."""
     base = request.host_url.rstrip("/")
     projects = load_all_projects()
 
@@ -275,7 +262,6 @@ def robots():
 @main.route("/api/search")
 def search_projects():
     """Return projects matching the user's search query."""
-
     query = request.args.get("q", "").strip().lower()
 
     if not query:
@@ -285,8 +271,6 @@ def search_projects():
     filtered_projects = []
 
     for project in projects:
-
-        # Combine searchable project fields into one lowercase string
         searchable_text = " ".join([
             project.get("title", ""),
             project.get("description", ""),
@@ -304,15 +288,6 @@ def search_projects():
 
 # ---------------------------------------------------------------------------
 # Learning path API
-#
-# Endpoints for reading and writing a user's learning path data.  Every
-# request must supply the owner token that was returned when the path was
-# first created.  Requests with a missing or wrong token are rejected with
-# 403 Forbidden before any data is read or modified, closing the
-# cross-user exposure described in issue #736.
-#
-# Token transport: the X-Learning-Path-Token request header.
-# Path identity:   the <path_id> URL segment (opaque, UUID-like string).
 # ---------------------------------------------------------------------------
 
 _TOKEN_HEADER = "X-Learning-Path-Token"
