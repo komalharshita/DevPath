@@ -230,10 +230,29 @@ function saveProgressState() {
 }
 
 function computeProgressPoints() {
-  progress.points = progress.searches * POINTS_PER_SEARCH + progress.projectViews * POINTS_PER_VIEW +
-    progress.codeOpens * POINTS_PER_CODE_OPEN + progress.completions * POINTS_PER_COMPLETION;
-}
+  var raw =
+    progress.searches * POINTS_PER_SEARCH +
+    progress.projectViews * POINTS_PER_VIEW +
+    progress.codeOpens * POINTS_PER_CODE_OPEN +
+    progress.completions * POINTS_PER_COMPLETION;
 
+  progress.points = Math.min(raw, PROGRESS_MAX_POINTS);
+}
+var POINTS_PER_SEARCH = 5;
+var POINTS_PER_VIEW = 10;
+var POINTS_PER_CODE_OPEN = 15;
+var POINTS_PER_COMPLETION = 30;
+
+var PROGRESS_TARGET_SEARCHES = 10;
+var PROGRESS_TARGET_VIEWS = 10;
+var PROGRESS_TARGET_CODE_OPENS = 10;
+var PROGRESS_TARGET_COMPLETIONS = 5;
+
+var PROGRESS_MAX_POINTS =
+  PROGRESS_TARGET_SEARCHES * POINTS_PER_SEARCH +
+  PROGRESS_TARGET_VIEWS * POINTS_PER_VIEW +
+  PROGRESS_TARGET_CODE_OPENS * POINTS_PER_CODE_OPEN +
+  PROGRESS_TARGET_COMPLETIONS * POINTS_PER_COMPLETION;
 function showAchievementToast(title, detail) {
   var toast = document.getElementById("achievement-toast");
   if (!toast) return;
@@ -394,7 +413,27 @@ function recordCompletion(projectId, projectTitle) {
 
 loadProgressState();
 updateProfileWidgets();
+// Read query params on page load and auto-populate form
+(function loadFromURL() {
+  var params = new URLSearchParams(window.location.search);
+  if (!params.has("skills") && !params.has("level")) return;
 
+  var skillsHidden = document.getElementById("skills");
+  var skillsTextInput = document.getElementById("skills-input");
+  var levelEl = document.getElementById("level");
+  var interestEl = document.getElementById("interest");
+  var timeEl = document.getElementById("time");
+
+  if (params.get("skills") && skillsHidden) skillsHidden.value = params.get("skills");
+  if (params.get("skills") && skillsTextInput) skillsTextInput.value = params.get("skills");
+  if (params.get("level") && levelEl) levelEl.value = params.get("level");
+  if (params.get("interest") && interestEl) interestEl.value = params.get("interest");
+  if (params.get("time") && timeEl) timeEl.value = params.get("time");
+
+  // Auto-submit the form
+  var form = document.getElementById("recommend-form");
+  if (form) form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+})();
 (function initIndexPage() {
   var form = document.getElementById("recommend-form");
   if (!form) return;
@@ -419,13 +458,18 @@ updateProfileWidgets();
     : quickPickChips.map(function (chip) { return chip.getAttribute("data-skill"); });
   var activeSuggestionIndex = -1;
   var visibleSuggestions = [];
+  var SAVED_PROJECTS_KEY = "devpathSavedProjects";
+  var hasSearched = false;
+  var techStackSelect = document.getElementById("tech_stack");
 
   function normalize(value) {
     return String(value || "").trim().toLowerCase();
   }
 
   function syncSkillsHiddenInput() {
-    skillsHidden.value = JSON.stringify(selectedSkills);
+    skillsHidden.value = selectedSkills.join(", ");
+    var event = new Event("change", { bubbles: true });
+    skillsHidden.dispatchEvent(event);
   }
 
   function isSelected(skill) {
@@ -475,6 +519,7 @@ updateProfileWidgets();
     syncSkillsHiddenInput();
     updateQuickPickState();
     clearFieldError("skills-error");
+    skillsInput.setAttribute("aria-invalid", "false");
     if (skillsInput) skillsInput.focus();
   };
 
@@ -490,6 +535,13 @@ updateProfileWidgets();
     if (el) el.textContent = "";
   }
 
+  function syncSkillsHiddenInput() {
+    if (!skillsHidden) {
+      skillsHidden = document.getElementById("skills");
+    }
+    // Keep the hidden <input> in sync for form serialisation
+    // The API expects a comma-separated string, so join the array that way
+    skillsHidden.value = selectedSkills.join(", ");
   function showFieldError(id, message) {
     var el = document.getElementById(id);
     if (el) el.textContent = message;
@@ -558,24 +610,115 @@ updateProfileWidgets();
   function validateForm() {
     var valid = true;
     if (!selectedSkills.length) {
-      showFieldError("skills-error", "Please add at least one skill.");
+      showFieldError("skills-error", "Please select at least one skill.");
+      skillsInput.setAttribute("aria-invalid", "true");
       valid = false;
     }
-    if (!document.getElementById("level").value) {
+    var levelEl = document.getElementById("level");
+    if (!levelEl.value) {
       showFieldError("level-error", "Please select your experience level.");
+      levelEl.setAttribute("aria-invalid", "true");
       valid = false;
     }
-    if (!document.getElementById("interest").value) {
-      showFieldError("interest-error", "Please select an area of interest.");
+    var interestEl = document.getElementById("interest");
+    if (!interestEl.value) {
+      showFieldError("interest-error", "Please select an interest area.");
+      interestEl.setAttribute("aria-invalid", "true");
       valid = false;
     }
-    if (!document.getElementById("time").value) {
-      showFieldError("time-error", "Please select your time availability.");
+    var timeEl = document.getElementById("time");
+    if (!timeEl.value) {
+      showFieldError("time-error", "Please select a time commitment.");
+      timeEl.setAttribute("aria-invalid", "true");
       valid = false;
     }
     return valid;
   }
+  // ----------------------------------------------------------
+  // Loading state
+  // ----------------------------------------------------------
 
+  ["level", "interest", "time"].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("change", function() {
+        clearFieldError(id + "-error");
+        el.setAttribute("aria-invalid", "false");
+      });
+    }
+  });
+
+
+
+  // ----------------------------------------------------------
+  // Form submission and API call
+  // ----------------------------------------------------------
+
+  form.addEventListener("submit", function (evt) {
+    evt.preventDefault(); //stop the browser from reloading the page on form submit
+    clearAllErrors();
+
+    if (skillsTextInput.value.trim()) {
+      addSkill(skillsTextInput.value);
+      skillsTextInput.value = "";
+      hideSuggestions();
+    }
+
+    if (!validateForm()) return; //stop - anything missing/invalid
+
+    setLoadingState(true);
+
+    // Allow browser to paint spinner before request starts
+    requestAnimationFrame(function () {
+
+      //combine form values into an object to send to server/api
+      // Write form values to URL as query params
+      var params = new URLSearchParams();
+      params.set("skills", skillsHidden.value.trim() || skillsTextInput.value.trim());
+      params.set("level", document.getElementById("level").value);
+      params.set("interest", document.getElementById("interest").value);
+      params.set("time", document.getElementById("time").value);
+      history.replaceState(null, "", "?" + params.toString());
+      var payload = {
+        // Prefer the hidden input value; fall back to raw text box if hidden input is empty
+        skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
+        level: document.getElementById("level").value,
+        interest: document.getElementById("interest").value,
+        time: document.getElementById("time").value
+      };
+
+      //post the data to backend api as JSON, then handle the response
+      fetch("/api/recommend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload) //convert object to json string
+      })
+        .then(function (res) {
+          return res.json(); //parse the response as JSON
+        })
+        .then(function (data) {
+          setLoadingState(false);
+
+          if (data.error) {
+            var generalErr = document.getElementById("form-error-general");
+            if (generalErr) generalErr.textContent = data.error;
+            return;
+          }
+
+          renderResults(data.projects || [], data.message);
+        })
+        .catch(function (err) {
+          // this runs if the network request itself fails
+          setLoadingState(false);
+          var generalErr = document.getElementById("form-error-general");
+          if (generalErr) generalErr.textContent = "Something went wrong. Please try again.";
+          console.error("API request failed:", err);
+        });
+    });
+  });
+
+
+  // Manages the loading state of the form and results section(whats visible or not)
   function setLoadingState(isLoading) {
     submitBtn.disabled = isLoading;
     submitBtn.setAttribute("aria-busy", isLoading ? "true" : "false");
@@ -604,6 +747,20 @@ updateProfileWidgets();
     span.className = "project-tag project-tag--" + normalize(type).replace(/[^a-z0-9_-]/g, "-");
     span.textContent = text;
     return span;
+
+    //takes the array of projects from the api and draws them on the page as cards
+    //if array is empty it shows the "no results" message instead
+    function renderResults(projects, message) {
+      resultsSection.style.display = "block";
+      resultsLoadingEl.style.display = "none";
+      // Clear out any cards from a previous search before showing new ones
+      resultsGrid.innerHTML = "";
+
+      if (!projects || projects.length === 0) {
+        resultsGrid.style.display = "none";
+        resultsEmptyEl.style.display = "block";
+        if (message && emptyMessageEl) emptyMessageEl.textContent = message;
+        resultsSection.scrollIntoView({ behavior: "smooth" });
   }
 
   function buildProjectCard(project) {
@@ -779,12 +936,21 @@ updateProfileWidgets();
 
   var clearBtn = document.getElementById("clear-filters-btn");
   if (clearBtn) {
-    clearBtn.addEventListener("click", resetFormAndState);
-  }
-
-  var inlineResetBtn = document.getElementById("reset-form-btn");
-  if (inlineResetBtn) {
-    inlineResetBtn.addEventListener("click", resetFormAndState);
+    clearBtn.addEventListener("click", function () {
+      form.reset();
+      selectedSkills = [];
+      renderSelectedChips();
+      syncSkillsHiddenInput();
+      updateQuickPickState();
+      clearAllErrors();
+      hideSuggestions();
+      if (techStackSelect) {
+        techStackSelect.value = "all";
+      }
+      hasSearched = false;
+      resultsSection.style.display = "none";
+      skillsInput.focus();
+    });
   }
 
   var resetProgressBtn = document.getElementById("reset-progress-btn");
@@ -828,7 +994,8 @@ updateProfileWidgets();
         skills: JSON.stringify(selectedSkills),
         level: document.getElementById("level").value,
         interest: document.getElementById("interest").value,
-        time: document.getElementById("time").value
+        time: document.getElementById("time").value,
+        tech_stack: techStackSelect ? techStackSelect.value : "all"
       })
     })
       .then(function (response) {
@@ -840,14 +1007,28 @@ updateProfileWidgets();
       .then(function (data) {
         setLoadingState(false);
         recordSearch();
+        hasSearched = true;
         renderResults(data.projects || [], data.message);
       })
       .catch(function (err) {
         setLoadingState(false);
         var general = document.getElementById("form-error-general");
-        if (general) general.textContent = err.message || "An unexpected error occurred. Please try again.";
+        if (general) general.textContent = "Unable to generate recommendations. Please try again.";
       });
   });
+
+  if (techStackSelect) {
+    techStackSelect.addEventListener("change", function () {
+      if (hasSearched) {
+        submitBtn.click();
+      }
+    });
+  }
+};
+
+  // ----------------------------------------------------------
+  // GitHub modal
+  // ----------------------------------------------------------
 
   var modal = document.getElementById("github-modal-overlay");
   var openModalBtn = document.getElementById("btn-show-github");
@@ -878,201 +1059,515 @@ updateProfileWidgets();
         errorMsg.textContent = "Please enter a GitHub username.";
         return;
       }
-      fetchBtn.disabled = true;
-      fetchBtn.textContent = "Syncing...";
-      fetch("https://api.github.com/users/" + encodeURIComponent(username) + "/repos?sort=updated&per_page=100")
+
+      resultsEmptyEl.style.display = "none";
+      resultsGrid.style.display = "grid";
+
+      projects.forEach(function (project) {
+        resultsGrid.appendChild(buildProjectCard(project));
+      });
+
+      resultsSection.scrollIntoView({ behavior: "smooth" });
+      main
+    }
+
+    function buildProjectCard(project) {
+      var card = document.createElement("div");
+      card.className = "project-card";
+
+      var title = document.createElement("h3");
+      title.className = "project-card-title";
+      title.textContent = project.title;
+
+      var desc = document.createElement("p");
+      desc.className = "project-card-desc";
+      var descText = document.createElement("span");
+      descText.className = "project-card-desc-text";
+      descText.textContent = truncate(project.description, 120);
+      desc.appendChild(descText);
+
+      if (project.description && project.description.length > 120) {
+        var expanded = false;
+        var readMore = document.createElement("button");
+        readMore.type = "button";
+        readMore.className = "read-more-btn";
+        readMore.textContent = "Read more";
+        readMore.setAttribute("aria-expanded", "false");
+        readMore.addEventListener("click", function () {
+          expanded = !expanded;
+          descText.textContent = expanded ? project.description : truncate(project.description, 120);
+          readMore.textContent = expanded ? "Read less" : "Read more";
+          readMore.setAttribute("aria-expanded", expanded ? "true" : "false");
+        });
+        desc.appendChild(readMore);
+      }
+
+      var tags = document.createElement("div");
+      tags.className = "project-card-tags";
+      (project.skills || []).forEach(function (skill) { tags.appendChild(createTag(skill, "skill")); });
+      tags.appendChild(createTag(project.level, project.level));
+      tags.appendChild(createTag("Time: " + project.time, "time"));
+
+      var footer = document.createElement("div");
+      footer.className = "project-card-footer";
+
+      var saveButton = document.createElement("button");
+      saveButton.type = "button";
+      saveButton.className = "btn-save-project";
+      saveButton.setAttribute("data-save-project-id", project.id);
+      saveButton.setAttribute("aria-pressed", projectIsSaved(project.id) ? "true" : "false");
+      if (projectIsSaved(project.id)) {
+        saveButton.classList.add("saved");
+        saveButton.textContent = "Saved";
+      } else {
+        saveButton.textContent = "Save Project";
+      }
+      saveButton.addEventListener("click", function () {
+        toggleSavedProject(project, saveButton);
+      });
+
+      var link = document.createElement("a");
+      link.className = "btn-details";
+      link.textContent = "View Full Project";
+      link.href = "/project/" + project.id;
+      footer.appendChild(saveButton);
+      footer.appendChild(link);
+
+      card.appendChild(title);
+      card.appendChild(desc);
+      card.appendChild(tags);
+      card.appendChild(footer);
+      return card;
+    }
+
+    renderSavedProjects();
+
+    function renderResults(projects, message) {
+      resultsSection.style.display = "block";
+      resultsLoadingEl.style.display = "none";
+      resultsGrid.textContent = "";
+      if (!projects || projects.length === 0) {
+        resultsGrid.style.display = "none";
+        resultsEmptyEl.style.display = "block";
+        emptyMessageEl.textContent = message || "Try adjusting your skills or choosing a different interest area.";
+        resultsSection.scrollIntoView({ behavior: "smooth" });
+        return;
+      }
+      resultsEmptyEl.style.display = "none";
+      resultsGrid.style.display = "grid";
+      projects.forEach(function (project) { resultsGrid.appendChild(buildProjectCard(project)); });
+      resultsSection.scrollIntoView({ behavior: "smooth" });
+    }
+
+    function runProjectSearch(query) {
+      if (!query) return;
+      setLoadingState(true);
+      fetch("/api/search?q=" + encodeURIComponent(query))
         .then(function (response) {
-          if (!response.ok) throw new Error(response.status === 404 ? "Username not found." : "Unable to fetch GitHub repositories.");
-          return response.json();
-        })
-        .then(function (repos) {
-          var languages = [];
-          repos.forEach(function (repo) {
-            if (repo.language && languages.indexOf(repo.language) === -1) languages.push(repo.language);
+          return response.json().then(function (data) {
+            if (!response.ok) throw new Error("Search failed. Please try again.");
+            return data;
           });
-          if (!languages.length) {
-            errorMsg.textContent = "No public languages found.";
-            return;
+        })
+        .then(function (projects) {
+          setLoadingState(false);
+          recordSearch();
+          var message = projects.length
+            ? null
+            : "No projects matched \"" + query + "\". Try a different keyword.";
+          renderResults(projects, message);
+          var mobileMenu = document.getElementById("nav-mobile-menu");
+          var mobileToggle = document.getElementById("nav-mobile-toggle");
+          if (mobileMenu && mobileMenu.classList.contains("open")) {
+            mobileMenu.classList.remove("open");
+            if (mobileToggle) {
+              mobileToggle.classList.remove("open");
+              mobileToggle.setAttribute("aria-expanded", "false");
+            }
           }
-          languages.forEach(window.addSkill);
-          closeGithubModal();
         })
         .catch(function (err) {
-          errorMsg.textContent = err.message || "Failed to fetch skills.";
-        })
-        .finally(function () {
-          fetchBtn.disabled = false;
-          fetchBtn.textContent = "Fetch Skills";
+          setLoadingState(false);
+          var general = document.getElementById("form-error-general");
+          if (general) general.textContent = err.message || "Search failed. Please try again.";
         });
-    });
-  }
-})();
+    }
 
-(function initDetailPage() {
-  if (typeof PROJECT_ID === "undefined") return;
-  recordProjectView();
-
-  var codePanel = document.getElementById("code-panel");
-  var codePanelOverlay = document.getElementById("code-panel-overlay");
-  var codeContentEl = document.getElementById("code-content");
-  var codePanelFilename = document.getElementById("code-panel-filename");
-  var btnViewCode = document.getElementById("btn-view-code");
-  var btnViewCodeSm = document.getElementById("btn-view-code-sm");
-  var btnClosePanel = document.getElementById("code-panel-close");
-  var btnCopyCode = document.getElementById("btn-copy-code");
-  var copyToast = document.getElementById("copy-toast");
-  var completionBtn = document.getElementById("btn-mark-complete");
-  var codeFetched = false;
-
-  function renderCode(code) {
-    codeContentEl.textContent = "";
-    String(code || "").split("\n").forEach(function (line, index) {
-      var row = document.createElement("div");
-      row.className = "code-line";
-      var number = document.createElement("span");
-      number.className = "code-line-number";
-      number.setAttribute("aria-hidden", "true");
-      number.textContent = index + 1;
-      var content = document.createElement("span");
-      content.className = "code-line-content";
-      content.textContent = line;
-      row.appendChild(number);
-      row.appendChild(content);
-      codeContentEl.appendChild(row);
-    });
-  }
-
-  function fetchStarterCode() {
-    codeContentEl.textContent = "Loading starter code...";
-    fetch("/project/" + PROJECT_ID + "/code")
-      .then(function (response) {
-        return response.json().then(function (data) {
-          if (!response.ok) throw new Error(data.error || "Starter code unavailable.");
-          return data;
-        });
-      })
-      .then(function (data) {
-        codePanelFilename.textContent = data.filename;
-        renderCode(data.code);
-        codeFetched = true;
-      })
-      .catch(function (err) {
-        codeContentEl.textContent = err.message || "Could not load starter code. Try downloading it instead.";
+    function bindSearchForm(form, input) {
+      if (!form || !input) return;
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        runProjectSearch(input.value.trim());
       });
-  }
+    }
 
-  function openCodePanel() {
-    if (!codePanel) return;
-    codePanel.classList.add("active");
-    if (codePanelOverlay) codePanelOverlay.classList.add("active");
-    document.body.style.overflow = "hidden";
-    recordCodeOpen();
-    if (!codeFetched) fetchStarterCode();
-  }
+    bindSearchForm(document.getElementById("topic-search-form"), document.getElementById("topic-search"));
+    bindSearchForm(document.getElementById("topic-search-form-mobile"), document.getElementById("topic-search-mobile"));
 
-  function closeCodePanel() {
-    if (!codePanel) return;
-    codePanel.classList.remove("active");
-    if (codePanelOverlay) codePanelOverlay.classList.remove("active");
-    document.body.style.overflow = "";
-  }
+    skillsInput.setAttribute("role", "combobox");
+    skillsInput.setAttribute("aria-expanded", "false");
+    suggestions.setAttribute("role", "listbox");
 
-  if (btnViewCode) btnViewCode.addEventListener("click", openCodePanel);
-  if (btnViewCodeSm) btnViewCodeSm.addEventListener("click", openCodePanel);
-  if (btnClosePanel) btnClosePanel.addEventListener("click", closeCodePanel);
-  if (codePanelOverlay) codePanelOverlay.addEventListener("click", closeCodePanel);
-  document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape") closeCodePanel();
-  });
-
-  if (btnCopyCode) {
-    btnCopyCode.addEventListener("click", function () {
-      var code = Array.prototype.slice.call(codeContentEl.querySelectorAll(".code-line-content"))
-        .map(function (line) { return line.textContent; })
-        .join("\n");
-      if (!code) return;
-      var done = function () {
-        if (copyToast) {
-          copyToast.classList.add("show");
-          window.setTimeout(function () { copyToast.classList.remove("show"); }, 2500);
+    skillsInput.addEventListener("input", function () {
+      showSuggestions(filteredSkills(skillsInput.value));
+    });
+    skillsInput.addEventListener("focus", function () {
+      if (skillsInput.value.trim()) showSuggestions(filteredSkills(skillsInput.value));
+    });
+    skillsInput.addEventListener("blur", function () {
+      window.setTimeout(hideSuggestions, 150);
+    });
+    skillsInput.addEventListener("keydown", function (event) {
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        if (!visibleSuggestions.length) showSuggestions(filteredSkills(skillsInput.value));
+        if (!visibleSuggestions.length) return;
+        event.preventDefault();
+        activeSuggestionIndex = event.key === "ArrowDown"
+          ? (activeSuggestionIndex + 1) % visibleSuggestions.length
+          : (activeSuggestionIndex <= 0 ? visibleSuggestions.length - 1 : activeSuggestionIndex - 1);
+        renderSuggestionState();
+        return;
+      }
+      if (event.key === "Escape") {
+        hideSuggestions();
+        return;
+      }
+      if (event.key === "Enter") {
+        event.preventDefault();
+        if (activeSuggestionIndex >= 0 && visibleSuggestions[activeSuggestionIndex]) {
+          window.addSkill(visibleSuggestions[activeSuggestionIndex]);
+        } else {
+          window.addSkill(skillsInput.value);
         }
-      };
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(code).then(done);
-      } else {
-        var textarea = document.createElement("textarea");
-        textarea.value = code;
-        textarea.style.cssText = "position:fixed;top:-9999px;left:-9999px";
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-        try { document.execCommand("copy"); } catch (err) {}
-        document.body.removeChild(textarea);
-        done();
+        skillsInput.value = "";
+        hideSuggestions();
       }
     });
-  }
 
-  var roadmapCheckboxes = Array.prototype.slice.call(document.querySelectorAll(".roadmap-checkbox"));
-  var progressFill = document.getElementById("roadmap-progress-fill");
-  var progressText = document.getElementById("roadmap-progress-text");
-  var progressBar = document.querySelector(".roadmap-progress-bar");
-  var roadmapStorageKey = "devpath-roadmap-progress-" + PROJECT_ID;
-
-  function updateRoadmapProgress() {
-    if (!roadmapCheckboxes.length) return;
-    var completed = roadmapCheckboxes.filter(function (checkbox) { return checkbox.checked; }).length;
-    var percent = Math.round((completed / roadmapCheckboxes.length) * 100);
-    roadmapCheckboxes.forEach(function (checkbox) {
-      var step = checkbox.closest(".roadmap-step");
-      if (step) step.classList.toggle("completed", checkbox.checked);
+    quickPickChips.forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        var skill = chip.getAttribute("data-skill");
+        if (isSelected(skill)) removeSkill(skill);
+        else window.addSkill(skill);
+        skillsInput.value = "";
+        hideSuggestions();
+      });
     });
-    if (progressFill) progressFill.style.width = percent + "%";
-    if (progressText) progressText.textContent = percent + "% completed";
-    if (progressBar) progressBar.setAttribute("aria-valuenow", String(percent));
+
+    if (skillWrap) {
+      skillWrap.addEventListener("click", function () { skillsInput.focus(); });
+    }
+
+    var clearBtn = document.getElementById("clear-filters-btn");
+    if (clearBtn) {
+      clearBtn.addEventListener("click", function () {
+        form.reset();
+        selectedSkills = [];
+        renderSelectedChips();
+        syncSkillsHiddenInput();
+        updateQuickPickState();
+        clearAllErrors();
+        hideSuggestions();
+        resultsSection.style.display = "none";
+        skillsInput.focus();
+      });
+    }
+
+    var resetProgressBtn = document.getElementById("reset-progress-btn");
+    if (resetProgressBtn) {
+      resetProgressBtn.addEventListener("click", function () {
+        progress.searches = 0;
+        progress.projectViews = 0;
+        progress.codeOpens = 0;
+        progress.completions = 0;
+        progress.points = 0;
+        progress.viewedProjects = [];
+        progress.completedProjects = [];
+        progress.achievements = [];
+        progress.badges = {
+          first_search: false,
+          project_explorer: false,
+          code_starter: false,
+          completionist: false,
+          roadmap_runner: false
+        };
+        saveProgressState();
+        updateProfileWidgets();
+        showAchievementToast("Progress reset", "Your local profile has been cleared.");
+      });
+    }
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      clearAllErrors();
+      if (skillsInput.value.trim()) {
+        window.addSkill(skillsInput.value);
+        skillsInput.value = "";
+        hideSuggestions();
+      }
+      if (!validateForm()) return;
+      setLoadingState(true);
+      fetch("/api/recommend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          skills: JSON.stringify(selectedSkills),
+          level: document.getElementById("level").value,
+          interest: document.getElementById("interest").value,
+          time: document.getElementById("time").value
+        })
+      })
+        .then(function (response) {
+          return response.json().then(function (data) {
+            if (!response.ok) throw new Error(data.error || "Unable to generate recommendations.");
+            return data;
+          });
+        })
+        .then(function (data) {
+          setLoadingState(false);
+          recordSearch();
+          renderResults(data.projects || [], data.message);
+        })
+        .catch(function (err) {
+          setLoadingState(false);
+          var general = document.getElementById("form-error-general");
+          if (general) general.textContent = err.message || "An unexpected error occurred. Please try again.";
+        });
+    });
+
+    var modal = document.getElementById("github-modal-overlay");
+    var openModalBtn = document.getElementById("btn-show-github");
+    var closeModalBtn = document.getElementById("btn-close-github");
+    var fetchBtn = document.getElementById("btn-fetch-github");
+    var githubInput = document.getElementById("github-username");
+    var errorMsg = document.getElementById("github-modal-error");
+
+    function closeGithubModal() {
+      modal.classList.remove("active");
+      githubInput.value = "";
+      errorMsg.textContent = "";
+      openModalBtn.focus(); // add this line
+    }
+
+    if (modal && openModalBtn && closeModalBtn && fetchBtn && githubInput && errorMsg) {
+      openModalBtn.addEventListener("click", function () {
+        modal.classList.add("active");
+        githubInput.focus();
+      });
+      modal.addEventListener("keydown", function (event) {
+        if (!modal.classList.contains("active")) return;
+        var focusable = modal.querySelectorAll("button, input");
+        var first = focusable[0];
+        var last = focusable[focusable.length - 1];
+        if (event.key === "Tab") {
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        }
+        if (event.key === "Escape") closeGithubModal();
+      });
+      closeModalBtn.addEventListener("click", closeGithubModal);
+      modal.addEventListener("click", function (event) {
+        if (event.target === modal) closeGithubModal();
+      });
+      fetchBtn.addEventListener("click", function () {
+        var username = githubInput.value.trim();
+        errorMsg.textContent = "";
+        if (!username) {
+          errorMsg.textContent = "Please enter a GitHub username.";
+          return;
+        }
+        fetchBtn.disabled = true;
+        fetchBtn.textContent = "Syncing...";
+        fetch("https://api.github.com/users/" + encodeURIComponent(username) + "/repos?sort=updated&per_page=100")
+          .then(function (response) {
+            if (!response.ok) throw new Error(response.status === 404 ? "Username not found." : "Unable to fetch GitHub repositories.");
+            return response.json();
+          })
+          .then(function (repos) {
+            var languages = [];
+            repos.forEach(function (repo) {
+              if (repo.language && languages.indexOf(repo.language) === -1) languages.push(repo.language);
+            });
+            if (!languages.length) {
+              errorMsg.textContent = "No public languages found.";
+              return;
+            }
+            languages.forEach(window.addSkill);
+            closeGithubModal();
+          })
+          .catch(function (err) {
+            errorMsg.textContent = err.message || "Failed to fetch skills.";
+          })
+          .finally(function () {
+            fetchBtn.disabled = false;
+            fetchBtn.textContent = "Fetch Skills";
+          });
+      });
+    }
+  }) ();
+
+  (function initDetailPage() {
+    if (typeof PROJECT_ID === "undefined") return;
+    recordProjectView();
+
+    var codePanel = document.getElementById("code-panel");
+    var codePanelOverlay = document.getElementById("code-panel-overlay");
+    var codeContentEl = document.getElementById("code-content");
+    var codePanelFilename = document.getElementById("code-panel-filename");
+    var btnViewCode = document.getElementById("btn-view-code");
+    var btnViewCodeSm = document.getElementById("btn-view-code-sm");
+    var btnClosePanel = document.getElementById("code-panel-close");
+    var btnCopyCode = document.getElementById("btn-copy-code");
+    var copyToast = document.getElementById("copy-toast");
+    var completionBtn = document.getElementById("btn-mark-complete");
+    var codeFetched = false;
+
+    function renderCode(code) {
+      codeContentEl.textContent = "";
+      String(code || "").split("\n").forEach(function (line, index) {
+        var row = document.createElement("div");
+        row.className = "code-line";
+        var number = document.createElement("span");
+        number.className = "code-line-number";
+        number.setAttribute("aria-hidden", "true");
+        number.textContent = index + 1;
+        var content = document.createElement("span");
+        content.className = "code-line-content";
+        content.textContent = line;
+        row.appendChild(number);
+        row.appendChild(content);
+        codeContentEl.appendChild(row);
+      });
+    }
+
+    function fetchStarterCode() {
+      codeContentEl.textContent = "Loading starter code...";
+      fetch("/project/" + PROJECT_ID + "/code")
+        .then(function (response) {
+          return response.json().then(function (data) {
+            if (!response.ok) throw new Error(data.error || "Starter code unavailable.");
+            return data;
+          });
+        })
+        .then(function (data) {
+          codePanelFilename.textContent = data.filename;
+          renderCode(data.code);
+          codeFetched = true;
+        })
+        .catch(function (err) {
+          codeContentEl.textContent = err.message || "Could not load starter code. Try downloading it instead.";
+        });
+    }
+
+    function openCodePanel() {
+      if (!codePanel) return;
+      codePanel.classList.add("active");
+      if (codePanelOverlay) codePanelOverlay.classList.add("active");
+      document.body.style.overflow = "hidden";
+      recordCodeOpen();
+      if (!codeFetched) fetchStarterCode();
+    }
+
+    function closeCodePanel() {
+      if (!codePanel) return;
+      codePanel.classList.remove("active");
+      if (codePanelOverlay) codePanelOverlay.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+
+    if (btnViewCode) btnViewCode.addEventListener("click", openCodePanel);
+    if (btnViewCodeSm) btnViewCodeSm.addEventListener("click", openCodePanel);
+    if (btnClosePanel) btnClosePanel.addEventListener("click", closeCodePanel);
+    if (codePanelOverlay) codePanelOverlay.addEventListener("click", closeCodePanel);
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") closeCodePanel();
+    });
+
+    if (btnCopyCode) {
+      btnCopyCode.addEventListener("click", function () {
+        var code = Array.prototype.slice.call(codeContentEl.querySelectorAll(".code-line-content"))
+          .map(function (line) { return line.textContent; })
+          .join("\n");
+        if (!code) return;
+        var done = function () {
+          if (copyToast) {
+            copyToast.classList.add("show");
+            window.setTimeout(function () { copyToast.classList.remove("show"); }, 2500);
+          }
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(code).then(done);
+        } else {
+          var textarea = document.createElement("textarea");
+          textarea.value = code;
+          textarea.style.cssText = "position:fixed;top:-9999px;left:-9999px";
+          document.body.appendChild(textarea);
+          textarea.focus();
+          textarea.select();
+          try { document.execCommand("copy"); } catch (err) { }
+          document.body.removeChild(textarea);
+          done();
+        }
+      });
+    }
+
+    var roadmapCheckboxes = Array.prototype.slice.call(document.querySelectorAll(".roadmap-checkbox"));
+    var progressFill = document.getElementById("roadmap-progress-fill");
+    var progressText = document.getElementById("roadmap-progress-text");
+    var progressBar = document.querySelector(".roadmap-progress-bar");
+    var roadmapStorageKey = "devpath-roadmap-progress-" + PROJECT_ID;
+
+    function updateRoadmapProgress() {
+      if (!roadmapCheckboxes.length) return;
+      var completed = roadmapCheckboxes.filter(function (checkbox) { return checkbox.checked; }).length;
+      var percent = Math.round((completed / roadmapCheckboxes.length) * 100);
+      roadmapCheckboxes.forEach(function (checkbox) {
+        var step = checkbox.closest(".roadmap-step");
+        if (step) step.classList.toggle("completed", checkbox.checked);
+      });
+      if (progressFill) progressFill.style.width = percent + "%";
+      if (progressText) progressText.textContent = percent + "% completed";
+      if (progressBar) progressBar.setAttribute("aria-valuenow", String(percent));
+      try {
+        localStorage.setItem(roadmapStorageKey, JSON.stringify(roadmapCheckboxes.map(function (checkbox) {
+          return checkbox.checked;
+        })));
+      } catch (err) { }
+    }
+
     try {
-      localStorage.setItem(roadmapStorageKey, JSON.stringify(roadmapCheckboxes.map(function (checkbox) {
-        return checkbox.checked;
-      })));
-    } catch (err) {}
-  }
-
-  try {
-    var saved = JSON.parse(localStorage.getItem(roadmapStorageKey) || "[]");
-    roadmapCheckboxes.forEach(function (checkbox, index) {
-      checkbox.checked = !!saved[index];
+      var saved = JSON.parse(localStorage.getItem(roadmapStorageKey) || "[]");
+      roadmapCheckboxes.forEach(function (checkbox, index) {
+        checkbox.checked = !!saved[index];
+      });
+    } catch (err) { }
+    roadmapCheckboxes.forEach(function (checkbox) {
+      checkbox.addEventListener("change", updateRoadmapProgress);
     });
-  } catch (err) {}
-  roadmapCheckboxes.forEach(function (checkbox) {
-    checkbox.addEventListener("change", updateRoadmapProgress);
-  });
-  updateRoadmapProgress();
+    updateRoadmapProgress();
 
-  if (completionBtn) {
-    completionBtn.addEventListener("click", function () {
-      recordCompletion(PROJECT_ID, typeof PROJECT_TITLE !== "undefined" ? PROJECT_TITLE : "");
-      showAchievementToast("Project completed", "Nice work finishing this project.");
-    });
-  }
-})();
+    if (completionBtn) {
+      completionBtn.addEventListener("click", function () {
+        recordCompletion(PROJECT_ID, typeof PROJECT_TITLE !== "undefined" ? PROJECT_TITLE : "");
+        showAchievementToast("Project completed", "Nice work finishing this project.");
+      });
+    }
+  })();
 
-(function initScrollButton() {
-  var button = document.getElementById("scroll-top-btn");
-  var icon = document.getElementById("scroll-btn-icon");
-  if (!button) return;
-  var atBottom = false;
+  (function initScrollButton() {
+    var button = document.getElementById("scroll-top-btn");
+    var icon = document.getElementById("scroll-btn-icon");
+    if (!button) return;
+    var atBottom = false;
 
-  function nearBottom() {
-    return window.innerHeight + window.pageYOffset >= document.body.scrollHeight - 40;
-  }
-
-  function update() {
-    button.classList.toggle("visible", window.pageYOffset > 200);
-    atBottom = nearBottom();
-    button.setAttribute("aria-label", atBottom ? "Scroll to top" : "Scroll to bottom");
-    button.title = atBottom ? "Scroll to top" : "Scroll to bottom";
-    if (icon) icon.innerHTML = atBottom ? '<polyline points="18 15 12 9 6 15"/>' : '<polyline points="6 9 12 15 18 9"/>';
-  }
+    function nearBottom() {
+      return window.innerHeight + window.pageYOffset >= document.body.scrollHeight - 40;
+    }
 
   window.addEventListener("scroll", update, { passive: true });
   button.addEventListener("click", function () {
@@ -1080,3 +1575,75 @@ updateProfileWidgets();
   });
   update();
 })();
+
+// ==========================================
+// Git Bash Feature Injection: Project Tracker (GSSoC '26)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Try parsing the current Project ID from URL search params or metadata attributes
+  const urlParams = new URLSearchParams(window.location.search);
+  const projectId = urlParams.get('id') || window.location.pathname.split('/').pop() || 'default';
+  const storageKey = `devpath_progress_${projectId}`;
+
+  const roadmapItems = document.querySelectorAll('.roadmap-step, .roadmap-item, .step-card');
+  const progressText = document.getElementById('progress-text');
+  const progressFill = document.getElementById('progress-fill');
+
+  if (roadmapItems.length === 0) return;
+
+  // Retrieve existing checked step indexes array from localStorage
+  let savedProgress = JSON.parse(localStorage.getItem(storageKey)) || [];
+
+  function updateTrackerUI() {
+    let completedCount = 0;
+    
+    roadmapItems.forEach((item, index) => {
+      let checkbox = item.querySelector('.step-checker');
+      
+      // If checkbox isn't built into the static template yet, prepend it dynamically via JS
+      if (!checkbox) {
+        checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'step-checker';
+        checkbox.style.marginRight = '12px';
+        checkbox.style.cursor = 'pointer';
+        item.insertBefore(checkbox, item.firstChild);
+        
+        // Setup event observer
+        checkbox.addEventListener('change', () => toggleStep(index, checkbox.checked));
+      }
+
+      // Restore checked states
+      if (savedProgress.includes(index)) {
+        checkbox.checked = true;
+        item.classList.add('step-completed');
+        completedCount++;
+      } else {
+        checkbox.checked = false;
+        item.classList.remove('step-completed');
+      }
+    });
+
+    // Calculate percentage mathematics
+    const totalSteps = roadmapItems.length;
+    const percentage = Math.round((completedCount / totalSteps) * 100) || 0;
+
+    if (progressText && progressFill) {
+      progressText.textContent = `${percentage}% Completed (${completedCount}/${totalSteps} steps)`;
+      progressFill.style.width = `${percentage}%`;
+    }
+  }
+
+  function toggleStep(index, isChecked) {
+    if (isChecked) {
+      if (!savedProgress.includes(index)) savedProgress.push(index);
+    } else {
+      savedProgress = savedProgress.filter(i => i !== index);
+    }
+    localStorage.setItem(storageKey, JSON.stringify(savedProgress));
+    updateTrackerUI();
+  }
+
+  // Initialize view state
+  updateTrackerUI();
+});

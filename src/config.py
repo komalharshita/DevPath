@@ -19,6 +19,13 @@ class Config:
     
     # OG image path (relative to static folder)
     OG_IMAGE_PATH = "/static/og-banner.png"
+
+    # Contact form handler endpoint. Replace this with the project's
+    # Formspree form URL or set CONTACT_FORM_ACTION in the deployment.
+    CONTACT_FORM_ACTION = os.getenv(
+        "CONTACT_FORM_ACTION",
+        "https://formspree.io/f/your-form-id",
+    )
     
     @classmethod
     def get_og_image_url(cls):

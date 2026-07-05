@@ -1,15 +1,24 @@
-# Base image — pin to a specific digest in production for reproducibility
-FROM python:3.9-slim
+# ── Stage 1: Builder ──────────────────────────────────────────
+FROM python:3.11-slim AS builder
 
-# Python runtime optimizations
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Install dependencies as root before switching users
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# ── Stage 2: Runtime ──────────────────────────────────────────
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Copy only installed packages from builder stage
+COPY --from=builder /install /usr/local
 
 # Copy application code
 COPY . .
