@@ -1675,6 +1675,7 @@ html[data-theme="dark"] .theme-toggle-label::before {
   padding: 44px 44px 40px;
   box-shadow: var(--shadow-lg);
   text-align: left;
+  overflow: visible;
 }
 
 /* Form groups */
@@ -1712,6 +1713,7 @@ label {
   gap: 6px;
   cursor: text;
   transition: border-color var(--t), box-shadow var(--t), background var(--t);
+  overflow: visible;
 }
 
 .skill-input-wrap:focus-within {
@@ -1858,6 +1860,7 @@ label {
   background: var(--indigo-50);
 }
 
+
 /*suggestions dropdown*/
 /* Suggestions dropdown */
 .skills-suggestions {
@@ -1872,7 +1875,7 @@ label {
   margin-top: -1px;
   max-height: 280px;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 99999;
   display: none;
   box-shadow: 0 8px 24px rgba(79, 110, 247, 0.15);
 }
