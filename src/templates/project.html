@@ -128,6 +128,13 @@
             </svg>
             View Code
           </button>
+          <button class="btn-view-code" id="btn-save-project-detail" data-save-project-id="{{ project.id }}" aria-label="Save project">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
+            Save Project
+          </button>
         </div>
       </div>
     </div>
@@ -233,58 +240,25 @@
 
         {% for step in project.roadmap %}
 
-        <li class="roadmap-step"
-            data-step="step-{{loop.index}}">
-
+        <li class="roadmap-step" data-step="step-{{loop.index}}">
             <!-- Marker -->
             <div class="roadmap-marker">
-
                 <span class="roadmap-dot"></span>
-
                 <span class="roadmap-line"></span>
-
-
-          <section class="detail-section">
-            <div class="detail-section-header">
-              <div class="detail-section-icon">
-                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                </svg>
-              </div>
-              <h2>Project Roadmap</h2>
-
             </div>
-
 
             <!-- Content -->
             <div class="roadmap-content">
-
                 <label class="roadmap-step-label">
-
-                    <input
-                        type="checkbox"
-                        class="roadmap-checkbox"
-                    >
-
+                    <input type="checkbox" class="roadmap-checkbox">
                     <div class="roadmap-text-wrap">
-
-                        <span class="roadmap-step-num">
-                            Step {{loop.index}}
-                        </span>
-
+                        <span class="roadmap-step-num">Step {{loop.index}}</span>
                         <p class="roadmap-step-text">
-
                             {{ step | replace("Step " ~ loop.index ~ ": ", "") }}
-
                         </p>
-
                     </div>
-
                 </label>
-
             </div>
-
         </li>
 
         {% endfor %}
@@ -476,9 +450,13 @@
   <script>
     var PROJECT_ID = {{ project.id | tojson }};
     var PROJECT_TITLE = {{ project.title | tojson }};
+    var PROJECT_LEVEL = {{ project.level | tojson }};
+    var PROJECT_TIME = {{ project.time | tojson }};
+    var PROJECT_SKILLS = {{ project.skills | tojson }};
   </script>
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
   <script src="/static/script.js"></script>
+  <script src="/static/bookmarks.js"></script>
 </body>
 
 </html>

@@ -58,6 +58,7 @@
   {% include 'partials/theme_head.html' %}
   <link rel="stylesheet" href="/static/style.css" />
   <link rel="stylesheet" href="/static/bookmarks.css" />
+  <link rel="stylesheet" href="/static/animations.css" />
   <link
     href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet" />
@@ -391,7 +392,7 @@
               d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </button>
-      </div>
+      </form>
 
       <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation"
         aria-expanded="false" aria-controls="nav-mobile-menu">
@@ -414,7 +415,7 @@
       <a href="#home" class="nav-mobile-link" role="menuitem">Home</a>
       <a href="#how-it-works" class="nav-mobile-link" role="menuitem">How It Works</a>
       <a href="#features" class="nav-mobile-link" role="menuitem">Features</a>
-      <a href="#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
+      <a href="#the-project" class="nav-mobile-link" role="menuitem">Find Project</a>
       <a href="/compare" class="nav-mobile-link" role="menuitem">Compare</a>
       <a href="/contact" class="nav-mobile-link" role="menuitem">Contact</a>
       <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
@@ -824,9 +825,6 @@
           <h3>Starter Code Included</h3>
           <p>Download a working template for every project. Skip the blank-page problem and start building immediately.</p>
           <a href="#the-project" class="feature-card-link">Get starter code</a>
-          <p>Download a working template for every project. Skip the blank-page problem and start building immediately.
-          </p>
-          <a href="#find-project" class="feature-card-link">Get starter code</a>
         </div>
       </div>
     </div>
@@ -859,14 +857,12 @@
             </div>
             <button type="button" class="share-prefill-banner-close" id="share-prefill-banner-close" aria-label="Dismiss banner">&times;</button>
           </div>
-          <form id="recommend-form" novalidate onsubmit="event.preventDefault()">
             <div class="form-group">
               <div class="form-label-row" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
                 <label for="skills-input">
                   Your Skills
                   <button type="button" class="tooltip" aria-label="Skills help" aria-describedby="skills-tooltip">
                     <span aria-hidden="true">ⓘ</span>
-  <span aria-hidden="true">ⓘ</span>
                     <span id="skills-tooltip" class="tooltip-text" role="tooltip">
                       Add technologies, programming languages, or tools you know like Python, React, Git, SQL, etc.
                     </span>
@@ -876,7 +872,7 @@
                 
                 <!-- Reset button and Inline GitHub Trigger -->
                 <div style="display: flex; gap: 3px; align-items: center;">
-                   <button type="reset" id="clear-filters-btn" class="btn-clear" style="padding: 4px 12px; font-size: 0.75rem;">
+                   <button type="reset" id="reset-form-btn" class="btn-clear" style="padding: 4px 12px; font-size: 0.75rem;">
                     Reset
                   </button>
                 <div class="github-inline-trigger" id="github-trigger-wrap" style="line-height: 1.2;">
@@ -907,10 +903,6 @@
                   </button>
                 </div>
                 <div id="skills-suggestions" class="skills-suggestions skills-dropdown" style="display: none; max-height: 250px; overflow-y: auto; border: 1px solid var(--color-border); border-top: none; background: white; position: absolute; width: 100%; margin-top: -2px; z-index: 10;"></div>
-                <input type="text" id="skills-input" placeholder="Type a skill and press Enter..." autocomplete="off" />
-                <input type="text" id="skills-input" placeholder="Type a skill and press Enter..."
-                  autocomplete="off" aria-haspopup="listbox" aria-expanded="false" aria-controls="skills-suggestions" />
-                <div id="skills-suggestions" class="skills-suggestions"></div>
 
               </div>
               <input type="hidden" id="skills" name="skills" />
@@ -1029,19 +1021,12 @@
               <span class="form-hint">Include coding, debugging, learning, and reviewing time in your estimate.</span>
               <div class="form-error-msg" id="time-error"></div>
             </div>
-
             <div class="form-actions">
               <button type="submit" class="btn-submit" id="submit-btn">
                 <span id="btn-label">Generate My Projects</span>
                 <span id="btn-loading" style="display:none;">Finding matches...</span>
               </button>
-              <button type="button" class="btn-clear" id="clear-filters-btn">
-                <span>Clear Filters</span>
-              </button>
             </div>
-              <span id="btn-loading" style="display:none;">Finding matches...</span>
-            </button>
-        </div>
 
           </form>
         </div>
@@ -1101,7 +1086,8 @@
           </div>
           <h3>No Projects Found</h3>
           <p id="empty-message">Try adjusting your skills or selecting a different interest area.</p>
-          <button class="btn-try-again" onclick="document.getElementById('find-project').scrollIntoView({behavior:'smooth'})">Try Different Inputs</button>
+          <button class="btn-try-again"
+            onclick="document.getElementById('find-project').scrollIntoView({behavior:'smooth'})">Try Different Inputs</button>
         </div>
       </div>
 
@@ -1181,7 +1167,6 @@
           <li><a href="#how-it-works">How It Works</a></li>
           <li><a href="#features">Features</a></li>
           <li><a href="#the-project">Find Project</a></li>
-          <li><a href="#find-project">Find Project</a></li>
           <li><a href="/contact">Contact Us</a></li>
         </ul>
       </div>
@@ -1276,36 +1261,12 @@
   </button>
 
   <script src="/static/script.js"></script>
-  
-  <script>
-    // Tab switching for leaderboard/achievements (adds to your existing JS)
-    document.addEventListener('DOMContentLoaded', function() {
-      const tabs = document.querySelectorAll('.la-tab');
-      tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-          const parent = this.closest('.leaderboard-achievement-card');
-          if (parent) {
-            parent.querySelectorAll('.la-tab').forEach(t => t.classList.remove('active'));
-            parent.querySelectorAll('.la-content').forEach(c => c.classList.remove('active'));
-            this.classList.add('active');
-            const tabId = this.getAttribute('data-tab');
-            if (tabId === 'leaderboard') {
-              const leaderboardContent = parent.querySelector('#leaderboard-content');
-              if (leaderboardContent) leaderboardContent.classList.add('active');
-            } else {
-              const achievementsContent = parent.querySelector('#achievements-content');
-              if (achievementsContent) achievementsContent.classList.add('active');
-            }
-          }
-        });
-      });
-    });
   </script>
     
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
 
+  <script src="/static/animations.js"></script>
   <script src="/static/script.js"></script>
-  </script>
 </body>
 
 </html>

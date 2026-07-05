@@ -18,9 +18,24 @@ _CLUSTERS_PATH = os.path.join(
     "clusters.json",
 )
 
-VALID_LEVELS = {"beginner", "intermediate", "advanced"}
-VALID_INTERESTS = {"web", "data", "education", "automation", "games", "cybersecurity", "devops", "backend", "tools", "productivity", "business logic", "mobile", "machine learning/ai"}
-VALID_TIME_AVAILABILITY = {"low", "medium", "high"}
+VALID_LEVELS = ["beginner", "intermediate", "advanced"]
+VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
+VALID_INTERESTS = [
+    "automation",
+    "backend",
+    "business logic",
+    "cloud computing",
+    "cybersecurity",
+    "data",
+    "devops",
+    "education",
+    "games",
+    "machine learning/ai",
+    "mobile",
+    "productivity",
+    "tools",
+    "web",
+]
 SCORING_WEIGHTS = {
     "skill": 3,
     "level": 2,
@@ -32,14 +47,6 @@ WEIGHT_SKILL = SCORING_WEIGHTS["skill"]
 WEIGHT_LEVEL = SCORING_WEIGHTS["level"]
 WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
 WEIGHT_TIME = SCORING_WEIGHTS["time"]
-
-VALID_INTERESTS = {
-    "web", "data", "education", "automation", "games",
-    "cybersecurity", "devops", "mobile", "machine learning/ai",
-    "artificial intelligence", "cloud computing", "mobile app development",
-    "backend", "tools", "productivity", "business logic"
-}
-VALID_TIMES = {"low", "medium", "high"}
 
 # Common aliases and abbreviations for skills
 # This improves recommendation accuracy by normalizing user input
@@ -378,14 +385,6 @@ def get_recommendations(skills_string, level, interest, time_availability):
         "progression": progression,
     }
 
-VALID_LEVELS = ["beginner", "intermediate", "advanced"]
-VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
-
-
-VALID_LEVELS = ["beginner", "intermediate", "advanced"]
-VALID_INTERESTS = ["data", "web", "backend", "cybersecurity", "games", "education", "automation"]
-VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
-
 
 def validate_recommendation_inputs(skills, level, interest, time_availability):
     errors = []
@@ -400,8 +399,12 @@ def validate_recommendation_inputs(skills, level, interest, time_availability):
     elif level.strip().lower() not in VALID_LEVELS:
         errors.append("Invalid experience level. Choose Beginner, Intermediate, or Advanced.")
 
-    if not interest or not isinstance(interest, str) or not interest.strip():
-        errors.append("Please select an area of interest.")
+    if (
+        not interest
+        or not isinstance(interest, str)
+        or interest.strip().lower() not in VALID_INTERESTS
+    ):
+        errors.append("Please select a valid area of interest.")
 
     if not time_availability or not time_availability.strip():
         errors.append("Please select your time availability.")
