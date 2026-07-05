@@ -17,8 +17,15 @@ from utils.learning_path import (
     PathAlreadyExistsError,
     AuthorizationError,
 )
+from utils.skill_progression import (
+    SkillProgressionValidator,
+    SkillDifficulty,
+    validate_skill_progression,
+)
 from config import Config
 import os
+
+_skill_validator = SkillProgressionValidator()
 
 # Interest categories that currently have no project recommendations available
 NO_PROJECT_INTERESTS = {
@@ -309,6 +316,131 @@ def search_projects():
             filtered_projects.append(project)
 
     return jsonify(filtered_projects)
+
+
+@main.route("/api/skill-progression/validate", methods=["POST"])
+def validate_skill():
+    """Validate if user can learn a skill at target difficulty level."""
+    payload = request.get_json(silent=True)
+
+    if not payload:
+        return jsonify({"error": "Request body must be valid JSON."}), 400
+
+    user_id = (payload.get("user_id") or "").strip()
+    skill_name = (payload.get("skill") or "").strip()
+    target_difficulty = (payload.get("difficulty") or "").strip()
+
+    if not user_id or not skill_name or not target_difficulty:
+        return jsonify({
+            "error": "user_id, skill, and difficulty are required"
+        }), 400
+
+    result = validate_skill_progression(
+        user_id,
+        skill_name,
+        target_difficulty,
+        _skill_validator
+    )
+
+    return jsonify(result), 200 if result["allowed"] else 400
+
+
+@main.route("/api/skill-progression/record", methods=["POST"])
+def record_skill_completion():
+    """Record user completion of a skill at given difficulty level."""
+    payload = request.get_json(silent=True)
+
+    if not payload:
+        return jsonify({"error": "Request body must be valid JSON."}), 400
+
+    user_id = (payload.get("user_id") or "").strip()
+    skill_name = (payload.get("skill") or "").strip()
+    difficulty = (payload.get("difficulty") or "").strip()
+    assessment_score = payload.get("assessment_score")
+
+    if not user_id or not skill_name or not difficulty:
+        return jsonify({
+            "error": "user_id, skill, and difficulty are required"
+        }), 400
+
+    try:
+        diff_enum = SkillDifficulty[difficulty.upper()]
+    except KeyError:
+        return jsonify({"error": f"Invalid difficulty: {difficulty}"}), 400
+
+    if assessment_score is not None:
+        try:
+            assessment_score = float(assessment_score)
+            if not (0 <= assessment_score <= 100):
+                return jsonify({
+                    "error": "assessment_score must be between 0 and 100"
+                }), 400
+        except (ValueError, TypeError):
+            return jsonify({
+                "error": "assessment_score must be a number"
+            }), 400
+
+    skill_data = _skill_validator.record_skill_completion(
+        user_id,
+        skill_name,
+        diff_enum,
+        assessment_score
+    )
+
+    return jsonify({
+        "success": True,
+        "user_id": user_id,
+        "skill": skill_name,
+        "difficulty": difficulty,
+        "skill_data": skill_data
+    }), 201
+
+
+@main.route("/api/skill-progression/user/<user_id>")
+def get_user_progression(user_id):
+    """Get skill progression data for a user."""
+    user_id = user_id.strip()
+
+    if not user_id:
+        return jsonify({"error": "user_id is required"}), 400
+
+    skills = _skill_validator.get_user_skills(user_id)
+    proficiency = _skill_validator.calculate_overall_proficiency(user_id)
+
+    return jsonify({
+        "user_id": user_id,
+        "skills": skills,
+        "proficiency": proficiency
+    }), 200
+
+
+@main.route("/api/skill-progression/next/<user_id>/<skill>")
+def get_next_skill(user_id, skill):
+    """Get recommended next skill level for user to pursue."""
+    user_id = user_id.strip()
+    skill = skill.strip()
+
+    if not user_id or not skill:
+        return jsonify({"error": "user_id and skill are required"}), 400
+
+    next_skill = _skill_validator.get_recommended_next_skill(user_id, skill)
+
+    if not next_skill:
+        return jsonify({
+            "user_id": user_id,
+            "skill": skill,
+            "next_skill": None,
+            "message": "No next skill level available or skill not started"
+        }), 200
+
+    return jsonify({
+        "user_id": user_id,
+        "skill": skill,
+        "next_skill": {
+            "skill": next_skill[0],
+            "difficulty": next_skill[1].name
+        }
+    }), 200
 
 
 # ---------------------------------------------------------------------------
