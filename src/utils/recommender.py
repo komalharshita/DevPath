@@ -377,6 +377,7 @@ def get_recommendations(skills_string, level, interest, time_availability, tech_
         all_projects = [p for p in all_projects if project_matches_tech(p, tech_stack)]
         
     scored_projects = []
+    graph = _load_skill_graph()
     for project in all_projects:
         rule_score = score_single_project(
             project,
@@ -394,7 +395,16 @@ def get_recommendations(skills_string, level, interest, time_availability, tech_
             all_projects,
         )
         final_score = rule_score + similarity_score
-        if final_score > 0:
+
+        # Check relevance: project must match at least one user skill,
+        # have a positive boost from the skill graph, or have a significant
+        # ML semantic match (similarity_score >= 0.15).
+        project_skills = [SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", [])]
+        matched_skills = sum(1 for skill in user_skills if skill in project_skills)
+        boost = gap_boost(user_skills, project_skills, graph)
+        is_relevant = (matched_skills > 0) or (boost > 0) or (similarity_score >= 0.15)
+
+        if final_score > 0 and is_relevant:
             scored_projects.append({
                 "project": project,
                 "score": final_score,
