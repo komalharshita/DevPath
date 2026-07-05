@@ -1261,31 +1261,6 @@
   </button>
 
   <script src="/static/script.js"></script>
-  <script src="/static/bookmarks.js"></script>
-  
-  <script>
-    // Tab switching for leaderboard/achievements (adds to your existing JS)
-    document.addEventListener('DOMContentLoaded', function() {
-      const tabs = document.querySelectorAll('.la-tab');
-      tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-          const parent = this.closest('.leaderboard-achievement-card');
-          if (parent) {
-            parent.querySelectorAll('.la-tab').forEach(t => t.classList.remove('active'));
-            parent.querySelectorAll('.la-content').forEach(c => c.classList.remove('active'));
-            this.classList.add('active');
-            const tabId = this.getAttribute('data-tab');
-            if (tabId === 'leaderboard') {
-              const leaderboardContent = parent.querySelector('#leaderboard-content');
-              if (leaderboardContent) leaderboardContent.classList.add('active');
-            } else {
-              const achievementsContent = parent.querySelector('#achievements-content');
-              if (achievementsContent) achievementsContent.classList.add('active');
-            }
-          }
-        });
-      });
-    });
   </script>
     
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
