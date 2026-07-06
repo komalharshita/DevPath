@@ -1128,7 +1128,6 @@ updateProfileWidgets();
       });
 
       resultsSection.scrollIntoView({ behavior: "smooth" });
-      main
     }
 
     function buildProjectCard(project) {
