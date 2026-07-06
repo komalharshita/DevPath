@@ -18,9 +18,24 @@ _CLUSTERS_PATH = os.path.join(
     "clusters.json",
 )
 
-VALID_LEVELS = {"beginner", "intermediate", "advanced"}
-VALID_INTERESTS = {"web", "data", "education", "automation", "games", "cybersecurity", "devops", "backend", "tools", "productivity", "business logic", "mobile", "machine learning/ai"}
-VALID_TIME_AVAILABILITY = {"low", "medium", "high"}
+VALID_LEVELS = ["beginner", "intermediate", "advanced"]
+VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
+VALID_INTERESTS = [
+    "automation",
+    "backend",
+    "business logic",
+    "cloud computing",
+    "cybersecurity",
+    "data",
+    "devops",
+    "education",
+    "games",
+    "machine learning/ai",
+    "mobile",
+    "productivity",
+    "tools",
+    "web",
+]
 SCORING_WEIGHTS = {
     "skill": 3,
     "level": 2,
@@ -32,14 +47,6 @@ WEIGHT_SKILL = SCORING_WEIGHTS["skill"]
 WEIGHT_LEVEL = SCORING_WEIGHTS["level"]
 WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
 WEIGHT_TIME = SCORING_WEIGHTS["time"]
-
-VALID_INTERESTS = {
-    "web", "data", "education", "automation", "games",
-    "cybersecurity", "devops", "mobile", "machine learning/ai",
-    "artificial intelligence", "cloud computing", "mobile app development",
-    "backend", "tools", "productivity", "business logic"
-}
-VALID_TIMES = {"low", "medium", "high"}
 
 # Common aliases and abbreviations for skills
 # This improves recommendation accuracy by normalizing user input
@@ -347,10 +354,44 @@ def _get_related(recommended_ids, all_projects, cluster_data):
 # Public API
 # ---------------------------------------------------------------------------
 
-def get_recommendations(skills_string, level, interest, time_availability):
+def project_matches_tech(project, tech_stack):
+    """
+    Check if a project matches the selected tech_stack using strict boundary checks.
+    """
+    if not tech_stack or tech_stack.lower() == "all":
+        return True
+        
+    tech_stack = tech_stack.lower().strip()
+    
+    if tech_stack == "jsp":
+        pattern = re.compile(r'\b(jsp|servlet|servlets)\b', re.IGNORECASE)
+    elif tech_stack == "java":
+        pattern = re.compile(r'\bjava\b', re.IGNORECASE)
+    elif tech_stack == "javascript":
+        pattern = re.compile(r'\b(javascript|js)\b', re.IGNORECASE)
+    else:
+        pattern = re.compile(rf'\b{re.escape(tech_stack)}\b', re.IGNORECASE)
+        
+    for skill in project.get("skills", []):
+        if pattern.search(skill):
+            return True
+            
+    for tech in project.get("tech_stack", []):
+        if pattern.search(tech):
+            return True
+            
+    return False
+
+
+def get_recommendations(skills_string, level, interest, time_availability, tech_stack="all"):
     user_skills = parse_skills(skills_string)
     all_projects = load_all_projects()
+    
+    if tech_stack and tech_stack.lower() != "all":
+        all_projects = [p for p in all_projects if project_matches_tech(p, tech_stack)]
+        
     scored_projects = []
+    graph = _load_skill_graph()
     for project in all_projects:
         score_result = score_single_project(
             project,
@@ -373,7 +414,16 @@ def get_recommendations(skills_string, level, interest, time_availability):
             all_projects,
         )
         final_score = rule_score + similarity_score
-        if final_score > 0:
+
+        # Check relevance: project must match at least one user skill,
+        # have a positive boost from the skill graph, or have a significant
+        # ML semantic match (similarity_score >= 0.15).
+        project_skills = [SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", [])]
+        matched_skills = sum(1 for skill in user_skills if skill in project_skills)
+        boost = gap_boost(user_skills, project_skills, graph)
+        is_relevant = (matched_skills > 0) or (boost > 0) or (similarity_score >= 0.15)
+
+        if final_score > 0 and is_relevant:
             scored_projects.append({
                 "project": project,
                 "score": final_score,
@@ -468,9 +518,7 @@ def get_recommendations(skills_string, level, interest, time_availability):
         "progression": progression,
     }
 
-VALID_LEVELS = ["beginner", "intermediate", "advanced"]
-VALID_INTERESTS = ["data", "web", "backend", "cybersecurity", "games", "education", "automation"]
-VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
+
 
 def validate_recommendation_inputs(skills, level, interest, time_availability):
     errors = []
@@ -485,8 +533,12 @@ def validate_recommendation_inputs(skills, level, interest, time_availability):
     elif level.strip().lower() not in VALID_LEVELS:
         errors.append("Invalid experience level. Choose Beginner, Intermediate, or Advanced.")
 
-    if not interest or not isinstance(interest, str) or not interest.strip():
-        errors.append("Please select an area of interest.")
+    if (
+        not interest
+        or not isinstance(interest, str)
+        or interest.strip().lower() not in VALID_INTERESTS
+    ):
+        errors.append("Please select a valid area of interest.")
 
     if not time_availability or not time_availability.strip():
         errors.append("Please select your time availability.")

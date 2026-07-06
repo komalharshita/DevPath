@@ -104,22 +104,27 @@ def list_expenses():
     """
     expenses = read_all_expenses()
 
-    if not expenses:
-        print("No expenses recorded yet.")
-        return
+    # --- Write your display code here ---
+import csv
 
-    # Print Headers
-    print(f"\n{'Date':<12} {'Category':<15} {'Amount':<10} {'Note'}")
-    print("-" * 55)
-
-    # Print Data Rows
-    total_amount = 0.0
-    for row in expenses:
-        print(f"{row['date']:<12} {row['category']:<15} ${row['amount']:<9.2f} {row['note']}")
-        total_amount += row["amount"]
-
-    print("-" * 55)
-    print(f"Total: ${total_amount:.2f} across {len(expenses)} entries.")
+def list_all_expenses():
+    try:
+        with open("expenses.csv", "r") as file:
+            reader = csv.DictReader(file)
+            print("\n=== All Expenses ===")
+            has_data = False
+            # Print header row
+            print(f"{'Date':<12} | {'Category':<12} | {'Amount':<10} | {'Note'}")
+            print("-" * 55)
+            for row in reader:
+                # Normalize category for consistency
+                category = row['category'].strip().capitalize()
+                print(f"{row['date']:<12} | {category:<12} | {row['amount']:<10} | {row['note']}")
+                has_data = True
+            if not has_data:
+                print("No expenses recorded yet.")
+    except FileNotFoundError:
+        print("No expense file found. Please add an expense first.")
 
 
 def monthly_summary():

@@ -21,10 +21,10 @@
     <div class="nav-inner">
       <a href="/" class="nav-logo">Dev<span class="nav-logo-accent">Path</span></a>
       <div class="nav-links">
-        <a href="/" class="nav-link">Home</a>
-        <a href="/compare" class="nav-link nav-link--active">Compare</a>
+        <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">Home</a>
+        <a href="/compare" class="nav-link {% if request.path == '/compare' %}active{% endif %}">Compare</a>
         <a href="/#find-project" class="nav-link">Find Project</a>
-        <a href="/contact" class="nav-link">Contact</a>
+        <a href="/contact" class="nav-link {% if request.path == '/contact' %}active{% endif %}">Contact</a>
         <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
           class="nav-btn-outline">GitHub</a>
         <button class="theme-toggle" id="theme-toggle-desktop" aria-pressed="false" aria-label="Switch to dark mode">
@@ -52,10 +52,10 @@
       </button>
     </div>
     <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
-      <a href="/" class="nav-mobile-link" role="menuitem">Home</a>
-      <a href="/compare" class="nav-mobile-link" role="menuitem">Compare</a>
+      <a href="/" class="nav-mobile-link {% if request.path == '/' %}active{% endif %}" role="menuitem">Home</a>
+      <a href="/compare" class="nav-mobile-link {% if request.path == '/compare' %}active{% endif %}" role="menuitem">Compare</a>
       <a href="/#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
-      <a href="/contact" class="nav-mobile-link" role="menuitem">Contact</a>
+      <a href="/contact" class="nav-mobile-link {% if request.path == '/contact' %}active{% endif %}" role="menuitem">Contact</a>
     </div>
   </nav>
 
@@ -231,6 +231,7 @@
     </div>
   </footer>
 
+  {% include 'partials/scroll_top_btn.html' %}
   <script src="/static/script.js"></script>
   <script src="/static/compare.js"></script>
 </body>
