@@ -1011,7 +1011,6 @@
       "Real Python CLI apps: https://realpython.com/command-line-interfaces-python-argparse",
       "Python os module: https://docs.python.org/3/library/os.html"
     ],
-<<<<<<< HEAD
     "starter_code": null
   },
   {
@@ -1146,5 +1145,86 @@
       "C++ STL tutorial: https://www.geeksforgeeks.org/the-c-standard-template-library-stl/"
     ],
     "starter_code": null
+  },
+  
+  {
+    "id": 33,
+    "title": "Network Anomaly Detection with Ensemble ML",
+    "skills": [
+      "Python",
+      "Machine Learning",
+      "Data Analysis"
+    ],
+    "level": "Advanced",
+    "interest": "Data",
+    "time": "High",
+    "estimated_hours": 45,
+    "description": "Build a robust framework to detect network anomalies using ensemble models and Explainable AI for transparent decision-making. Ideal for transitioning from theoretical AI to practical security applications.",
+    "features": [
+      "Process and clean large network traffic logs",
+      "Implement baseline classification models",
+      "Design an ensemble architecture for high accuracy",
+      "Integrate SHAP or LIME for model explainability"
+    ],
+    "tech_stack": [
+      "Python",
+      "scikit-learn",
+      "pandas",
+      "SHAP"
+    ],
+    "roadmap": [
+      "Step 1: Set up the Python environment and install required machine learning libraries",
+      "Step 2: Load and preprocess the network traffic dataset using pandas",
+      "Step 3: Train baseline models including Random Forest and Support Vector Machines",
+      "Step 4: Develop an ensemble model combining the baseline predictions",
+      "Step 5: Evaluate the ensemble model using accuracy and F1 score metrics",
+      "Step 6: Integrate Explainable AI using SHAP to interpret model decisions",
+      "Step 7: Document the findings and model performance in a final report"
+    ],
+    "resources": [
+      "scikit-learn ensemble guide: https://scikit-learn.org/stable/modules/ensemble.html",
+      "SHAP documentation: https://shap.readthedocs.io/en/latest/"
+    ],
+    "starter_code": "starter_code/adv_ml_anomaly.py"
+  },
+  {
+    "id": 34,
+    "title": "Automated CI/CD Pipeline Infrastructure",
+    "skills": [
+      "Docker",
+      "YAML",
+      "Linux"
+    ],
+    "level": "Advanced",
+    "interest": "DevOps",
+    "time": "High",
+    "estimated_hours": 40,
+    "description": "Containerize a web application using Docker and build an automated Continuous Integration and Continuous Deployment pipeline to ensure scalable and reliable software delivery.",
+    "features": [
+      "Write a Dockerfile for a sample application",
+      "Configure Docker Compose for multi-container environments",
+      "Create automated testing workflows",
+      "Automate image builds on code pushes"
+    ],
+    "tech_stack": [
+      "Docker",
+      "GitHub Actions",
+      "Bash"
+    ],
+    "roadmap": [
+      "Step 1: Install Docker and Docker Compose on your local machine",
+      "Step 2: Write a complete Dockerfile for the provided sample application",
+      "Step 3: Create a docker-compose configuration to run the app and a database together",
+      "Step 4: Set up a new GitHub repository and push the starter code",
+      "Step 5: Define a GitHub Actions workflow file in the required directory",
+      "Step 6: Configure the workflow to automatically build the Docker image on every push",
+      "Step 7: Add an automated testing step to the workflow to verify the build succeeds",
+      "Step 8: Write a deployment script to simulate pushing the image to a staging server"
+    ],
+    "resources": [
+      "Docker getting started: https://docs.docker.com/get-started/",
+      "GitHub Actions documentation: https://docs.github.com/en/actions"
+    ],
+    "starter_code": "starter_code/devops_pipeline.yml"
   }
 ]
