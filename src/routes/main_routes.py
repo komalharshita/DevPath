@@ -152,27 +152,6 @@ def recommend():
     recommendations_data = get_recommendations(skills, level, interest, time_availability, tech_stack)
     results = recommendations_data.get("recommendations", [])
 
-    if not results:
-        return jsonify({
-            "projects": [],
-            "message": (
-                "No projects matched your inputs. "
-                "Try different skills or broaden your interest area."
-            )
-        }), 200
-
-    recommendations_data = get_recommendations(skills, level, interest, time_availability)
-    results = recommendations_data.get("recommendations", [])
-
-    if not results:
-        return jsonify({
-            "projects": [],
-            "message": (
-                "No projects matched your inputs. "
-                "Try different skills or broaden your interest area."
-            )
-        }), 200
-
     # Ensure all projects have IDs in the response
     projects_data = []
     for project in results:
