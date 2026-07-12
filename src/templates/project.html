@@ -10,7 +10,7 @@
   
   <!-- Open Graph meta tags for social media sharing -->
   <meta property="og:title" content="{{ project.title }} — DevPath" />
-  <meta property="og:description" content="{{ project.description[:155] }}" />
+  <meta property="og:description" content="{{ project.description|truncate(155, False, '...') }}" />
   <meta property="og:image" content="{{ config.get_og_image_url() }}" />
   <meta property="og:url" content="{{ config.get_base_url() }}/project/{{ project.id }}" />
   <meta property="og:type" content="article" />
@@ -19,7 +19,7 @@
   <!-- Twitter Card meta tags -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="{{ project.title }} — DevPath" />
-  <meta name="twitter:description" content="{{ project.description[:155] }}" />
+  <meta name="twitter:description" content="{{ project.description|truncate(155, False, '...') }}" />
   <meta name="twitter:image" content="{{ config.get_og_image_url() }}" />
   <link rel="stylesheet" href="/static/style.css" />
   <link
@@ -444,8 +444,7 @@
     </div>
   </footer>
 
-  <!-- Scroll-to-top button -->
-  <button id="scroll-top-btn" aria-label="Back to top" title="Back to top">↑</button>
+  {% include 'partials/scroll_top_btn.html' %}
 
   <script>
     var PROJECT_ID = {{ project.id | tojson }};

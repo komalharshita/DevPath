@@ -206,6 +206,25 @@ var progress = {
   bestScore: 0
 };
 
+// Points awarded per action
+var POINTS_PER_SEARCH     = 5;
+var POINTS_PER_VIEW       = 10;
+var POINTS_PER_CODE_OPEN  = 15;
+var POINTS_PER_COMPLETION = 30;
+
+var PROGRESS_TARGET_SEARCHES     = 10;
+var PROGRESS_TARGET_VIEWS        = 10;
+var PROGRESS_TARGET_CODE_OPENS   = 10;
+var PROGRESS_TARGET_COMPLETIONS  = 5;
+
+// Maximum achievable points given the targets above
+var PROGRESS_MAX_POINTS = (
+  PROGRESS_TARGET_SEARCHES    * POINTS_PER_SEARCH     +   // 50
+  PROGRESS_TARGET_VIEWS       * POINTS_PER_VIEW       +   // 100
+  PROGRESS_TARGET_CODE_OPENS  * POINTS_PER_CODE_OPEN  +   // 150
+  PROGRESS_TARGET_COMPLETIONS * POINTS_PER_COMPLETION     // 150
+);  // total = 450
+
 function loadProgressState() {
   try {
     var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
@@ -419,6 +438,8 @@ updateProfileWidgets();
     : quickPickChips.map(function (chip) { return chip.getAttribute("data-skill"); });
   var activeSuggestionIndex = -1;
   var visibleSuggestions = [];
+  var hasSearched = false;
+  var techStackSelect = document.getElementById("tech_stack");
 
   function normalize(value) {
     return String(value || "").trim().toLowerCase();
@@ -610,6 +631,42 @@ updateProfileWidgets();
     var card = document.createElement("div");
     card.className = "project-card";
 
+    if (project.match_score !== undefined) {
+      var scoreBadge = document.createElement("div");
+      scoreBadge.className = "project-match-score";
+      scoreBadge.setAttribute("aria-label", "Match score: " + project.match_score + " out of 10");
+
+      var scoreLabel = document.createElement("span");
+      scoreLabel.className = "score-label";
+      scoreLabel.textContent = "Match Score";
+
+      var scoreValue = document.createElement("span");
+      scoreValue.className = "score-value";
+      scoreValue.textContent = project.match_score.toFixed(1) + " / 10";
+
+      var scoreBar = document.createElement("div");
+      scoreBar.className = "score-bar";
+      scoreBar.setAttribute("role", "presentation");
+
+      var scoreBarFill = document.createElement("div");
+      scoreBarFill.className = "score-bar-fill";
+      scoreBarFill.style.width = (project.match_score * 10) + "%";
+
+      scoreBar.appendChild(scoreBarFill);
+      scoreBadge.appendChild(scoreLabel);
+      scoreBadge.appendChild(scoreValue);
+      scoreBadge.appendChild(scoreBar);
+      
+      card.appendChild(scoreBadge);
+    }
+
+    if (project.match_explanation) {
+      var explanationP = document.createElement("p");
+      explanationP.className = "project-match-explanation";
+      explanationP.innerHTML = '<svg class="explanation-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span>' + project.match_explanation + '</span>';
+      card.appendChild(explanationP);
+    }
+
     var title = document.createElement("h3");
     title.className = "project-card-title";
     title.textContent = project.title;
@@ -639,6 +696,7 @@ updateProfileWidgets();
 
     var tags = document.createElement("div");
     tags.className = "project-card-tags";
+
     (project.skills || []).forEach(function (skill) { tags.appendChild(createTag(skill, "skill")); });
     tags.appendChild(createTag(project.level, project.level));
     tags.appendChild(createTag("Time: " + project.time, "time"));
@@ -676,6 +734,7 @@ updateProfileWidgets();
     card.appendChild(title);
     card.appendChild(desc);
     card.appendChild(tags);
+
     card.appendChild(footer);
     return card;
   }
@@ -836,7 +895,8 @@ updateProfileWidgets();
         skills: JSON.stringify(selectedSkills),
         level: document.getElementById("level").value,
         interest: document.getElementById("interest").value,
-        time: document.getElementById("time").value
+        time: document.getElementById("time").value,
+        tech_stack: techStackSelect ? techStackSelect.value : "all"
       })
     })
       .then(function (response) {
@@ -848,6 +908,7 @@ updateProfileWidgets();
       .then(function (data) {
         setLoadingState(false);
         recordSearch();
+        hasSearched = true;
         renderResults(data.projects || [], data.message);
       })
       .catch(function (err) {
@@ -856,6 +917,14 @@ updateProfileWidgets();
         if (general) general.textContent = err.message || "An unexpected error occurred. Please try again.";
       });
   });
+
+  if (techStackSelect) {
+    techStackSelect.addEventListener("change", function () {
+      if (hasSearched) {
+        submitBtn.click();
+      }
+    });
+  }
 
   var modal = document.getElementById("github-modal-overlay");
   var openModalBtn = document.getElementById("btn-show-github");
