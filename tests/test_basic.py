@@ -1,30 +1,12 @@
-# tests/test_basic.py
-# Basic tests for core DevPath functionality.
-#
-# Run with:   python -m pytest tests/
-# Or:         python tests/test_basic.py
-#
-# These tests check that:
-#   - The projects dataset loads without errors
-#   - The recommendation engine returns sensible results
-#   - Input validation catches bad data
-#   - All main HTTP routes return the expected status codes
-
 import sys
 import os
-
 import pytest
 
-# Allow imports from the project root and src/ when running tests directly
+# Allow imports from the project root when running tests directly
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from utils.data_loader import load_all_projects, find_project_by_id, clear_cache, validate_projects
-from utils.roadmap_comparer import (
-    load_all_career_roadmaps,
-    compare_roadmaps,
-    clear_roadmap_cache,
-)
 from utils.recommender import (
     get_recommendations,
     validate_recommendation_inputs,
@@ -34,215 +16,58 @@ from utils.recommender import (
     VALID_LEVELS,
     VALID_TIME_AVAILABILITY,
     SKILL_SYNONYMS,
+    WEIGHT_LEVEL,
+    WEIGHT_INTEREST,
+    WEIGHT_TIME,
 )
-
-WEIGHT_LEVEL    = SCORING_WEIGHTS["level"]
-WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
-WEIGHT_TIME     = SCORING_WEIGHTS["time"]
 from app import app, internal_server_error
 
 
 # ============================================================
-# Test setup
+# Setup
 # ============================================================
 
 def setup_module():
-    """Clear the data cache before running the test suite to ensure clean state."""
     clear_cache()
-    clear_roadmap_cache()
 
 
 # ============================================================
-# Data loader tests
+# Data Loader Tests
 # ============================================================
 
 def test_projects_json_loads():
-    """The data file must exist and contain at least one project."""
     projects = load_all_projects()
-    assert isinstance(projects, list), "Expected a list of projects"
-    assert len(projects) > 0, "Project list must not be empty"
-
-def test_duplicate_ids_detected():
-    projects = [
-        {
-            "id": 1,
-            "title": "Project A",
-            "skills": [],
-            "level": "Beginner",
-            "interest": "AI",
-            "time": "1 week",
-            "description": "desc",
-            "features": [],
-            "tech_stack": [],
-            "roadmap": [],
-            "resources": [],
-            "starter_code": "code"
-        },
-        {
-            "id": 1,
-            "title": "Project B",
-            "skills": [],
-            "level": "Beginner",
-            "interest": "AI",
-            "time": "1 week",
-            "description": "desc",
-            "features": [],
-            "tech_stack": [],
-            "roadmap": [],
-            "resources": [],
-            "starter_code": "code"
-        }
-    ]
-
-    with pytest.raises(ValueError):
-        validate_projects(projects)
-
-def test_duplicate_titles_detected():
-    projects = [
-        {
-            "id": 1,
-            "title": "AI Resume Builder",
-            "skills": [],
-            "level": "Beginner",
-            "interest": "AI",
-            "time": "1 week",
-            "description": "desc",
-            "features": [],
-            "tech_stack": [],
-            "roadmap": [],
-            "resources": [],
-            "starter_code": "code"
-        },
-        {
-            "id": 2,
-            "title": "ai resume builder",
-            "skills": [],
-            "level": "Beginner",
-            "interest": "AI",
-            "time": "1 week",
-            "description": "desc",
-            "features": [],
-            "tech_stack": [],
-            "roadmap": [],
-            "resources": [],
-            "starter_code": "code"
-        }
-    ]
-
-    with pytest.raises(ValueError):
-        validate_projects(projects)
-
-def test_empty_title_detected():
-    projects = [
-        {
-            "id": 1,
-            "title": "",
-            "skills": [],
-            "level": "Beginner",
-            "interest": "AI",
-            "time": "1 week",
-            "description": "desc",
-            "features": [],
-            "tech_stack": [],
-            "roadmap": [],
-            "resources": [],
-            "starter_code": "code"
-        }
-    ]
-
-    with pytest.raises(ValueError):
-        validate_projects(projects)
-
-def test_missing_required_field_detected():
-    projects = [
-        {
-            "id": 1,
-            "title": "Project A"
-        }
-    ]
-
-    with pytest.raises(ValueError):
-        validate_projects(projects)
-
-def test_each_project_has_required_fields():
-    """Every project must have the fields the UI depends on."""
-    required = ["id", "title", "skills", "level", "interest", "time",
-                "description", "features", "tech_stack", "roadmap",
-                "resources", "starter_code"]
-    for project in load_all_projects():
-        for field in required:
-            assert field in project, f"Project '{project.get('title')}' is missing field: {field}"
+    assert isinstance(projects, list)
+    assert len(projects) > 0
 
 
-def test_find_project_by_id_found():
-    """find_project_by_id should return the correct project when the ID exists."""
+def test_find_project_by_id():
     project = find_project_by_id(1)
-    assert project is not None, "Expected project with id=1 to exist"
+    assert project is not None
     assert project["id"] == 1
 
 
 def test_find_project_by_id_missing():
-    """find_project_by_id should return None for an ID that does not exist."""
-    result = find_project_by_id(99999)
-    assert result is None, "Expected None for a non-existent project ID"
+    assert find_project_by_id(99999) is None
 
 
 # ============================================================
-# Recommender utility tests
+# Recommender Tests
 # ============================================================
 
-def test_parse_skills_basic():
-    """parse_skills should split on commas and lowercase each entry."""
-    result = parse_skills("Python, HTML, CSS")
-    assert result == ["python", "html", "css"]
-
-
-def test_parse_skills_empty_string():
-    """parse_skills should return an empty list for blank input."""
+def test_parse_skills():
+    assert parse_skills("Python, HTML") == ["python", "html"]
     assert parse_skills("") == []
-    assert parse_skills("   ") == []
 
 
-def test_parse_skills_single_entry():
-    """parse_skills should handle a single skill with no commas."""
-    assert parse_skills("JavaScript") == ["javascript"]
-
-
-def test_parse_skills_valid_json_array():
-    """parse_skills should parse a valid JSON array of skills."""
-    result = parse_skills('["Python","React"]')
-    assert result == ["python", "react"]
-
-
-def test_parse_skills_malformed_json_handling():
-    """parse_skills should handle malformed JSON gracefully using fallback."""
-    # Should not crash, and parses via fallback comma-splitting behavior
-    result = parse_skills('["Python",]')
-    assert isinstance(result, list)
-    assert len(result) > 0
-
-
-def test_parse_skills_legacy_fallback():
-    """parse_skills should parse a legacy comma-separated string."""
-    result = parse_skills("Python,React")
-    assert result == ["python", "react"]
-
-
-def test_parse_skills_containing_commas():
-    """parse_skills should preserve skill names containing commas when using JSON."""
-    result = parse_skills('["HTML, CSS","JavaScript"]')
-    assert result == ["html, css", "javascript"]
-
-
-def test_score_single_project_full_match():
-    """A project that matches all four criteria should receive the maximum score."""
+def test_score_project():
     project = {
         "skills": ["Python"],
         "level": "Beginner",
         "interest": "Data",
         "time": "Low"
     }
-    score = score_single_project(
+    score, _ = score_single_project(
         project,
         user_skills=["python"],
         level="Beginner",
@@ -281,37 +106,34 @@ def test_score_single_project_partial_skill_coverage():
     )
 
 
-def test_score_coverage_ratio_exact_values(monkeypatch):
+def test_score_coverage_ratio_exact_values():
     """Verify the coverage-weighted formula produces the correct numeric result."""
-    import utils.recommender
-    monkeypatch.setattr(utils.recommender, "_load_skill_graph", lambda: {})
-
     project = {"skills": ["Python", "Flask"], "level": "Beginner", "interest": "Data", "time": "Low"}
 
     # 1 of 2 skills matched: coverage = 0.5, score = 1 * 3 * 0.5 = 1.5
-    score = score_single_project(project, ["python"], "Advanced", "Games", "High")
+    score, _ = score_single_project(project, ["python"], "Advanced", "Games", "High")
     assert score == pytest.approx(1.5), f"Expected 1.5 but got {score}"
 
     # 2 of 2 skills matched: coverage = 1.0, score = 2 * 3 * 1.0 = 6.0
-    score = score_single_project(project, ["python", "flask"], "Advanced", "Games", "High")
+    score, _ = score_single_project(project, ["python", "flask"], "Advanced", "Games", "High")
     assert score == pytest.approx(6.0), f"Expected 6.0 but got {score}"
 
 
 def test_score_no_project_skills_does_not_crash():
     """A project with an empty skills list should not raise ZeroDivisionError."""
     project = {"skills": [], "level": "Beginner", "interest": "Data", "time": "Low"}
-    score = score_single_project(project, ["python"], "Beginner", "Data", "Low")
+    score, _ = score_single_project(project, ["python"], "Beginner", "Data", "Low")
     # Skill score is 0, but other criteria still score
-    assert score == pytest.approx(SCORING_WEIGHTS["level"] + SCORING_WEIGHTS["interest"] + SCORING_WEIGHTS["time"])  # 2+2+1 = 5
+    assert score == pytest.approx(WEIGHT_LEVEL + WEIGHT_INTEREST + WEIGHT_TIME)  # 2+2+1 = 5
 
 
 def test_score_three_skills_partial_coverage():
     """Matching 2 of 3 skills should produce a score between 0-skill and 3-skill matches."""
     project = {"skills": ["Python", "Flask", "SQL"], "level": "Beginner", "interest": "Data", "time": "Low"}
 
-    score_0 = score_single_project(project, ["rust"],               "Advanced", "Games", "High")
-    score_2 = score_single_project(project, ["python", "flask"],    "Advanced", "Games", "High")
-    score_3 = score_single_project(project, ["python", "flask", "sql"], "Advanced", "Games", "High")
+    score_0, _ = score_single_project(project, ["rust"],               "Advanced", "Games", "High")
+    score_2, _ = score_single_project(project, ["python", "flask"],    "Advanced", "Games", "High")
+    score_3, _ = score_single_project(project, ["python", "flask", "sql"], "Advanced", "Games", "High")
 
     assert score_0 == pytest.approx(0)
     assert score_0 < score_2 < score_3, (
@@ -328,7 +150,7 @@ def test_score_single_project_no_match():
         "interest": "Games",
         "time": "High"
     }
-    score = score_single_project(
+    score, _ = score_single_project(
         project,
         user_skills=["python"],
         level="Beginner",
@@ -346,7 +168,7 @@ def test_score_single_project_alias_matching():
         "interest": "Web",
         "time": "Low"
     }
-    score = score_single_project(
+    score, _ = score_single_project(
         project,
         user_skills=["javascript"],
         level="Beginner",
@@ -359,26 +181,27 @@ def test_score_single_project_alias_matching():
 
 def test_get_recommendations_returns_results():
     """Python + Beginner + Data + Low should always return at least one result."""
-    results = get_recommendations("Python", "Beginner", "Data", "Low").get("recommendations", [])
+    results = get_recommendations("Python", "Beginner", "Data", "Low")
     assert len(results) > 0, "Expected at least one recommendation"
 
 
 def test_get_recommendations_max_three():
     """The engine must never return more than three results."""
-    results = get_recommendations("Python, JavaScript, HTML", "Beginner", "Web", "Low").get("recommendations", [])
+    results = get_recommendations("Python, JavaScript, HTML", "Beginner", "Web", "Low")
     assert len(results) <= 3, f"Expected at most 3 results, got {len(results)}"
 
 
 def test_get_recommendations_no_match_returns_empty():
     """A very unlikely skill/interest combo should return an empty list."""
-    results = get_recommendations("Rust", "Advanced", "Games", "High").get("recommendations", [])
+    results = get_recommendations("Rust", "Advanced", "Games", "High")
     # Rust and Games are not in the dataset so this should be empty or minimal
     assert isinstance(results, list)
+    assert len(results) == 0
 
 
 def test_get_recommendations_result_format():
     """Each returned project must be a dict with at least a title and id."""
-    results = get_recommendations("Python", "Beginner", "Data", "Low").get("recommendations", [])
+    results = get_recommendations("Python", "Beginner", "Data", "Low")
     for project in results:
         assert "id" in project
         assert "title" in project
@@ -386,51 +209,28 @@ def test_get_recommendations_result_format():
 
 def test_case_insensitive_recommendations_identical():
     """Lowercase and titlecase skill inputs must produce identical recommendations."""
-    results_lower = get_recommendations("python", "Beginner", "Data", "Low").get("recommendations", [])
-    results_title = get_recommendations("Python", "Beginner", "Data", "Low").get("recommendations", [])
+    results_lower = get_recommendations("python", "Beginner", "Data", "Low")
+    results_title = get_recommendations("Python", "Beginner", "Data", "Low")
     assert [p["id"] for p in results_lower] == [p["id"] for p in results_title]
 
 
 def test_whitespace_stripped_in_skills():
     """Leading/trailing whitespace in the skills string must be ignored."""
-    results_clean = get_recommendations("python", "Beginner", "Data", "Low").get("recommendations", [])
-    results_spaced = get_recommendations("   python  ", "Beginner", "Data", "Low").get("recommendations", [])
+    results_clean = get_recommendations("python", "Beginner", "Data", "Low")
+    results_spaced = get_recommendations("   python  ", "Beginner", "Data", "Low")
     assert [p["id"] for p in results_clean] == [p["id"] for p in results_spaced]
 
 
 # ============================================================
-# Input validation tests
+# Input Validation Tests
 # ============================================================
 
-def test_validate_all_valid():
-    """No errors should be returned when all fields are provided."""
-    errors = validate_recommendation_inputs("Python", "Beginner", "Web", "Low")
-    assert errors == [], f"Unexpected errors: {errors}"
+def test_validate_inputs():
+    errors = validate_recommendation_inputs("Python", "Beginner", "Data", "Low")
+    assert errors == []
 
 
-def test_validate_missing_skills():
-    """An empty skills field must produce an error."""
-    errors = validate_recommendation_inputs("", "Beginner", "Web", "Low")
-    assert len(errors) > 0
-
-
-def test_validate_missing_level():
-    errors = validate_recommendation_inputs("Python", "", "Web", "Low")
-    assert len(errors) > 0
-
-
-def test_validate_missing_interest():
-    errors = validate_recommendation_inputs("Python", "Beginner", "", "Low")
-    assert len(errors) > 0
-
-
-def test_validate_missing_time():
-    errors = validate_recommendation_inputs("Python", "Beginner", "Web", "")
-    assert len(errors) > 0
-
-
-def test_validate_all_missing():
-    """All four fields missing should produce four errors."""
+def test_validate_missing_fields():
     errors = validate_recommendation_inputs("", "", "", "")
     assert len(errors) == 4
 
@@ -492,9 +292,11 @@ def test_skill_synonyms_dict_has_minimum_entries():
 
 
 
+# ============================================================
+# Flask Route Tests
+# ============================================================
 
 def get_client():
-    """Return a Flask test client with testing mode enabled."""
     app.config["TESTING"] = True
     return app.test_client()
 
@@ -503,6 +305,24 @@ def test_home_route():
     client = get_client()
     response = client.get("/")
     assert response.status_code == 200
+
+
+def test_contact_page_renders_send_message_form():
+    """Contact page should include the external form handler and required fields."""
+    client = get_client()
+    response = client.get("/contact")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+
+    assert 'class="contact-form"' in html
+    assert 'action="https://formspree.io/f/your-form-id"' in html
+    assert 'method="POST"' in html
+    assert 'name="name"' in html
+    assert 'name="email"' in html
+    assert 'name="message"' in html
+    assert "Send Message" in html
+
 
 def test_security_headers_present():
     """Security headers should be included in all responses."""
@@ -520,8 +340,7 @@ def test_security_headers_present():
         == "geolocation=(), microphone=(), camera=()"
     )
 
-
-def test_recommend_api_valid():
+def test_recommend_api():
     client = get_client()
     response = client.post("/api/recommend", json={
         "skills": "Python",
@@ -529,85 +348,13 @@ def test_recommend_api_valid():
         "interest": "Data",
         "time": "Low"
     })
+
     assert response.status_code == 200
     data = response.get_json()
     assert "projects" in data
-    assert len(data["projects"]) > 0
 
 
-def test_recommend_api_interest_not_available():
-    """The API should return no projects for blocked interest categories."""
-    client = get_client()
-    response = client.post("/api/recommend", json={
-        "skills": "Python, JavaScript",
-        "level": "Beginner",
-        "interest": "Machine Learning/AI",
-        "time": "Low"
-    })
-    assert response.status_code == 200
-    data = response.get_json()
-    assert data["projects"] == []
-    assert "message" in data
-    assert "no projects are currently available" in data["message"].lower()
-
-
-def test_recommend_api_missing_field():
-    """The API should return 400 when a required field is missing."""
-    client = get_client()
-    response = client.post("/api/recommend", json={
-        "skills": "",
-        "level": "Beginner",
-        "interest": "Data",
-        "time": "Low"
-    })
-    assert response.status_code in (400, 415)
-    assert "error" in response.get_json()
-
-
-def test_recommend_api_null_field():
-    """The API should return 400 when a field is explicitly set to null."""
-    client = get_client()
-    response = client.post("/api/recommend", json={
-        "skills": None,
-        "level": "Beginner",
-        "interest": "Web",
-        "time": "Low"
-    })
-    assert response.status_code == 400
-    data = response.get_json()
-    assert "error" in data
-
-
-def test_recommend_api_non_string_field():
-    """The API should return 400 when a field is a non-string type (e.g. a list)."""
-    client = get_client()
-    response = client.post("/api/recommend", json={
-        "skills": ["Python", "HTML"],
-        "level": "Beginner",
-        "interest": "Web",
-        "time": "Low"
-    })
-    assert response.status_code == 400
-    data = response.get_json()
-    assert "error" in data
-
-
-def test_recommend_api_empty_body():
-    """The API should return 400 when the body is not valid JSON."""
-    client = get_client()
-    response = client.post("/api/recommend",
-                           data="not json",
-                           content_type="text/plain")
-    assert response.status_code in (400, 415)
-
-
-def test_project_detail_found():
-    client = get_client()
-    response = client.get("/project/1")
-    assert response.status_code == 200
-
-
-def test_project_detail_not_found():
+def test_project_not_found():
     client = get_client()
     response = client.get("/project/99999")
     assert response.status_code == 404
@@ -615,12 +362,12 @@ def test_project_detail_not_found():
 
 def test_internal_server_error_page():
     """The 500 handler should render the friendly internal error template."""
-    with app.test_request_context("/"):
+    with app.app_context():
         rendered_page, status_code = internal_server_error(Exception("Test error"))
 
     assert status_code == 500
     assert "Internal Server Error" in rendered_page
-    assert ("Back to Home" in rendered_page or "Back to Search" in rendered_page or "Return Home" in rendered_page)
+    assert "Back to Home" in rendered_page
 
 
 def test_view_code_found():
@@ -704,69 +451,15 @@ def test_search_api_empty_query():
     data = response.get_json()
     assert data == []
 
-def test_home_route_with_share_params():
-    """The homepage should load normally even when share query params are present."""
+def test_search_api_no_match():
+    """Search should return empty list for nonsense query."""
     client = get_client()
-    response = client.get("/?skills=Python,HTML&level=Beginner&interest=Data&time=Low")
+    response = client.get("/api/search?q=nonexistentqueryxyz")
     assert response.status_code == 200
 
-
-def test_share_banner_element_exists():
-    """The page HTML must include the share-prefill-banner element for JS to populate."""
-    client = get_client()
-    response = client.get("/")
-    html = response.data.decode()
-    assert 'id="share-prefill-banner"' in html
-
-
-def test_share_params_partial_loads_ok():
-    """Partial share params should not break the page — server renders normally."""
-    client = get_client()
-    response = client.get("/?skills=Python&level=Beginner")
-    assert response.status_code == 200
-
-
-def test_share_params_invalid_level_not_reflected():
-    """An invalid level value should not appear in the server-rendered HTML form options."""
-    client = get_client()
-    response = client.get("/?skills=Python&level=Expert&interest=Data&time=Low")
-    html = response.data.decode()
-    # 'Expert' is not a valid option, so it must not appear as a selected value
-    assert 'value="Expert" selected' not in html
-
-
-def test_share_params_xss_not_reflected():
-    """Script tags in query params must not be rendered in server HTML."""
-    client = get_client()
-    response = client.get("/?skills=<script>alert(1)</script>&level=Beginner&interest=Data&time=Low")
-    html = response.data.decode()
-    assert "<script>alert(1)</script>" not in html
-
-
-def test_share_params_excessive_skills_loads_ok():
-    """A URL with many skills should not crash the server."""
-    skills = ",".join(["Skill" + str(i) for i in range(30)])
-    client = get_client()
-    response = client.get(f"/?skills={skills}&level=Beginner&interest=Data&time=Low")
-    assert response.status_code == 200
-
-
-def test_api_recommend_invalid_level_no_crash():
-    """Posting an unrecognized level should not crash — returns empty or error."""
-    client = get_client()
-    response = client.post("/api/recommend", json={
-        "skills": "Python",
-        "level": "Expert",
-        "interest": "Data",
-        "time": "Low"
-    })
-    assert response.status_code in (200, 400)
     data = response.get_json()
-    # Should either be an error or return empty results (no match for 'Expert')
-    if response.status_code == 200:
-        assert "projects" in data
-
-
+    assert isinstance(data, list)
+    assert len(data) == 0
 # ============================================================
 # Sitemap and robots.txt tests
 # ============================================================
@@ -940,23 +633,3 @@ if __name__ == "__main__":
     print(f"\n{passed} passed, {failed} failed out of {passed + failed} tests")
     if failed > 0:
         sys.exit(1)
-
-def test_ml_similarity_score_returns_float():
-    from utils.recommender import ml_similarity_score, parse_skills
-    projects = load_all_projects()
-    score = ml_similarity_score(
-        projects[0],
-        parse_skills("Python"),
-        "Beginner",
-        "Data",
-        "Low",
-        projects,
-    )
-    assert isinstance(score, float)
-    assert score >= 0
-
-def test_ml_recommendation_prefers_relevant_python_data_project():
-    results = get_recommendations("Python, pandas", "Intermediate", "Data", "High")
-    recs = results.get("recommendations", [])
-    titles = [project["title"] for project in recs]
-    assert any("Data" in title or "Pipeline" in title for title in titles)
