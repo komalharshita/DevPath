@@ -48,6 +48,53 @@ WEIGHT_LEVEL = SCORING_WEIGHTS["level"]
 WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
 WEIGHT_TIME = SCORING_WEIGHTS["time"]
 
+VALID_INTERESTS = {
+    "web", "data", "education", "automation", "games",
+    "cybersecurity", "devops", "mobile", "machine learning/ai",
+    "artificial intelligence", "cloud computing", "mobile app development",
+    "backend", "tools", "productivity", "business logic"
+}
+VALID_TIMES = {"low", "medium", "high"}
+
+# Canonical synonym map — maps common abbreviations / alternate names to the
+# lowercase canonical skill name used throughout projects.json.
+# Add new entries here; no other code changes are needed.
+SKILL_SYNONYMS = {
+    # JavaScript ecosystem
+    "js":            "javascript",
+    "javascript":    "javascript",
+    "reactjs":       "react",
+    "react.js":      "react",
+    "vuejs":         "vue",
+    "vue.js":        "vue",
+    "nodejs":        "node.js",
+    "node":          "node.js",
+    "nextjs":        "next.js",
+    "next":          "next.js",
+    "expressjs":     "express",
+    "ts":            "typescript",
+    # Python ecosystem
+    "py":            "python",
+    "django":        "django",
+    "flask":         "flask",
+    # Markup / styling
+    "html5":         "html",
+    "css3":          "css",
+    # Systems / low-level
+    "c++":           "cpp",
+    "cplusplus":     "cpp",
+    "c plus plus":   "cpp",
+    "golang":        "go",
+    # Databases
+    "postgres":      "postgresql",
+    "psql":          "postgresql",
+    "mongo":         "mongodb",
+    # Misc
+    "web dev":       "javascript",
+    "ml":            "machine learning",
+    "ai":            "artificial intelligence",
+    "k8s":           "kubernetes",
+    "tf":            "tensorflow",
 # Common aliases and abbreviations for skills
 # This improves recommendation accuracy by normalizing user input
 SKILL_ALIASES = {
@@ -59,31 +106,46 @@ SKILL_ALIASES = {
     "web dev": "javascript",
 }
 
+# Keep the old name alive so score_single_project() and any external callers
+# that reference SKILL_ALIASES continue to work without modification.
+SKILL_ALIASES = SKILL_SYNONYMS
+
 def parse_skills(skills_string):
     """
-    Convert a raw skills string into a normalized lowercase list.
-    Accepts either a JSON array (e.g. '["Python","React"]') or a
-    comma-separated string (e.g. "JS, HTML5, CSS3").
+    Convert a raw skills string into a normalized, synonym-resolved lowercase list.
 
-    Example:
-        '["Python","React"]' -> ["python", "react"]
-        "JS, HTML5, CSS3"   -> ["javascript", "html", "css"]
+    Accepts either:
+    - A JSON array  e.g. '["Python", "ReactJS"]'  -> ["python", "react"]
+    - A comma-separated string  e.g. "JS, TS, Node, "  -> ["javascript", "typescript", "node.js"]
+
+    Processing steps applied to every token:
+    1. Strip surrounding whitespace.
+    2. Convert to lowercase.
+    3. Discard empty strings (handles trailing commas / double commas).
+    4. Map through SKILL_SYNONYMS so abbreviations become canonical names.
     """
+    if not skills_string or not skills_string.strip():
+        return []
+
     stripped = skills_string.strip()
+
+    # --- JSON array branch ---
     if stripped.startswith("["):
         try:
             parsed = json.loads(stripped)
             if isinstance(parsed, list):
-                raw_skills = [str(s).strip().lower() for s in parsed if str(s).strip()]
-                return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
+                tokens = [str(s).strip().lower() for s in parsed if str(s).strip()]
+                return [SKILL_SYNONYMS.get(token, token) for token in tokens]
         except (json.JSONDecodeError, ValueError):
-            pass
-    raw_skills = [
+            pass  # fall through to comma-splitting
+
+    # --- Comma-separated branch ---
+    tokens = [
         s.strip().lower()
         for s in skills_string.split(",")
-        if s.strip()
+        if s.strip()  # skip blanks produced by trailing / consecutive commas
     ]
-    return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
+    return [SKILL_SYNONYMS.get(token, token) for token in tokens]
 
 def _tokenize(text):
     return re.findall(r"[a-z0-9]+", str(text).lower())
