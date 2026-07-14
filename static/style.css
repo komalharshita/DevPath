@@ -425,7 +425,7 @@ ol {
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.07);
   border-radius: var(--r-full);
-  padding: 6px 16px;
+  padding: 8px 20px;
   margin-bottom: 24px;
 }
 
@@ -456,7 +456,7 @@ ol {
   color: rgba(255, 255, 255, 0.72);
   line-height: 1.78;
   margin-bottom: 32px;
-  max-width: 500px;
+  max-width: 540px;
 }
 
 
@@ -475,7 +475,7 @@ ol {
   gap: 8px;
   padding: 14px 28px;
   background: var(--yellow-400);
-  color: var(--indigo-900);
+  color: #111827;
   font-family: var(--font-display);
   font-size: 0.95rem;
   font-weight: 700;
@@ -495,7 +495,7 @@ ol {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 14px 28px;
+  padding: 13px 26px;
   background: rgba(255, 255, 255, 0.1);
   border: 1.5px solid rgba(255, 255, 255, 0.25);
   color: var(--white);
