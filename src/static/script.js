@@ -918,6 +918,16 @@ updateProfileWidgets();
         recordSearch();
         hasSearched = true;
         renderResults(data.projects || [], data.message);
+
+        // Update URL query parameters so the result is shareable
+        try {
+          var params = new URLSearchParams();
+          params.set("skills", JSON.stringify(selectedSkills));
+          params.set("level", document.getElementById("level").value);
+          params.set("interest", document.getElementById("interest").value);
+          params.set("time", document.getElementById("time").value);
+          window.history.replaceState(null, "", "?" + params.toString());
+        } catch (e) {}
       })
       .catch(function (err) {
         setLoadingState(false);
@@ -1203,6 +1213,65 @@ updateProfileWidgets();
       recordCompletion(PROJECT_ID, typeof PROJECT_TITLE !== "undefined" ? PROJECT_TITLE : "");
       showAchievementToast("Project completed", "Nice work finishing this project.");
     });
+  }
+
+  // Handle shareable results URL via query parameters
+  function parseUrlQueryParams() {
+    var params = new URLSearchParams(window.location.search);
+    var skillsParam = params.get("skills");
+    var levelParam = params.get("level");
+    var interestParam = params.get("interest");
+    var timeParam = params.get("time");
+
+    var hasParams = false;
+
+    if (skillsParam) {
+      hasParams = true;
+      try {
+        var parsed = JSON.parse(skillsParam);
+        if (Array.isArray(parsed)) {
+          parsed.forEach(function (skill) {
+            window.addSkill(skill);
+          });
+        } else if (typeof parsed === "string") {
+          parsed.split(",").forEach(function (skill) {
+            window.addSkill(skill.trim());
+          });
+        }
+      } catch (e) {
+        skillsParam.split(",").forEach(function (skill) {
+          window.addSkill(skill.trim());
+        });
+      }
+    }
+
+    if (levelParam) {
+      hasParams = true;
+      var levelEl = document.getElementById("level");
+      if (levelEl) levelEl.value = levelParam;
+    }
+
+    if (interestParam) {
+      hasParams = true;
+      var interestEl = document.getElementById("interest");
+      if (interestEl) interestEl.value = interestParam;
+    }
+
+    if (timeParam) {
+      hasParams = true;
+      var timeEl = document.getElementById("time");
+      if (timeEl) timeEl.value = timeParam;
+    }
+
+    if (hasParams && form) {
+      setTimeout(function () {
+        form.dispatchEvent(new Event("submit"));
+      }, 100);
+    }
+  }
+
+  if (form) {
+    parseUrlQueryParams();
   }
 })();
 
