@@ -139,8 +139,7 @@ var DevPathBookmarks = (function () {
     if (!list || !count || !panel) return;
 
     var saved = getSaved();
-    count.textContent = saved.length + (saved.length === 1 ? " saved" : " saved");
-
+    count.textContent = saved.length === 1 ? "1 project saved" : `${saved.length} projects saved`;
     // Show panel only when there is at least one saved project
     panel.style.display = saved.length ? "block" : "none";
 
