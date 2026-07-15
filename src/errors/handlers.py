@@ -8,22 +8,27 @@
 #   3. Never leaks stack traces, file paths, or internal state to the client.
 #
 # Register by calling register_error_handlers(app) from app.py.
-
+from flask import make_response
 from flask import Flask, render_template, request, jsonify
 from config import Config
 from utils.error_logger import log_exception
 
+from flask import has_request_context, request
 
-def _wants_json() -> bool:
-    """Return True when the request prefers a JSON response.
+from flask import has_request_context
 
-    API routes (prefixed /api/) always receive JSON error responses.
-    Browser requests receive the HTML error pages.
-    """
+def _wants_json():
+    if not has_request_context():
+        return False
+
     if request.path.startswith("/api/"):
         return True
-    best = request.accept_mimetypes.best_match(["application/json", "text/html"])
-    return best == "application/json"
+
+    return (
+        request.accept_mimetypes["application/json"]
+        >
+        request.accept_mimetypes["text/html"]
+    )
 
 
 def _json_error(status_code: int, message: str, correlation_id: str = ""):
@@ -47,12 +52,14 @@ def bad_request(error):
 
 
 def forbidden(error):
-    """Handle 403 Forbidden."""
     correlation_id = log_exception(error, status_code=403, context="forbidden")
     if _wants_json():
         return _json_error(403, "Access denied.", correlation_id)
-    return render_template("403.html", config=Config, reference=correlation_id), 403
-
+    return render_template(
+        "403.html",
+        config=Config,
+        reference=correlation_id,
+    ), 403
 
 def page_not_found(error):
     """Handle 404 Not Found."""
@@ -79,11 +86,26 @@ def too_many_requests(error):
 
 
 def internal_server_error(error):
-    """Handle 500 Internal Server Error."""
-    correlation_id = log_exception(error, status_code=500, context="internal_server_error")
+    correlation_id = log_exception(
+        error,
+        status_code=500,
+        context="internal_server_error",
+    )
+
     if _wants_json():
-        return _json_error(500, "An unexpected error occurred.", correlation_id)
-    return render_template("500.html", config=Config, reference=correlation_id), 500
+        return _json_error(
+            500,
+            "An unexpected error occurred.",
+            correlation_id,
+        )
+
+    rendered = render_template(
+        "500.html",
+        config=Config,
+        reference=correlation_id,
+    )
+
+    return rendered, 500
 
 
 def unhandled_exception(error):
@@ -91,7 +113,13 @@ def unhandled_exception(error):
     correlation_id = log_exception(error, status_code=500, context="unhandled_exception")
     if _wants_json():
         return _json_error(500, "An unexpected error occurred.", correlation_id)
-    return render_template("500.html", config=Config, reference=correlation_id), 500
+    rendered = render_template(
+        "500.html",
+        config=Config,
+        reference=correlation_id,
+    )
+
+    return rendered, 500
 
 
 # ---------------------------------------------------------------------------
