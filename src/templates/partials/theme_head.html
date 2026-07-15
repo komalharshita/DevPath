@@ -3,5 +3,10 @@
     var saved = localStorage.getItem("theme");
     var theme = saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
     document.documentElement.setAttribute("data-theme", theme);
+    document.addEventListener("DOMContentLoaded", function() {
+      if (document.body) {
+        document.body.classList.toggle("dark-theme", theme === "dark");
+      }
+    });
   })();
 </script>
