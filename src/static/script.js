@@ -206,6 +206,25 @@ var progress = {
   bestScore: 0
 };
 
+// Points awarded per action
+var POINTS_PER_SEARCH     = 5;
+var POINTS_PER_VIEW       = 10;
+var POINTS_PER_CODE_OPEN  = 15;
+var POINTS_PER_COMPLETION = 30;
+
+var PROGRESS_TARGET_SEARCHES     = 10;
+var PROGRESS_TARGET_VIEWS        = 10;
+var PROGRESS_TARGET_CODE_OPENS   = 10;
+var PROGRESS_TARGET_COMPLETIONS  = 5;
+
+// Maximum achievable points given the targets above
+var PROGRESS_MAX_POINTS = (
+  PROGRESS_TARGET_SEARCHES    * POINTS_PER_SEARCH     +   // 50
+  PROGRESS_TARGET_VIEWS       * POINTS_PER_VIEW       +   // 100
+  PROGRESS_TARGET_CODE_OPENS  * POINTS_PER_CODE_OPEN  +   // 150
+  PROGRESS_TARGET_COMPLETIONS * POINTS_PER_COMPLETION     // 150
+);  // total = 450
+
 function loadProgressState() {
   try {
     var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
@@ -349,8 +368,24 @@ function updateProfileWidgets() {
   }
   if (completionBtn && typeof PROJECT_ID !== "undefined") {
     var completed = projectIsCompleted(PROJECT_ID);
-    completionBtn.textContent = completed ? "Project Completed" : "Mark Project Complete";
-    completionBtn.disabled = completed;
+    if (completed) {
+      completionBtn.textContent = "Project Completed";
+      completionBtn.disabled = true;
+    } else {
+      var checkboxes = document.querySelectorAll(".roadmap-checkbox");
+      var total = checkboxes.length;
+      var checkedCount = 0;
+      for (var i = 0; i < total; i++) {
+        if (checkboxes[i].checked) checkedCount++;
+      }
+      if (total > 0 && checkedCount === total) {
+        completionBtn.textContent = "Mark Project Complete";
+        completionBtn.disabled = false;
+      } else {
+        completionBtn.textContent = "Complete All Steps First";
+        completionBtn.disabled = true;
+      }
+    }
   }
 }
 
@@ -419,6 +454,8 @@ updateProfileWidgets();
     : quickPickChips.map(function (chip) { return chip.getAttribute("data-skill"); });
   var activeSuggestionIndex = -1;
   var visibleSuggestions = [];
+  var hasSearched = false;
+  var techStackSelect = document.getElementById("tech_stack");
 
   function normalize(value) {
     return String(value || "").trim().toLowerCase();
@@ -610,35 +647,53 @@ updateProfileWidgets();
     var card = document.createElement("div");
     card.className = "project-card";
 
+    if (project.match_score !== undefined) {
+      var scoreBadge = document.createElement("div");
+      scoreBadge.className = "project-match-score";
+      scoreBadge.setAttribute("aria-label", "Match score: " + project.match_score + " out of 10");
+
+      var scoreLabel = document.createElement("span");
+      scoreLabel.className = "score-label";
+      scoreLabel.textContent = "Match Score";
+
+      var scoreValue = document.createElement("span");
+      scoreValue.className = "score-value";
+      scoreValue.textContent = project.match_score.toFixed(1) + " / 10";
+
+      var scoreBar = document.createElement("div");
+      scoreBar.className = "score-bar";
+      scoreBar.setAttribute("role", "presentation");
+
+      var scoreBarFill = document.createElement("div");
+      scoreBarFill.className = "score-bar-fill";
+      scoreBarFill.style.width = (project.match_score * 10) + "%";
+
+      scoreBar.appendChild(scoreBarFill);
+      scoreBadge.appendChild(scoreLabel);
+      scoreBadge.appendChild(scoreValue);
+      scoreBadge.appendChild(scoreBar);
+      
+      card.appendChild(scoreBadge);
+    }
+
+    if (project.match_explanation) {
+      var explanationP = document.createElement("p");
+      explanationP.className = "project-match-explanation";
+      explanationP.innerHTML = '<svg class="explanation-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span>' + project.match_explanation + '</span>';
+      card.appendChild(explanationP);
+    }
+
     var title = document.createElement("h3");
     title.className = "project-card-title";
     title.textContent = project.title;
 
-    var desc = document.createElement("p");
-    desc.className = "project-card-desc";
-    var descText = document.createElement("span");
-    descText.className = "project-card-desc-text";
-    descText.textContent = truncate(project.description, 120);
-    desc.appendChild(descText);
-
-    if (project.description && project.description.length > 120) {
-      var expanded = false;
-      var readMore = document.createElement("button");
-      readMore.type = "button";
-      readMore.className = "read-more-btn";
-      readMore.textContent = "Read more";
-      readMore.setAttribute("aria-expanded", "false");
-      readMore.addEventListener("click", function () {
-        expanded = !expanded;
-        descText.textContent = expanded ? project.description : truncate(project.description, 120);
-        readMore.textContent = expanded ? "Read less" : "Read more";
-        readMore.setAttribute("aria-expanded", expanded ? "true" : "false");
-      });
-      desc.appendChild(readMore);
-    }
+    var desc = document.createElement("div");
+    desc.className = "project-card-description";
+    desc.textContent = project.description;
 
     var tags = document.createElement("div");
     tags.className = "project-card-tags";
+
     (project.skills || []).forEach(function (skill) { tags.appendChild(createTag(skill, "skill")); });
     tags.appendChild(createTag(project.level, project.level));
     tags.appendChild(createTag("Time: " + project.time, "time"));
@@ -670,6 +725,7 @@ updateProfileWidgets();
     card.appendChild(title);
     card.appendChild(desc);
     card.appendChild(tags);
+
     card.appendChild(footer);
     return card;
   }
@@ -828,7 +884,8 @@ updateProfileWidgets();
         skills: JSON.stringify(selectedSkills),
         level: document.getElementById("level").value,
         interest: document.getElementById("interest").value,
-        time: document.getElementById("time").value
+        time: document.getElementById("time").value,
+        tech_stack: techStackSelect ? techStackSelect.value : "all"
       })
     })
       .then(function (response) {
@@ -840,7 +897,18 @@ updateProfileWidgets();
       .then(function (data) {
         setLoadingState(false);
         recordSearch();
+        hasSearched = true;
         renderResults(data.projects || [], data.message);
+
+        // Update URL query parameters so the result is shareable
+        try {
+          var params = new URLSearchParams();
+          params.set("skills", JSON.stringify(selectedSkills));
+          params.set("level", document.getElementById("level").value);
+          params.set("interest", document.getElementById("interest").value);
+          params.set("time", document.getElementById("time").value);
+          window.history.replaceState(null, "", "?" + params.toString());
+        } catch (e) {}
       })
       .catch(function (err) {
         setLoadingState(false);
@@ -849,62 +917,73 @@ updateProfileWidgets();
       });
   });
 
+  if (techStackSelect) {
+    techStackSelect.addEventListener("change", function () {
+      if (hasSearched) {
+        submitBtn.click();
+      }
+    });
+  }
+
   var modal = document.getElementById("github-modal-overlay");
   var openModalBtn = document.getElementById("btn-show-github");
   var closeModalBtn = document.getElementById("btn-close-github");
-  var fetchBtn = document.getElementById("btn-fetch-github");
-  var githubInput = document.getElementById("github-username");
   var errorMsg = document.getElementById("github-modal-error");
 
   function closeGithubModal() {
     modal.classList.remove("active");
-    githubInput.value = "";
-    errorMsg.textContent = "";
+    if (errorMsg) errorMsg.textContent = "";
   }
 
-  if (modal && openModalBtn && closeModalBtn && fetchBtn && githubInput && errorMsg) {
+  if (modal && openModalBtn && closeModalBtn && errorMsg) {
     openModalBtn.addEventListener("click", function () {
       modal.classList.add("active");
-      githubInput.focus();
     });
     closeModalBtn.addEventListener("click", closeGithubModal);
     modal.addEventListener("click", function (event) {
       if (event.target === modal) closeGithubModal();
     });
-    fetchBtn.addEventListener("click", function () {
-      var username = githubInput.value.trim();
-      errorMsg.textContent = "";
-      if (!username) {
-        errorMsg.textContent = "Please enter a GitHub username.";
-        return;
-      }
-      fetchBtn.disabled = true;
-      fetchBtn.textContent = "Syncing...";
-      fetch("https://api.github.com/users/" + encodeURIComponent(username) + "/repos?sort=updated&per_page=100")
-        .then(function (response) {
-          if (!response.ok) throw new Error(response.status === 404 ? "Username not found." : "Unable to fetch GitHub repositories.");
-          return response.json();
-        })
-        .then(function (repos) {
-          var languages = [];
-          repos.forEach(function (repo) {
-            if (repo.language && languages.indexOf(repo.language) === -1) languages.push(repo.language);
-          });
-          if (!languages.length) {
-            errorMsg.textContent = "No public languages found.";
-            return;
-          }
-          languages.forEach(window.addSkill);
-          closeGithubModal();
-        })
-        .catch(function (err) {
-          errorMsg.textContent = err.message || "Failed to fetch skills.";
-        })
-        .finally(function () {
-          fetchBtn.disabled = false;
-          fetchBtn.textContent = "Fetch Skills";
+  }
+
+  // Handle OAuth callback logic
+  var urlParams = new URLSearchParams(window.location.search);
+  var githubAuth = urlParams.get("github_auth");
+  
+  if (githubAuth === "success") {
+    // Optional: show some loading UI here if desired
+    fetch("/api/github/repos")
+      .then(function (response) {
+        if (!response.ok) throw new Error("Unable to fetch GitHub repositories.");
+        return response.json();
+      })
+      .then(function (repos) {
+        var languages = [];
+        repos.forEach(function (repo) {
+          if (repo.language && languages.indexOf(repo.language) === -1) languages.push(repo.language);
         });
-    });
+        if (!languages.length) {
+          if (modal && errorMsg) {
+            modal.classList.add("active");
+            errorMsg.textContent = "No public languages found in your GitHub repositories.";
+          }
+          return;
+        }
+        languages.forEach(window.addSkill);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      })
+      .catch(function (err) {
+        if (modal && errorMsg) {
+          modal.classList.add("active");
+          errorMsg.textContent = err.message || "Failed to fetch skills.";
+        }
+        window.history.replaceState({}, document.title, window.location.pathname);
+      });
+  } else if (githubAuth === "error") {
+    if (modal && errorMsg) {
+      modal.classList.add("active");
+      errorMsg.textContent = "GitHub authentication failed. Please try again.";
+    }
+    window.history.replaceState({}, document.title, window.location.pathname);
   }
 })();
 
@@ -930,11 +1009,11 @@ updateProfileWidgets();
       var row = document.createElement("div");
       row.className = "code-line";
       var number = document.createElement("span");
-      number.className = "code-line-number";
+      number.className = "line-number";
       number.setAttribute("aria-hidden", "true");
       number.textContent = index + 1;
       var content = document.createElement("span");
-      content.className = "code-line-content";
+      content.className = "line-content";
       content.textContent = line;
       row.appendChild(number);
       row.appendChild(content);
@@ -987,7 +1066,7 @@ updateProfileWidgets();
 
   if (btnCopyCode) {
     btnCopyCode.addEventListener("click", function () {
-      var code = Array.prototype.slice.call(codeContentEl.querySelectorAll(".code-line-content"))
+      var code = Array.prototype.slice.call(codeContentEl.querySelectorAll(".line-content"))
         .map(function (line) { return line.textContent; })
         .join("\n");
       if (!code) return;
@@ -1021,8 +1100,8 @@ updateProfileWidgets();
 
   function updateRoadmapProgress() {
     if (!roadmapCheckboxes.length) return;
-    var completed = roadmapCheckboxes.filter(function (checkbox) { return checkbox.checked; }).length;
-    var percent = Math.round((completed / roadmapCheckboxes.length) * 100);
+    var completedCount = roadmapCheckboxes.filter(function (checkbox) { return checkbox.checked; }).length;
+    var percent = Math.round((completedCount / roadmapCheckboxes.length) * 100);
     roadmapCheckboxes.forEach(function (checkbox) {
       var step = checkbox.closest(".roadmap-step");
       if (step) step.classList.toggle("completed", checkbox.checked);
@@ -1030,6 +1109,26 @@ updateProfileWidgets();
     if (progressFill) progressFill.style.width = percent + "%";
     if (progressText) progressText.textContent = percent + "% completed";
     if (progressBar) progressBar.setAttribute("aria-valuenow", String(percent));
+
+    // Disable completion button unless all steps are completed
+    var completionBtn = document.getElementById("btn-mark-complete");
+    if (completionBtn && typeof PROJECT_ID !== "undefined") {
+      var isAlreadyCompleted = projectIsCompleted(PROJECT_ID);
+      if (isAlreadyCompleted) {
+        completionBtn.textContent = "Project Completed";
+        completionBtn.disabled = true;
+      } else {
+        var allChecked = completedCount === roadmapCheckboxes.length;
+        if (allChecked) {
+          completionBtn.textContent = "Mark Project Complete";
+          completionBtn.disabled = false;
+        } else {
+          completionBtn.textContent = "Complete All Steps First";
+          completionBtn.disabled = true;
+        }
+      }
+    }
+
     try {
       localStorage.setItem(roadmapStorageKey, JSON.stringify(roadmapCheckboxes.map(function (checkbox) {
         return checkbox.checked;
@@ -1048,11 +1147,115 @@ updateProfileWidgets();
   });
   updateRoadmapProgress();
 
+  // Initialize expandable roadmap details
+  var stepToggles = document.querySelectorAll(".btn-step-details-toggle");
+  var stepTexts = document.querySelectorAll(".roadmap-step-text");
+  var stepGuidances = document.querySelectorAll(".step-detailed-guidance");
+
+  var guidanceRules = [
+    { pattern: /set\s*up|folder|create|initialize/i, text: "Initialize your project workspace. Create a dedicated directory, initialize Git version control, and set up your configuration or main script files (e.g., main.py, index.html). Plan your module structure." },
+    { pattern: /design|structure|database|schema|model/i, text: "Determine the data entities and attributes. Write down the schema or dictionary layout, choose key-value pairs, and decide on database or memory storage mechanism." },
+    { pattern: /function|logic|write|implement|calculate|process/i, text: "Draft helper functions with clear inputs and outputs. Focus on clean implementation of core business logic first, keeping functions modular, clean, and testable." },
+    { pattern: /api|fetch|endpoint|route|request|http/i, text: "Implement routes/controllers for handling HTTP requests. Verify correct status codes, JSON formats, and integrate error handling for network or request failures." },
+    { pattern: /ui|interface|frontend|view|css|style|render|display/i, text: "Build a responsive interface using semantic HTML and clean styling. Design for mobile-first views and verify interactive component states (hover, focus, disabled)." },
+    { pattern: /test|bug|mock|assert|verify/i, text: "Write test cases (unit/integration) or manually test inputs to verify the code handles edge cases, empty values, and invalid format errors gracefully." }
+  ];
+
+  function getGuidanceText(stepText) {
+    for (var i = 0; i < guidanceRules.length; i++) {
+      if (guidanceRules[i].pattern.test(stepText)) {
+        return guidanceRules[i].text;
+      }
+    }
+    return "Break down this milestone into smaller tasks. Research best libraries or methods, implement a prototype, and review for performance and correctness.";
+  }
+
+  stepTexts.forEach(function (el, index) {
+    if (stepGuidances[index]) {
+      stepGuidances[index].textContent = getGuidanceText(el.textContent);
+    }
+  });
+
+  stepToggles.forEach(function (btn, index) {
+    btn.addEventListener("click", function (event) {
+      event.preventDefault();
+      var guidance = stepGuidances[index];
+      if (!guidance) return;
+      var isHidden = guidance.style.display === "none";
+      guidance.style.display = isHidden ? "block" : "none";
+      var label = btn.querySelector("span");
+      if (label) label.textContent = isHidden ? "Hide Details" : "Show Details";
+      var chevron = btn.querySelector(".chevron-icon");
+      if (chevron) {
+        chevron.style.transform = isHidden ? "rotate(180deg)" : "rotate(0deg)";
+      }
+    });
+  });
+
   if (completionBtn) {
     completionBtn.addEventListener("click", function () {
       recordCompletion(PROJECT_ID, typeof PROJECT_TITLE !== "undefined" ? PROJECT_TITLE : "");
       showAchievementToast("Project completed", "Nice work finishing this project.");
     });
+  }
+
+  // Handle shareable results URL via query parameters
+  function parseUrlQueryParams() {
+    var params = new URLSearchParams(window.location.search);
+    var skillsParam = params.get("skills");
+    var levelParam = params.get("level");
+    var interestParam = params.get("interest");
+    var timeParam = params.get("time");
+
+    var hasParams = false;
+
+    if (skillsParam) {
+      hasParams = true;
+      try {
+        var parsed = JSON.parse(skillsParam);
+        if (Array.isArray(parsed)) {
+          parsed.forEach(function (skill) {
+            window.addSkill(skill);
+          });
+        } else if (typeof parsed === "string") {
+          parsed.split(",").forEach(function (skill) {
+            window.addSkill(skill.trim());
+          });
+        }
+      } catch (e) {
+        skillsParam.split(",").forEach(function (skill) {
+          window.addSkill(skill.trim());
+        });
+      }
+    }
+
+    if (levelParam) {
+      hasParams = true;
+      var levelEl = document.getElementById("level");
+      if (levelEl) levelEl.value = levelParam;
+    }
+
+    if (interestParam) {
+      hasParams = true;
+      var interestEl = document.getElementById("interest");
+      if (interestEl) interestEl.value = interestParam;
+    }
+
+    if (timeParam) {
+      hasParams = true;
+      var timeEl = document.getElementById("time");
+      if (timeEl) timeEl.value = timeParam;
+    }
+
+    if (hasParams && form) {
+      setTimeout(function () {
+        form.dispatchEvent(new Event("submit"));
+      }, 100);
+    }
+  }
+
+  if (form) {
+    parseUrlQueryParams();
   }
 })();
 
