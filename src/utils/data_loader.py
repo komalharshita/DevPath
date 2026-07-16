@@ -83,9 +83,11 @@ def load_all_projects():
     """
     global _projects_cache
     if _projects_cache is None:
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            _projects_cache = json.load(f)
-        validate_projects(_projects_cache)
+        with _cache_lock:
+            if _projects_cache is None:
+                with open(DATA_FILE, "r", encoding="utf-8") as f:
+                    _projects_cache = json.load(f)
+                validate_projects(_projects_cache)
     return _projects_cache
 
 
@@ -94,7 +96,10 @@ def get_available_levels():
     projects = load_all_projects()
     return sorted({p["level"] for p in projects})
 
-
+def get_available_interests():
+    """Return all unique project interests."""
+    projects = load_all_projects()
+    return sorted({p["interest"] for p in projects if "interest" in p})
 def find_project_by_id(project_id):
     """Return the project whose 'id' matches project_id, or None."""
     for project in load_all_projects():

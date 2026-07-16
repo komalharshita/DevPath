@@ -20,4 +20,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- No fixes recorded yet
+- Correct skills suggestions dropdown overlapping with available skill chips and resolve white background conflict in dark theme
