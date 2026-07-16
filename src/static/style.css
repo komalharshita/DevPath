@@ -1874,9 +1874,9 @@ label {
 /* Suggestions dropdown container */
 .skills-suggestions {
   position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
+  top: 0;
+  left: 100%;
+  width: 6px;
   background: var(--surface);
   border: 1.5px solid var(--indigo-200);
   border-top: 2px solid var(--indigo-400);
@@ -1922,6 +1922,7 @@ label {
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 10px;
+  transition: visibility 0s;
   margin-bottom: 24px;
 }
 
