@@ -4823,11 +4823,12 @@ body.dark-theme .theme-toggle:hover {
 }
 
 [data-theme="dark"] a {
-  color: #818cf8;
+  color: #232852;
 }
 
 [data-theme="dark"] a:hover {
   color: #a5b4fc;
+
 }
 
 .line-content {
