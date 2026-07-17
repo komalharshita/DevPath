@@ -1,11 +1,5 @@
-/* =============================================================
-   style.css — DevPath
-   Design language: bold blue/indigo hero, clean white sections,
-   coloured feature cards, strong CTA, multi-column footer.
-   Inspired by modern EdTech SaaS aesthetics.
-   ============================================================= */
 
-/* ---- Variables -------------------------------------------- */
+
 :root {
   /* Core palette */
   --indigo-900: #0f1560;
