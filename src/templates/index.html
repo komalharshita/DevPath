@@ -59,6 +59,7 @@
   {% include 'partials/theme_head.html' %}
   <link rel="stylesheet" href="/static/style.css" />
   <link rel="stylesheet" href="/static/bookmarks.css" />
+  <link rel="stylesheet" href="/static/animations.css" />
   <link
     href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet" />
@@ -998,9 +999,6 @@
           <p>Download a working template for every project. Skip the blank-page problem and start building immediately.
           </p>
           <a href="#the-project" class="feature-card-link">Get starter code</a>
-          <p>Download a working template for every project. Skip the blank-page problem and start building immediately.
-          </p>
-          <a href="#find-project" class="feature-card-link">Get starter code</a>
         </div>
       </div>
     </div>
@@ -1009,7 +1007,7 @@
   <!-- ============================================================
        Find Project Form Section
        ============================================================ -->
-  <section class="form-section" id="the-project">
+  <section class="form-section" id="find-project">
     <div class="container">
       <div class="section-eyebrow">Get Your Recommendations</div>
       <h2 class="section-title">Find The Project</h2>
@@ -1164,19 +1162,9 @@
                 <div class="select-wrap">
                   <select id="interest" name="interest">
                     <option value="" disabled selected>Select interest</option>
-                    <option value="Web">Web Development</option>
-                    <option value="Data">Data and Analytics</option>
-                    <option value="Education">Education Tools</option>
-                    <option value="Automation">Automation</option>
-                    <option value="Games">Games</option>
-                    <option value="Cybersecurity">CyberSecurity/Ethical Hacking</option>
-                    <option value="Devops">DevOps / Cloud Computing</option>
-                    <option value="Backend">Backend APIs</option>
-                    <option value="Tools">Developer Tools</option>
-                    <option value="Productivity">Productivity</option>
-                    <option value="Business Logic">Business Logic</option>
-                    <option value="Mobile">Mobile Development</option>
-                    <option value="Machine Learning/AI">Machine Learning/AI</option>
+                    {% for interest in available_interests %}
+                    <option value="{{ interest }}">{{ interest }}</option>
+                    {% endfor %}
                   </select>
                 </div>
                 <span class="form-hint">Pick the domain you want to explore such as Web Development, Automation, or
@@ -1201,20 +1189,39 @@
                   <option value="High">High — a week or more</option>
                 </select>
               </div>
-              <span class="form-hint">Include coding, debugging, learning, and reviewing time in your estimate.</span>
-              <div class="form-error-msg" id="time-error"></div>
+
+              <div class="form-group">
+                <label for="tech_stack">
+                  Technology Stack
+                  <button type="button" class="tooltip" aria-label="Technology Stack help" aria-describedby="tech-tooltip">
+                    ⓘ
+                    <span id="tech-tooltip" class="tooltip-text" role="tooltip">
+                      Refine project recommendations based on target languages/frameworks.
+                    </span>
+                  </button>
+                </label>
+                <div class="select-wrap">
+                  <select id="tech_stack" name="tech_stack">
+                    <option value="all" selected>All Technologies</option>
+                    <option value="java">Java</option>
+                    <option value="mysql">MySQL</option>
+                    <option value="python">Python</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="react">React</option>
+                    <option value="jsp">JSP / Servlets</option>
+                  </select>
+                </div>
+                <span class="form-hint">Filter projects that use a specific language or framework.</span>
+                <div class="form-error-msg" id="tech-error"></div>
+              </div>
             </div>
-
-            <div class="form-error-msg" id="form-error-general"></div>
-
+            <div class="form-error-msg" id="form-error-general" style="color:#ef4444;margin-bottom:8px;"></div>
             <div class="form-actions">
               <button type="submit" class="btn-submit" id="submit-btn">
                 <span id="btn-label">Generate My Projects</span>
                 <span id="btn-loading" style="display:none;">Finding matches...</span>
               </button>
-              <button type="button" class="btn-clear" id="clear-filters-btn">
-                <span>Clear Filters</span>
-              </button>
+              <button type="button" class="btn-surprise" id="surprise-btn">🎲 Surprise Me</button>
             </div>
 
           </form>
@@ -1357,7 +1364,6 @@
           <li><a href="#how-it-works">How It Works</a></li>
           <li><a href="#features">Features</a></li>
           <li><a href="#the-project">Find Project</a></li>
-          <li><a href="#find-project">Find Project</a></li>
           <li><a href="/contact">Contact Us</a></li>
         </ul>
       </div>
@@ -1410,8 +1416,8 @@
         Sync with GitHub
       </div>
 
-      <p class="sidebar-card-desc" style="margin-bottom: 20px;">Enter your username to import coding languages from your
-        top repositories into the skills list.<br /> Note: We use stars to determine top repositories</p>
+      <p class="sidebar-card-desc" style="margin-bottom: 20px;">Authenticate with GitHub to import coding languages from your
+        top repositories into the skills list.</p>
 
       <div class="form-group" style="margin-bottom: 20px;">
         <div class="skill-input-wrap">
@@ -1493,6 +1499,9 @@
   </script>
 
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+
+  <script src="/static/animations.js"></script>
+  <script src="/static/script.js"></script>
 </body>
 
 </html>
