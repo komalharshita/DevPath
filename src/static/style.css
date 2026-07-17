@@ -4229,6 +4229,10 @@ body.dark-theme .btn-clear:hover {
 }
 
 @media (max-width: 480px) {
+  .nav-mobile-menu {
+    padding: 80px 16px 16px;
+  }
+
   .footer {
     padding: 48px 18px 0;
   }

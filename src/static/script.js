@@ -152,6 +152,7 @@
     menu.classList.toggle("open", isOpen);
     toggle.classList.toggle("open", isOpen);
     toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    document.body.style.overflow = isOpen ? "hidden" : "";
   }
 
   toggle.addEventListener("click", function () {
