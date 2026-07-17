@@ -2451,6 +2451,11 @@ body.dark-theme .btn-clear:hover {
   color: #ffffff;
 }
 
+.btn-save-project:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
 .btn-details {
   display: block;
   width: 100%;
@@ -3735,6 +3740,11 @@ body.dark-theme .btn-clear:hover {
   background: var(--surface-hover);
   border-color: var(--text-light);
   color: var(--text-heading);
+}
+
+.btn-ghost:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .btn-mark-complete {
@@ -5044,6 +5054,11 @@ body.dark-theme .theme-toggle:hover {
   transform: translateY(-1px);
 }
 
+.compare-quick-btn:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
 .compare-results {
   display: flex;
   flex-direction: column;
@@ -5465,6 +5480,11 @@ body.dark-theme .theme-toggle:hover {
   color: var(--danger);
 }
 
+.reset-btn-mini:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
 /* Badges Grid Mini */
 .badges-grid-mini {
   display: flex;
@@ -5591,6 +5611,11 @@ body.dark-theme .theme-toggle:hover {
 .la-tab.active {
   background: var(--primary);
   color: white;
+}
+
+.la-tab:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .la-content {
