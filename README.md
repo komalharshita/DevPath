@@ -438,6 +438,7 @@ Thanks to all the amazing people who contribute to DevPath.
 | [docs/project_overview.md](docs/project_overview.md) | What DevPath is and why |
 | [docs/github_issues.md](docs/github_issues.md) | All 12 issues with full descriptions |
 
+| [docs/faq.md](docs/faq.md) | Frequently asked questions |
 ---
 
 ## Code of Conduct

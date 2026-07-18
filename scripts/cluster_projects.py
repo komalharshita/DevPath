@@ -20,7 +20,7 @@ Output format (data/clusters.json):
         },
         "members": {
             "0": [1, 7, 10],
-            "1": [3, 9, 19],
+     projects = load_projects(PROJECTS_PATH)       "1": [3, 9, 19],
             ...
         }
     }
@@ -60,6 +60,49 @@ MIN_PROJECTS = 10
 def load_projects(path: str) -> list[dict]:
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
+
+
+def validate_projects(projects: list[dict]) -> None:
+    """
+    Validate that every project contains the required fields.
+    """
+    required_fields = {
+        "id",
+        "title",
+        "skills",
+        "level",
+        "interest",
+        "time",
+    }
+
+    for index, project in enumerate(projects):
+        missing = required_fields - project.keys()
+
+        if missing:
+            raise ValueError(
+                f"Project at index {index} is missing required fields: "
+                f"{', '.join(sorted(missing))}"
+            )
+
+
+def validate_unique_ids(projects: list[dict]) -> None:
+    """
+    Ensure every project ID is unique.
+    """
+    ids = [project["id"] for project in projects]
+
+    duplicates = sorted(
+        {
+            pid
+            for pid in ids
+            if ids.count(pid) > 1
+        }
+    )
+
+    if duplicates:
+        raise ValueError(
+            f"Duplicate project IDs detected: {duplicates}"
+        )
 
 
 def choose_k(n: int) -> int:
@@ -180,6 +223,11 @@ def main():
         sys.exit(f"projects.json not found at: {PROJECTS_PATH}")
 
     projects = load_projects(PROJECTS_PATH)
+    try:
+        validate_projects(projects)
+        validate_unique_ids(projects)
+    except ValueError as exc:
+        sys.exit(f"Validation Error: {exc}")
 
     # ------------------------------------------------------------------
     # 2. Guard: need enough projects for clustering to be meaningful
