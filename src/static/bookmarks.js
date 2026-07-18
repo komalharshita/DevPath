@@ -139,8 +139,7 @@ var DevPathBookmarks = (function () {
     if (!list || !count || !panel) return;
 
     var saved = getSaved();
-    count.textContent = saved.length + (saved.length === 1 ? " saved" : " saved");
-
+    count.textContent = saved.length === 1 ? "1 project saved" : `${saved.length} projects saved`;
     // Show panel only when there is at least one saved project
     panel.style.display = saved.length ? "block" : "none";
 
@@ -214,11 +213,21 @@ var DevPathBookmarks = (function () {
     var session = lsGet(SESSION_KEY);
     if (!session || typeof session !== "object") return;
 
-    // Restore skills: split comma-separated string, add each via script.js helper
+    // Restore skills: split comma-separated string or parse JSON array
     var rawSkills = (session.skills || "").trim();
     if (rawSkills) {
-      // window.addSkill is defined by script.js; it deduplicates and updates UI
-      var skillList = rawSkills.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+      var skillList = [];
+      if (rawSkills.startsWith("[")) {
+        try {
+          var parsed = JSON.parse(rawSkills);
+          if (Array.isArray(parsed)) {
+            skillList = parsed;
+          }
+        } catch (e) {}
+      }
+      if (skillList.length === 0) {
+        skillList = rawSkills.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+      }
       skillList.forEach(function (skill) {
         if (typeof window.addSkill === "function") window.addSkill(skill);
       });

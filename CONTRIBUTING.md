@@ -312,6 +312,32 @@ Recommended first issues:
 
 ---
 
+## Troubleshooting
+
+If you encounter issues while setting up your local environment, try these common solutions first:
+
+### Common Setup Errors
+
+* **Dependency Mismatch:** If you see `ModuleNotFoundError` or version conflicts, ensure your virtual environment is activated and you are using Python 3.8+.
+* **Port Already in Use:** If `python app.py` fails because port 5000 is occupied, ensure no other local servers are running.
+* **Database/JSON Errors:** If the application fails to load projects, verify that your changes to `data/projects.json` are valid JSON (use a [JSON Validator](https://jsonlint.com/) if unsure).
+
+### The "Clean Start" Protocol
+
+If the application is behaving unexpectedly or you have dependency issues, perform a clean re-installation:
+
+```bash
+# Remove the old environment and dependencies
+rm -rf venv
+rm -rf node_modules  # If applicable
+
+# Re-create and re-install
+python -m venv venv
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+pip install -r requirements.txt
+
+---
+
 ## Getting Help
 
 - Open a GitHub Discussion for questions about the codebase

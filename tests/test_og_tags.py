@@ -64,6 +64,13 @@ def test_index_twitter_image():
 # Project Page OG Tag Tests
 # ============================================================
 
+def test_project_og_description_rendered():
+    """Project page OG description should render actual text."""
+    html = get_client().get("/project/1").data.decode()
+
+    assert 'property="og:description"' in html
+    assert "Great for learning file handling" in html
+
 def test_project_og_title_dynamic():
     """Project page og:title must contain the project's actual title."""
     client = get_client()

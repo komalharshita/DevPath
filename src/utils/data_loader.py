@@ -1,12 +1,19 @@
 # utils/data_loader.py
+# utils/data_loader.py
 import json
 import os
 import threading
 import logging
+from pathlib import Path
 
 from utils.url_validator import is_valid_url, parse_resource
 
-DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "..", "data", "projects.json")
+# 1. __file__ is src/utils/data_loader.py
+# 2. .parent is src/utils/
+# 3. .parent.parent is src/
+# 4. .parent.parent.parent gets us to the true DevPath root directory!
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+DATA_FILE = BASE_DIR / "data" / "projects.json"
 
 logger = logging.getLogger("devpath.data_loader")
 
@@ -83,9 +90,11 @@ def load_all_projects():
     """
     global _projects_cache
     if _projects_cache is None:
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            _projects_cache = json.load(f)
-        validate_projects(_projects_cache)
+        with _cache_lock:
+            if _projects_cache is None:
+                with open(DATA_FILE, "r", encoding="utf-8") as f:
+                    _projects_cache = json.load(f)
+                validate_projects(_projects_cache)
     return _projects_cache
 
 
@@ -94,7 +103,10 @@ def get_available_levels():
     projects = load_all_projects()
     return sorted({p["level"] for p in projects})
 
-
+def get_available_interests():
+    """Return all unique project interests."""
+    projects = load_all_projects()
+    return sorted({p["interest"] for p in projects if "interest" in p})
 def find_project_by_id(project_id):
     """Return the project whose 'id' matches project_id, or None."""
     for project in load_all_projects():
