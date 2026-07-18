@@ -3,7 +3,7 @@
 # Each route is kept thin: it validates input, calls a utility function,
 # and returns a response. No business logic lives here.
 
-from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response
+from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response, redirect, url_for, session, flash
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
 from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats, get_available_interests
@@ -28,6 +28,8 @@ from config import Config
 from flask import jsonify
 from utils.portfolio_analyzer import analyze_portfolio
 import os
+import base64
+import requests
 
 _skill_validator = SkillProgressionValidator()
 _code_review_manager = CodeReviewManager()
@@ -212,8 +214,32 @@ def project_detail(project_id):
     project = find_project_by_id(project_id)
     if not project:
         abort(404)
-    return render_template("project.html", project=project, config=Config)
+        
+    return render_template("project.html", project=project, config=Config, og_url=Config.get_base_url() + "/project/" + str(project_id))
 
+@main.route("/profile")
+def profile():
+    from flask import session
+    from models import db, User
+    from utils.data_loader import find_project_by_id
+    
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('auth.login'))
+        
+    user = db.session.get(User, user_id)
+    if not user:
+        session.pop('user_id', None)
+        return redirect(url_for('auth.login'))
+        
+    # Hydrate bookmarked projects
+    bookmarked_projects = []
+    for pid in user.bookmarked_projects:
+        p = find_project_by_id(pid)
+        if p:
+            bookmarked_projects.append(p)
+            
+    return render_template("profile.html", user=user, bookmarked_projects=bookmarked_projects)
 
 @main.route("/project/<int:project_id>/code")
 def view_code(project_id):
@@ -244,6 +270,113 @@ def download_code(project_id):
     filename = os.path.basename(full_path)
     file_dir = os.path.dirname(full_path)
     return send_from_directory(file_dir, filename, as_attachment=True)
+
+
+@main.route("/project/<int:project_id>/export_github", methods=["POST"])
+def export_github(project_id):
+    """Create a new GitHub repository for the user and push starter code."""
+    token = session.get('github_token')
+    if not token or 'access_token' not in token:
+        flash("You must be logged in with GitHub to export projects.", "error")
+        return redirect(url_for('auth.login'))
+
+    project = find_project_by_id(project_id)
+    if not project:
+        abort(404)
+
+    full_path = resolve_starter_file(project)
+    if not full_path:
+        flash("Starter code not available for this project.", "error")
+        return redirect(url_for('main.project_detail', project_id=project_id))
+
+    # Read the starter code file
+    try:
+        with open(full_path, "rb") as f:
+            content_bytes = f.read()
+            content_b64 = base64.b64encode(content_bytes).decode('utf-8')
+    except Exception as e:
+        flash(f"Error reading starter code: {str(e)}", "error")
+        return redirect(url_for('main.project_detail', project_id=project_id))
+
+    filename = os.path.basename(full_path)
+    
+    # Generate repository name
+    import re
+    safe_title = re.sub(r'[^a-zA-Z0-9-]', '-', project['title'].lower())
+    repo_name = f"DevPath-Starter-{safe_title}"
+
+    headers = {
+        "Authorization": f"Bearer {token['access_token']}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+
+    # 1. Get the current user's GitHub username to construct URLs later
+    user_resp = requests.get("https://api.github.com/user", headers=headers)
+    if user_resp.status_code == 401:
+        flash("Your GitHub session has expired or the token is invalid. Please log in again.", "error")
+        session.pop('github_token', None)
+        return redirect(url_for('auth.login'))
+    elif user_resp.status_code == 403:
+        flash("GitHub API rate limit exceeded. Please try again later.", "error")
+        return redirect(url_for('main.project_detail', project_id=project_id))
+    elif user_resp.status_code != 200:
+        flash("Failed to retrieve your GitHub profile.", "error")
+        return redirect(url_for('main.project_detail', project_id=project_id))
+    
+    username = user_resp.json().get('login')
+
+    # 2. Create the repository
+    repo_payload = {
+        "name": repo_name,
+        "description": f"Starter code for DevPath project: {project['title']}",
+        "private": False,
+        "auto_init": False
+    }
+    
+    create_resp = requests.post("https://api.github.com/user/repos", json=repo_payload, headers=headers)
+    
+    if create_resp.status_code == 422:
+        # 422 usually means the repository already exists
+        pass
+    elif create_resp.status_code == 403:
+        flash("GitHub API rate limit exceeded or lack of permissions. Please try again later.", "error")
+        return redirect(url_for('main.project_detail', project_id=project_id))
+    elif create_resp.status_code == 401:
+        flash("GitHub authorization failed. Please log in again.", "error")
+        session.pop('github_token', None)
+        return redirect(url_for('auth.login'))
+    elif create_resp.status_code != 201:
+        flash(f"Failed to create repository. GitHub API responded with {create_resp.status_code}.", "error")
+        return redirect(url_for('main.project_detail', project_id=project_id))
+        
+    # If 422, the repo might already exist, which is fine, we can try to push the file anyway.
+
+    # 3. Create the file in the repository
+    file_payload = {
+        "message": "Initial commit from DevPath \U0001f680",
+        "content": content_b64
+    }
+    
+    put_resp = requests.put(
+        f"https://api.github.com/repos/{username}/{repo_name}/contents/{filename}",
+        json=file_payload,
+        headers=headers
+    )
+    
+    if put_resp.status_code in (201, 200):
+        # 201 Created, 200 OK (updated)
+        flash("Successfully exported to GitHub!", "success")
+        return redirect(f"https://github.com/{username}/{repo_name}")
+    elif put_resp.status_code == 422:
+        flash(f"File {filename} already exists in repository {repo_name}.", "warning")
+        return redirect(f"https://github.com/{username}/{repo_name}")
+    elif put_resp.status_code == 409:
+        flash("Conflict updating the file. The repository might have diverging commits.", "error")
+        return redirect(url_for('main.project_detail', project_id=project_id))
+    else:
+        flash(f"Repository created, but failed to upload file. Status: {put_resp.status_code}", "error")
+        return redirect(url_for('main.project_detail', project_id=project_id))
+
 
 
 @main.route("/sitemap.xml")
