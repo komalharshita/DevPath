@@ -302,7 +302,7 @@ def export_github(project_id):
     
     # Generate repository name
     import re
-    safe_title = re.sub(r'[^a-zA-Z0-9-]', '-', project.title.lower())
+    safe_title = re.sub(r'[^a-zA-Z0-9-]', '-', project['title'].lower())
     repo_name = f"DevPath-Starter-{safe_title}"
 
     headers = {
@@ -312,7 +312,14 @@ def export_github(project_id):
 
     # 1. Get the current user's GitHub username to construct URLs later
     user_resp = requests.get("https://api.github.com/user", headers=headers)
-    if user_resp.status_code != 200:
+    if user_resp.status_code == 401:
+        flash("Your GitHub session has expired or the token is invalid. Please log in again.", "error")
+        session.pop('github_token', None)
+        return redirect(url_for('auth.login'))
+    elif user_resp.status_code == 403:
+        flash("GitHub API rate limit exceeded. Please try again later.", "error")
+        return redirect(url_for('main.project_detail', project_id=project_id))
+    elif user_resp.status_code != 200:
         flash("Failed to retrieve your GitHub profile.", "error")
         return redirect(url_for('main.project_detail', project_id=project_id))
     
@@ -321,19 +328,28 @@ def export_github(project_id):
     # 2. Create the repository
     repo_payload = {
         "name": repo_name,
-        "description": f"Starter code for DevPath project: {project.title}",
+        "description": f"Starter code for DevPath project: {project['title']}",
         "private": False,
         "auto_init": False
     }
     
     create_resp = requests.post("https://api.github.com/user/repos", json=repo_payload, headers=headers)
     
-    if create_resp.status_code not in (201, 422):
+    if create_resp.status_code == 422:
+        # 422 usually means the repository already exists
+        pass
+    elif create_resp.status_code == 403:
+        flash("GitHub API rate limit exceeded or lack of permissions. Please try again later.", "error")
+        return redirect(url_for('main.project_detail', project_id=project_id))
+    elif create_resp.status_code == 401:
+        flash("GitHub authorization failed. Please log in again.", "error")
+        session.pop('github_token', None)
+        return redirect(url_for('auth.login'))
+    elif create_resp.status_code != 201:
         flash(f"Failed to create repository. GitHub API responded with {create_resp.status_code}.", "error")
         return redirect(url_for('main.project_detail', project_id=project_id))
         
-    # If 422, the repo might already exist, which is fine, we can try to push the file anyway or inform user
-    # We will just continue. If it already exists, pushing the file might fail or update it.
+    # If 422, the repo might already exist, which is fine, we can try to push the file anyway.
 
     # 3. Create the file in the repository
     file_payload = {
@@ -347,10 +363,16 @@ def export_github(project_id):
         headers=headers
     )
     
-    if put_resp.status_code in (201, 200, 422):
-        # 201 Created, 200 OK (updated), 422 (might be Invalid request or file exists)
+    if put_resp.status_code in (201, 200):
+        # 201 Created, 200 OK (updated)
         flash("Successfully exported to GitHub!", "success")
         return redirect(f"https://github.com/{username}/{repo_name}")
+    elif put_resp.status_code == 422:
+        flash(f"File {filename} already exists in repository {repo_name}.", "warning")
+        return redirect(f"https://github.com/{username}/{repo_name}")
+    elif put_resp.status_code == 409:
+        flash("Conflict updating the file. The repository might have diverging commits.", "error")
+        return redirect(url_for('main.project_detail', project_id=project_id))
     else:
         flash(f"Repository created, but failed to upload file. Status: {put_resp.status_code}", "error")
         return redirect(url_for('main.project_detail', project_id=project_id))

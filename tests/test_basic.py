@@ -12,9 +12,7 @@ from utils.recommender import (
     validate_recommendation_inputs,
     parse_skills,
     score_single_project,
-    WEIGHT_LEVEL,
-    WEIGHT_INTEREST,
-    WEIGHT_TIME,
+    SCORING_WEIGHTS,
 )
 
 
@@ -160,8 +158,12 @@ def test_score_no_project_skills_does_not_crash():
     """A project with an empty skills list should not raise ZeroDivisionError."""
     project = {"skills": [], "level": "Beginner", "interest": "Data", "time": "Low"}
     score, _ = score_single_project(project, ["python"], "Beginner", "Data", "Low")
-    # Skill score is 0, but other criteria still score
-    assert score == pytest.approx(WEIGHT_LEVEL + WEIGHT_INTEREST + WEIGHT_TIME)  # 2+2+1 = 5
+    # Skill Match = 1/2 = 0.5 * SCORING_WEIGHTS["skill"] (5) = 2.5
+    # Level Match = SCORING_WEIGHTS["level"] (2)
+    # Interest Mismatch = 0
+    # Time Match = SCORING_WEIGHTS["time"] (1)
+    # Total = 2.5 + 2 + 0 + 1 = 5.5
+    assert score == pytest.approx(2.5 + SCORING_WEIGHTS["level"] + SCORING_WEIGHTS["time"])
 
 
 def test_score_three_skills_partial_coverage():
@@ -732,6 +734,66 @@ def test_export_github_missing_starter_code():
         response = client.post("/project/999/export_github")
         assert response.status_code == 302
         assert "/project/999" in response.headers["Location"]
+
+
+from unittest.mock import patch
+
+@patch("routes.main_routes.requests.get")
+@patch("routes.main_routes.requests.post")
+@patch("routes.main_routes.requests.put")
+def test_export_github_api_failures(mock_put, mock_post, mock_get):
+    """Test how the app handles different GitHub API failure status codes."""
+    # First, we need a project that actually has a starter code file to pass the file check
+    with app.app_context():
+        from models import db, Project
+        p = db.session.get(Project, 1000)
+        if not p:
+            p = Project(
+                id=1000, title="Valid Code", level="Beg", interest="Web", time="Low", 
+                description="Desc", starter_code="expense_tracker.py"
+            )
+            db.session.add(p)
+            db.session.commit()
+
+    # Test 401 Unauthorized
+    with app.test_client() as client:
+        with client.session_transaction() as sess:
+            sess['github_token'] = {'access_token': 'dummy_token'}
+            
+        mock_get.return_value.status_code = 401
+        response = client.post("/project/1000/export_github")
+        
+        assert response.status_code == 302
+        assert "/auth/login" in response.headers["Location"]
+        
+    # Test 403 Rate Limit on repo creation
+    with app.test_client() as client:
+        with client.session_transaction() as sess:
+            sess['github_token'] = {'access_token': 'dummy_token'}
+            
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {"login": "testuser"}
+        mock_post.return_value.status_code = 403
+        
+        response = client.post("/project/1000/export_github")
+        
+        assert response.status_code == 302
+        assert "/project/1000" in response.headers["Location"]
+
+    # Test 422 Conflict (repo exists) but file push succeeds
+    with app.test_client() as client:
+        with client.session_transaction() as sess:
+            sess['github_token'] = {'access_token': 'dummy_token'}
+            
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {"login": "testuser"}
+        mock_post.return_value.status_code = 422
+        mock_put.return_value.status_code = 201
+        
+        response = client.post("/project/1000/export_github")
+        
+        assert response.status_code == 302
+        assert "github.com/testuser/DevPath-Starter-valid-code" in response.headers["Location"]
 
 
 
