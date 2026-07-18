@@ -16,6 +16,11 @@ class Config:
     # Can be overridden via environment variable for different deployments
     BASE_URL = os.getenv("BASE_URL", "https://mydevpath-github.vercel.app")
     
+    # Database Settings
+    basedir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite:///" + os.path.join(basedir, "data", "devpath.db"))
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    
     # Application metadata for OG tags
     SITE_NAME = "DevPath"
     SITE_DESCRIPTION = "Get personalized coding project recommendations with step-by-step roadmaps and starter code."

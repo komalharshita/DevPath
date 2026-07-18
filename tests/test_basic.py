@@ -12,9 +12,7 @@ from utils.recommender import (
     validate_recommendation_inputs,
     parse_skills,
     score_single_project,
-    WEIGHT_LEVEL,
-    WEIGHT_INTEREST,
-    WEIGHT_TIME,
+    SCORING_WEIGHTS,
 )
 
 
@@ -26,7 +24,44 @@ from app import app, internal_server_error
 # ============================================================
 
 def setup_module():
-    clear_cache()
+    """Clear the data cache before running the test suite to ensure clean state."""
+    import tempfile
+    import os
+    db_fd, db_path = tempfile.mkstemp()
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+    app.config["TESTING"] = True
+    app.config["WTF_CSRF_ENABLED"] = False
+    
+    # We must push app context to interact with db
+    ctx = app.app_context()
+    ctx.push()
+    
+    from models import db, Project
+    db.drop_all()
+    db.create_all()
+    
+    # Load from JSON once to seed in-memory db
+    import json
+    data_file = os.path.join(os.path.dirname(__file__), "..", "data", "projects.json")
+    with open(data_file, "r", encoding="utf-8") as f:
+        projects_data = json.load(f)
+        for p_data in projects_data:
+            project = Project(
+                id=p_data.get("id"),
+                title=p_data.get("title", ""),
+                level=p_data.get("level", "Beginner"),
+                interest=p_data.get("interest", ""),
+                time=p_data.get("time", "Low"),
+                description=p_data.get("description", ""),
+                skills=p_data.get("skills", []),
+                features=p_data.get("features", []),
+                tech_stack=p_data.get("tech_stack", []),
+                roadmap=p_data.get("roadmap", []),
+                resources=p_data.get("resources", []),
+                starter_code=p_data.get("starter_code")
+            )
+            db.session.add(project)
+        db.session.commit()
 
 
 # ============================================================
@@ -121,8 +156,12 @@ def test_score_no_project_skills_does_not_crash():
     """A project with an empty skills list should not raise ZeroDivisionError."""
     project = {"skills": [], "level": "Beginner", "interest": "Data", "time": "Low"}
     score, _ = score_single_project(project, ["python"], "Beginner", "Data", "Low")
-    # Skill score is 0, but other criteria still score
-    assert score == pytest.approx(WEIGHT_LEVEL + WEIGHT_INTEREST + WEIGHT_TIME)  # 2+2+1 = 5
+    # Skill Match = 1/2 = 0.5 * SCORING_WEIGHTS["skill"] (5) = 2.5
+    # Level Match = SCORING_WEIGHTS["level"] (2)
+    # Interest Mismatch = 0
+    # Time Match = SCORING_WEIGHTS["time"] (1)
+    # Total = 2.5 + 2 + 0 + 1 = 5.5
+    assert score == pytest.approx(2.5 + SCORING_WEIGHTS["level"] + SCORING_WEIGHTS["time"])
 
 
 def test_score_three_skills_partial_coverage():
@@ -559,6 +598,7 @@ def test_sitemap_includes_compare():
 # ============================================================
 
 if __name__ == "__main__":
+    setup_module()
     test_functions = [v for k, v in list(globals().items()) if k.startswith("test_")]
     passed = 0
     failed = 0

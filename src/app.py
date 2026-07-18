@@ -27,12 +27,16 @@ from routes.main_routes import main
 from routes.github_routes import github_bp
 from config import Config
 from errors.handlers import register_error_handlers
+from models import db
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "default-dev-secret-key-replace-in-production")
 
 # Load config settings into Flask's internal config manager properly
 app.config.from_object(Config)
+
+# Initialize SQLAlchemy
+db.init_app(app)
 
 # Enable CSRF protection for all state-changing requests
 csrf = CSRFProtect(app)
