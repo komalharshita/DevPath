@@ -12,9 +12,7 @@ from utils.recommender import (
     validate_recommendation_inputs,
     parse_skills,
     score_single_project,
-    WEIGHT_LEVEL,
-    WEIGHT_INTEREST,
-    WEIGHT_TIME,
+    SCORING_WEIGHTS,
 )
 
 
@@ -32,6 +30,7 @@ def setup_module():
     db_fd, db_path = tempfile.mkstemp()
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
     app.config["TESTING"] = True
+    app.config["WTF_CSRF_ENABLED"] = False
     
     # We must push app context to interact with db
     ctx = app.app_context()
@@ -157,8 +156,12 @@ def test_score_no_project_skills_does_not_crash():
     """A project with an empty skills list should not raise ZeroDivisionError."""
     project = {"skills": [], "level": "Beginner", "interest": "Data", "time": "Low"}
     score, _ = score_single_project(project, ["python"], "Beginner", "Data", "Low")
-    # Skill score is 0, but other criteria still score
-    assert score == pytest.approx(WEIGHT_LEVEL + WEIGHT_INTEREST + WEIGHT_TIME)  # 2+2+1 = 5
+    # Skill Match = 1/2 = 0.5 * SCORING_WEIGHTS["skill"] (5) = 2.5
+    # Level Match = SCORING_WEIGHTS["level"] (2)
+    # Interest Mismatch = 0
+    # Time Match = SCORING_WEIGHTS["time"] (1)
+    # Total = 2.5 + 2 + 0 + 1 = 5.5
+    assert score == pytest.approx(2.5 + SCORING_WEIGHTS["level"] + SCORING_WEIGHTS["time"])
 
 
 def test_score_three_skills_partial_coverage():
