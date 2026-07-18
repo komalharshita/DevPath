@@ -572,3 +572,30 @@ if __name__ == "__main__":
     print(f"\n{passed} passed, {failed} failed out of {passed + failed} tests")
     if failed > 0:
         sys.exit(1)
+
+def test_ml_similarity_score_returns_float():
+    from utils.recommender import (
+        ml_similarity_score, parse_skills, _tokenize, 
+        _project_text, _user_text, _idf, _tfidf_vector
+    )
+    projects = load_all_projects()
+    
+    project_documents = [_tokenize(_project_text(p)) for p in projects]
+    user_skills = parse_skills("Python")
+    user_tokens = _tokenize(_user_text(user_skills, "Beginner", "Data", "Low"))
+    idf_scores = _idf(project_documents + [user_tokens])
+    user_vector = _tfidf_vector(user_tokens, idf_scores)
+
+    score = ml_similarity_score(
+        projects[0],
+        user_vector,
+        idf_scores,
+    )
+    assert isinstance(score, float)
+    assert score >= 0
+
+def test_ml_recommendation_prefers_relevant_python_data_project():
+    results = get_recommendations("Python, pandas", "Intermediate", "Data", "High")
+    recs = results.get("recommendations", [])
+    titles = [project["title"] for project in recs]
+    assert any("Data" in title or "Pipeline" in title for title in titles)
