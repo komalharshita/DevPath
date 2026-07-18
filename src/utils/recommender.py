@@ -18,24 +18,22 @@ _CLUSTERS_PATH = os.path.join(
     "clusters.json",
 )
 
-VALID_LEVELS = ["beginner", "intermediate", "advanced"]
-VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
-VALID_INTERESTS = [
-    "automation",
-    "backend",
-    "business logic",
-    "cloud computing",
-    "cybersecurity",
-    "data",
-    "devops",
-    "education",
-    "games",
-    "machine learning/ai",
-    "mobile",
-    "productivity",
-    "tools",
-    "web",
-]
+_cached_clusters = None
+_clusters_loaded = False
+_cached_skill_graph = None
+_skill_graph_loaded = False
+
+def clear_caches():
+    """Clear all in-memory JSON caches."""
+    global _cached_clusters, _clusters_loaded, _cached_skill_graph, _skill_graph_loaded
+    _cached_clusters = None
+    _clusters_loaded = False
+    _cached_skill_graph = None
+    _skill_graph_loaded = False
+
+VALID_LEVELS = {"beginner", "intermediate", "advanced"}
+VALID_INTERESTS = {"web", "data", "education", "automation", "games", "cybersecurity", "devops", "backend", "tools", "productivity", "business logic", "mobile", "machine learning/ai"}
+VALID_TIME_AVAILABILITY = {"low", "medium", "high"}
 SCORING_WEIGHTS = {
     "skill": 3,
     "level": 2,
@@ -253,17 +251,24 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
 
 def _load_skill_graph():
     """Load skill_graph.json from data/. Returns empty dict on failure."""
+    global _cached_skill_graph, _skill_graph_loaded
+    if _skill_graph_loaded:
+        return _cached_skill_graph
+        
+    _skill_graph_loaded = True
     path = os.path.join(
         os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
         "data", "skill_graph.json"
     )
     if not os.path.exists(path):
-        return {}
+        _cached_skill_graph = {}
+        return _cached_skill_graph
     try:
         with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
+            _cached_skill_graph = json.load(f)
     except (json.JSONDecodeError, OSError):
-        return {}
+        _cached_skill_graph = {}
+    return _cached_skill_graph
 
 
 def _hops_to_skill(target, user_skills, graph, max_hops=3):
@@ -351,13 +356,20 @@ def _load_clusters():
     A missing file is a soft failure — the recommender still works,
     it just won't return related projects.
     """
+    global _cached_clusters, _clusters_loaded
+    if _clusters_loaded:
+        return _cached_clusters
+        
+    _clusters_loaded = True
     if not os.path.exists(_CLUSTERS_PATH):
-        return None
+        _cached_clusters = None
+        return _cached_clusters
     try:
         with open(_CLUSTERS_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
+            _cached_clusters = json.load(f)
     except (json.JSONDecodeError, OSError):
-        return None
+        _cached_clusters = None
+    return _cached_clusters
 
 
 def _get_related(recommended_ids, all_projects, cluster_data):
