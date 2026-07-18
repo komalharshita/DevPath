@@ -9,6 +9,9 @@ import os
 class Config:
     """Base configuration class with sensible defaults."""
     
+    # Secret key for session signing and CSRF protection
+    SECRET_KEY = os.getenv("SECRET_KEY", "change-this-secret-in-production")
+    
     # Base URL for the application - used for OG tags and canonical URLs
     # Can be overridden via environment variable for different deployments
     BASE_URL = os.getenv("BASE_URL", "https://mydevpath-github.vercel.app")
@@ -24,6 +27,13 @@ class Config:
     
     # OG image path (relative to static folder)
     OG_IMAGE_PATH = "/static/og-banner.png"
+
+    # Contact form handler endpoint. Replace this with the project's
+    # Formspree form URL or set CONTACT_FORM_ACTION in the deployment.
+    CONTACT_FORM_ACTION = os.getenv(
+        "CONTACT_FORM_ACTION",
+        "https://formspree.io/f/your-form-id",
+    )
     
     @classmethod
     def get_og_image_url(cls):
