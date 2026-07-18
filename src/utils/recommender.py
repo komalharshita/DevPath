@@ -171,7 +171,7 @@ def ml_similarity_score(project, user_vector, idf_scores):
 
     return _cosine_similarity(user_vector, project_vector)
 
-def score_single_project(project, user_skills, level, interest, time_availability, graph=None ):
+def score_single_project(project, user_skills, level, interest, time_availability, graph=None, skill_proficiencies=None):
     TIME_RANKS = ["low", "medium", "high"]
 
     user_time    = time_availability.strip().lower()

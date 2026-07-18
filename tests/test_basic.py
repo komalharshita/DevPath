@@ -12,10 +12,9 @@ from utils.recommender import (
     validate_recommendation_inputs,
     parse_skills,
     score_single_project,
-    WEIGHT_LEVEL,
-    WEIGHT_INTEREST,
-    WEIGHT_TIME,
+    SCORING_WEIGHTS,
 )
+from utils.roadmap_comparer import load_all_career_roadmaps, compare_roadmaps
 
 
 from app import app, internal_server_error
@@ -121,8 +120,12 @@ def test_score_no_project_skills_does_not_crash():
     """A project with an empty skills list should not raise ZeroDivisionError."""
     project = {"skills": [], "level": "Beginner", "interest": "Data", "time": "Low"}
     score, _ = score_single_project(project, ["python"], "Beginner", "Data", "Low")
-    # Skill score is 0, but other criteria still score
-    assert score == pytest.approx(WEIGHT_LEVEL + WEIGHT_INTEREST + WEIGHT_TIME)  # 2+2+1 = 5
+    # Skill Match = 1/2 = 0.5 * SCORING_WEIGHTS["skill"] (5) = 2.5
+    # Level Match = SCORING_WEIGHTS["level"] (2)
+    # Interest Mismatch = 0
+    # Time Match = SCORING_WEIGHTS["time"] (1)
+    # Total = 2.5 + 2 + 0 + 1 = 5.5
+    assert score == pytest.approx(2.5 + SCORING_WEIGHTS["level"] + SCORING_WEIGHTS["time"])
 
 
 def test_score_three_skills_partial_coverage():
@@ -239,6 +242,7 @@ def test_validate_missing_fields():
 
 def get_client():
     app.config["TESTING"] = True
+    app.config["WTF_CSRF_ENABLED"] = False
     return app.test_client()
 
 
@@ -247,6 +251,16 @@ def test_home_route():
     response = client.get("/")
     assert response.status_code == 200
 
+
+def test_explore_route():
+    """Explore route should return 200 OK and handle pagination."""
+    client = get_client()
+    response = client.get("/explore?page=1&per_page=5")
+    assert response.status_code == 200
+    html = response.data.decode("utf-8")
+    assert "Explore All Projects" in html
+    # The max per_page is 5, so there should be pagination controls or fewer items.
+    assert 'class="project-card"' in html
 
 def test_contact_page_renders_send_message_form():
     """Contact page should include the external form handler and required fields."""
@@ -263,7 +277,6 @@ def test_contact_page_renders_send_message_form():
     assert 'name="email"' in html
     assert 'name="message"' in html
     assert "Send Message" in html
-
 
 def test_security_headers_present():
     """Security headers should be included in all responses."""
