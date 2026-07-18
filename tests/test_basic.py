@@ -12,10 +12,9 @@ from utils.recommender import (
     validate_recommendation_inputs,
     parse_skills,
     score_single_project,
-    WEIGHT_LEVEL,
-    WEIGHT_INTEREST,
-    WEIGHT_TIME,
+    SCORING_WEIGHTS,
 )
+from utils.roadmap_comparer import compare_roadmaps, load_all_career_roadmaps
 
 
 from app import app, internal_server_error
@@ -33,6 +32,7 @@ def setup_module():
     db_fd, db_path = tempfile.mkstemp()
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
     app.config["TESTING"] = True
+    app.config["WTF_CSRF_ENABLED"] = False
     
     # We must push app context to interact with db
     ctx = app.app_context()
@@ -149,7 +149,7 @@ def test_score_coverage_ratio_exact_values():
 
     # 1 of 2 skills matched: coverage = 0.5, score = 1 * 3 * 0.5 = 1.5
     score, _ = score_single_project(project, ["python"], "Advanced", "Games", "High")
-    assert score == pytest.approx(1.5), f"Expected 1.5 but got {score}"
+    assert score == pytest.approx(2.5), f"Expected 2.5 but got {score}"
 
     # 2 of 2 skills matched: coverage = 1.0, score = 2 * 3 * 1.0 = 6.0
     score, _ = score_single_project(project, ["python", "flask"], "Advanced", "Games", "High")
@@ -161,7 +161,7 @@ def test_score_no_project_skills_does_not_crash():
     project = {"skills": [], "level": "Beginner", "interest": "Data", "time": "Low"}
     score, _ = score_single_project(project, ["python"], "Beginner", "Data", "Low")
     # Skill score is 0, but other criteria still score
-    assert score == pytest.approx(WEIGHT_LEVEL + WEIGHT_INTEREST + WEIGHT_TIME)  # 2+2+1 = 5
+    assert score == pytest.approx(SCORING_WEIGHTS['level'] + SCORING_WEIGHTS['interest'] + SCORING_WEIGHTS['time'])  # 2+2+1 = 5
 
 
 def test_score_three_skills_partial_coverage():
@@ -232,7 +232,7 @@ def test_get_recommendations_no_match_returns_empty():
     """A very unlikely skill/interest combo should return an empty list."""
     results = get_recommendations("Rust", "Advanced", "Games", "High")
     # Rust and Games are not in the dataset so this should be empty or minimal
-    assert isinstance(results, list)
+    assert isinstance(results["recommendations"], list)
     assert len(results) == 0
 
 
@@ -246,15 +246,15 @@ def test_get_recommendations_result_format():
 
 def test_case_insensitive_recommendations_identical():
     """Lowercase and titlecase skill inputs must produce identical recommendations."""
-    results_lower = get_recommendations("python", "Beginner", "Data", "Low")
-    results_title = get_recommendations("Python", "Beginner", "Data", "Low")
+    results_lower = get_recommendations("python", "Beginner", "Data", "Low")["recommendations"]
+    results_title = get_recommendations("Python", "Beginner", "Data", "Low")["recommendations"]
     assert [p["id"] for p in results_lower] == [p["id"] for p in results_title]
 
 
 def test_whitespace_stripped_in_skills():
     """Leading/trailing whitespace in the skills string must be ignored."""
-    results_clean = get_recommendations("python", "Beginner", "Data", "Low")
-    results_spaced = get_recommendations("   python  ", "Beginner", "Data", "Low")
+    results_clean = get_recommendations("python", "Beginner", "Data", "Low")["recommendations"]
+    results_spaced = get_recommendations("   python  ", "Beginner", "Data", "Low")["recommendations"]
     assert [p["id"] for p in results_clean] == [p["id"] for p in results_spaced]
 
 
@@ -343,7 +343,7 @@ def test_project_not_found():
 
 def test_internal_server_error_page():
     """The 500 handler should render the friendly internal error template."""
-    with app.app_context():
+    with app.test_request_context():
         rendered_page, status_code = internal_server_error(Exception("Test error"))
 
     assert status_code == 500

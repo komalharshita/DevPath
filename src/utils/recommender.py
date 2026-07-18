@@ -171,7 +171,7 @@ def ml_similarity_score(project, user_vector, idf_scores):
 
     return _cosine_similarity(user_vector, project_vector)
 
-def score_single_project(project, user_skills, level, interest, time_availability, graph=None ):
+def score_single_project(project, user_skills, level, interest, time_availability, graph=None, skill_proficiencies=None):
     TIME_RANKS = ["low", "medium", "high"]
 
     user_time    = time_availability.strip().lower()
@@ -179,9 +179,9 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
 
     # If the project needs more time than the user has, exclude it.
     if project_time not in TIME_RANKS or user_time not in TIME_RANKS:
-        return 0
+        return 0, {}
     if TIME_RANKS.index(project_time) > TIME_RANKS.index(user_time):
-        return 0
+        return 0, {}
 
     score = 0
 
