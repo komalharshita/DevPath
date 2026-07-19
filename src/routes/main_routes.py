@@ -35,8 +35,12 @@ _code_review_manager = CodeReviewManager()
 
 # Interest categories that currently have no project recommendations available
 NO_PROJECT_INTERESTS = {
+    "machine learning/ai",
+    "devops",
+    "mobile",
     "artificial intelligence",
     "cloud computing",
+    "mobile app development",
 }
 
 def interest_has_no_projects(interest):
@@ -146,17 +150,11 @@ def recommend():
     if not skills:
         return jsonify({"error": "Please enter at least one skill to get recommendations."}), 400
 
-    # Package arguments cleanly into a dictionary expected by the utility methods
-    user_input_dict = {
-        "skills": skills,
-        "level": level,
-        "interest": interest,
-        "time": time_availability
-    }
-
-    # Validate the data package object layout
-    if not validate_recommendation_inputs(user_input_dict):
-        return jsonify({"error": "Invalid recommendation inputs provided structure."}), 400
+    # Validate before running the recommendation engine
+    errors = validate_recommendation_inputs(skills, level, interest, time_availability)
+    if errors:
+        # Return only the first error to keep the UI message clean
+        return jsonify({"error": errors[0]}), 400
 
     if interest_has_no_projects(interest):
         return jsonify({
@@ -164,9 +162,14 @@ def recommend():
             "message": "No projects are currently available for this interest area. Please check back later."
         }), 200
 
-    # Fetch the dataset array and feed the core recommender utility interface properly
-    projects_dataset = load_all_projects()
-    results = get_recommendations(user_input_dict, projects_dataset)
+    recommendations_data = get_recommendations(
+    skills,
+    level,
+    interest,
+    time_availability,
+    tech_stack,
+    max_results=None,)
+    results = recommendations_data.get("recommendations", [])
 
     # Ensure all projects have IDs in the response
     projects_data = []
@@ -177,18 +180,35 @@ def recommend():
             project_dict['id'] = project.get('id', 0)
         projects_data.append(project_dict)
 
-    # Return main recommendations matched array structure mapping
+    # Return main recommendations, related, and progression
     response_data = {
         "projects": projects_data,
-        "related": [],
-        "progression": []
+        "related": [dict(p) for p in recommendations_data.get("related", [])],
+        "progression": [
+            {"project": dict(item["project"]), "gap_score": item["gap_score"]}
+            for item in recommendations_data.get("progression", [])
+        ]
     }
 
     return jsonify(response_data), 200
 
 @main.route("/api/project/<int:project_id>/resources")
 def project_resources(project_id):
-    """Return the validated resource list for a project."""
+    """Return the validated resource list for a project.
+
+    Each resource is parsed from its raw "Label: URL" string format and
+    returned as a structured object so the frontend can render broken
+    links differently from valid ones.
+
+    Response shape:
+        {
+            "project_id": 1,
+            "resources": [
+                {"label": "Python official docs", "url": "https://docs.python.org", "valid": true},
+                {"label": "Broken link", "url": "not-a-url", "valid": false}
+            ]
+        }
+    """
     from utils.url_validator import validate_resources
 
     project = find_project_by_id(project_id)
@@ -267,7 +287,10 @@ def download_code(project_id):
 
 @main.route("/sitemap.xml")
 def sitemap():
-    """Generate and return a sitemap.xml for search engine indexing."""
+    """
+    Generate and return a sitemap.xml for search engine indexing.
+    Includes the homepage and all individual project detail pages.
+    """
     base = request.host_url.rstrip("/")
     projects = load_all_projects()
 
@@ -294,6 +317,7 @@ def robots():
 @rate_limit(max_requests=30, window_seconds=60)
 def search_projects():
     """Return projects matching the user's search query."""
+
     query = request.args.get("q", "").strip().lower()
 
     if not query:
@@ -303,6 +327,8 @@ def search_projects():
     filtered_projects = []
 
     for project in projects:
+
+        # Combine searchable project fields into one lowercase string
         searchable_text = " ".join([
             project.get("title", ""),
             project.get("description", ""),
@@ -682,10 +708,20 @@ def get_code_recommendations(submission_id):
 
 # ---------------------------------------------------------------------------
 # Learning path API
+#
+# Endpoints for reading and writing a user's learning path data.  Every
+# request must supply the owner token that was returned when the path was
+# first created.  Requests with a missing or wrong token are rejected with
+# 403 Forbidden before any data is read or modified, closing the
+# cross-user exposure described in issue #736.
+#
+# Token transport: the X-Learning-Path-Token request header.
+# Path identity:   the <path_id> URL segment (opaque, UUID-like string).
 # ---------------------------------------------------------------------------
 
 _TOKEN_HEADER = "X-Learning-Path-Token"
-_MAX_DATA_BYTES = 64 * 1024  # 64 KB
+_MAX_DATA_BYTES = 64 * 1024  # 64 KB — guard against oversized payloads
+
 
 def _extract_token(req):
     """Return the bearer token from the request header, or None if absent."""
@@ -695,7 +731,19 @@ def _extract_token(req):
 @main.route("/api/learning-path/<path_id>", methods=["POST"])
 @rate_limit(max_requests=10, window_seconds=60)
 def create_path(path_id):
-    """Create a new learning path and bind it to the supplied token."""
+    """Create a new learning path and bind it to the supplied token.
+
+    Request headers:
+        X-Learning-Path-Token  (required) - the secret token chosen by the
+                               client (should be a random UUID or similar).
+
+    Request body (JSON):
+        Any JSON object representing the initial learning-path state.
+
+    Response 201:  {"path_id": "<path_id>", "message": "Learning path created."}
+    Response 400:  malformed request body or invalid path_id / token format.
+    Response 409:  a learning path with this path_id already exists.
+    """
     token = _extract_token(request)
     if not token:
         return jsonify({"error": f"'{_TOKEN_HEADER}' header is required."}), 400
@@ -725,7 +773,17 @@ def create_path(path_id):
 @main.route("/api/learning-path/<path_id>", methods=["GET"])
 @rate_limit(max_requests=20, window_seconds=60)
 def read_path(path_id):
-    """Return the data payload for a learning path."""
+    """Return the data payload for a learning path.
+
+    Request headers:
+        X-Learning-Path-Token  (required) - the token associated with this
+                               path when it was created.
+
+    Response 200:  {"path_id": "<path_id>", "data": { ... }}
+    Response 400:  token header missing or path_id format invalid.
+    Response 403:  token does not match the owner token.
+    Response 404:  no learning path found for this path_id.
+    """
     token = _extract_token(request)
     if not token:
         return jsonify({"error": f"'{_TOKEN_HEADER}' header is required."}), 400
@@ -745,7 +803,20 @@ def read_path(path_id):
 @main.route("/api/learning-path/<path_id>", methods=["PUT"])
 @rate_limit(max_requests=10, window_seconds=60)
 def update_path(path_id):
-    """Overwrite the data payload for an existing learning path."""
+    """Overwrite the data payload for an existing learning path.
+
+    Request headers:
+        X-Learning-Path-Token  (required) - the token associated with this
+                               path when it was created.
+
+    Request body (JSON):
+        Any JSON object representing the new learning-path state.
+
+    Response 200:  {"path_id": "<path_id>", "message": "Learning path updated."}
+    Response 400:  malformed request body, missing token, or invalid format.
+    Response 403:  token does not match the owner token.
+    Response 404:  no learning path found for this path_id.
+    """
     token = _extract_token(request)
     if not token:
         return jsonify({"error": f"'{_TOKEN_HEADER}' header is required."}), 400
@@ -772,3 +843,149 @@ def update_path(path_id):
         return jsonify({"error": "Forbidden: invalid token for this path."}), 403
 
     return jsonify({"path_id": path_id, "message": "Learning path updated."}), 200
+
+@main.route("/api/project/<int:project_id>/progress", methods=["GET"])
+def get_project_progress(project_id):
+    """Return the user's roadmap progress for a specific project."""
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    progress = ProjectProgress.query.filter_by(user_id=user_id, project_id=project_id).first()
+    completed_steps = progress.completed_steps if progress else []
+    return jsonify({"completed_steps": completed_steps}), 200
+
+@main.route("/api/project/<int:project_id>/progress", methods=["POST"])
+def update_project_progress(project_id):
+    """Update the user's roadmap progress for a specific project."""
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    payload = request.get_json(silent=True)
+    if not payload or not isinstance(payload.get("completed_steps"), list):
+        return jsonify({"error": "Invalid payload. Expected 'completed_steps' array."}), 400
+
+    completed_steps = payload["completed_steps"]
+
+    progress = ProjectProgress.query.filter_by(user_id=user_id, project_id=project_id).first()
+    if progress:
+        progress.completed_steps = completed_steps
+    else:
+        progress = ProjectProgress(
+            user_id=user_id,
+            project_id=project_id,
+            completed_steps=completed_steps
+        )
+        db.session.add(progress)
+
+    db.session.commit()
+    return jsonify({"message": "Progress saved successfully"}), 200
+@main.route("/api/portfolio-analysis", methods=["POST"])
+def portfolio_analysis():
+    """
+    Analyze the user's completed projects and return
+    portfolio diversity information.
+    """
+
+    payload = request.get_json(silent=True)
+
+    if payload is None:
+        return jsonify({"error": "Invalid JSON payload"}), 400
+
+    print(payload)
+
+    completed_ids = payload.get("completed_projects", [])
+
+    if not isinstance(completed_ids, list):
+        return jsonify({"error": "'completed_projects' must be a list"}), 400
+
+    all_projects = load_all_projects()
+
+    completed_projects = [
+        project
+        for project in all_projects
+        if project["id"] in completed_ids
+    ]
+
+    result = analyze_portfolio(completed_projects)
+
+    return jsonify(result), 200
+
+# Constants for learning velocity recommendations
+VELOCITY_SLOW_THRESHOLD = 1.2
+VELOCITY_FAST_THRESHOLD = 0.8
+
+
+@main.route("/api/learning-path/<path_id>/analytics", methods=["GET"])
+def get_path_analytics(path_id):
+    """
+    Calculate time analytics and velocity for a specific learning path.
+    
+    Requires X-Learning-Path-Token header for authorization.
+    Expected data structure in path['progress']:
+    {
+        "project_id": {"completed": bool, "actual_hours": float}
+    }
+    """
+    token = _extract_token(request)
+    if not token:
+        return jsonify({"error": f"'{_TOKEN_HEADER}' header is required."}), 400
+
+    try:
+        path_data = get_learning_path(path_id, token)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    except PathNotFoundError:
+        return jsonify({"error": "Learning path not found."}), 404
+    except AuthorizationError:
+        return jsonify({"error": "Forbidden: invalid token for this path."}), 403
+
+    # Analytics Calculation
+    progress = path_data.get("progress", {})
+    total_est = 0
+    total_act = 0
+    comp_est = 0
+    comp_act = 0
+
+    for pid_str, stats in progress.items():
+        try:
+            project = find_project_by_id(int(pid_str))
+            if not project:
+                continue
+            
+            est = project.get("estimated_hours", 0)
+            act = stats.get("actual_hours", 0)
+            
+            total_est += est
+            total_act += act
+            
+            if stats.get("completed"):
+                comp_est += est
+                comp_act += act
+        except (ValueError, TypeError):
+            continue
+
+    # Learning Velocity: ratio of Actual Time / Estimated Time
+    # > 1.0 means slower than estimate, < 1.0 means faster than estimate
+    velocity = round(comp_act / comp_est, 2) if comp_est > 0 else 1.0
+    
+    remaining_est = total_est - comp_est
+    predicted_remaining = round(remaining_est * velocity, 1)
+    
+    # Recommendations based on velocity
+    recommendation = "You're matching the estimates perfectly!" # Default recommendation
+    if velocity > VELOCITY_SLOW_THRESHOLD:
+        recommendation = "You're taking more time than estimated. Consider breaking tasks into smaller chunks."
+    elif velocity < VELOCITY_FAST_THRESHOLD:
+        recommendation = "You're moving fast! You might want to try a higher difficulty level next."
+
+    return jsonify({
+        "path_id": path_id,
+        "total_estimated_hours": total_est,
+        "total_actual_hours_spent": total_act,
+        "learning_velocity": velocity,
+        "completion_percentage": round((comp_est / total_est * 100), 1) if total_est > 0 else 0,
+        "predicted_hours_remaining": predicted_remaining,
+        "recommendation": recommendation
+    }), 200

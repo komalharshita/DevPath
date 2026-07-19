@@ -163,6 +163,7 @@ class SkillProgressionValidator:
         skill_name: str,
         difficulty: SkillDifficulty,
         assessment_score: Optional[float] = None,
+        score: Optional[float] = None,
     ) -> Dict:
         """
         Record user completion of a skill at given difficulty level.
@@ -172,10 +173,14 @@ class SkillProgressionValidator:
             skill_name: Name of the skill
             difficulty: Difficulty level completed
             assessment_score: Optional assessment score (0-100)
+            score: Optional assessment score (0-100) — backward compatibility
 
         Returns:
             Updated skill profile
         """
+        if assessment_score is None:
+            assessment_score = score
+
         if user_id not in self.user_skills:
             self.user_skills[user_id] = {}
 

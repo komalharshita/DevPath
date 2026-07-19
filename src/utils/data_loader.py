@@ -11,6 +11,8 @@ from models import Project
 
 logger = logging.getLogger("devpath.data_loader")
 
+_projects_cache = None
+
 
 def validate_projects(projects):
     """
@@ -75,8 +77,11 @@ def validate_projects(projects):
 
 def load_all_projects():
     """Read and return the full list of projects from the database."""
-    projects = Project.query.all()
-    return [p.to_dict() for p in projects]
+    global _projects_cache
+    if _projects_cache is None:
+        projects = Project.query.all()
+        _projects_cache = [p.to_dict() for p in projects]
+    return _projects_cache
 
 def get_available_levels():
     """Return all unique project levels."""
@@ -114,4 +119,5 @@ def get_project_stats():
 
 def clear_cache():
     """Reset the in-memory project cache (used in tests)."""
-    pass
+    global _projects_cache
+    _projects_cache = None
