@@ -1036,7 +1036,7 @@
                   </button>
                 </label>
                 <div class="select-wrap">
-                  <select id="interest" name="interest">
+                  <select id="interest" name="interest" multiple>
                     <option value="" disabled selected>Select interest</option>
                     {% for interest in available_interests %}
                     <option value="{{ interest }}">{{ interest }}</option>

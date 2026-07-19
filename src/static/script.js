@@ -644,7 +644,7 @@ async function updatePortfolioAnalysis() {
       showFieldError("level-error", "Please select your experience level.");
       valid = false;
     }
-    if (!document.getElementById("interest").value) {
+    if (document.getElementById("interest").selectedOptions.length === 0 || document.getElementById("interest").selectedOptions[0].value === "") {
       showFieldError("interest-error", "Please select an area of interest.");
       valid = false;
     }
@@ -981,7 +981,7 @@ async function updatePortfolioAnalysis() {
           };
         })),
         level: document.getElementById("level").value,
-        interest: document.getElementById("interest").value,
+        interest: Array.from(document.getElementById("interest").selectedOptions).map(opt => opt.value),
         time: document.getElementById("time").value,
         tech_stack: techStackSelect ? techStackSelect.value : "all"
       })
