@@ -7,6 +7,7 @@ import os
 # Make sure imports resolve from the repo root regardless of where Python
 # looks by default.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "src"))
 
 from utils.recommender import (
     get_recommendations,

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You're Offline - DevPath</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .offline-container {
+            background: white;
+            border-radius: 12px;
+            padding: 60px 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .offline-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 30px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .message {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .cached-content {
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+            border-radius: 4px;
+        }
+
+        .cached-content h3 {
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .cached-links {
+            list-style: none;
+        }
+
+        .cached-links li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cached-links li:last-child {
+            border-bottom: none;
+        }
+
+        .cached-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .cached-links a:hover {
+            text-decoration: underline;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        @media (max-width: 600px) {
+            .offline-container {
+                padding: 40px 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon">📡</div>
+        <h1>You're Offline</h1>
+        <p class="message">
+            It looks like you've lost your internet connection.
+            Don't worry, you can still access recently visited learning paths!
+        </p>
+
+        <div class="cached-content" id="cachedPaths" style="display: none;">
+            <h3>Recently Visited Paths</h3>
+            <ul class="cached-links" id="cachedLinksList">
+                <!-- Populated by JavaScript -->
+            </ul>
+        </div>
+
+        <p class="message" style="font-size: 14px; margin-bottom: 30px; color: #999;">
+            To access new content, reconnect to the internet.
+        </p>
+
+        <div class="action-buttons">
+            <button class="btn-primary" onclick="location.reload()">Try Again</button>
+            <button class="btn-secondary" onclick="goHome()">Go to Home</button>
+        </div>
+    </div>
+
+    <script>
+        // Load cached paths from localStorage
+        function loadCachedPaths() {
+            var cached = localStorage.getItem('devpath_cached_paths');
+            if (cached) {
+                var paths = JSON.parse(cached);
+                if (paths.length > 0) {
+                    var container = document.getElementById('cachedPaths');
+                    var list = document.getElementById('cachedLinksList');
+
+                    list.innerHTML = '';
+                    paths.forEach(function(path) {
+                        var li = document.createElement('li');
+                        var a = document.createElement('a');
+                        a.href = path.url;
+                        a.textContent = path.name;
+                        li.appendChild(a);
+                        list.appendChild(li);
+                    });
+
+                    container.style.display = 'block';
+                }
+            }
+        }
+
+        function goHome() {
+            window.location.href = '/';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', loadCachedPaths);
+    </script>
+</body>
+</html>
