@@ -393,6 +393,17 @@
           </svg>
         </button>
       </form>
+      <div class="nav-links desktop-only" style="margin-left: auto; display: flex; align-items: center; gap: 1.5rem; padding-right: 1.5rem;">
+        {% if current_user %}
+        {% if current_user.is_admin %}
+        <a href="/admin" class="nav-link" style="font-weight: 600; color: #4f46e5; text-decoration: none;">Admin</a>
+        {% endif %}
+        <a href="/profile" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Profile</a>
+        <a href="/auth/logout" class="nav-link" style="color: var(--text-muted); text-decoration: none;">Logout</a>
+        {% else %}
+        <a href="/auth/login" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Login with GitHub</a>
+        {% endif %}
+      </div>
 
       <div class="nav-right">
             <nav class="nav-links" aria-label="site navigation">
@@ -431,6 +442,15 @@
       <a href="#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
       <a href="/compare" class="nav-mobile-link {% if request.path == '/compare' %}active{% endif %}" role="menuitem">Compare</a>
       <a href="/contact" class="nav-mobile-link {% if request.path == '/contact' %}active{% endif %}" role="menuitem">Contact</a>
+      {% if current_user %}
+      {% if current_user.is_admin %}
+      <a href="/admin" class="nav-mobile-link" role="menuitem" style="color: #4f46e5;">Admin</a>
+      {% endif %}
+      <a href="/profile" class="nav-mobile-link" role="menuitem">Profile</a>
+      <a href="/auth/logout" class="nav-mobile-link" role="menuitem">Logout</a>
+      {% else %}
+      <a href="/auth/login" class="nav-mobile-link" role="menuitem">Login with GitHub</a>
+      {% endif %}
       <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
         class="nav-mobile-link" role="menuitem">GitHub</a>
       <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile"
@@ -620,7 +640,8 @@
           <div class="stat-dashboard-value" id="progress-points">0</div>
           <div class="stat-dashboard-progress">
             <div class="progress-meter">
-              <span class="progress-meter-fill" id="progress-meter-fill" style="width: 0%;" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">0%</span>
+              <div class="progress-meter-fill" id="progress-meter-fill"></div>
+              <span class="progress-text" id="progress-text">0%</span>
             </div>
           </div>
           <div class="stat-dashboard-footer">
@@ -1134,6 +1155,16 @@
       </div>
 
       <div class="results-grid" id="results-grid"></div>
+
+      <div class="show-more-container" style="text-align:center; margin-top:2rem;">
+        <button
+          id="show-more-btn"
+          class="btn-submit"
+          style="display:none;"
+          type="button">
+          Show More Projects
+        </button>
+      </div>
 
       <div class="saved-projects-panel" id="saved-projects-panel">
         <div class="saved-projects-header">

@@ -234,9 +234,9 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
 
     # If the project needs more time than the user has, exclude it.
     if project_time not in TIME_RANKS or user_time not in TIME_RANKS:
-        return 0
+        return 0, {}
     if TIME_RANKS.index(project_time) > TIME_RANKS.index(user_time):
-        return 0
+        return 0, {}
 
     score = 0
 
@@ -461,32 +461,41 @@ def project_matches_tech(project, tech_stack):
     """
     if not tech_stack or tech_stack.lower() == "all":
         return True
-        
+
     tech_stack = tech_stack.lower().strip()
-    
+
     if tech_stack == "jsp":
-        pattern = re.compile(r'\b(jsp|servlet|servlets)\b', re.IGNORECASE)
+        pattern = re.compile(r"\b(jsp|servlet|servlets)\b", re.IGNORECASE)
     elif tech_stack == "java":
-        pattern = re.compile(r'\bjava\b', re.IGNORECASE)
+        pattern = re.compile(r"\bjava\b", re.IGNORECASE)
     elif tech_stack == "javascript":
-        pattern = re.compile(r'\b(javascript|js)\b', re.IGNORECASE)
+        pattern = re.compile(r"\b(javascript|js)\b", re.IGNORECASE)
     else:
-        pattern = re.compile(rf'\b{re.escape(tech_stack)}\b', re.IGNORECASE)
-        
+        pattern = re.compile(rf"\b{re.escape(tech_stack)}\b", re.IGNORECASE)
+
     for skill in project.get("skills", []):
         if pattern.search(skill):
             return True
-            
+
     for tech in project.get("tech_stack", []):
         if pattern.search(tech):
             return True
-            
+
     return False
 
 
-def get_recommendations(skills_string, level, interest, time_availability, tech_stack="all"):
+def get_recommendations(
+    skills_string,
+    level,
+    interest,
+    time_availability,
+    tech_stack="all",
+    max_results=None,
+):
     skill_entries = parse_skill_entries(skills_string)
+
     user_skills = [entry["skill"] for entry in skill_entries]
+
     skill_proficiencies = {
         entry["skill"]: entry["proficiency"]
         for entry in skill_entries
@@ -554,79 +563,86 @@ def get_recommendations(skills_string, level, interest, time_availability, tech_
     # most relevant recommendations appear first.
     scored_projects.sort(key=lambda item: (item["score"], item["project"].get("id", 0)), reverse=True)
     
+    selected_projects = (
+      scored_projects
+      if max_results is None
+      else scored_projects[:max_results])
+
     top_projects = []
-    for item in scored_projects[:MAX_RESULTS]:
-        proj = item["project"].copy()
-        
-        # Calculate theoretical max score for THIS project
-        project_skills_count = len(proj.get("skills", []))
-        theoretical_max = (project_skills_count * SCORING_WEIGHTS["skill"]) + \
-                          SCORING_WEIGHTS["level"] + \
-                          SCORING_WEIGHTS["interest"] + \
-                          SCORING_WEIGHTS["time"] + 1.0  # +1.0 for max ML similarity
-                          
-        if theoretical_max == 0:
-            theoretical_max = 1.0
-            
-        project_percentage = item["score"] / theoretical_max
-        match_score = round(4.0 + (project_percentage * 6.0), 1)
-        
-        # Ensure it stays exactly within 4.0 to 10.0
-        proj["match_score"] = min(max(match_score, 4.0), 10.0)
-        
-        match_details = item.get("match_details", {})
-        
-        # Construct distinct explanation
-        import random
-        
-        matched_skills_list = match_details.get("matched_skills", [])
-        skills_str = ""
-        if matched_skills_list:
-            skills_str = ", ".join(matched_skills_list[:3])
-            if len(matched_skills_list) > 3:
-                skills_str += f", and {len(matched_skills_list) - 3} more"
-        
-        # Determine components
-        has_skills = bool(skills_str)
-        has_level = bool(match_details.get("level"))
-        has_interest = bool(match_details.get("interest"))
-        
-        # Build dynamic parts
-        parts = []
-        if has_skills:
-            parts.append(f"utilizes your skills in {skills_str}")
-        if has_level:
-            parts.append("fits your current experience level")
-        if has_interest:
-            parts.append("aligns closely with your interests")
-            
-        project_title = proj.get("title", "this project")
-            
-        if not parts:
-            explanation = f"We highly recommend '{project_title}' based on your overall profile."
-        else:
-            # Join the parts naturally
-            if len(parts) == 1:
-                reasons = parts[0]
-            elif len(parts) == 2:
-                reasons = f"{parts[0]} and {parts[1]}"
-            else:
-                reasons = f"{parts[0]}, {parts[1]}, and {parts[2]}"
-                
-            templates = [
-                f"'{project_title}' is a great match because it {reasons}.",
-                f"We recommend '{project_title}' as it {reasons}.",
-                f"Based on your profile, '{project_title}' stands out because it {reasons}.",
-                f"Dive into '{project_title}'! It's an excellent choice that {reasons}.",
-                f"This project, '{project_title}', is ideal for you since it {reasons}."
-            ]
-            explanation = random.choice(templates)
-            
-        proj["match_explanation"] = explanation
-        top_projects.append(proj)
-        
+
+    for item in selected_projects:
+      proj = item["project"].copy()
+
+      # Calculate theoretical max score for THIS project
+      project_skills_count = len(proj.get("skills", []))
+      theoretical_max = (
+        project_skills_count * SCORING_WEIGHTS["skill"]
+        + SCORING_WEIGHTS["level"]
+        + SCORING_WEIGHTS["interest"]
+        + SCORING_WEIGHTS["time"]
+        + 1.0
+      )
+
+      if theoretical_max == 0:
+        theoretical_max = 1.0
+
+      project_percentage = item["score"] / theoretical_max
+      match_score = round(4.0 + (project_percentage * 6.0), 1)
+
+      # Ensure it stays exactly within 4.0 to 10.0
+      proj["match_score"] = min(max(match_score, 4.0), 10.0)
+
+      match_details = item.get("match_details", {})
+
+      import random
+
+      matched_skills_list = match_details.get("matched_skills", [])
+      skills_str = ""
+
+      if matched_skills_list:
+        skills_str = ", ".join(matched_skills_list[:3])
+        if len(matched_skills_list) > 3:
+          skills_str += f", and {len(matched_skills_list) - 3} more"
+
+      has_skills = bool(skills_str)
+      has_level = bool(match_details.get("level"))
+      has_interest = bool(match_details.get("interest"))
+
+      parts = []
+      if has_skills:
+        parts.append(f"utilizes your skills in {skills_str}")
+      if has_level:
+        parts.append("fits your current experience level")
+      if has_interest:
+        parts.append("aligns closely with your interests")
+
+      project_title = proj.get("title", "this project")
+      if not parts:
+          explanation = (
+              f"We highly recommend '{project_title}' based on your overall profile."
+          )
+      else:
+          if len(parts) == 1:
+              reasons = parts[0]
+          elif len(parts) == 2:
+              reasons = f"{parts[0]} and {parts[1]}"
+          else:
+              reasons = f"{parts[0]}, {parts[1]}, and {parts[2]}"
+
+          templates = [
+              f"'{project_title}' is a great match because it {reasons}.",
+              f"We recommend '{project_title}' as it {reasons}.",
+              f"Based on your profile, '{project_title}' stands out because it {reasons}.",
+              f"Dive into '{project_title}'! It's an excellent choice that {reasons}.",
+              f"This project, '{project_title}', is ideal for you since it {reasons}.",
+          ]
+
+          explanation = random.choice(templates)
+
+      proj["match_explanation"] = explanation
+      top_projects.append(proj)      
     top_ids = [p["id"] for p in top_projects]
-    
+
     cluster_data = _load_clusters()
     related = _get_related(top_ids, all_projects, cluster_data) if cluster_data else []
     

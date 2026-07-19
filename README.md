@@ -156,7 +156,7 @@ source venv/bin/activate
 
 pip install -r requirements.txt
 
-python app.py
+python src/app.py
 ```
 
 ### Windows Setup
@@ -170,7 +170,7 @@ venv\Scripts\activate
 
 pip install -r requirements.txt
 
-python app.py
+python src/app.py
 ```
 
 ## Verify Everything Works

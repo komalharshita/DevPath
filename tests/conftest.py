@@ -17,6 +17,7 @@ from utils.rate_limiter import reset_rate_limits
 def client():
     """Provide a Flask test client for testing the application."""
     app.config['TESTING'] = True
+    app.config['WTF_CSRF_ENABLED'] = False
     with app.test_client() as client:
         yield client
 

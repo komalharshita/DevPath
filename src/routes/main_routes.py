@@ -3,7 +3,7 @@
 # Each route is kept thin: it validates input, calls a utility function,
 # and returns a response. No business logic lives here.
 
-from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response
+from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response, redirect, url_for, session
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
 from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats, get_available_interests
@@ -28,6 +28,7 @@ from config import Config
 from flask import jsonify
 from utils.portfolio_analyzer import analyze_portfolio
 import os
+from models import db, ProjectProgress
 
 _skill_validator = SkillProgressionValidator()
 _code_review_manager = CodeReviewManager()
@@ -153,7 +154,13 @@ def recommend():
             "message": "No projects are currently available for this interest area. Please check back later."
         }), 200
 
-    recommendations_data = get_recommendations(skills, level, interest, time_availability, tech_stack)
+    recommendations_data = get_recommendations(
+    skills,
+    level,
+    interest,
+    time_availability,
+    tech_stack,
+    max_results=None,)
     results = recommendations_data.get("recommendations", [])
 
     # Ensure all projects have IDs in the response
@@ -212,8 +219,32 @@ def project_detail(project_id):
     project = find_project_by_id(project_id)
     if not project:
         abort(404)
-    return render_template("project.html", project=project, config=Config)
+        
+    return render_template("project.html", project=project, config=Config, og_url=Config.get_base_url() + "/project/" + str(project_id))
 
+@main.route("/profile")
+def profile():
+    from flask import session
+    from models import db, User
+    from utils.data_loader import find_project_by_id
+    
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('auth.login'))
+        
+    user = db.session.get(User, user_id)
+    if not user:
+        session.pop('user_id', None)
+        return redirect(url_for('auth.login'))
+        
+    # Hydrate bookmarked projects
+    bookmarked_projects = []
+    for pid in user.bookmarked_projects:
+        p = find_project_by_id(pid)
+        if p:
+            bookmarked_projects.append(p)
+            
+    return render_template("profile.html", user=user, bookmarked_projects=bookmarked_projects)
 
 @main.route("/project/<int:project_id>/code")
 def view_code(project_id):
@@ -804,6 +835,44 @@ def update_path(path_id):
         return jsonify({"error": "Forbidden: invalid token for this path."}), 403
 
     return jsonify({"path_id": path_id, "message": "Learning path updated."}), 200
+
+@main.route("/api/project/<int:project_id>/progress", methods=["GET"])
+def get_project_progress(project_id):
+    """Return the user's roadmap progress for a specific project."""
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    progress = ProjectProgress.query.filter_by(user_id=user_id, project_id=project_id).first()
+    completed_steps = progress.completed_steps if progress else []
+    return jsonify({"completed_steps": completed_steps}), 200
+
+@main.route("/api/project/<int:project_id>/progress", methods=["POST"])
+def update_project_progress(project_id):
+    """Update the user's roadmap progress for a specific project."""
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    payload = request.get_json(silent=True)
+    if not payload or not isinstance(payload.get("completed_steps"), list):
+        return jsonify({"error": "Invalid payload. Expected 'completed_steps' array."}), 400
+
+    completed_steps = payload["completed_steps"]
+
+    progress = ProjectProgress.query.filter_by(user_id=user_id, project_id=project_id).first()
+    if progress:
+        progress.completed_steps = completed_steps
+    else:
+        progress = ProjectProgress(
+            user_id=user_id,
+            project_id=project_id,
+            completed_steps=completed_steps
+        )
+        db.session.add(progress)
+
+    db.session.commit()
+    return jsonify({"message": "Progress saved successfully"}), 200
 @main.route("/api/portfolio-analysis", methods=["POST"])
 def portfolio_analysis():
     """
