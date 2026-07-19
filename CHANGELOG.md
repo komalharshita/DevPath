@@ -6,6 +6,8 @@
 - Initial CHANGELOG.md setup for tracking project history
 - Documentation structure for future contributor updates
 - Added .flake8 config file to enforce consistent 88-character line limit for all contributors
+- DevPath Sentinel developer tool for repository health and dataset integrity validation (#1295)
+- Dataset validator to detect duplicate project IDs, duplicate project titles, missing required fields, empty required fields, and missing starter code references
 
 ### Changed
 
