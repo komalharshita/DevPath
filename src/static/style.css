@@ -996,7 +996,7 @@ html[data-theme="dark"] .theme-toggle-label::before {
   font-size: clamp(2.4rem, 5vw, 3.8rem);
   font-weight: 800;
   color: #ffffff;
-  line-height: 1.1;
+  line-height: 1.3;
   letter-spacing: -0.04em;
   margin-bottom: 22px;
 }
@@ -1007,7 +1007,7 @@ html[data-theme="dark"] .theme-toggle-label::before {
 
 .hero-subtext {
   font-size: 1.08rem;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.85);
   line-height: 1.78;
   margin-bottom: 32px;
   max-width: 500px;
@@ -1024,35 +1024,66 @@ html[data-theme="dark"] .theme-toggle-label::before {
 .btn-hero-primary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 14px 28px;
+  padding: 16px 32px;
   background: var(--yellow-400);
-  color: #000000;
+  color: #0B0F19;
   font-family: var(--font-display);
   font-size: 0.95rem;
   font-weight: 700;
   border-radius: var(--r-full);
   box-shadow: 0 4px 20px rgba(251, 191, 36, 0.4);
-  transition: background var(--t), transform var(--t), box-shadow var(--t);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  min-height: 48px;
 }
 
 .btn-hero-primary:hover {
-  background: var(--yellow-300);
+  background: #F59E0B;
   transform: translateY(-2px);
-  box-shadow: 0 6px 28px rgba(251, 191, 36, 0.5);
+  box-shadow: 
+    0 8px 32px rgba(251, 191, 36, 0.6),
+    0 0 0 1px rgba(251, 191, 36, 0.2),
+    0 0 24px rgba(251, 191, 36, 0.3);
   text-decoration: none;
+  color: #0B0F19;
 }
 
 .btn-hero-primary:focus-visible {
-  outline: var(--focus-ring-width) solid #ffffff;
-  outline-offset: var(--focus-ring-offset);
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.btn-hero-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 12px rgba(251, 191, 36, 0.4);
+}
+
+/* Dark mode override for primary CTA button - keep yellow background, make text black */
+html[data-theme="dark"] .btn-hero-primary {
+  background: var(--yellow-400);
+  color: #000000;
+  box-shadow: 0 4px 20px rgba(251, 191, 36, 0.4);
+}
+
+html[data-theme="dark"] .btn-hero-primary:hover {
+  background: #F59E0B;
+  color: #000000;
+  box-shadow: 
+    0 8px 32px rgba(251, 191, 36, 0.6),
+    0 0 0 1px rgba(251, 191, 36, 0.2),
+    0 0 24px rgba(251, 191, 36, 0.3);
 }
 
 .btn-hero-ghost {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 14px 28px;
+  padding: 16px 32px;
   background: rgba(255, 255, 255, 0.1);
   border: 1.5px solid rgba(255, 255, 255, 0.25);
   color: #ffffff;
@@ -1060,17 +1091,29 @@ html[data-theme="dark"] .theme-toggle-label::before {
   font-size: 0.95rem;
   font-weight: 600;
   border-radius: var(--r-full);
-  transition: background var(--t);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  text-decoration: none;
+  min-height: 48px;
 }
 
 .btn-hero-ghost:hover {
   background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.1);
   text-decoration: none;
+  color: #ffffff;
 }
 
 .btn-hero-ghost:focus-visible {
-  outline: var(--focus-ring-width) solid #ffffff;
-  outline-offset: var(--focus-ring-offset);
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.btn-hero-ghost:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 12px rgba(255, 255, 255, 0.15);
 }
 
 /* Visual column (code preview cards) */
@@ -1087,10 +1130,13 @@ html[data-theme="dark"] .theme-toggle-label::before {
   display: flex;
   align-items: center;
   gap: 14px;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--r-md);
   padding: 14px 18px;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .hvc-icon {
@@ -1104,13 +1150,13 @@ html[data-theme="dark"] .theme-toggle-label::before {
 }
 
 .hvc-icon--blue {
-  background: var(--indigo-100);
-  color: var(--indigo-600);
+  background: rgba(79, 110, 247, 0.2);
+  color: #a5b4fc;
 }
 
 .hvc-icon--green {
-  background: var(--green-100);
-  color: var(--green-500);
+  background: rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
 }
 
 .hvc-text {
@@ -1119,18 +1165,17 @@ html[data-theme="dark"] .theme-toggle-label::before {
   gap: 2px;
 }
 
-/* Hero visual cards always have white background — use non-variable colours
-   intentionally so they stand out against the dark hero regardless of theme. */
+/* Hero visual cards now use dark glassmorphism background */
 .hvc-title {
   font-family: var(--font-display);
   font-size: 0.88rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #e2e8f0;
 }
 
 .hvc-sub {
   font-size: 0.77rem;
-  color: #475569;
+  color: #94a3b8;
 }
 
 /* Code preview card */
@@ -1169,7 +1214,7 @@ html[data-theme="dark"] .theme-toggle-label::before {
 }
 
 .hvm-code {
-  padding: 18px 20px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 0;

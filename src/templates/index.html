@@ -404,28 +404,23 @@
           </svg>
         </button>
       </form>
-      <div class="nav-links desktop-only" style="margin-left: auto; display: flex; align-items: center; gap: 1.5rem; padding-right: 1.5rem;">
-        {% if current_user %}
-        {% if current_user.is_admin %}
-        <a href="/admin" class="nav-link" style="font-weight: 600; color: #4f46e5; text-decoration: none;">Admin</a>
-        {% endif %}
-        <a href="/profile" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Profile</a>
-        <a href="/auth/logout" class="nav-link" style="color: var(--text-muted); text-decoration: none;">Logout</a>
-        {% else %}
-        <a href="/auth/login" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Login with GitHub</a>
-        {% endif %}
-      </div>
-
       <div class="nav-right">
             <nav class="nav-links" aria-label="site navigation">
                 <a href="#how-it-works" class="nav-link">How It Works</a>
                 <a href="#features" class="nav-link">Features</a>
                 <a href="#the-project" class="nav-link">Find Project</a>
-                <a href="/compare" class="nav-link">Compare</a>
                 <a href="/contact" class="nav-link">Contact</a>
-                <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-link">GitHub</a>
             </nav>
             <div class="nav-actions">
+                {% if current_user %}
+                {% if current_user.is_admin %}
+                <a href="/admin" class="nav-link" style="font-weight: 600; color: #4f46e5; text-decoration: none; margin-right: 1rem;">Admin</a>
+                {% endif %}
+                <a href="/profile" class="nav-link" style="font-weight: 600; color: rgba(255, 255, 255, 0.85); text-decoration: none; margin-right: 1rem;">Profile</a>
+                <a href="/auth/logout" class="nav-link" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; margin-right: 1rem;">Logout</a>
+                {% else %}
+                <a href="/auth/login" class="nav-link" style="font-weight: 600; color: rgba(255, 255, 255, 0.85); text-decoration: none; margin-right: 1rem;">Login with GitHub</a>
+                {% endif %}
                 {% include 'partials/theme_toggle.html' %}
             </div>
             
@@ -451,7 +446,6 @@
       <a href="#how-it-works" class="nav-mobile-link" role="menuitem">How It Works</a>
       <a href="#features" class="nav-mobile-link" role="menuitem">Features</a>
       <a href="#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
-      <a href="/compare" class="nav-mobile-link {% if request.path == '/compare' %}active{% endif %}" role="menuitem">Compare</a>
       <a href="/contact" class="nav-mobile-link {% if request.path == '/contact' %}active{% endif %}" role="menuitem">Contact</a>
       {% if current_user %}
       {% if current_user.is_admin %}
@@ -462,8 +456,6 @@
       {% else %}
       <a href="/auth/login" class="nav-mobile-link" role="menuitem">Login with GitHub</a>
       {% endif %}
-      <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
-        class="nav-mobile-link" role="menuitem">GitHub</a>
       <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile"
         aria-pressed="false" aria-label="Switch to dark mode" role="menuitem">
         <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
