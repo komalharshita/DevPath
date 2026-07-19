@@ -306,6 +306,7 @@ function updateProfileWidgets() {
   var pointsEl = document.getElementById("progress-points");
   var statsEl = document.getElementById("progress-stats");
   var meterFill = document.getElementById("progress-meter-fill");
+  var meterLabel = document.getElementById("progress-meter-label");
   var badgesEl = document.getElementById("progress-badges");
   var achievementList = document.getElementById("achievement-list");
   var leaderboardList = document.getElementById("leaderboard-list");
@@ -324,7 +325,7 @@ function updateProfileWidgets() {
     var percentage = Math.min(100, Math.round((progress.points / PROGRESS_MAX_POINTS) * 100));
     meterFill.style.width = percentage + "%";
     meterFill.setAttribute("aria-valuenow", String(percentage));
-    meterFill.textContent = percentage + "%";
+    if (meterLabel) meterLabel.textContent = percentage + "%";
   }
   if (badgesEl) {
     var badges = [
@@ -475,6 +476,7 @@ async function updatePortfolioAnalysis() {
   var btnLoading = document.getElementById("btn-loading");
   var resultsSection = document.getElementById("results-section");
   var resultsGrid = document.getElementById("results-grid");
+  var showMoreBtn = document.getElementById("show-more-btn");
   var resultsLoadingEl = document.getElementById("results-loading");
   var resultsEmptyEl = document.getElementById("results-empty");
   var emptyMessageEl = document.getElementById("empty-message");
@@ -727,9 +729,35 @@ async function updatePortfolioAnalysis() {
     title.className = "project-card-title";
     title.textContent = project.title;
 
-    var desc = document.createElement("div");
-    desc.className = "project-card-description";
-    desc.textContent = project.description;
+    var desc = document.createElement("p");
+    desc.className = "project-card-desc";
+    var descText = document.createElement("span");
+    descText.className = "project-card-desc-text";
+    descText.textContent = truncate(project.description, 120);
+    desc.appendChild(descText);
+
+    if (project.description && project.description.length > 120) {
+      var expanded = false;
+      var readMore = document.createElement("button");
+      readMore.type = "button";
+      readMore.className = "read-more-btn";
+      readMore.setAttribute("aria-label", "Read full description for " + project.title);
+      readMore.setAttribute("aria-expanded", "false");
+      var readMoreLabel = document.createElement("span");
+      readMoreLabel.textContent = "Read more";
+      readMore.appendChild(readMoreLabel);
+      readMore.addEventListener("click", function () {
+        expanded = !expanded;
+        descText.textContent = expanded ? project.description : truncate(project.description, 120);
+        readMoreLabel.textContent = expanded ? "Read less" : "Read more";
+        readMore.setAttribute("aria-expanded", expanded ? "true" : "false");
+        readMore.setAttribute(
+          "aria-label",
+          (expanded ? "Collapse description for " : "Read full description for ") + project.title
+        );
+      });
+      desc.appendChild(readMore);
+    }
 
     var tags = document.createElement("div");
     tags.className = "project-card-tags";
@@ -737,6 +765,9 @@ async function updatePortfolioAnalysis() {
     (project.skills || []).forEach(function (skill) { tags.appendChild(createTag(skill, "skill")); });
     tags.appendChild(createTag(project.level, project.level));
     tags.appendChild(createTag("Time: " + project.time, "time"));
+    if (project.synergy_applied) {
+      tags.appendChild(createTag("Synergy Match ✨", "synergy"));
+    }
 
     var footer = document.createElement("div");
     footer.className = "project-card-footer";
@@ -770,11 +801,17 @@ async function updatePortfolioAnalysis() {
     return card;
   }
 
+  var allProjects = [];
+  var visibleProjectCount = 3;
+
+  var PROJECTS_PER_LOAD = 3;
+
   function renderResults(projects, message) {
     resultsSection.style.display = "block";
     resultsLoadingEl.style.display = "none";
     resultsGrid.innerHTML = "";
     if (!projects || projects.length === 0) {
+      showMoreBtn.style.display = "none";
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "block";
       if (emptyMessageEl) {
@@ -788,6 +825,19 @@ async function updatePortfolioAnalysis() {
     projects.forEach(function (project) { resultsGrid.appendChild(buildProjectCard(project)); });
     resultsSection.scrollIntoView({ behavior: "smooth" });
   }
+  if (showMoreBtn) {
+      showMoreBtn.addEventListener("click", function () {
+        visibleProjectCount += PROJECTS_PER_LOAD;
+        
+        renderResults(
+          allProjects.slice(0, visibleProjectCount)
+        );
+        
+        if (visibleProjectCount >= allProjects.length) {
+          showMoreBtn.style.display = "none";
+        }
+      });
+    }
 
   skillsInput.setAttribute("role", "combobox");
   skillsInput.setAttribute("aria-expanded", "false");
@@ -870,6 +920,9 @@ async function updatePortfolioAnalysis() {
     clearAllErrors();
     hideSuggestions();
     resultsSection.style.display = "none";
+    showMoreBtn.style.display = "none";
+    allProjects = [];
+    visibleProjectCount = PROJECTS_PER_LOAD;
     if (skillsInput) skillsInput.focus();
   }
 
@@ -943,9 +996,20 @@ async function updatePortfolioAnalysis() {
         setLoadingState(false);
         recordSearch();
         hasSearched = true;
-        renderResults(data.projects || [], data.message);
 
-        // Update URL query parameters so the result is shareable
+        allProjects = data.projects || [];
+        visibleProjectCount = PROJECTS_PER_LOAD;
+
+        renderResults(
+          allProjects.slice(0, visibleProjectCount),data.message);
+  
+        if (allProjects.length > visibleProjectCount) {
+          showMoreBtn.style.display = "inline-block";
+        } else {
+          showMoreBtn.style.display = "none";
+        }
+
+         // Update URL query parameters so the result is shareable
         try {
           var params = new URLSearchParams();
           params.set("skills", JSON.stringify(selectedSkills));
@@ -953,7 +1017,7 @@ async function updatePortfolioAnalysis() {
           params.set("interest", document.getElementById("interest").value);
           params.set("time", document.getElementById("time").value);
           window.history.replaceState(null, "", "?" + params.toString());
-        } catch (e) {}
+      } catch (e) {}
       })
       .catch(function (err) {
         setLoadingState(false);
@@ -1141,9 +1205,9 @@ async function updatePortfolioAnalysis() {
   var progressFill = document.getElementById("roadmap-progress-fill");
   var progressText = document.getElementById("roadmap-progress-text");
   var progressBar = document.querySelector(".roadmap-progress-bar");
-  var roadmapStorageKey = "devpath-roadmap-progress-" + PROJECT_ID;
+  var roadmapStorageKey = "devpath-roadmap-progress-" + (typeof PROJECT_ID !== 'undefined' ? PROJECT_ID : "");
 
-  function updateRoadmapProgress() {
+  function updateRoadmapProgress(skipSave) {
     if (!roadmapCheckboxes.length) return;
     var completedCount = roadmapCheckboxes.filter(function (checkbox) { return checkbox.checked; }).length;
     var percent = Math.round((completedCount / roadmapCheckboxes.length) * 100);
@@ -1151,10 +1215,10 @@ async function updatePortfolioAnalysis() {
       var step = checkbox.closest(".roadmap-step");
       if (step) step.classList.toggle("completed", checkbox.checked);
     });
+    
     if (progressFill) progressFill.style.width = percent + "%";
     if (progressText) progressText.textContent = percent + "% completed";
     if (progressBar) progressBar.setAttribute("aria-valuenow", String(percent));
-
     // Disable completion button unless all steps are completed
     var completionBtn = document.getElementById("btn-mark-complete");
     if (completionBtn && typeof PROJECT_ID !== "undefined") {
@@ -1174,23 +1238,49 @@ async function updatePortfolioAnalysis() {
       }
     }
 
-    try {
-      localStorage.setItem(roadmapStorageKey, JSON.stringify(roadmapCheckboxes.map(function (checkbox) {
-        return checkbox.checked;
-      })));
-    } catch (err) {}
+    if (skipSave === true) return;
+
+    var completedStates = roadmapCheckboxes.map(function (checkbox) {
+      return checkbox.checked;
+    });
+
+    if (typeof USER_LOGGED_IN !== 'undefined' && USER_LOGGED_IN) {
+      fetch("/api/project/" + PROJECT_ID + "/progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ completed_steps: completedStates })
+      }).catch(console.error);
+    } else {
+      try {
+        localStorage.setItem(roadmapStorageKey, JSON.stringify(completedStates));
+      } catch (err) {}
+    }
   }
 
-  try {
-    var saved = JSON.parse(localStorage.getItem(roadmapStorageKey) || "[]");
+  function renderRoadmapFromState(saved) {
     roadmapCheckboxes.forEach(function (checkbox, index) {
       checkbox.checked = !!saved[index];
     });
-  } catch (err) {}
-  roadmapCheckboxes.forEach(function (checkbox) {
-    checkbox.addEventListener("change", updateRoadmapProgress);
-  });
-  updateRoadmapProgress();
+    updateRoadmapProgress(true);
+  }
+
+  if (roadmapCheckboxes.length > 0) {
+    if (typeof USER_LOGGED_IN !== 'undefined' && USER_LOGGED_IN) {
+      fetch("/api/project/" + PROJECT_ID + "/progress")
+        .then(function(res) { return res.json(); })
+        .then(function(data) { renderRoadmapFromState(data.completed_steps || []); })
+        .catch(console.error);
+    } else {
+      try {
+        var saved = JSON.parse(localStorage.getItem(roadmapStorageKey) || "[]");
+        renderRoadmapFromState(saved);
+      } catch (err) {}
+    }
+
+    roadmapCheckboxes.forEach(function (checkbox) {
+      checkbox.addEventListener("change", function() { updateRoadmapProgress(false); });
+    });
+  }
 
   // Initialize expandable roadmap details
   var stepToggles = document.querySelectorAll(".btn-step-details-toggle");

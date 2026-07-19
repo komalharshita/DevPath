@@ -7,18 +7,11 @@ import logging
 from pathlib import Path
 
 from utils.url_validator import is_valid_url, parse_resource
-
-# 1. __file__ is src/utils/data_loader.py
-# 2. .parent is src/utils/
-# 3. .parent.parent is src/
-# 4. .parent.parent.parent gets us to the true DevPath root directory!
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-DATA_FILE = BASE_DIR / "data" / "projects.json"
+from models import Project
 
 logger = logging.getLogger("devpath.data_loader")
 
 _projects_cache = None
-_cache_lock = threading.Lock()
 
 
 def validate_projects(projects):
@@ -83,20 +76,12 @@ def validate_projects(projects):
 
 
 def load_all_projects():
-    """Read and return the full list of projects from the JSON file.
-
-    Results are cached in memory after the first read so subsequent calls
-    do not hit the filesystem.
-    """
+    """Read and return the full list of projects from the database."""
     global _projects_cache
     if _projects_cache is None:
-        with _cache_lock:
-            if _projects_cache is None:
-                with open(DATA_FILE, "r", encoding="utf-8") as f:
-                    _projects_cache = json.load(f)
-                validate_projects(_projects_cache)
+        projects = Project.query.all()
+        _projects_cache = [p.to_dict() for p in projects]
     return _projects_cache
-
 
 def get_available_levels():
     """Return all unique project levels."""
@@ -109,10 +94,9 @@ def get_available_interests():
     return sorted({p["interest"] for p in projects if "interest" in p})
 def find_project_by_id(project_id):
     """Return the project whose 'id' matches project_id, or None."""
-    for project in load_all_projects():
-        if project.get("id") == project_id:
-            return project
-    return None
+    from models import db
+    p = db.session.get(Project, project_id)
+    return p.to_dict() if p else None
 
 
 def get_project_stats():
@@ -136,5 +120,4 @@ def get_project_stats():
 def clear_cache():
     """Reset the in-memory project cache (used in tests)."""
     global _projects_cache
-    with _cache_lock:
-        _projects_cache = None
+    _projects_cache = None

@@ -120,6 +120,16 @@
       margin: 0.75rem 0;
     }
 
+    .progress-meter-label {
+      display: block;
+      margin-bottom: 0.4rem;
+      color: var(--text-muted, #6b7280);
+      font-size: 0.75rem;
+      font-weight: 700;
+      line-height: 1;
+      text-align: right;
+    }
+
     .progress-meter {
       background: var(--gray-200, #e5e7eb);
       border-radius: 100px;
@@ -132,6 +142,7 @@
       height: 100%;
       border-radius: 100px;
       display: block;
+      min-width: 0;
       width: 0%;
       transition: width 0.3s ease;
     }
@@ -393,6 +404,17 @@
           </svg>
         </button>
       </form>
+      <div class="nav-links desktop-only" style="margin-left: auto; display: flex; align-items: center; gap: 1.5rem; padding-right: 1.5rem;">
+        {% if current_user %}
+        {% if current_user.is_admin %}
+        <a href="/admin" class="nav-link" style="font-weight: 600; color: #4f46e5; text-decoration: none;">Admin</a>
+        {% endif %}
+        <a href="/profile" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Profile</a>
+        <a href="/auth/logout" class="nav-link" style="color: var(--text-muted); text-decoration: none;">Logout</a>
+        {% else %}
+        <a href="/auth/login" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Login with GitHub</a>
+        {% endif %}
+      </div>
 
       <div class="nav-right">
             <nav class="nav-links" aria-label="site navigation">
@@ -431,6 +453,15 @@
       <a href="#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
       <a href="/compare" class="nav-mobile-link {% if request.path == '/compare' %}active{% endif %}" role="menuitem">Compare</a>
       <a href="/contact" class="nav-mobile-link {% if request.path == '/contact' %}active{% endif %}" role="menuitem">Contact</a>
+      {% if current_user %}
+      {% if current_user.is_admin %}
+      <a href="/admin" class="nav-mobile-link" role="menuitem" style="color: #4f46e5;">Admin</a>
+      {% endif %}
+      <a href="/profile" class="nav-mobile-link" role="menuitem">Profile</a>
+      <a href="/auth/logout" class="nav-mobile-link" role="menuitem">Logout</a>
+      {% else %}
+      <a href="/auth/login" class="nav-mobile-link" role="menuitem">Login with GitHub</a>
+      {% endif %}
       <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
         class="nav-mobile-link" role="menuitem">GitHub</a>
       <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile"
@@ -619,8 +650,9 @@
           </div>
           <div class="stat-dashboard-value" id="progress-points">0</div>
           <div class="stat-dashboard-progress">
+            <span class="progress-meter-label" id="progress-meter-label">0%</span>
             <div class="progress-meter">
-              <span class="progress-meter-fill" id="progress-meter-fill" style="width: 0%;" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">0%</span>
+              <span class="progress-meter-fill" id="progress-meter-fill" style="width: 0%;" role="progressbar" aria-label="Points progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></span>
             </div>
           </div>
           <div class="stat-dashboard-footer">
@@ -885,7 +917,7 @@
                 
                 <!-- Reset button and Inline GitHub Trigger -->
                 <div style="display: flex; gap: 3px; align-items: center;">
-                   <button type="reset" id="reset-form-btn" class="btn-clear" style="padding: 4px 12px; font-size: 0.75rem;">
+                   <button type="reset" id="clear-filters-btn" class="btn-clear" style="padding: 4px 12px; font-size: 0.75rem;">
                     Reset
                   </button>
                 <div class="github-inline-trigger" id="github-trigger-wrap" style="line-height: 1.2;">
@@ -1134,6 +1166,16 @@
       </div>
 
       <div class="results-grid" id="results-grid"></div>
+
+      <div class="show-more-container" style="text-align:center; margin-top:2rem;">
+        <button
+          id="show-more-btn"
+          class="btn-submit"
+          style="display:none;"
+          type="button">
+          Show More Projects
+        </button>
+      </div>
 
       <div class="saved-projects-panel" id="saved-projects-panel">
         <div class="saved-projects-header">
