@@ -404,6 +404,10 @@
           </svg>
         </button>
       </form>
+      <div class="nav-links">
+        {% include 'partials/theme_toggle.html' %}
+        </div>
+        <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation"></button>
       <div class="nav-links desktop-only" style="margin-left: auto; display: flex; align-items: center; gap: 1.5rem; padding-right: 1.5rem;">
         {% if current_user %}
         {% if current_user.is_admin %}
