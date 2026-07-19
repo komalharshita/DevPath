@@ -1,17 +1,15 @@
 # utils/data_loader.py
+# utils/data_loader.py
 import json
 import os
 import threading
 import logging
+from pathlib import Path
 
 from utils.url_validator import is_valid_url, parse_resource
-
-DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "..", "data", "projects.json")
+from models import Project
 
 logger = logging.getLogger("devpath.data_loader")
-
-_projects_cache = None
-_cache_lock = threading.Lock()
 
 
 def validate_projects(projects):
@@ -76,31 +74,24 @@ def validate_projects(projects):
 
 
 def load_all_projects():
-    """Read and return the full list of projects from the JSON file.
-
-    Results are cached in memory after the first read so subsequent calls
-    do not hit the filesystem.
-    """
-    global _projects_cache
-    if _projects_cache is None:
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            _projects_cache = json.load(f)
-        validate_projects(_projects_cache)
-    return _projects_cache
-
+    """Read and return the full list of projects from the database."""
+    projects = Project.query.all()
+    return [p.to_dict() for p in projects]
 
 def get_available_levels():
     """Return all unique project levels."""
     projects = load_all_projects()
     return sorted({p["level"] for p in projects})
 
-
+def get_available_interests():
+    """Return all unique project interests."""
+    projects = load_all_projects()
+    return sorted({p["interest"] for p in projects if "interest" in p})
 def find_project_by_id(project_id):
     """Return the project whose 'id' matches project_id, or None."""
-    for project in load_all_projects():
-        if project.get("id") == project_id:
-            return project
-    return None
+    from models import db
+    p = db.session.get(Project, project_id)
+    return p.to_dict() if p else None
 
 
 def get_project_stats():
@@ -123,6 +114,4 @@ def get_project_stats():
 
 def clear_cache():
     """Reset the in-memory project cache (used in tests)."""
-    global _projects_cache
-    with _cache_lock:
-        _projects_cache = None
+    pass

@@ -93,6 +93,11 @@ class TestCreateLearningPath:
         with pytest.raises(ValueError):
             create_learning_path("bad path!", make_token(), {})
 
+    def test_create_path_id_with_exclamation_raises(self):
+        """path_id containing '!' must be rejected by validation."""
+        with pytest.raises(ValueError):
+            create_learning_path("bad!path", make_token(), {})
+
     def test_create_empty_path_id_raises(self):
         """Empty path_id should raise ValueError."""
         with pytest.raises(ValueError):
@@ -281,12 +286,18 @@ class TestCreatePathRoute:
         assert response.status_code == 409
 
     def test_post_invalid_path_id_characters_returns_400(self):
-        """path_id with spaces or special characters must be rejected."""
+        """path_id containing '!' (an illegal special character) must be rejected with 400.
+
+        The validation regex only permits letters, digits, hyphens, and
+        underscores.  An exclamation mark is explicitly illegal and is
+        consistent with the unit-level test ``test_create_invalid_path_id_raises``
+        which also uses '!'.  The character is URL-encoded (%21) so that Flask
+        routes the request to the handler rather than returning a 404 for an
+        unroutable path.
+        """
         client = get_client()
-        # Flask URL routing converts spaces, so we test via a known-bad char
-        # that reaches validation: a path_id with a dot
         response = client.post(
-            "/api/learning-path/bad.path",
+            "/api/learning-path/bad%21path",
             json={},
             headers={TOKEN_HEADER: make_token()},
         )
