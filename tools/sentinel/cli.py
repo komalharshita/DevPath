@@ -1,20 +1,25 @@
 """
 Command-line entry point for DevPath Sentinel.
 """
+import sys
 
-if __package__:
-    # Running as: python -m tools.sentinel.cli
-    from .report import print_banner, print_no_validators
-else:
-    # Running as: python tools/sentinel/cli.py
-    from report import print_banner, print_no_validators
+from .report import print_banner, print_validation_result
+from .validators.dataset_validator import run
 
 
 def main() -> None:
     """Run DevPath Sentinel."""
 
     print_banner()
-    print_no_validators()
+
+    result = run()
+
+    print_validation_result(result)
+
+    if result.errors:
+        sys.exit(1)
+
+    sys.exit(0)
 
 
 if __name__ == "__main__":
