@@ -4,6 +4,7 @@
 import math
 import re
 from collections import Counter
+import functools
 
 import json
 import os
@@ -111,8 +112,20 @@ def parse_skills(skills_string):
 def parse_skills(skills_string):
     return [entry["skill"] for entry in parse_skill_entries(skills_string)]
 
-def _tokenize(text):
-    return re.findall(r"[a-z0-9]+", str(text).lower())
+_nlp_model = None
+_project_embeddings_cache = {}
+
+def get_nlp_model():
+    """Lazily load the SentenceTransformer model to save startup time."""
+    global _nlp_model
+    if _nlp_model is None:
+        try:
+            from sentence_transformers import SentenceTransformer
+            _nlp_model = SentenceTransformer('all-MiniLM-L6-v2')
+        except Exception as e:
+            print(f"Error loading NLP model: {e}")
+            pass
+    return _nlp_model
 
 def _project_text(project):
     parts = [
@@ -128,7 +141,50 @@ def _project_text(project):
     return " ".join(parts)
 
 def _user_text(user_skills, level, interest, time_availability):
-    return " ".join(user_skills + [level, interest, time_availability])
+    return f"I am a {level} developer interested in {interest}. I have {time_availability} time. My skills are: {', '.join(user_skills)}."
+
+@functools.lru_cache(maxsize=128)
+def _get_user_embedding(user_text):
+    model = get_nlp_model()
+    if not model:
+        return None
+    return model.encode(user_text, convert_to_tensor=True)
+
+def _get_project_embedding(project):
+    model = get_nlp_model()
+    if not model:
+        return None
+        
+    pid = project.get("id")
+    if pid not in _project_embeddings_cache:
+        text = _project_text(project)
+        _project_embeddings_cache[pid] = model.encode(text, convert_to_tensor=True)
+        
+    return _project_embeddings_cache[pid]
+
+def ml_similarity_score(project, user_skills, level, interest, time_availability):
+    """
+    Computes semantic similarity between the user's profile and the project using NLP embeddings.
+    """
+    model = get_nlp_model()
+    if not model:
+        return 0.0
+        
+    user_str = _user_text(user_skills, level, interest, time_availability)
+    user_emb = _get_user_embedding(user_str)
+    proj_emb = _get_project_embedding(project)
+    
+    if user_emb is None or proj_emb is None:
+        return 0.0
+        
+    from sentence_transformers import util
+    cos_sim = util.cos_sim(user_emb, proj_emb)
+    
+    # cos_sim is a 2D tensor, get the scalar value
+    return cos_sim.item()
+
+def _tokenize(text):
+    return re.findall(r"[a-z0-9]+", str(text).lower())
 
 def _tf(tokens):
     counts = Counter(tokens)
@@ -166,9 +222,8 @@ def _cosine_similarity(vec_a, vec_b):
 
     return dot_product / (magnitude_a * magnitude_b)
 
-def ml_similarity_score(project, user_vector, idf_scores):
+def tfidf_similarity_score(project, user_vector, idf_scores):
     project_vector = _tfidf_vector(_tokenize(_project_text(project)), idf_scores)
-
     return _cosine_similarity(user_vector, project_vector)
 
 def score_single_project(project, user_skills, level, interest, time_availability, graph=None, skill_proficiencies=None):
@@ -447,15 +502,15 @@ def get_recommendations(
     }
     all_projects = load_all_projects()
     
-    # Pre-compute IDF scores and user vector
-    # PERFORMANCE NOTE: Pre-computing the tokenization and base idf_scores outside of the
-    # ml_similarity_score loop reduces the time complexity from O(N^2) to O(N).
-    # Benchmarking on 22 projects showed a ~15x speedup (0.15s down to 0.01s).
-    # This ensures scalable performance as the number of projects grows.
-    project_documents = [_tokenize(_project_text(p)) for p in all_projects]
-    user_tokens = _tokenize(_user_text(user_skills, level, interest, time_availability))
-    idf_scores = _idf(project_documents + [user_tokens])
-    user_vector = _tfidf_vector(user_tokens, idf_scores)
+    # Load NLP model to determine if we should use semantic search
+    model = get_nlp_model()
+    
+    # Pre-compute TF-IDF vectors ONLY if fallback is needed
+    if not model:
+        project_documents = [_tokenize(_project_text(p)) for p in all_projects]
+        user_tokens = _tokenize(_user_text(user_skills, level, interest, time_availability))
+        idf_scores = _idf(project_documents + [user_tokens])
+        user_vector = _tfidf_vector(user_tokens, idf_scores)
     
     scored_projects = []
     graph = _load_skill_graph()
@@ -473,11 +528,21 @@ def get_recommendations(
         else:
             rule_score, match_details = score_result, {}
 
-        similarity_score = ml_similarity_score(
-            project,
-            user_vector,
-            idf_scores
-        )
+        if model:
+            similarity_score = ml_similarity_score(
+                project,
+                user_skills,
+                level,
+                interest,
+                time_availability,
+            )
+        else:
+            similarity_score = tfidf_similarity_score(
+                project,
+                user_vector,
+                idf_scores
+            )
+
         final_score = rule_score + similarity_score
 
         # Check relevance: project must match at least one user skill,
