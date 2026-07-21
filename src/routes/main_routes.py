@@ -5,7 +5,7 @@
 
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response, redirect, url_for, session
 
-from utils.recommender import get_recommendations, validate_recommendation_inputs
+from utils.recommender import get_recommendations, validate_recommendation_inputs, diagnose_empty_state
 from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats, get_available_interests
 from utils.roadmap_comparer import load_all_career_roadmaps, compare_roadmaps
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
@@ -163,13 +163,21 @@ def recommend():
         }), 200
 
     recommendations_data = get_recommendations(
-    skills,
-    level,
-    interest,
-    time_availability,
-    tech_stack,
-    max_results=None,)
+        skills,
+        level,
+        interest,
+        time_availability,
+        tech_stack,
+        max_results=None,
+    )
     results = recommendations_data.get("recommendations", [])
+
+    if not results:
+        diagnostic_message = diagnose_empty_state(skills, level, interest, time_availability)
+        return jsonify({
+            "projects": [],
+            "message": diagnostic_message
+        }), 200
 
     # Ensure all projects have IDs in the response
     projects_data = []
