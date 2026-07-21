@@ -5381,58 +5381,135 @@ body.dark-theme .theme-toggle:hover {
   color: #c4b5fd;
 }
 /* Extra small screens (360px - budget Android devices) */
-/* Extra small screens (360px - budget Android devices) */
+/* ============================================================
+   RESPONSIVE PROJECT CARDS — Multi-breakpoint approach
+   Ensures no regressions on tablets and desktops
+   ============================================================ */
+
+/* Base: 320px - 380px (Mobile) */
 @media (max-width: 380px) {
-  /* Project cards — reduce padding & margins */
   .project-card {
-    padding: 20px; /* Reduced from 30px 28px */
-    gap: 12px; /* Reduced from 16px */
+    padding: 20px;
+    gap: 12px;
   }
 
-  /* Results grid — single column */
   .results-grid {
     grid-template-columns: 1fr;
-    gap: 16px; /* Reduced from 26px */
+    gap: 16px;
   }
 
-  /* Tags — ensure wrap & visibility */
   .project-card-tags {
-    gap: 6px; /* Reduced from 7px */
+    gap: 6px;
     margin-bottom: 8px;
   }
 
   .project-tag {
-    font-size: 0.7rem; /* Reduced from 0.74rem */
-    padding: 3px 9px; /* Reduced from 3px 11px */
-    white-space: nowrap; /* Prevent text wrap */
+    font-size: 0.7rem;
+    padding: 3px 9px;
+    white-space: nowrap;
   }
 
-  /* Action buttons — full width, readable text */
   .btn-save-project,
   .btn-details {
-    padding: 10px 14px; /* Reduced from 11px 18px */
-    font-size: 0.82rem; /* Reduced from 0.88rem */
+    padding: 10px 14px;
+    font-size: 0.82rem;
     width: 100%;
   }
 
   .project-card-footer {
-    gap: 8px; /* Reduced from 10px */
-    padding-top: 6px; /* Reduced from 8px */
+    gap: 8px;
+    padding-top: 6px;
   }
 
-  /* Card title — smaller on tiny screens */
   .project-card-title {
-    font-size: 0.95rem; /* Reduced from 1.08rem */
+    font-size: 0.95rem;
   }
 
-  /* Card description — tighter line height */
   .project-card-desc {
-    font-size: 0.82rem; /* Reduced from 0.88rem */
-    line-height: 1.6; /* Slightly tighter */
+    font-size: 0.82rem;
+    line-height: 1.6;
   }
 
-  /* Container padding */
   .container {
-    padding: 0 16px; /* Reduced from 32px */
+    padding: 0 16px;
+  }
+}
+
+/* 381px - 640px (Small Tablet) — RESTORE & STABILIZE */
+@media (min-width: 381px) and (max-width: 640px) {
+  .project-card {
+    padding: 24px; /* Intermediate between 20px and 28px */
+    gap: 14px;
+  }
+
+  .results-grid {
+    grid-template-columns: 1fr; /* Still single column */
+    gap: 20px;
+  }
+
+  .project-tag {
+    font-size: 0.72rem;
+    padding: 3px 10px;
+  }
+
+  .btn-save-project,
+  .btn-details {
+    padding: 10px 16px;
+    font-size: 0.84rem;
+  }
+
+  .project-card-title {
+    font-size: 1rem;
+  }
+
+  .project-card-desc {
+    font-size: 0.85rem;
+  }
+
+  .container {
+    padding: 0 20px;
+  }
+}
+
+/* 641px+ (Tablet & Desktop) — RESTORE ORIGINAL STYLES */
+@media (min-width: 641px) {
+  .project-card {
+    padding: 30px 28px; /* Original value */
+    gap: 16px; /* Original value */
+  }
+
+  .results-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 26px; /* Original value */
+  }
+
+  .project-tag {
+    font-size: 0.74rem; /* Original */
+    padding: 3px 11px; /* Original */
+    white-space: normal; /* Allow wrap on larger screens */
+  }
+
+  .btn-save-project,
+  .btn-details {
+    padding: 11px 18px; /* Original */
+    font-size: 0.88rem; /* Original */
+  }
+
+  .project-card-footer {
+    gap: 10px; /* Original */
+    padding-top: 8px; /* Original */
+  }
+
+  .project-card-title {
+    font-size: 1.08rem; /* Original */
+  }
+
+  .project-card-desc {
+    font-size: 0.88rem; /* Original */
+    line-height: 1.7; /* Original */
+  }
+
+  .container {
+    padding: 0 32px; /* Original */
   }
 }
