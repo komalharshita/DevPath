@@ -3,12 +3,13 @@
 # Each route is kept thin: it validates input, calls a utility function,
 # and returns a response. No business logic lives here.
 
-from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response
+from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response, redirect, url_for, session
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
-from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats
+from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats, get_available_interests
 from utils.roadmap_comparer import load_all_career_roadmaps, compare_roadmaps
 from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
+from utils.rate_limiter import rate_limit
 from utils.learning_path import (
     create_learning_path,
     get_learning_path,
@@ -24,7 +25,10 @@ from utils.skill_progression import (
 )
 from utils.code_review import CodeReviewManager
 from config import Config
+from flask import jsonify
+from utils.portfolio_analyzer import analyze_portfolio
 import os
+from models import db, ProjectProgress
 
 _skill_validator = SkillProgressionValidator()
 _code_review_manager = CodeReviewManager()
@@ -33,8 +37,10 @@ _code_review_manager = CodeReviewManager()
 NO_PROJECT_INTERESTS = {
     "machine learning/ai",
     "devops",
+    "mobile",
     "artificial intelligence",
     "cloud computing",
+    "mobile app development",
 }
 
 def interest_has_no_projects(interest):
@@ -50,6 +56,7 @@ def index():
     try:
         stats = get_project_stats()
         available_levels = get_available_levels()
+        available_interests = get_available_interests()
     except Exception as e:
         # In development, we prefer rendering a fallback homepage rather than
         # aborting entirely. Log the error and use safe defaults so UI/layout
@@ -57,8 +64,9 @@ def index():
         print("Warning: failed to load project stats:", e)
         stats = {"total_projects": 0, "unique_skills": 0, "beginner_friendly": 0}
         available_levels = ["Beginner", "Intermediate", "Advanced"]
+        available_interests = []
 
-    return render_template("index.html", stats=stats, available_levels=available_levels, config=Config)
+    return render_template("index.html", stats=stats, available_levels=available_levels, available_interests=available_interests, config=Config)
 
 @main.route("/contact")
 def contact():
@@ -109,6 +117,7 @@ def health_check():
 
 
 @main.route("/api/recommend", methods=["POST"])
+@rate_limit(max_requests=10, window_seconds=60)
 def recommend():
     """
     Accept a JSON body with user inputs and return matching project recommendations.
@@ -137,6 +146,10 @@ def recommend():
     time_availability = (payload.get("time") or "").strip()
     tech_stack        = (payload.get("tech_stack") or "").strip()
 
+    # Explicitly check if skills string field is empty to prevent underlying scoring engine crashes
+    if not skills:
+        return jsonify({"error": "Please enter at least one skill to get recommendations."}), 400
+
     # Validate before running the recommendation engine
     errors = validate_recommendation_inputs(skills, level, interest, time_availability)
     if errors:
@@ -149,29 +162,14 @@ def recommend():
             "message": "No projects are currently available for this interest area. Please check back later."
         }), 200
 
-    recommendations_data = get_recommendations(skills, level, interest, time_availability, tech_stack)
+    recommendations_data = get_recommendations(
+    skills,
+    level,
+    interest,
+    time_availability,
+    tech_stack,
+    max_results=None,)
     results = recommendations_data.get("recommendations", [])
-
-    if not results:
-        return jsonify({
-            "projects": [],
-            "message": (
-                "No projects matched your inputs. "
-                "Try different skills or broaden your interest area."
-            )
-        }), 200
-
-    recommendations_data = get_recommendations(skills, level, interest, time_availability)
-    results = recommendations_data.get("recommendations", [])
-
-    if not results:
-        return jsonify({
-            "projects": [],
-            "message": (
-                "No projects matched your inputs. "
-                "Try different skills or broaden your interest area."
-            )
-        }), 200
 
     # Ensure all projects have IDs in the response
     projects_data = []
@@ -229,8 +227,32 @@ def project_detail(project_id):
     project = find_project_by_id(project_id)
     if not project:
         abort(404)
-    return render_template("project.html", project=project, config=Config)
+        
+    return render_template("project.html", project=project, config=Config, og_url=Config.get_base_url() + "/project/" + str(project_id))
 
+@main.route("/profile")
+def profile():
+    from flask import session
+    from models import db, User
+    from utils.data_loader import find_project_by_id
+    
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('auth.login'))
+        
+    user = db.session.get(User, user_id)
+    if not user:
+        session.pop('user_id', None)
+        return redirect(url_for('auth.login'))
+        
+    # Hydrate bookmarked projects
+    bookmarked_projects = []
+    for pid in user.bookmarked_projects:
+        p = find_project_by_id(pid)
+        if p:
+            bookmarked_projects.append(p)
+            
+    return render_template("profile.html", user=user, bookmarked_projects=bookmarked_projects)
 
 @main.route("/project/<int:project_id>/code")
 def view_code(project_id):
@@ -247,6 +269,7 @@ def view_code(project_id):
 
 
 @main.route("/project/<int:project_id>/download")
+@rate_limit(max_requests=20, window_seconds=60)
 def download_code(project_id):
     """Serve the starter code file as a downloadable attachment."""
     project = find_project_by_id(project_id)
@@ -291,6 +314,7 @@ def robots():
     return send_from_directory("static", "robots.txt", mimetype="text/plain")
 
 @main.route("/api/search")
+@rate_limit(max_requests=30, window_seconds=60)
 def search_projects():
     """Return projects matching the user's search query."""
 
@@ -705,6 +729,7 @@ def _extract_token(req):
 
 
 @main.route("/api/learning-path/<path_id>", methods=["POST"])
+@rate_limit(max_requests=10, window_seconds=60)
 def create_path(path_id):
     """Create a new learning path and bind it to the supplied token.
 
@@ -730,6 +755,11 @@ def create_path(path_id):
     if not isinstance(payload, dict):
         return jsonify({"error": "Request body must be a JSON object."}), 400
 
+    if len(request.data) > _MAX_DATA_BYTES:
+        return jsonify({
+            "error": f"Payload too large. Maximum allowed size is {_MAX_DATA_BYTES // 1024} KB."
+        }), 400
+
     try:
         create_learning_path(path_id, token, payload)
     except ValueError as exc:
@@ -741,6 +771,7 @@ def create_path(path_id):
 
 
 @main.route("/api/learning-path/<path_id>", methods=["GET"])
+@rate_limit(max_requests=20, window_seconds=60)
 def read_path(path_id):
     """Return the data payload for a learning path.
 
@@ -770,6 +801,7 @@ def read_path(path_id):
 
 
 @main.route("/api/learning-path/<path_id>", methods=["PUT"])
+@rate_limit(max_requests=10, window_seconds=60)
 def update_path(path_id):
     """Overwrite the data payload for an existing learning path.
 
@@ -796,6 +828,11 @@ def update_path(path_id):
     if not isinstance(payload, dict):
         return jsonify({"error": "Request body must be a JSON object."}), 400
 
+    if len(request.data) > _MAX_DATA_BYTES:
+        return jsonify({
+            "error": f"Payload too large. Maximum allowed size is {_MAX_DATA_BYTES // 1024} KB."
+        }), 400
+
     try:
         update_learning_path(path_id, token, payload)
     except ValueError as exc:
@@ -806,6 +843,74 @@ def update_path(path_id):
         return jsonify({"error": "Forbidden: invalid token for this path."}), 403
 
     return jsonify({"path_id": path_id, "message": "Learning path updated."}), 200
+
+@main.route("/api/project/<int:project_id>/progress", methods=["GET"])
+def get_project_progress(project_id):
+    """Return the user's roadmap progress for a specific project."""
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    progress = ProjectProgress.query.filter_by(user_id=user_id, project_id=project_id).first()
+    completed_steps = progress.completed_steps if progress else []
+    return jsonify({"completed_steps": completed_steps}), 200
+
+@main.route("/api/project/<int:project_id>/progress", methods=["POST"])
+def update_project_progress(project_id):
+    """Update the user's roadmap progress for a specific project."""
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    payload = request.get_json(silent=True)
+    if not payload or not isinstance(payload.get("completed_steps"), list):
+        return jsonify({"error": "Invalid payload. Expected 'completed_steps' array."}), 400
+
+    completed_steps = payload["completed_steps"]
+
+    progress = ProjectProgress.query.filter_by(user_id=user_id, project_id=project_id).first()
+    if progress:
+        progress.completed_steps = completed_steps
+    else:
+        progress = ProjectProgress(
+            user_id=user_id,
+            project_id=project_id,
+            completed_steps=completed_steps
+        )
+        db.session.add(progress)
+
+    db.session.commit()
+    return jsonify({"message": "Progress saved successfully"}), 200
+@main.route("/api/portfolio-analysis", methods=["POST"])
+def portfolio_analysis():
+    """
+    Analyze the user's completed projects and return
+    portfolio diversity information.
+    """
+
+    payload = request.get_json(silent=True)
+
+    if payload is None:
+        return jsonify({"error": "Invalid JSON payload"}), 400
+
+    print(payload)
+
+    completed_ids = payload.get("completed_projects", [])
+
+    if not isinstance(completed_ids, list):
+        return jsonify({"error": "'completed_projects' must be a list"}), 400
+
+    all_projects = load_all_projects()
+
+    completed_projects = [
+        project
+        for project in all_projects
+        if project["id"] in completed_ids
+    ]
+
+    result = analyze_portfolio(completed_projects)
+
+    return jsonify(result), 200
 
 # Constants for learning velocity recommendations
 VELOCITY_SLOW_THRESHOLD = 1.2

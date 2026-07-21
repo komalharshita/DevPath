@@ -8,7 +8,6 @@
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
   {% include 'partials/theme_head.html' %}
   
-  <!-- Open Graph meta tags for social media sharing -->
   <meta property="og:title" content="{{ project.title }} — DevPath" />
   <meta property="og:description" content="{{ project.description|truncate(155, False, '...') }}" />
   <meta property="og:image" content="{{ config.get_og_image_url() }}" />
@@ -16,7 +15,6 @@
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="{{ config.SITE_NAME }}" />
   
-  <!-- Twitter Card meta tags -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="{{ project.title }} — DevPath" />
   <meta name="twitter:description" content="{{ project.description|truncate(155, False, '...') }}" />
@@ -29,9 +27,6 @@
 
 <body class="detail-page">
 
-  <!-- ============================================================
-       Navigation
-       ============================================================ -->
   <nav class="navbar" aria-label="Main navigation">
     <div class="nav-inner">
       <a href="/" class="nav-logo">DevPath</a>
@@ -40,7 +35,6 @@
         <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-link nav-link-gh">GitHub</a>
         {% include 'partials/theme_toggle.html' %}
       </div>
-      <!-- Mobile hamburger — was missing from project.html entirely -->
       <button class="nav-mobile-toggle" id="nav-mobile-toggle"
               aria-label="Toggle navigation"
               aria-expanded="false"
@@ -48,12 +42,10 @@
         <span></span><span></span><span></span>
       </button>
     </div>
-    <!-- Mobile menu for project detail page -->
     <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
       <a href="/" class="nav-mobile-link" role="menuitem">Back to Search</a>
-      <a href="https://github.com" target="_blank" rel="noopener noreferrer"
+      <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
          class="nav-mobile-link" role="menuitem">GitHub</a>
-      <!-- Theme toggle in mobile menu -->
       <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile"
               style="background:none;border:none;text-align:left;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;padding:10px 0;font-size:0.95rem;font-weight:500;color:rgba(255,255,255,0.8);"
               aria-pressed="false"
@@ -82,12 +74,8 @@
     </div>
   </nav>
 
-  <!-- ============================================================
-       Project Hero Banner
-       ============================================================ -->
   <div class="detail-hero">
     <div class="container">
-      <!-- Breadcrumb trail -->
       <nav class="breadcrumb" aria-label="breadcrumb">
         <a href="/">Home</a>
         <span class="breadcrumb-sep">&#8250;</span>
@@ -97,19 +85,20 @@
       <div class="detail-hero-content">
         <div class="detail-hero-left">
           <h1 class="detail-title">{{ project.title }}</h1>
-          <!-- Difficulty, interest, and skill badges -->
           <div class="badge-group">
-            <span class="badge badge--{{ project.level | lower }}">{{ project.level }}</span>
-            <span class="badge badge--{{ project.interest | lower }}">{{ project.interest }}</span>
-            {% for skill in project.skills %}
-            <span class="badge badge--{{ skill | lower }}">{{ skill }}</span>
-            {% endfor %}
-            <span class="badge badge--time">{{ project.time }} effort</span>
+            <!-- Inside <div class="badge-group"> -->
+<span class="badge badge--{{ project.level | lower }}">{{ project.level }}</span>
+<span class="badge badge--{{ project.interest | lower }}">{{ project.interest }}</span>
+
+<!-- ADD THIS NEW DYNAMIC BADGE -->
+<span class="badge badge--effort" data-time="{{ project.time }}">
+    {{ project.time }}
+</span>
+         
           </div>
           <p class="detail-description">{{ project.description }}</p>
         </div>
 
-        <!-- Quick-action buttons in the hero -->
         <div class="detail-hero-actions">
           <a href="/project/{{ project.id }}/download" class="btn-download" aria-label="Download starter code file">
             <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -123,8 +112,8 @@
           <button class="btn-view-code" id="btn-view-code" aria-label="Open inline code viewer">
             <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="16 18 22 12 16 6" />
-              <polyline points="8 6 2 12 8 18" />
+              <polyline points="16 18 22 12 16 6" </>
+              <polyline points="8 6 2 12 8 18" </>
             </svg>
             View Code
           </button>
@@ -140,17 +129,12 @@
     </div>
   </div>
 
-  <!-- ============================================================
-       Main Detail Content
-       ============================================================ -->
   <div class="detail-body">
     <div class="container">
       <div class="detail-grid">
 
-        <!-- LEFT COLUMN: Features, Roadmap, Resources -->
         <div class="detail-main">
 
-          <!-- Features Section -->
           <section class="detail-section">
             <div class="detail-section-header">
               <div class="detail-section-icon">
@@ -177,97 +161,71 @@
             </ul>
           </section>
 
-          <!-- Roadmap Section with visual timeline -->
-
- <!-- Roadmap Section -->
-<section class="detail-section">
-
-    <!-- Header -->
-    <div class="detail-section-header">
-
-        <div class="detail-section-icon">
-            <svg width="18"
-                 height="18"
-                 viewBox="0 0 24 24"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-width="2"
-                 stroke-linecap="round"
-                 stroke-linejoin="round">
-
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-
-            </svg>
-        </div>
-
-        <h2>Project Roadmap</h2>
-
-    </div>
-
-
-    <!-- Description -->
-    <p class="detail-section-sub">
-        Follow these steps in order.
-        Each one builds on the previous.
-    </p>
-
-
-   <!-- Progress -->
-<div class="roadmap-progress-wrap">
-
-    <div
-        class="roadmap-progress-bar"
-        role="progressbar"
-        aria-valuemin="0"
-        aria-valuemax="100"
-        aria-valuenow="0"
-        aria-label="Roadmap completion progress"
-    >
-        <div id="roadmap-progress-fill"></div>
-    </div>
-
-    <span
-        id="roadmap-progress-text"
-        aria-live="polite"
-    >
-        0% completed
-    </span>
-
-</div>
-
-    <!-- Timeline -->
-    <ol class="roadmap-timeline" id="roadmap-list">
-
-        {% for step in project.roadmap %}
-
-        <li class="roadmap-step" data-step="step-{{loop.index}}">
-            <!-- Marker -->
-            <div class="roadmap-marker">
-                <span class="roadmap-dot"></span>
-                <span class="roadmap-line"></span>
+          <section class="detail-section">
+            <div class="detail-section-header">
+                <div class="detail-section-icon">
+                    <svg width="18"
+                         height="18"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                    </svg>
+                </div>
+                <h2>Project Roadmap</h2>
             </div>
 
-            <!-- Content -->
-            <div class="roadmap-content">
-                <label class="roadmap-step-label">
-                    <input type="checkbox" class="roadmap-checkbox">
-                    <div class="roadmap-text-wrap">
-                        <span class="roadmap-step-num">Step {{loop.index}}</span>
-                        <p class="roadmap-step-text">
-                            {{ step | replace("Step " ~ loop.index ~ ": ", "") }}
-                        </p>
+            <p class="detail-section-sub">
+                Follow these steps in order.
+                Each one builds on the previous.
+            </p>
+
+            <div class="roadmap-progress-wrap">
+                <div
+                    class="roadmap-progress-bar"
+                    role="progressbar"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-valuenow="0"
+                    aria-label="Roadmap completion progress"
+                >
+                    <div id="roadmap-progress-fill"></div>
+                </div>
+                <span
+                    id="roadmap-progress-text"
+                    aria-live="polite"
+                >
+                    0% completed
+                </span>
+            </div>
+
+            <ol class="roadmap-timeline" id="roadmap-list">
+                {% for step in project.roadmap %}
+                <li class="roadmap-step" data-step="step-{{loop.index}}">
+                    <div class="roadmap-marker">
+                        <span class="roadmap-dot"></span>
+                        <span class="roadmap-line"></span>
                     </div>
-                </label>
-            </div>
-        </li>
 
-        {% endfor %}
+                    <div class="roadmap-content">
+                        <label class="roadmap-step-label">
+                            <input type="checkbox" class="roadmap-checkbox">
+                            <div class="roadmap-text-wrap">
+                                <span class="roadmap-step-num">Step {{loop.index}}</span>
+                                <p class="roadmap-step-text">
+                                    {{ step | replace("Step " ~ loop.index ~ ": ", "") }}
+                                </p>
+                            </div>
+                        </label>
+                    </div>
+                </li>
+                {% endfor %}
+            </ol>
+          </section>
 
-    </ol>
-
-</section>
-
-          <!-- Resources Section -->
           <section class="detail-section">
             <div class="detail-section-header">
               <div class="detail-section-icon">
@@ -283,7 +241,6 @@
             <ul class="resource-list">
               {% for resource in project.resources %}
               <li class="resource-item">
-                <!-- Parse the "Label: URL" format stored in the data -->
                 {% set parts = resource.split(": http") %}
                 {% if parts|length > 1 %}
                   <a href="http{{ parts[1] }}" target="_blank" rel="noopener noreferrer" class="resource-link">
@@ -296,7 +253,21 @@
                     </svg>
                   </a>
                 {% else %}
-                <span class="resource-plain">{{ resource }}</span>
+                  {% if "http" in resource %}
+                    {% set raw_url = resource[resource.find("http"):] %}
+                    {% set raw_label = resource[:resource.find("http")] | replace(":", "") | trim %}
+                    <a href="{{ raw_url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
+                      <span>{% if raw_label %}{{ raw_label }}{% else %}Documentation{% endif %}</span>
+                      <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                        <polyline points="15 3 21 3 21 9" />
+                        <line x1="10" y1="14" x2="21" y2="3" />
+                      </svg>
+                    </a>
+                  {% else %}
+                    <span class="resource-plain">{{ resource }}</span>
+                  {% endif %}
                 {% endif %}
               </li>
               {% endfor %}
@@ -305,10 +276,8 @@
 
         </div>
 
-        <!-- RIGHT COLUMN: Tech stack sidebar + starter code panel -->
         <aside class="detail-sidebar">
 
-          <!-- Tech Stack card -->
           <div class="sidebar-card">
             <h3 class="sidebar-card-title">
               <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -326,7 +295,6 @@
             </div>
           </div>
 
-          <!-- Project stats card -->
           <div class="sidebar-card">
             <h3 class="sidebar-card-title">
               <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -356,7 +324,6 @@
             </ul>
           </div>
 
-          <!-- Starter code actions card -->
           <div class="sidebar-card sidebar-card--code">
             <h3 class="sidebar-card-title">
               <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -374,14 +341,17 @@
             <button id="btn-mark-complete" class="btn-ghost btn-mark-complete" type="button">Mark Project Complete</button>
           </div>
 
+          <!-- Portfolio diversity widget -->
+          <div class="sidebar-card sidebar-card--portfolio">
+            <h3 class="sidebar-card-title">📊 Portfolio Diversity</h3>
+            <p class="sidebar-card-desc">See how this project fits into your overall skill coverage.</p>
+            <div id="portfolio-analysis-container"></div>
+          </div>
         </aside>
       </div>
     </div>
   </div>
 
-  <!-- ============================================================
-       Starter Code Viewer Panel (slides in from bottom)
-       ============================================================ -->
   <div class="code-panel" id="code-panel">
     <div class="code-panel-header">
       <div class="code-panel-title">
@@ -409,13 +379,10 @@
         <button class="code-panel-close" id="code-panel-close">Close</button>
       </div>
     </div>
-    <!-- Code is injected here by script.js -->
     <pre class="code-viewer" id="code-viewer"><code id="code-content" style="display:block">Loading...</code></pre>
   </div>
-  <!-- Dark overlay behind the code panel -->
   <div class="code-panel-overlay" id="code-panel-overlay"></div>
 
-  <!-- Copy success toast notification -->
   <div class="copy-toast" id="copy-toast" role="status" aria-live="polite">
     <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -423,12 +390,8 @@
     </svg>
     Copied to clipboard!
   </div>
-
   <div class="achievement-toast" id="achievement-toast" role="status" aria-live="polite"></div>
 
-  <!-- ============================================================
-       Footer
-       ============================================================ -->
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-brand">
@@ -437,13 +400,10 @@
           Open source. Built for learners, by learners.
         </p>
       </div>
-      <div class="footer-links">
-        <a href="/">Back to Search</a>
-        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">GitHub</a>
-      </div>
     </div>
   </footer>
 
+  <button id="scroll-top-btn" aria-label="Back to top" title="Back to top">↑</button>
   {% include 'partials/scroll_top_btn.html' %}
 
   <script>
@@ -452,6 +412,7 @@
     var PROJECT_LEVEL = {{ project.level | tojson }};
     var PROJECT_TIME = {{ project.time | tojson }};
     var PROJECT_SKILLS = {{ project.skills | tojson }};
+    var USER_LOGGED_IN = {{ 'true' if session.get('user_id') else 'false' }};
   </script>
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
   <script src="/static/script.js"></script>

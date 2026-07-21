@@ -118,6 +118,33 @@ class TestCodeReviewManager:
                 reviewer_id="reviewer_001",
             )
 
+    def test_add_feedback_invalid_review_id(self, review_manager):
+        """Test adding feedback to a non-existent review."""
+        with pytest.raises(ValueError):
+            review_manager.add_feedback_comment(
+                review_id="invalid_review",
+                line_number=1,
+                code_snippet="x = 1",
+                feedback="Test feedback",
+            )
+
+    def test_score_category_invalid_review_id(self, review_manager):
+        """Test scoring a non-existent review."""
+        with pytest.raises(ValueError):
+            review_manager.score_category(
+                review_id="invalid_review",
+                category="functionality",
+                score=80,
+            )
+
+    def test_complete_review_invalid_review_id(self, review_manager):
+        """Test completing a non-existent review."""
+        with pytest.raises(ValueError):
+            review_manager.complete_review(
+                review_id="invalid_review",
+                summary="Review completed",
+            )
+
     def test_add_feedback_comment(self, review_manager):
         """Test adding feedback comments to a review."""
         review_manager.submit_code(

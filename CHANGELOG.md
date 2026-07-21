@@ -1,13 +1,6 @@
-# Changelog
-
-All notable changes to this project are documented here.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
-
 ## [Unreleased]
 
 ### Added
-
 - "Share My Result" button on results page that copies a pre-filled URL to clipboard (#411)
 - Auto-fill form and trigger recommendations when opening a shared URL (#411)
 - Initial CHANGELOG.md setup for tracking project history
@@ -20,4 +13,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- No fixes recorded yet
+- Correct skills suggestions dropdown overlapping with available skill chips and resolve white background conflict in dark theme
