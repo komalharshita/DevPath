@@ -120,6 +120,16 @@
       margin: 0.75rem 0;
     }
 
+    .progress-meter-label {
+      display: block;
+      margin-bottom: 0.4rem;
+      color: var(--text-muted, #6b7280);
+      font-size: 0.75rem;
+      font-weight: 700;
+      line-height: 1;
+      text-align: right;
+    }
+
     .progress-meter {
       background: var(--gray-200, #e5e7eb);
       border-radius: 100px;
@@ -132,6 +142,7 @@
       height: 100%;
       border-radius: 100px;
       display: block;
+      min-width: 0;
       width: 0%;
       transition: width 0.3s ease;
     }
@@ -392,13 +403,37 @@
               d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </button>
+      </form>
+      <div class="nav-links desktop-only" style="margin-left: auto; display: flex; align-items: center; gap: 1.5rem; padding-right: 1.5rem;">
+        {% if current_user %}
+        {% if current_user.is_admin %}
+        <a href="/admin" class="nav-link" style="font-weight: 600; color: #4f46e5; text-decoration: none;">Admin</a>
+        {% endif %}
+        <a href="/profile" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Profile</a>
+        <a href="/auth/logout" class="nav-link" style="color: var(--text-muted); text-decoration: none;">Logout</a>
+        {% else %}
+        <a href="/auth/login" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Login with GitHub</a>
+        {% endif %}
       </div>
 
-      <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation"
-        aria-expanded="false" aria-controls="nav-mobile-menu">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
+      <div class="nav-right">
+            <nav class="nav-links" aria-label="site navigation">
+                <a href="#how-it-works" class="nav-link">How It Works</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#the-project" class="nav-link">Find Project</a>
+                <a href="/compare" class="nav-link">Compare</a>
+                <a href="/contact" class="nav-link">Contact</a>
+                <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-link">GitHub</a>
+            </nav>
+            <div class="nav-actions">
+                {% include 'partials/theme_toggle.html' %}
+            </div>
+            
+            <button class="nav-mobile-toggle" id="nav-mobile-toggle" type="button" aria-label="Toggle navigation"
+                aria-expanded="false" aria-controls="nav-mobile-menu">
+                <span></span><span></span><span></span><span></span>
+            </button>
+          </div>
 
     <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
       <form id="topic-search-form-mobile" class="navbar-search navbar-search--mobile" role="search">
@@ -412,12 +447,21 @@
         <input type="search" id="topic-search-mobile" autocomplete="off" aria-label="Search projects"
           placeholder="Search projects…" />
       </form>
-      <a href="#home" class="nav-mobile-link" role="menuitem">Home</a>
+      <a href="#home" class="nav-mobile-link {% if request.path == '/' %}active{% endif %}" role="menuitem">Home</a>
       <a href="#how-it-works" class="nav-mobile-link" role="menuitem">How It Works</a>
       <a href="#features" class="nav-mobile-link" role="menuitem">Features</a>
       <a href="#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
-      <a href="/compare" class="nav-mobile-link" role="menuitem">Compare</a>
-      <a href="/contact" class="nav-mobile-link" role="menuitem">Contact</a>
+      <a href="/compare" class="nav-mobile-link {% if request.path == '/compare' %}active{% endif %}" role="menuitem">Compare</a>
+      <a href="/contact" class="nav-mobile-link {% if request.path == '/contact' %}active{% endif %}" role="menuitem">Contact</a>
+      {% if current_user %}
+      {% if current_user.is_admin %}
+      <a href="/admin" class="nav-mobile-link" role="menuitem" style="color: #4f46e5;">Admin</a>
+      {% endif %}
+      <a href="/profile" class="nav-mobile-link" role="menuitem">Profile</a>
+      <a href="/auth/logout" class="nav-mobile-link" role="menuitem">Logout</a>
+      {% else %}
+      <a href="/auth/login" class="nav-mobile-link" role="menuitem">Login with GitHub</a>
+      {% endif %}
       <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
         class="nav-mobile-link" role="menuitem">GitHub</a>
       <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile"
@@ -606,8 +650,9 @@
           </div>
           <div class="stat-dashboard-value" id="progress-points">0</div>
           <div class="stat-dashboard-progress">
+            <span class="progress-meter-label" id="progress-meter-label">0%</span>
             <div class="progress-meter">
-              <span class="progress-meter-fill" id="progress-meter-fill" style="width: 0%;" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">0%</span>
+              <span class="progress-meter-fill" id="progress-meter-fill" style="width: 0%;" role="progressbar" aria-label="Points progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></span>
             </div>
           </div>
           <div class="stat-dashboard-footer">
@@ -825,9 +870,6 @@
           <h3>Starter Code Included</h3>
           <p>Download a working template for every project. Skip the blank-page problem and start building immediately.</p>
           <a href="#the-project" class="feature-card-link">Get starter code</a>
-          <p>Download a working template for every project. Skip the blank-page problem and start building immediately.
-          </p>
-          <a href="#find-project" class="feature-card-link">Get starter code</a>
         </div>
       </div>
     </div>
@@ -836,7 +878,7 @@
   <!-- ============================================================
        Find Project Form Section
        ============================================================ -->
-  <section class="form-section" id="the-project">
+  <section class="form-section" id="find-project">
     <div class="container">
       <div class="section-eyebrow">Get Your Recommendations</div>
       <h2 class="section-title">Find The Project</h2>
@@ -860,7 +902,7 @@
             </div>
             <button type="button" class="share-prefill-banner-close" id="share-prefill-banner-close" aria-label="Dismiss banner">&times;</button>
           </div>
-            <div class="form-group">
+            <div class="form-group form-group-skills">
               <div class="form-label-row" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
                 <label for="skills-input">
                   Your Skills
@@ -875,7 +917,7 @@
                 
                 <!-- Reset button and Inline GitHub Trigger -->
                 <div style="display: flex; gap: 3px; align-items: center;">
-                   <button type="reset" id="reset-form-btn" class="btn-clear" style="padding: 4px 12px; font-size: 0.75rem;">
+                   <button type="reset" id="clear-filters-btn" class="btn-clear" style="padding: 4px 12px; font-size: 0.75rem;">
                     Reset
                   </button>
                 <div class="github-inline-trigger" id="github-trigger-wrap" style="line-height: 1.2;">
@@ -895,7 +937,7 @@
                   <input
                     type="text"
                     id="skills-input"
-                    placeholder="Type a skill and press Enter or select from dropdown..."
+                    placeholder="Search or add a skill, e.g. Python, React"
                     autocomplete="off"
                     aria-haspopup="listbox"
                     aria-expanded="false"
@@ -905,7 +947,7 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                   </button>
                 </div>
-                <div id="skills-suggestions" class="skills-suggestions skills-dropdown" style="display: none; max-height: 250px; overflow-y: auto; border: 1px solid var(--color-border); border-top: none; background: white; position: absolute; width: 100%; margin-top: -2px; z-index: 10;"></div>
+                <div id="skills-suggestions" class="skills-suggestions skills-dropdown"></div>
 
               </div>
               <input type="hidden" id="skills" name="skills" />
@@ -960,6 +1002,16 @@
 
             <div class="form-row">
               <div class="form-group">
+                <label for="skill-proficiency">Skill Proficiency</label>
+                <div class="select-wrap">
+                  <select id="skill-proficiency" name="skill-proficiency">
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate" selected>Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                  </select>
+                </div>
+                <span class="form-hint">Selected level is assigned to newly added skills.</span>
+
                 <label for="level">Experience Level</label>
                 <div class="select-wrap">
                   <select id="level" name="level">
@@ -986,19 +1038,9 @@
                 <div class="select-wrap">
                   <select id="interest" name="interest">
                     <option value="" disabled selected>Select interest</option>
-                    <option value="Web">Web Development</option>
-                    <option value="Data">Data and Analytics</option>
-                    <option value="Education">Education Tools</option>
-                    <option value="Automation">Automation</option>
-                    <option value="Games">Games</option>
-                    <option value="Cybersecurity">CyberSecurity/Ethical Hacking</option>
-                    <option value="Devops">DevOps / Cloud Computing</option>
-                    <option value="Backend">Backend APIs</option>
-                    <option value="Tools">Developer Tools</option>
-                    <option value="Productivity">Productivity</option>
-                    <option value="Business Logic">Business Logic</option>
-                    <option value="Mobile">Mobile Development</option>
-                    <option value="Machine Learning/AI">Machine Learning/AI</option>
+                    {% for interest in available_interests %}
+                    <option value="{{ interest }}">{{ interest }}</option>
+                    {% endfor %}
                   </select>
                 </div>
                 <span class="form-hint">Pick the domain you want to explore such as Web Development, Automation, or Games.</span>
@@ -1006,35 +1048,58 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <label for="time">
-                Time Availability
-                <span class="tooltip" title="Estimate how much time you can realistically dedicate to building the project.">
-                  ⓘ
-                </span>
-              </label>
-              <div class="select-wrap">
-                <select id="time" name="time">
-                  <option value="" disabled selected>How much time can you commit?</option>
-                  <option value="Low">Low — a few hours total</option>
-                  <option value="Medium">Medium — across a weekend</option>
-                  <option value="High">High — a week or more</option>
-                </select>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="time">
+                  Time Availability
+                  <span class="tooltip" title="Estimate how much time you can realistically dedicate to building the project.">
+                    ⓘ
+                  </span>
+                </label>
+                <div class="select-wrap">
+                  <select id="time" name="time">
+                    <option value="" disabled selected>How much time can you commit?</option>
+                    <option value="Low">Low — a few hours total</option>
+                    <option value="Medium">Medium — across a weekend</option>
+                    <option value="High">High — a week or more</option>
+                  </select>
+                </div>
+                <span class="form-hint">Include coding, debugging, learning, and reviewing time in your estimate.</span>
+                <div class="form-error-msg" id="time-error"></div>
               </div>
-              <span class="form-hint">Include coding, debugging, learning, and reviewing time in your estimate.</span>
-              <div class="form-error-msg" id="time-error"></div>
+
+              <div class="form-group">
+                <label for="tech_stack">
+                  Technology Stack
+                  <button type="button" class="tooltip" aria-label="Technology Stack help" aria-describedby="tech-tooltip">
+                    ⓘ
+                    <span id="tech-tooltip" class="tooltip-text" role="tooltip">
+                      Refine project recommendations based on target languages/frameworks.
+                    </span>
+                  </button>
+                </label>
+                <div class="select-wrap">
+                  <select id="tech_stack" name="tech_stack">
+                    <option value="all" selected>All Technologies</option>
+                    <option value="java">Java</option>
+                    <option value="mysql">MySQL</option>
+                    <option value="python">Python</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="react">React</option>
+                    <option value="jsp">JSP / Servlets</option>
+                  </select>
+                </div>
+                <span class="form-hint">Filter projects that use a specific language or framework.</span>
+                <div class="form-error-msg" id="tech-error"></div>
+              </div>
             </div>
-
-            <div class="form-error-msg" id="form-error-general"></div>
-
+            <div class="form-error-msg" id="form-error-general" style="color:#ef4444;margin-bottom:8px;"></div>
             <div class="form-actions">
               <button type="submit" class="btn-submit" id="submit-btn">
                 <span id="btn-label">Generate My Projects</span>
                 <span id="btn-loading" style="display:none;">Finding matches...</span>
               </button>
-              <button type="button" class="btn-clear" id="clear-filters-btn">
-                <span>Clear Filters</span>
-              </button>
+              <button type="button" class="btn-surprise" id="surprise-btn">🎲 Surprise Me</button>
             </div>
 
           </form>
@@ -1095,7 +1160,8 @@
           </div>
           <h3>No Projects Found</h3>
           <p id="empty-message">Try adjusting your skills or selecting a different interest area.</p>
-          <button class="btn-try-again" onclick="document.getElementById('find-project').scrollIntoView({behavior:'smooth'})">Try Different Inputs</button>
+          <button class="btn-try-again"
+            onclick="document.getElementById('find-project').scrollIntoView({behavior:'smooth'})">Try Different Inputs</button>
         </div>
       </div>
 
@@ -1122,6 +1188,19 @@
         </div>
         <div class="saved-projects-list" id="saved-projects-list"></div>
       </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Portfolio Diversity Analyzer
+       ============================================================ -->
+  <section id="portfolio-analysis-section" class="portfolio-analysis-section">
+    <div class="container">
+      <div class="section-eyebrow">Your Progress</div>
+      <h2 class="section-title">Portfolio Diversity Analyzer</h2>
+      <p class="section-sub">See how balanced your completed projects are across key skill domains, and discover what to build next.</p>
+
+      <div id="portfolio-analysis-container"></div>
     </div>
   </section>
 
@@ -1186,7 +1265,6 @@
           <li><a href="#how-it-works">How It Works</a></li>
           <li><a href="#features">Features</a></li>
           <li><a href="#the-project">Find Project</a></li>
-          <li><a href="#find-project">Find Project</a></li>
           <li><a href="/contact">Contact Us</a></li>
         </ul>
       </div>
@@ -1212,12 +1290,29 @@
     </div>
 
     <div class="footer-bottom">
-      <p>DevPath is open source. Licensed under the MIT License.</p>
-      <div class="footer-bottom-links">
-        <a href="#our-story">About Us</a>
-        <a href="https://github.com/komalharshita/DevPath/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Project License</a>
-      </div>
-    </div>
+  <p>DevPath is open source. Licensed under the MIT License.</p>
+  <div class="footer-bottom-links">
+    <a href="#our-story">About Us</a>
+    <a href="https://github.com/komalharshita/DevPath/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Project License</a>
+  </div>
+  <div class="footer-social-icons">
+    <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+      </svg>
+    </a>
+    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+      </svg>
+    </a>
+    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 14-7.496 14-13.986 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+      </svg>
+    </a>
+  </div>
+</div>
   </footer>
 
   <!-- GitHub Modal Overlay -->
@@ -1230,19 +1325,15 @@
         Sync with GitHub
       </div>
 
-      <p class="sidebar-card-desc" style="margin-bottom: 20px;">Enter your username to import coding languages from your
-        top repositories into the skills list.<br /> Note: We use stars to determine top repositories</p>
+      <p class="sidebar-card-desc" style="margin-bottom: 20px;">Authenticate with GitHub to import coding languages from your
+        top repositories into the skills list.</p>
 
       <div class="form-group" style="margin-bottom: 20px;">
-        <div class="skill-input-wrap">
-          <span style="color:var(--gray-400); font-family:var(--font-mono); font-size:0.8rem; margin-left:8px;">@</span>
-          <input type="text" id="github-username" placeholder="username" style="border:none; outline:none; flex:1; padding:10px;">
-        </div>
         <div class="form-error-msg" id="github-modal-error"></div>
       </div>
 
       <div style="display: flex; gap: 12px;">
-        <button type="button" id="btn-fetch-github" class="btn-primary" style="flex: 2; padding: 10px; font-size: 0.85rem;">Fetch Skills</button>
+        <a href="/api/github/login" id="btn-fetch-github" class="btn-primary" style="flex: 2; padding: 10px; font-size: 0.85rem; text-align: center; text-decoration: none;">Authenticate</a>
         <button type="button" id="btn-close-github" class="btn-view-code-sm" style="flex: 1; border-color: var(--border); color: var(--text-body);">Cancel</button>
       </div>
     </div>
@@ -1274,11 +1365,7 @@
 
   <script src="/static/data/skills.js"></script>
 
-  <button id="scroll-top-btn" aria-label="Scroll to top" title="Scroll to top">
-    <svg id="scroll-btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="18 15 12 9 6 15"/>
-    </svg>
-  </button>
+  {% include 'partials/scroll_top_btn.html' %}
 
   <script src="/static/script.js"></script>
   <script src="/static/bookmarks.js"></script>
@@ -1310,6 +1397,9 @@
   </script>
     
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+
+  <script src="/static/animations.js"></script>
+  <script src="/static/script.js"></script>
 </body>
 
 </html>
