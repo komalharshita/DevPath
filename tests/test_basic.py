@@ -114,7 +114,7 @@ def test_score_coverage_ratio_exact_values():
     # 1 of 2 skills matched: coverage = 0.5, score = 1 * 3 * 0.5 = 1.5
     score_result = score_single_project(project, ["python"], "Advanced", "Games", "High")[0]
     score = score_result[0] if isinstance(score_result, tuple) else score_result
-    assert score == pytest.approx(2.5), f"Expected 1.5 but got {score}"
+    assert score == pytest.approx(2.5), f"Expected 2.5 but got {score}"
 
     # 2 of 2 skills matched: coverage = 1.0, score = 2 * 3 * 1.0 = 6.0. Python + Flask has 1.5x synergy multiplier: 6.0 * 1.5 = 9.0
     score_result = score_single_project(project, ["python", "flask"], "Advanced", "Games", "High")
@@ -188,13 +188,13 @@ def test_score_single_project_alias_matching():
 def test_get_recommendations_returns_results():
     """Python + Beginner + Data + Low should always return at least one result."""
     results = get_recommendations("Python", "Beginner", "Data", "Low")
-    assert len(results) > 0, "Expected at least one recommendation"
+    assert len(results.get("recommendations", [])) > 0, "Expected at least one recommendation"
 
 
 def test_get_recommendations_max_three():
     """The engine must never return more than three results."""
     results = get_recommendations("Python, JavaScript, HTML", "Beginner", "Web", "Low")
-    assert len(results) <= 3, f"Expected at most 3 results, got {len(results)}"
+    assert len(results.get("recommendations", [])) <= 3, f"Expected at most 3 results, got {len(results.get('recommendations', []))}"
 
 
 def test_get_recommendations_result_format():
