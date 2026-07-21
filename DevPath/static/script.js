@@ -925,63 +925,86 @@ updateProfileWidgets();
   }
 
   function buildProjectCard(project) {
-    
-    var card = document.createElement("div");
-    card.className = "project-card";
+  var card = document.createElement("div");
+  card.className = "project-card";
 
-    // Console logging for debugging
-    console.log("Building card for project:", project);
-    console.log("Project ID:", project.id);
+  // Title
+  var title = document.createElement("h3");
+  title.className = "project-card-title";
+  title.textContent = project.title;
 
-    // Title
-    var title = document.createElement("h3");
-    title.className = "project-card-title";
-    title.textContent = project.title;
+  // Description (truncated for visual consistency)
+  var desc = document.createElement("p");
+  desc.className = "project-card-desc";
+  desc.textContent = truncate(project.description, 120);
 
-    // Description (truncated for visual consistency)
-    var desc = document.createElement("p");
-    desc.className = "project-card-desc";
-    // Cut description to 120 chars so all cards stay the same height
-    desc.textContent = truncate(project.description, 120);
+  // Tags row
+  var tagsRow = document.createElement("div");
+  tagsRow.className = "project-card-tags";
 
-    // Tags row
-    var tagsRow = document.createElement("div");
-    tagsRow.className = "project-card-tags";
+  (project.skills || []).forEach(function (skill) {
+    tagsRow.appendChild(createTag(skill, "skill"));
+  });
 
-    // Show all project skills as tags so users can see the full match
-    (project.skills || []).forEach(function (skill) {
-      tagsRow.appendChild(createTag(skill, "skill"));
-    });
+  tagsRow.appendChild(createTag(project.level, "level " + (project.level || "").toLowerCase()));
+  tagsRow.appendChild(createTag("Time: " + project.time, "time"));
 
-    // Level tag (colour-coded via CSS class)
-    // Lowercase so it matches the CSS class names like "level beginner", "level advanced"
-    tagsRow.appendChild(createTag(project.level, "level " + (project.level || "").toLowerCase()));
+  // ============================================================================
+  // FOOTER with SAVE BUTTON + VIEW DETAILS LINK
+  // ============================================================================
+  var footer = document.createElement("div");
+  footer.className = "project-card-footer";
 
-    // Time tag
-    tagsRow.appendChild(createTag("Time: " + project.time, "time"));
-
-    // Footer with view-details link
-    var footer = document.createElement("div");
-    footer.className = "project-card-footer";
-
-    var link = document.createElement("a");
-    link.className = "btn-details";
-    link.textContent = "View Full Project";
-    link.href = "/project/" + project.id; //each project has a unique id
-    
-    console.log("Created link with href:", link.href);
-
-    link.href = "/project/" + project.id;
-    footer.appendChild(saveButton);
-    footer.appendChild(link);
-
-    // Assemble the card in order
-    card.appendChild(title);
-    card.appendChild(desc);
-    card.appendChild(tagsRow);
-    card.appendChild(footer);
-    return card;
+  // SAVE PROJECT BUTTON (wired to DevPathBookmarks)
+  var saveBtn = document.createElement("button");
+  saveBtn.type = "button";
+  saveBtn.className = "btn-save-project";
+  saveBtn.setAttribute("data-save-project-id", project.id);
+  saveBtn.setAttribute("aria-label", "Save project");
+  saveBtn.setAttribute("aria-pressed", "false");
+  
+  // Check if already saved and set initial state
+  var isSaved = DevPathBookmarks.isSaved(project.id);
+  if (isSaved) {
+    saveBtn.classList.add("saved");
+    saveBtn.setAttribute("aria-pressed", "true");
+    saveBtn.setAttribute("aria-label", "Remove saved project");
   }
+  
+  // Set button content (SVG + label)
+  DevPathBookmarks.setButtonContent(saveBtn, isSaved);
+  
+  // Wire up click handler
+  saveBtn.addEventListener("click", function(e) {
+    e.preventDefault();
+    var projectObj = {
+      id: project.id,
+      title: project.title,
+      level: project.level,
+      time: project.time,
+      skills: project.skills || []
+    };
+    DevPathBookmarks.toggle(projectObj, saveBtn);
+  });
+
+  // VIEW DETAILS LINK (existing)
+  var link = document.createElement("a");
+  link.className = "btn-details";
+  link.textContent = "View Full Project";
+  link.href = "/project/" + project.id;
+
+  // Assemble footer
+  footer.appendChild(saveBtn);
+  footer.appendChild(link);
+
+  // Assemble the card
+  card.appendChild(title);
+  card.appendChild(desc);
+  card.appendChild(tagsRow);
+  card.appendChild(footer);
+  
+  return card;
+}
 
   function runProjectSearch(query) {
     if (!query) return;
