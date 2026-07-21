@@ -657,24 +657,15 @@ updateProfileWidgets();
     });
   }
 
-  // Show suggestions on input
+ // Show suggestions on input
   skillsTextInput.addEventListener("input", function (evt) {
     var typedValue = evt.target.value.trim();
     if (typedValue.length === 0) {
       hideSuggestions();
       return;
-    if (!document.getElementById("interest").value) {
-      showFieldError("interest-error", "Please select an area of interest.");
-      valid = false;
     }
-    if (!document.getElementById("time").value) {
-      showFieldError("time-error", "Please select your time availability.");
-      valid = false;
-    }
-
-    return valid;
-  }
-
+    displaySuggestions(getFilteredSkills(typedValue));
+  });
 
   document.addEventListener("click", function (evt) {
     if (skillWrap && !skillWrap.contains(evt.target)) {

@@ -1,0 +1,574 @@
+# kubernetes_manager.yaml
+# =======================
+# Project:    Kubernetes Deployment & Service Configuration
+# Difficulty: Advanced
+# Skills:     Kubernetes, YAML, Docker, Linux, kubectl
+# Time:       High (7-10 days)
+#
+# What you will build:
+#     A complete Kubernetes (K8s) deployment manifest that orchestrates
+#     containerised applications. You will define Deployments (manages
+#     app replicas), Services (networking), ConfigMaps (configuration),
+#     Secrets (sensitive data), Persistent Volumes (data storage), and
+#     resource limits/requests. This teaches infrastructure as code (IaC)
+#     and modern DevOps practices.
+#
+#     Kubernetes manages containerised apps at scale: auto-restarts
+#     failed containers, load balances traffic, rolls out updates with
+#     zero downtime, and scales horizontally (more replicas on demand).
+#
+# How to use:
+#     1. Install kubectl: https://kubernetes.io/docs/tasks/tools/
+#     2. Have access to a Kubernetes cluster (local minikube or cloud)
+#     3. Update values in this file (image name, replicas, etc.)
+#     4. Deploy: kubectl apply -f kubernetes_manager.yaml
+#     5. Monitor: kubectl get pods, kubectl logs <pod-name>
+#
+# Learning goals:
+#     - Understanding Kubernetes objects (Pod, Deployment, Service, etc.)
+#     - Writing declarative infrastructure (YAML manifests)
+#     - Configuring containerised apps in K8s
+#     - Managing networking and service discovery
+#     - Handling configuration (ConfigMaps) and secrets
+#     - Resource management and auto-scaling
+#     - Rolling updates and rollback strategies
+#     - Monitoring logs and debugging pods
+#
+# Key concept — Kubernetes in plain English:
+#     Without Kubernetes (manual approach):
+#         - You rent VMs, SSH in, and start Docker containers by hand
+#         - If container crashes, you don't notice until users complain
+#         - Scaling up means manually starting more containers
+#         - Deploying new versions requires downtime or careful manual steps
+#
+#     With Kubernetes:
+#         - You declare desired state in YAML ("I want 3 replicas of app")
+#         - K8s automatically achieves it (starts/stops containers as needed)
+#         - If a pod crashes, K8s instantly restarts it
+#         - Scaling: 1 command to change replica count
+#         - Rolling updates: Replace old pods with new ones gracefully
+#         - Self-healing, auto-scaling, load-balanced networking
+#
+# Kubernetes objects used here:
+#     - Namespace: Logical grouping (isolate environments)
+#     - ConfigMap: Non-sensitive configuration (env vars, config files)
+#     - Secret: Sensitive data (passwords, API keys, certs)
+#     - Deployment: Manages replicas of your app (scaling, updates)
+#     - Service: Exposes pods to network (load balancing, DNS)
+#     - PersistentVolume: Storage resource
+#     - PersistentVolumeClaim: Request for storage
+#     - Ingress: HTTP(S) routing (optional, more advanced)
+#
+# Manifest flow:
+#     kubectl apply -f kubernetes_manager.yaml
+#         |
+#         v
+#     Kubernetes API receives manifest
+#         |
+#         v
+#     Create Namespace
+#         |
+#         v
+#     Create ConfigMap (app configuration)
+#         |
+#         v
+#     Create Secret (passwords, API keys)
+#         |
+#         v
+#     Create PersistentVolume (optional storage)
+#         |
+#         v
+#     Create PersistentVolumeClaim (optional storage request)
+#         |
+#         v
+#     Create Deployment (manages pods)
+#         - K8s scheduler places pods on nodes
+#         - Container runtime pulls image and starts containers
+#         |
+#         v
+#     Create Service (networking)
+#         - Creates internal DNS name
+#         - Sets up load balancer
+#         |
+#         v
+#     Pods start receiving traffic via Service
+#
+# Roadmap:
+#     Step 1:  Understand Kubernetes concepts and YAML syntax
+#     Step 2:  Install kubectl and access a cluster
+#     Step 3:  Define Namespace and metadata
+#     Step 4:  Complete ConfigMap (configuration)
+#     Step 5:  Complete Secret (sensitive data)
+#     Step 6:  Complete PersistentVolume and PersistentVolumeClaim
+#     Step 7:  Complete Deployment (pod management, replicas, updates)
+#     Step 8:  Complete Service (networking and load balancing)
+#     Step 9:  Deploy and test with kubectl apply
+#     Step 10: Monitor and debug with kubectl logs, exec, describe
+
+# ============================================================================
+# NAMESPACE
+# ============================================================================
+# Namespaces logically partition a cluster.
+# Best practice: separate prod, staging, dev environments into different
+# namespaces for isolation, resource quotas, and access control.
+#
+# TODO: Choose a namespace name for your environment (e.g., prod, staging, dev)
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: myapp-production  # TODO: Change to your namespace name
+  # Optional: Add labels for organization
+  labels:
+    environment: production
+    team: backend
+
+
+# ============================================================================
+# ConfigMap
+# ============================================================================
+# Store non-sensitive configuration (app settings, feature flags, etc.)
+# Changes require pod restart (unlike Secrets which can be hot-reloaded).
+#
+# TODO: Add your app's configuration values
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: myapp-config
+  namespace: myapp-production
+data:
+  # TODO: Add key-value configuration for your app
+  # Example:
+  APP_NAME: "MyApp"
+  LOG_LEVEL: "info"
+  DATABASE_HOST: "postgres.myapp-production.svc.cluster.local"
+  DATABASE_PORT: "5432"
+  API_TIMEOUT: "30"
+  
+  # TODO: You can also store entire config files
+  # app.conf: |
+  #   server {
+  #       listen 8080;
+  #       access_log /var/log/nginx/access.log;
+  #   }
+
+  # TODO: Environment-specific settings
+  # FEATURE_BETA: "false"
+  # CACHE_TTL: "3600"
+
+
+# ============================================================================
+# Secret
+# ============================================================================
+# Store sensitive data: passwords, API keys, certificates.
+# Base64-encoded (NOT encrypted by default — use external secret management
+# in production).
+#
+# WARNING: Secrets are NOT automatically encrypted. For sensitive data:
+# - Use external secret management (HashiCorp Vault, AWS Secrets Manager)
+# - Enable encryption at rest in your cluster
+# - Restrict RBAC access to secrets
+#
+# TODO: Replace dummy values with real secrets (or use external secret store)
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: myapp-secrets
+  namespace: myapp-production
+  # TODO: Add labels for organisation
+  labels:
+    app: myapp
+type: Opaque  # Generic key-value secret
+data:
+  # TODO: Base64-encode your secrets:
+  # echo -n "my-password" | base64
+  # Output: bXktcGFzc3dvcmQ=
+  
+  # Replace these with your actual secrets:
+  DATABASE_PASSWORD: "cGFzc3dvcmQxMjM="  # TODO: base64("password123")
+  DATABASE_USER: "ZGJfdXNlcg=="  # TODO: base64("db_user")
+  API_KEY: "YWJjZGVmZ2hpamtsbW5vcA=="  # TODO: base64("your-api-key")
+  # TODO: Add more secrets as needed
+
+# Alternative: Use stringData (auto base64-encoded)
+# stringData:
+#   DATABASE_PASSWORD: "password123"  # TODO: Replace with actual
+
+
+# ============================================================================
+# PersistentVolume (Optional)
+# ============================================================================
+# Define persistent storage resources.
+# Only needed if your app requires persistent data (databases, file uploads).
+#
+# TODO: Uncomment if your app needs persistent storage
+
+# ---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: myapp-pv
+#   labels:
+#     type: local
+# spec:
+#   capacity:
+#     storage: 10Gi  # TODO: Adjust storage size
+#   accessModes:
+#     - ReadWriteOnce  # TODO: Change based on needs:
+#       # ReadWriteOnce: single pod can read/write
+#       # ReadWriteMany: multiple pods can read/write
+#       # ReadOnlyMany: multiple pods can read (no write)
+#   storageClassName: local-storage
+#   hostPath:
+#     path: "/mnt/data"  # TODO: Adjust node path
+
+
+# ============================================================================
+# PersistentVolumeClaim (Optional)
+# ============================================================================
+# Pods request storage via claims (don't directly use PersistentVolumes).
+#
+# TODO: Uncomment if your app needs persistent storage
+
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: myapp-pvc
+#   namespace: myapp-production
+# spec:
+#   accessModes:
+#     - ReadWriteOnce  # TODO: Match the PV's accessMode
+#   resources:
+#     requests:
+#       storage: 10Gi  # TODO: Request size (must be <= PV capacity)
+#   storageClassName: local-storage  # TODO: Match PV storageClassName
+
+
+# ============================================================================
+# Deployment
+# ============================================================================
+# Manages replicas of your app. Deployment creates ReplicaSets, which create
+# Pods. Deployment handles rolling updates, scaling, and rollback.
+#
+# TODO: Customize image, replicas, resource limits, and probe settings
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployment
+  namespace: myapp-production
+  labels:
+    app: myapp
+    version: v1
+spec:
+  # TODO: Set replica count (number of pod instances)
+  # Increasing replicas = horizontal scaling
+  # K8s automatically load-balances traffic across replicas
+  replicas: 3
+
+  # Selector: Deployment manages pods with matching labels
+  selector:
+    matchLabels:
+      app: myapp
+
+  # Strategy for updating (rolling updates with zero downtime)
+  strategy:
+    type: RollingUpdate
+    # TODO: Customize rolling update parameters
+    rollingUpdate:
+      maxSurge: 1        # Extra pods allowed during update (1 = 25% if replicas=4)
+      maxUnavailable: 0  # Pods that can be unavailable during update
+      # Set maxUnavailable=0 for zero downtime (requires maxSurge > 0)
+
+  # Template defines pod specifications
+  template:
+    metadata:
+      labels:
+        app: myapp
+        version: v1
+      # TODO: Add annotations for monitoring/logging
+      # annotations:
+      #   prometheus.io/scrape: "true"
+      #   prometheus.io/port: "8080"
+    spec:
+      # Restart policy: what happens if container crashes
+      restartPolicy: Always  # Always restart failed containers
+      # TODO: Other options:
+      #   OnFailure: only restart on non-zero exit code
+      #   Never: don't auto-restart
+
+      # ServiceAccount: permissions for this pod
+      serviceAccountName: default
+      # TODO: Create a custom ServiceAccount with specific RBAC rules if needed
+
+      # Pod-level resource limits
+      # TODO: Set these based on your app's needs
+      # resources:
+      #   requests:
+      #     memory: "64Mi"
+      #     cpu: "100m"
+      #   limits:
+      #     memory: "128Mi"
+      #     cpu: "200m"
+
+      # Container specification
+      containers:
+        # TODO: Replace "myapp" with your container name
+        - name: myapp
+
+          # TODO: Replace with your image
+          # Format: [registry]/[namespace]/[image]:[tag]
+          # Example: docker.io/mycompany/myapp:v1.0.0
+          image: docker.io/mycompany/myapp:latest
+
+          # Image pull policy
+          imagePullPolicy: IfNotPresent  # Pull if not already present
+          # TODO: Change to "Always" for latest version on every deploy
+          # Or "Never" if using local images only
+
+          # Container port
+          ports:
+            - containerPort: 8080  # TODO: Change to your app's port
+              protocol: TCP
+              name: http
+              # TODO: Add more ports if needed (e.g., metrics, debug)
+              # - containerPort: 9090
+              #   protocol: TCP
+              #   name: metrics
+
+          # Environment variables from ConfigMap and Secret
+          env:
+            # TODO: Add env vars from ConfigMap
+            - name: APP_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: myapp-config
+                  key: APP_NAME
+            
+            # TODO: Add env vars from Secret
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-secrets
+                  key: DATABASE_PASSWORD
+
+            # TODO: Direct environment variables
+            - name: ENVIRONMENT
+              value: "production"
+
+          # TODO: Mount ConfigMap as a file (optional)
+          # volumeMounts:
+          #   - name: config-volume
+          #     mountPath: /etc/config
+
+          # TODO: Mount PersistentVolume (optional, if using storage)
+          # volumeMounts:
+          #   - name: data-volume
+          #     mountPath: /data
+
+          # Liveness probe: Is the container alive?
+          # Restart if probe fails
+          livenessProbe:
+            httpGet:
+              path: /health  # TODO: Change to your health check endpoint
+              port: 8080     # TODO: Change to your container port
+            initialDelaySeconds: 10  # Wait before first check
+            periodSeconds: 10        # Check every 10 seconds
+            timeoutSeconds: 3        # Timeout per check
+            failureThreshold: 3      # Fail after 3 consecutive failures
+            # TODO: Alternative: exec command instead of HTTP
+            # exec:
+            #   command:
+            #     - /bin/sh
+            #     - -c
+            #     - "test -f /tmp/healthy"
+
+          # Readiness probe: Is the container ready for traffic?
+          # Remove from load balancer if probe fails
+          readinessProbe:
+            httpGet:
+              path: /ready   # TODO: Change to your readiness endpoint
+              port: 8080     # TODO: Change to your container port
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 2
+            # TODO: Alternative: exec command
+            # exec:
+            #   command:
+            #     - /bin/sh
+            #     - -c
+            #     - "curl -f http://localhost:8080/ready || exit 1"
+
+          # Resource requests and limits
+          # TODO: Set based on your app's needs
+          resources:
+            requests:
+              memory: "128Mi"     # TODO: Minimum memory needed
+              cpu: "100m"         # TODO: Minimum CPU (1000m = 1 core)
+            limits:
+              memory: "256Mi"     # TODO: Maximum memory allowed
+              cpu: "500m"         # TODO: Maximum CPU
+
+          # TODO: Security context (run as specific user, read-only filesystem)
+          # securityContext:
+          #   runAsNonRoot: true
+          #   runAsUser: 1000
+          #   readOnlyRootFilesystem: true
+
+      # TODO: Volumes (if using ConfigMap mounts or PersistentVolumes)
+      # volumes:
+      #   - name: config-volume
+      #     configMap:
+      #       name: myapp-config
+      #   - name: data-volume
+      #     persistentVolumeClaim:
+      #       claimName: myapp-pvc
+
+
+# ============================================================================
+# Service
+# ============================================================================
+# Exposes pods to network. Creates stable DNS names and load balances traffic
+# across pod replicas.
+#
+# TODO: Choose Service type and customize ports
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-service
+  namespace: myapp-production
+  labels:
+    app: myapp
+spec:
+  # Service type:
+  # TODO: Choose one:
+  # - ClusterIP: Internal DNS only (default, no external access)
+  # - NodePort: Accessible via node IP on a specific port
+  # - LoadBalancer: Cloud provider load balancer (external IP)
+  # - ExternalName: Maps to external DNS name
+  type: ClusterIP
+
+  # Selector: Which pods does this service route traffic to?
+  # Must match deployment pod labels
+  selector:
+    app: myapp
+
+  # Ports
+  ports:
+    # TODO: Change port/targetPort to match your app
+    - name: http
+      port: 80              # External port (via service)
+      targetPort: 8080      # Container port
+      protocol: TCP
+      # nodePort: 30080     # TODO: For NodePort type only
+    
+    # TODO: Add more ports if needed
+    # - name: metrics
+    #   port: 9090
+    #   targetPort: 9090
+
+  # Session affinity (sticky sessions)
+  sessionAffinity: None
+  # TODO: Change to "ClientIP" for sticky sessions (requests from same client go to same pod)
+
+
+# ============================================================================
+# Optional: Horizontal Pod Autoscaler (HPA)
+# ============================================================================
+# Automatically scale replicas based on CPU/memory usage
+#
+# TODO: Uncomment if you want auto-scaling
+
+# ---
+# apiVersion: autoscaling/v2
+# kind: HorizontalPodAutoscaler
+# metadata:
+#   name: myapp-hpa
+#   namespace: myapp-production
+# spec:
+#   scaleTargetRef:
+#     apiVersion: apps/v1
+#     kind: Deployment
+#     name: myapp-deployment
+#   minReplicas: 2  # TODO: Minimum pods
+#   maxReplicas: 10  # TODO: Maximum pods
+#   metrics:
+#     - type: Resource
+#       resource:
+#         name: cpu
+#         target:
+#           type: Utilization
+#           averageUtilization: 70  # Scale up if avg CPU > 70%
+#     - type: Resource
+#       resource:
+#         name: memory
+#         target:
+#           type: Utilization
+#           averageUtilization: 80  # Scale up if avg memory > 80%
+
+
+# ============================================================================
+# TODO DEPLOYMENT CHECKLIST
+# ============================================================================
+#
+# Before deploying to production:
+#
+# [ ] 1. Update namespace name (line ~30)
+# [ ] 2. Create ConfigMap with your app's configuration
+# [ ] 3. Create Secret with sensitive data (or use external secret store)
+# [ ] 4. Update Docker image name and tag (line ~180)
+# [ ] 5. Set resource requests/limits based on your app (line ~220-225)
+# [ ] 6. Update probe paths (/health, /ready) to match your app (line ~200, 209)
+# [ ] 7. Set correct container port (line ~175)
+# [ ] 8. Update Service port/targetPort (line ~270-271)
+# [ ] 9. Choose Service type (ClusterIP vs NodePort vs LoadBalancer)
+# [ ] 10. Test locally with minikube:
+#         minikube start
+#         kubectl apply -f kubernetes_manager.yaml
+#         kubectl get pods -n myapp-production
+#         kubectl logs -n myapp-production deployment/myapp-deployment
+# [ ] 11. Test rolling updates by changing image tag:
+#         kubectl set image deployment/myapp-deployment \
+#           myapp=docker.io/mycompany/myapp:v2 -n myapp-production
+# [ ] 12. Set up monitoring (Prometheus) and logging (Loki/ELK)
+# [ ] 13. Configure Ingress for HTTP(S) routing (if needed)
+# [ ] 14. Set up RBAC (role-based access control)
+# [ ] 15. Test disaster recovery (pod failures, node failures)
+#
+# Useful kubectl commands:
+#
+# # Deploy
+# kubectl apply -f kubernetes_manager.yaml
+#
+# # View resources
+# kubectl get all -n myapp-production
+# kubectl describe deployment myapp-deployment -n myapp-production
+#
+# # Logs
+# kubectl logs deployment/myapp-deployment -n myapp-production -f
+# kubectl logs -n myapp-production pod/myapp-deployment-abc123
+#
+# # Debug pod
+# kubectl exec -it -n myapp-production deployment/myapp-deployment -- /bin/bash
+#
+# # Scaling
+# kubectl scale deployment myapp-deployment --replicas=5 -n myapp-production
+#
+# # Rolling update
+# kubectl set image deployment/myapp-deployment \
+#   myapp=docker.io/mycompany/myapp:v2 -n myapp-production
+#
+# # Rollback
+# kubectl rollout undo deployment/myapp-deployment -n myapp-production
+#
+# # Delete
+# kubectl delete namespace myapp-production
