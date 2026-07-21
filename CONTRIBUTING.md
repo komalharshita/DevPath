@@ -209,6 +209,13 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
 
 ---
 
+### External Links
+
+- External URLs added to `projects.json` are rendered using `target="_blank"`
+- Only include trustworthy, safe, and relevant links
+- Avoid shortened or obfuscated URLs
+- Verify that all links are accessible before submitting a PR
+
 ## Commit Message Format
 
 Use the same `type/scope: description` format as branch names for commit messages.
@@ -261,6 +268,7 @@ If you add a new feature, add at least one corresponding test in `tests/test_bas
 - Your branch is up to date with the upstream `main` branch
 - Your code follows the style rules above
 - You have removed all debug `print()` statements and commented-out code
+- Update `CHANGELOG.md` for any user-facing or documentation-related changes
 
 ### Steps
 
@@ -301,6 +309,32 @@ Recommended first issues:
 - Improving a label or placeholder text in `templates/index.html`
 - Adding a new test case to `tests/test_basic.py`
 - Fixing a visual spacing issue in `static/style.css`
+
+---
+
+## Troubleshooting
+
+If you encounter issues while setting up your local environment, try these common solutions first:
+
+### Common Setup Errors
+
+* **Dependency Mismatch:** If you see `ModuleNotFoundError` or version conflicts, ensure your virtual environment is activated and you are using Python 3.8+.
+* **Port Already in Use:** If `python app.py` fails because port 5000 is occupied, ensure no other local servers are running.
+* **Database/JSON Errors:** If the application fails to load projects, verify that your changes to `data/projects.json` are valid JSON (use a [JSON Validator](https://jsonlint.com/) if unsure).
+
+### The "Clean Start" Protocol
+
+If the application is behaving unexpectedly or you have dependency issues, perform a clean re-installation:
+
+```bash
+# Remove the old environment and dependencies
+rm -rf venv
+rm -rf node_modules  # If applicable
+
+# Re-create and re-install
+python -m venv venv
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+pip install -r requirements.txt
 
 ---
 

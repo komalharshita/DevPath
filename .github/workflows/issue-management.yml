@@ -1,0 +1,58 @@
+name: Issue Management
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  assign-and-label:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Assign issue creator
+        uses: actions/github-script@v9
+        with:
+          script: |
+            await github.rest.issues.addAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              assignees: [context.payload.issue.user.login]
+            });
+
+      - name: Add GSSoC label
+        uses: actions/github-script@v9
+        with:
+          script: |
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ["gssoc-2026"]
+            });
+
+      - name: Add category labels
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const body = context.payload.issue.body || "";
+            const labels = [];
+
+            if (body.includes("bug")) labels.push("bug");
+            if (body.includes("documentation")) labels.push("documentation");
+            if (body.includes("enhancement")) labels.push("enhancement");
+            if (body.includes("ui")) labels.push("ui");
+            if (body.includes("data")) labels.push("data");
+            if (body.includes("good first issue")) labels.push("good first issue");
+
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels
+              });
+            }

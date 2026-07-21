@@ -1,0 +1,6 @@
+# Starter Code for Minimalist Weather App
+# Level: Beginner
+# Skills: JavaScript, HTML, CSS
+
+print('Hello World! Your journey begins here.')
+// Or equivalent in your chosen language!

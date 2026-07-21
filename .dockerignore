@@ -1,0 +1,35 @@
+```
+# Git metadata
+.git
+.github
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE files
+.vscode/
+.idea/
+
+# Environment files
+.env
+.env.*
+
+# Test and cache
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
+```
