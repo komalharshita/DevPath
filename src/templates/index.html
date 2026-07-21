@@ -58,7 +58,7 @@
   {% include 'partials/theme_head.html' %}
   <link rel="stylesheet" href="/static/style.css" />
   <link rel="stylesheet" href="/static/bookmarks.css" />
-  <link rel="stylesheet" href="/static/animations.css" />
+  <link rel="stylesheet" href="/static/recently-viewed.css" />
   <link
     href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet" />
@@ -1167,14 +1167,15 @@
 
       <div class="results-grid" id="results-grid"></div>
 
-      <div class="show-more-container" style="text-align:center; margin-top:2rem;">
-        <button
-          id="show-more-btn"
-          class="btn-submit"
-          style="display:none;"
-          type="button">
-          Show More Projects
-        </button>
+      <div class="recently-viewed-panel" id="recently-viewed-panel">
+        <div class="recently-viewed-header">
+          <div>
+            <h3>Recently Viewed</h3>
+            <p>Projects you've checked out recently.</p>
+          </div>
+          <span class="recently-viewed-count" id="recently-viewed-count">0 viewed</span>
+        </div>
+        <div class="recently-viewed-list" id="recently-viewed-list"></div>
       </div>
 
       <div class="saved-projects-panel" id="saved-projects-panel">
@@ -1366,6 +1367,35 @@
 
   {% include 'partials/scroll_top_btn.html' %}
 
+  <script src="/static/script.js"></script>
+  <script src="/static/bookmarks.js"></script>
+  <script src="/static/recently-viewed.js"></script>
+  
+  <script>
+    // Tab switching for leaderboard/achievements (adds to your existing JS)
+    document.addEventListener('DOMContentLoaded', function() {
+      const tabs = document.querySelectorAll('.la-tab');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          const parent = this.closest('.leaderboard-achievement-card');
+          if (parent) {
+            parent.querySelectorAll('.la-tab').forEach(t => t.classList.remove('active'));
+            parent.querySelectorAll('.la-content').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            const tabId = this.getAttribute('data-tab');
+            if (tabId === 'leaderboard') {
+              const leaderboardContent = parent.querySelector('#leaderboard-content');
+              if (leaderboardContent) leaderboardContent.classList.add('active');
+            } else {
+              const achievementsContent = parent.querySelector('#achievements-content');
+              if (achievementsContent) achievementsContent.classList.add('active');
+            }
+          }
+        });
+      });
+    });
+  </script>
+    
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
 
   <script src="/static/animations.js"></script>

@@ -791,6 +791,12 @@ async function updatePortfolioAnalysis() {
     link.className = "btn-details";
     link.textContent = "View Full Project";
     link.href = "/project/" + project.id;
+    
+    link.addEventListener("click", function() {
+      if (typeof RecentlyViewed !== "undefined") {
+        RecentlyViewed.trackView(project);
+      }
+    });
     footer.appendChild(link);
 
     card.appendChild(title);
@@ -920,12 +926,11 @@ async function updatePortfolioAnalysis() {
     clearAllErrors();
     hideSuggestions();
     resultsSection.style.display = "none";
-    showMoreBtn.style.display = "none";
-    allProjects = [];
-    visibleProjectCount = PROJECTS_PER_LOAD;
+    if (typeof RecentlyViewed !== "undefined") {
+    RecentlyViewed.clearHistory();
+    }
     if (skillsInput) skillsInput.focus();
-  }
-
+  }  
   var clearBtn = document.getElementById("clear-filters-btn");
   if (clearBtn) {
     clearBtn.addEventListener("click", resetFormAndState);
@@ -1099,6 +1104,17 @@ async function updatePortfolioAnalysis() {
 (function initDetailPage() {
   if (typeof PROJECT_ID === "undefined") return;
   recordProjectView();
+  
+if (typeof RecentlyViewed !== "undefined") {
+  var projectTitle = typeof PROJECT_TITLE !== "undefined" ? PROJECT_TITLE : "Project " + PROJECT_ID;
+  var projectInterest = document.querySelector("[data-project-interest]");
+  var interest = projectInterest ? projectInterest.getAttribute("data-project-interest") : "General";
+  RecentlyViewed.trackView({
+    id: PROJECT_ID,
+    title: projectTitle,
+    interest: interest
+  });
+  }
 
   var codePanel = document.getElementById("code-panel");
   var codePanelOverlay = document.getElementById("code-panel-overlay");
