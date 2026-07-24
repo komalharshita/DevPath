@@ -15,51 +15,51 @@ from collections import OrderedDict
 # OrderedDict just makes that intent explicit).
 PROJECT_CATEGORIES = OrderedDict([
     ("Frontend", {
-        "icon": "🎨",
+        "icon": "[FE]",
         "keywords": ["react", "vue", "angular", "html", "css", "javascript",
                      "tailwind", "bootstrap", "frontend", "ui"],
     }),
     ("Backend", {
-        "icon": "⚙️",
+        "icon": "[BE]",
         "keywords": ["flask", "django", "express", "node", "spring",
                      "fastapi", "backend", "server"],
     }),
     ("Database", {
-        "icon": "🗄️",
+        "icon": "[DB]",
         "keywords": ["mysql", "mongodb", "postgresql", "sqlite", "firebase",
                      "database", "sql", "nosql"],
     }),
     ("Authentication", {
-        "icon": "🔐",
+        "icon": "[AUTH]",
         "keywords": ["jwt", "oauth", "login", "authentication", "auth",
                      "signup", "session"],
     }),
     ("API Integration", {
-        "icon": "🔌",
+        "icon": "[API]",
         "keywords": ["api", "rest", "graphql", "axios", "fetch", "webhook"],
     }),
     ("Testing", {
-        "icon": "🧪",
+        "icon": "[TEST]",
         "keywords": ["pytest", "jest", "testing", "unit test", "unittest",
                      "test coverage", "tdd"],
     }),
     ("Deployment", {
-        "icon": "🚀",
+        "icon": "[DEPLOY]",
         "keywords": ["docker", "vercel", "netlify", "aws", "render",
                      "heroku", "deployment", "deploy"],
     }),
     ("AI/ML", {
-        "icon": "🤖",
+        "icon": "[AI]",
         "keywords": ["machine learning", "tensorflow", "opencv", "ai", "ml",
                      "pytorch", "scikit", "nlp", "llm"],
     }),
     ("DevOps", {
-        "icon": "🛠️",
+        "icon": "[DO]",
         "keywords": ["kubernetes", "github actions", "jenkins", "ci/cd",
                      "ci-cd", "pipeline", "devops"],
     }),
     ("Real-time", {
-        "icon": "💬",
+        "icon": "[RT]",
         "keywords": ["socket", "websocket", "chat", "firebase realtime",
                      "real-time", "realtime", "live"],
     }),
