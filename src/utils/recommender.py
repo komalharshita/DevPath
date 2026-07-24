@@ -122,10 +122,6 @@ def parse_skill_entries(skills_string):
 def parse_skills(skills_string):
     return [entry["skill"] for entry in parse_skill_entries(skills_string)]
 
-
-def parse_skills(skills_string):
-    return [entry["skill"] for entry in parse_skill_entries(skills_string)]
-
 _nlp_model = None
 _project_embeddings_cache = {}
 
