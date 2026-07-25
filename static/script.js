@@ -1093,7 +1093,7 @@ updateProfileWidgets();
           closeGithubModal();
         })
         .catch(function (err) {
-          if (err.message && err.message.toLowerCase().indexOf("networkerror") !== -1 || err.name === "TypeError") {
+          if ((err.message && err.message.toLowerCase().indexOf("networkerror") !== -1) || err.name === "TypeError") {
             errorMsg.textContent = "Network error: Connection blocked or offline. Please disable adblockers or check your connection.";
           } else {
             errorMsg.textContent = err.message || "Failed to fetch skills.";
