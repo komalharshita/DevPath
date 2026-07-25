@@ -10,6 +10,9 @@ DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "projects.json
 
 logger = logging.getLogger("devpath.data_loader")
 
+# Thread-safe cache lock for multi-threaded environments
+_cache_lock = threading.Lock()
+
 def validate_projects(projects):
     """
     Validate project dataset integrity.
