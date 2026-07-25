@@ -10,7 +10,13 @@ class PrivacyManager:
     """Manages GDPR compliance, data encryption, and privacy controls."""
 
     def __init__(self):
-        self.encryption_key = os.getenv("ENCRYPTION_KEY", Fernet.generate_key())
+        raw_key = os.getenv("ENCRYPTION_KEY")
+        if raw_key is None:
+            self.encryption_key = Fernet.generate_key()
+        elif isinstance(raw_key, str):
+            self.encryption_key = raw_key.encode()
+        else:
+            self.encryption_key = raw_key
         self.cipher = Fernet(self.encryption_key)
         self.user_consent: Dict[str, Dict] = {}
         self.data_requests: Dict[str, Dict] = {}
