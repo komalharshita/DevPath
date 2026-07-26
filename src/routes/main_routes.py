@@ -134,7 +134,7 @@ def recommend():
         return jsonify({"error": "Request body must be valid JSON."}), 400
 
     # Reject non-string values (e.g. null, lists, numbers) before calling .strip()
-    string_fields = ("skills", "level", "interest", "time", "tech_stack")
+    string_fields = ("skills", "level", "time", "tech_stack")
     for field in string_fields:
         value = payload.get(field)
         if value is not None and not isinstance(value, str):
@@ -142,9 +142,16 @@ def recommend():
 
     skills            = (payload.get("skills") or "").strip()
     level             = (payload.get("level") or "").strip()
-    interest          = (payload.get("interest") or "").strip()
     time_availability = (payload.get("time") or "").strip()
     tech_stack        = (payload.get("tech_stack") or "").strip()
+
+    interest = payload.get("interest")
+    if isinstance(interest, str):
+        interest = [interest.strip()]
+    elif isinstance(interest, list):
+        interest = [i.strip() for i in interest if isinstance(i, str)]
+    else:
+        interest = []
 
     # Explicitly check if skills string field is empty to prevent underlying scoring engine crashes
     if not skills:
@@ -156,10 +163,10 @@ def recommend():
         # Return only the first error to keep the UI message clean
         return jsonify({"error": errors[0]}), 400
 
-    if interest_has_no_projects(interest):
+    if interest and all(interest_has_no_projects(i) for i in interest):
         return jsonify({
             "projects": [],
-            "message": "No projects are currently available for this interest area. Please check back later."
+            "message": "No projects are currently available for your selected interest areas. Please check back later."
         }), 200
 
     recommendations_data = get_recommendations(

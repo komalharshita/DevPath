@@ -34,7 +34,7 @@ def clear_caches():
     _skill_graph_loaded = False
 
 VALID_LEVELS = {"beginner", "intermediate", "advanced"}
-VALID_INTERESTS = {"web", "data", "education", "automation", "games", "cybersecurity", "devops", "backend", "tools", "productivity", "business logic", "mobile", "machine learning/ai"}
+VALID_INTERESTS = {"web", "data", "education", "automation", "games", "cybersecurity", "devops", "backend", "tools", "productivity", "business logic", "mobile", "machine learning/ai", "artificial intelligence", "cloud computing"}
 VALID_TIME_AVAILABILITY = {"low", "medium", "high"}
 
 
@@ -135,7 +135,11 @@ def _project_text(project):
     return " ".join(parts)
 
 def _user_text(user_skills, level, interest, time_availability):
-    return f"I am a {level} developer interested in {interest}. I have {time_availability} time. My skills are: {', '.join(user_skills)}."
+    if isinstance(interest, list):
+        interest_str = ", ".join(interest)
+    else:
+        interest_str = interest
+    return f"I am a {level} developer interested in {interest_str}. I have {time_availability} time. My skills are: {', '.join(user_skills)}."
 
 @functools.lru_cache(maxsize=128)
 def _get_user_embedding(user_text):
@@ -285,6 +289,8 @@ class ScoringResult(tuple):
         return other / self.score
 
 def score_single_project(project, user_skills, level, interest, time_availability, graph=None, skill_proficiencies=None):
+    if isinstance(interest, str):
+        interest = [interest]
     TIME_RANKS = ["low", "medium", "high"]
     
     import sys
@@ -546,7 +552,6 @@ def project_matches_tech(project, tech_stack):
 
     return False
 
-
 def get_recommendations(
     skills_string,
     level,
@@ -555,6 +560,8 @@ def get_recommendations(
     tech_stack="all",
     max_results=None,
 ):
+    if isinstance(interest, str):
+        interest = [interest]
     skill_entries = parse_skill_entries(skills_string)
 
     user_skills = [entry["skill"] for entry in skill_entries]
@@ -735,12 +742,14 @@ def validate_recommendation_inputs(skills, level, interest, time_availability):
     elif level.strip().lower() not in VALID_LEVELS:
         errors.append("Invalid experience level. Choose Beginner, Intermediate, or Advanced.")
 
-    if (
-        not interest
-        or not isinstance(interest, str)
-        or interest.strip().lower() not in VALID_INTERESTS
-    ):
-        errors.append("Please select a valid area of interest.")
+    if isinstance(interest, str):
+        interest = [interest]
+    if not interest or not isinstance(interest, list) or len([i for i in interest if str(i).strip()]) == 0:
+        errors.append("Please select an area of interest.")
+    else:
+        invalid_interests = [i for i in interest if str(i).strip().lower() not in VALID_INTERESTS]
+        if invalid_interests:
+            errors.append("Please select a valid area of interest.")
 
     if not time_availability or not time_availability.strip():
         errors.append("Please select your time availability.")

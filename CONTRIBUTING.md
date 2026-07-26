@@ -257,6 +257,13 @@ pytest tests/ -v
 
 If you add a new feature, add at least one corresponding test in `tests/test_basic.py`.
 
+### Repository Validation
+
+Before opening a pull request, contributors are encouraged to run DevPath Sentinel.
+
+```bash
+python -m tools.sentinel.cli
+
 ---
 
 ## Submitting a Pull Request
@@ -264,6 +271,7 @@ If you add a new feature, add at least one corresponding test in `tests/test_bas
 ### Before opening a PR
 
 - All 27 tests pass locally
+- Run `python -m tools.sentinel.cli` to validate the    project dataset before opening a pull request
 - You have tested the running app in your browser
 - Your branch is up to date with the upstream `main` branch
 - Your code follows the style rules above
