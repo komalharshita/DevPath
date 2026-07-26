@@ -644,7 +644,7 @@ async function updatePortfolioAnalysis() {
       showFieldError("level-error", "Please select your experience level.");
       valid = false;
     }
-    if (!document.getElementById("interest").value) {
+    if (document.getElementById("interest").selectedOptions.length === 0 || document.getElementById("interest").selectedOptions[0].value === "") {
       showFieldError("interest-error", "Please select an area of interest.");
       valid = false;
     }
@@ -781,10 +781,23 @@ async function updatePortfolioAnalysis() {
       if (isSaved) saveBtn.classList.add("saved");
       saveBtn.setAttribute("aria-pressed", isSaved ? "true" : "false");
       DevPathBookmarks.setButtonContent(saveBtn, isSaved);
-      saveBtn.addEventListener("click", function () {
-        DevPathBookmarks.toggle(project, saveBtn);
+      // Keep your bookmarking code
+      // Save button logic
+      saveBtn.addEventListener("click", function(e) {
+        e.preventDefault();
+        var projectObj = {
+          id: project.id,
+          title: project.title,
+          level: project.level,
+          time: project.time,
+          skills: project.skills || []
+        };
+        DevPathBookmarks.toggle(projectObj, saveBtn);
       });
+
+      // Also keep recently-viewed tracking code
       footer.appendChild(saveBtn);
+      footer.appendChild(link);
     }
 
     var link = document.createElement("a");
@@ -986,7 +999,7 @@ async function updatePortfolioAnalysis() {
           };
         })),
         level: document.getElementById("level").value,
-        interest: document.getElementById("interest").value,
+        interest: Array.from(document.getElementById("interest").selectedOptions).map(opt => opt.value),
         time: document.getElementById("time").value,
         tech_stack: techStackSelect ? techStackSelect.value : "all"
       })

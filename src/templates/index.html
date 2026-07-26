@@ -388,7 +388,7 @@
     <div class="nav-inner">
       <a href="/" class="nav-logo">Dev<span class="nav-logo-accent">Path</span></a>
 
-      <form id="topic-search-form" class="navbar-search" role="search">
+    <form id="topic-search-form" class="navbar-search" role="search">
         <input
           type="search"
           id="topic-search"
@@ -403,18 +403,19 @@
               d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </button>
-      </form>
-      <div class="nav-links desktop-only" style="margin-left: auto; display: flex; align-items: center; gap: 1.5rem; padding-right: 1.5rem;">
-        {% if current_user %}
-        {% if current_user.is_admin %}
-        <a href="/admin" class="nav-link" style="font-weight: 600; color: #4f46e5; text-decoration: none;">Admin</a>
-        {% endif %}
-        <a href="/profile" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Profile</a>
-        <a href="/auth/logout" class="nav-link" style="color: var(--text-muted); text-decoration: none;">Logout</a>
-        {% else %}
-        <a href="/auth/login" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Login with GitHub</a>
-        {% endif %}
+    </form>
+
+    <div class="nav-right">
+      <div class="nav-links">
+        <a href="#home" class="nav-link">Home</a>
+        <a href="#how-it-works" class="nav-link">How It Works</a>
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#the-project" class="nav-link">Find Project</a>
+        <a href="/compare" class="nav-link">Compare</a>
+        <a href="/contact" class="nav-link">Contact</a>
+        <a href="https://github.com/komalharshita/DevPath" class="nav-link" target="_blank" rel="noopener noreferrer">Github</a>
       </div>
+    </div>
 
       <div class="nav-right">
             <nav class="nav-links" aria-label="site navigation">
@@ -870,6 +871,9 @@
           <h3>Starter Code Included</h3>
           <p>Download a working template for every project. Skip the blank-page problem and start building immediately.</p>
           <a href="#the-project" class="feature-card-link">Get starter code</a>
+          <p>Download a working template for every project. Skip the blank-page problem and start building immediately.
+          </p>
+          <a href="#the-project" class="feature-card-link">Get starter code</a>
         </div>
       </div>
     </div>
@@ -1036,7 +1040,7 @@
                   </button>
                 </label>
                 <div class="select-wrap">
-                  <select id="interest" name="interest">
+                  <select id="interest" name="interest" multiple>
                     <option value="" disabled selected>Select interest</option>
                     {% for interest in available_interests %}
                     <option value="{{ interest }}">{{ interest }}</option>

@@ -4902,11 +4902,12 @@ body.dark-theme .theme-toggle:hover {
 }
 
 [data-theme="dark"] a {
-  color: #818cf8;
+  color: #232852;
 }
 
 [data-theme="dark"] a:hover {
   color: #a5b4fc;
+
 }
 
 .line-content {
@@ -5346,6 +5347,13 @@ body.dark-theme .theme-toggle:hover {
   border-radius: var(--r-full);
   background: var(--gray-100);
   color: var(--text-body);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: default;
+}
+
+.compare-tag:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25);
 }
 
 .compare-tag--a {
@@ -5393,6 +5401,13 @@ body.dark-theme .theme-toggle:hover {
   font-weight: 600;
   padding: 5px 12px;
   border-radius: var(--r-full);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: default;
+}
+
+.compare-skill-chip:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25);
 }
 
 .compare-skill-chip--a {

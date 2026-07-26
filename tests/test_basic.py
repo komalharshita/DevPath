@@ -128,7 +128,7 @@ def test_score_no_project_skills_does_not_crash():
     score_result = score_single_project(project, ["python"], "Beginner", "Data", "Low")
     # Skill score is 0, but other criteria still score
     score = score_result[0] if isinstance(score_result, tuple) else score_result
-    assert score == pytest.approx(SCORING_WEIGHTS["level"] + SCORING_WEIGHTS["interest"] + SCORING_WEIGHTS["time"])  # 2+2+1 = 5
+    assert score == pytest.approx(SCORING_WEIGHTS["level"] + SCORING_WEIGHTS["interest"] + SCORING_WEIGHTS["time"])
 
 
 def test_score_three_skills_partial_coverage():
@@ -239,6 +239,7 @@ def test_validate_missing_fields():
 
 def get_client():
     app.config["TESTING"] = True
+    app.config["WTF_CSRF_ENABLED"] = False
     return app.test_client()
 
 
@@ -264,19 +265,67 @@ def test_security_headers_present():
         == "geolocation=(), microphone=(), camera=()"
     )
 
-def test_recommend_api():
+def test_recommend_api_single_interest():
     client = get_client()
     response = client.post("/api/recommend", json={
         "skills": "Python",
         "level": "Beginner",
-        "interest": "Data",
+        "interest": ["Data"],
         "time": "Low"
     })
-
     assert response.status_code == 200
-
     data = response.get_json()
     assert "projects" in data
+
+def test_recommend_api_multiple_interests_overlapping():
+    client = get_client()
+    response = client.post("/api/recommend", json={
+        "skills": "Python",
+        "level": "Beginner",
+        "interest": ["Data", "Web"],
+        "time": "Low"
+    })
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "projects" in data
+
+def test_recommend_api_multiple_interests_one_empty():
+    client = get_client()
+    response = client.post("/api/recommend", json={
+        "skills": "Python",
+        "level": "Beginner",
+        "interest": ["Data", "artificial intelligence"],
+        "time": "Low"
+    })
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "projects" in data
+    assert len(data["projects"]) > 0
+
+def test_recommend_api_multiple_interests_all_empty():
+    client = get_client()
+    response = client.post("/api/recommend", json={
+        "skills": "Python",
+        "level": "Beginner",
+        "interest": ["artificial intelligence", "cloud computing"],
+        "time": "Low"
+    })
+    assert response.status_code == 200
+    data = response.get_json()
+    assert len(data["projects"]) == 0
+    assert "No projects are currently available" in data["message"]
+
+def test_recommend_api_empty_selection():
+    client = get_client()
+    response = client.post("/api/recommend", json={
+        "skills": "Python",
+        "level": "Beginner",
+        "interest": [],
+        "time": "Low"
+    })
+    assert response.status_code == 400
+    data = response.get_json()
+    assert "Please select an area of interest" in data["error"]
 
 
 def test_project_not_found():
