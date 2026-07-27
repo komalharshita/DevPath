@@ -8,7 +8,7 @@ from flask import Blueprint, render_template, request, jsonify, send_from_direct
 from utils.recommender import get_recommendations, validate_recommendation_inputs
 from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats, get_available_interests
 from utils.roadmap_comparer import load_all_career_roadmaps, compare_roadmaps
-from utils.file_server import read_starter_code, resolve_starter_file, get_starter_code_dir
+from utils.file_server import read_starter_code, resolve_starter_file
 from utils.rate_limiter import rate_limit
 from utils.learning_path import (
     create_learning_path,
@@ -25,7 +25,6 @@ from utils.skill_progression import (
 )
 from utils.code_review import CodeReviewManager
 from config import Config
-from flask import jsonify
 from utils.portfolio_analyzer import analyze_portfolio
 import os
 from models import db, ProjectProgress
