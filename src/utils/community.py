@@ -12,6 +12,8 @@ class CommunityManager:
         self.questions: Dict[str, Dict] = {}
         self.study_groups: Dict[str, Dict] = {}
         self.user_reputation: Dict[str, int] = {}
+        self._reply_counters: Dict[str, int] = {}
+        self._answer_counters: Dict[str, int] = {}
 
     def create_discussion(
         self, discussion_id: str, user_id: str, course_id: int, title: str, content: str
@@ -38,13 +40,16 @@ class CommunityManager:
         if discussion_id not in self.discussions:
             raise ValueError(f"Discussion {discussion_id} not found")
 
+        reply_counter_key = f"reply_counter_{discussion_id}"
+        reply_num = self._reply_counters.get(reply_counter_key, 0)
         reply = {
-            "reply_id": f"reply_{len(self.discussions[discussion_id]['replies'])}",
+            "reply_id": f"reply_{reply_num}",
             "user_id": user_id,
             "content": reply_content,
             "created_at": datetime.utcnow().isoformat(),
             "likes": 0,
         }
+        self._reply_counters[reply_counter_key] = reply_num + 1
         self.discussions[discussion_id]["replies"].append(reply)
         self._add_reputation(user_id, 3)
         return reply
@@ -82,14 +87,17 @@ class CommunityManager:
         if question_id not in self.questions:
             raise ValueError(f"Question {question_id} not found")
 
+        answer_counter_key = f"answer_counter_{question_id}"
+        answer_num = self._answer_counters.get(answer_counter_key, 0)
         answer = {
-            "answer_id": f"answer_{len(self.questions[question_id]['answers'])}",
+            "answer_id": f"answer_{answer_num}",
             "user_id": user_id,
             "content": answer_content,
             "created_at": datetime.utcnow().isoformat(),
             "upvotes": 0,
             "is_accepted": False,
         }
+        self._answer_counters[answer_counter_key] = answer_num + 1
         self.questions[question_id]["answers"].append(answer)
         self._add_reputation(user_id, 15)
         return answer
