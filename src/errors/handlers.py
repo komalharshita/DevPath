@@ -8,14 +8,10 @@
 #   3. Never leaks stack traces, file paths, or internal state to the client.
 #
 # Register by calling register_error_handlers(app) from app.py.
-from flask import make_response
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, has_request_context
 from config import Config
 from utils.error_logger import log_exception
 
-from flask import has_request_context, request
-
-from flask import has_request_context
 
 def _wants_json():
     if not has_request_context():
