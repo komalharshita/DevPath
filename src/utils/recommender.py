@@ -105,16 +105,6 @@ SKILL_SYNONYMS = {
     "ai":            "artificial intelligence",
     "k8s":           "kubernetes",
     "tf":            "tensorflow",
-
-# Common aliases and abbreviations for skills
-# This improves recommendation accuracy by normalizing user input
-SKILL_ALIASES = {
-    "js": "javascript",
-    "py": "python",
-    "html5": "html",
-    "css3": "css",
-    "c++": "cpp",
-    "web dev": "javascript",
 }
 def _normalize_skill(s: str) -> str:
     """Normalize a skill string: strip surrounding whitespace and lowercase."""
@@ -124,47 +114,17 @@ def _normalize_skill(s: str) -> str:
 # that reference SKILL_ALIASES continue to work without modification.
 SKILL_ALIASES = SKILL_SYNONYMS
 
-def parse_skills(skills_string):
-    """
-    Convert a raw skills string into a normalized, synonym-resolved lowercase list.
-
-    Accepts either:
-    - A JSON array  e.g. '["Python", "ReactJS"]'  -> ["python", "react"]
-    - A comma-separated string  e.g. "JS, TS, Node, "  -> ["javascript", "typescript", "node.js"]
-
-    Processing steps applied to every token:
-    1. Strip surrounding whitespace.
-    2. Convert to lowercase.
-    3. Discard empty strings (handles trailing commas / double commas).
-    4. Map through SKILL_SYNONYMS so abbreviations become canonical names.
-    """
+def parse_skill_entries(skills_string):
+    """Parse skills with optional per-skill proficiency levels."""
     if not skills_string or not skills_string.strip():
         return []
 
-    stripped = skills_string.strip()
-
-    # --- JSON array branch ---
-
-def parse_skill_entries(skills_string):
-    """Parse skills with optional per-skill proficiency levels."""
     stripped = skills_string.strip()
 
     if stripped.startswith("["):
         try:
             parsed = json.loads(stripped)
             if isinstance(parsed, list):
-                tokens = [str(s).strip().lower() for s in parsed if str(s).strip()]
-                return [SKILL_SYNONYMS.get(token, token) for token in tokens]
-        except (json.JSONDecodeError, ValueError):
-            pass  # fall through to comma-splitting
-
-    # --- Comma-separated branch ---
-    tokens = [
-        s.strip().lower()
-        for s in skills_string.split(",")
-        if s.strip()  # skip blanks produced by trailing / consecutive commas
-    ]
-    return [SKILL_SYNONYMS.get(token, token) for token in tokens]
                 entries = []
                 for item in parsed:
                     if isinstance(item, dict):
@@ -177,7 +137,7 @@ def parse_skill_entries(skills_string):
                     if skill:
                         entries.append(
                             {
-                                "skill": SKILL_ALIASES.get(skill, skill),
+                                "skill": SKILL_SYNONYMS.get(skill, skill),
                                 "proficiency": (
                                     proficiency
                                     if proficiency in (
@@ -195,19 +155,17 @@ def parse_skill_entries(skills_string):
 
     return [
         {
-            "skill": SKILL_ALIASES.get(_normalize_skill(skill), _normalize_skill(skill)),
+            "skill": SKILL_SYNONYMS.get(_normalize_skill(skill), _normalize_skill(skill)),
             "proficiency": "Beginner",
         }
         for skill in skills_string.split(",")
         if skill.strip()
     ]
 
-
 def parse_skills(skills_string):
-    return [entry["skill"] for entry in parse_skill_entries(skills_string)]
-
-
-def parse_skills(skills_string):
+    """
+    Convert a raw skills string into a normalized, synonym-resolved lowercase list.
+    """
     return [entry["skill"] for entry in parse_skill_entries(skills_string)]
 
 _nlp_model = None
@@ -545,11 +503,17 @@ def gap_boost(user_skills, project_skills, graph):
     return round(boost, 3)
 
 
-def get_progression(user_skills, recommended_ids, all_projects, graph):
+def get_progression(user_skills, recommended_ids, all_projects, graph, level, time_availability):
     """
     Return projects that are 1 hop away from user's current skills
-    but were NOT already recommended.
+    but were NOT already recommended, applying level and time filters.
     """
+    TIME_RANKS = ["low", "medium", "high"]
+    LEVEL_RANKS = ["beginner", "intermediate", "advanced"]
+    
+    user_time = time_availability.strip().lower()
+    user_level = level.strip().lower()
+
     # Find all 1-hop reachable skills
     reachable = set()
     for skill in user_skills:
@@ -559,6 +523,18 @@ def get_progression(user_skills, recommended_ids, all_projects, graph):
     progression = []
     for project in all_projects:
         if project["id"] in recommended_ids:
+            continue
+            
+        project_time = project.get("time", "").strip().lower()
+        if project_time not in TIME_RANKS or user_time not in TIME_RANKS:
+            continue
+        if TIME_RANKS.index(project_time) > TIME_RANKS.index(user_time):
+            continue
+            
+        project_level = project.get("level", "").strip().lower()
+        if project_level not in LEVEL_RANKS or user_level not in LEVEL_RANKS:
+            continue
+        if LEVEL_RANKS.index(project_level) > LEVEL_RANKS.index(user_level):
             continue
         project_skills = [
             SKILL_ALIASES.get(_normalize_skill(s), _normalize_skill(s))
@@ -750,7 +726,7 @@ def get_recommendations(
             })
     # Sort projects in descending order so the
     # most relevant recommendations appear first.
-    scored_projects.sort(key=lambda item: (item["score"], item["project"].get("id", 0)), reverse=True)
+    scored_projects.sort(key=lambda item: (-item["score"], int(item["project"].get("id", 0))))
     
     selected_projects = (
       scored_projects
@@ -840,7 +816,7 @@ def get_recommendations(
     cluster_data = _load_clusters()
     related = _get_related(top_ids, all_projects, cluster_data) if cluster_data else []
     
-    progression = get_progression(user_skills, top_ids, all_projects, graph) if graph else []
+    progression = get_progression(user_skills, top_ids, all_projects, graph, level, time_availability) if graph else []
     
     return {
         "recommendations": top_projects,
