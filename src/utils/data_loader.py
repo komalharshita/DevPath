@@ -8,7 +8,6 @@ from pathlib import Path
 
 from utils.url_validator import is_valid_url, parse_resource
 from models import Project
-
 logger = logging.getLogger("devpath.data_loader")
 
 _projects_cache = None

@@ -91,7 +91,6 @@ from routes.admin_routes import admin_bp
 
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(admin_bp, url_prefix='/admin')
-
 # Enable CSRF protection for all state-changing requests
 csrf = CSRFProtect(app)
 

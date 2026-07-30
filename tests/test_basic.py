@@ -26,6 +26,7 @@ from utils.roadmap_comparer import compare_roadmaps, load_all_career_roadmaps
 
 from app import app, internal_server_error
 from utils.roadmap_comparer import load_all_career_roadmaps, compare_roadmaps
+from utils.data_loader import clear_cache
 
 
 # ============================================================
@@ -33,9 +34,45 @@ from utils.roadmap_comparer import load_all_career_roadmaps, compare_roadmaps
 # ============================================================
 
 def setup_module():
+    """Clear the data cache before running the test suite to ensure clean state."""
+    import tempfile
+    import os
+    db_fd, db_path = tempfile.mkstemp()
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
     app.config["TESTING"] = True
     app.config["WTF_CSRF_ENABLED"] = False
     clear_cache()
+    
+    # We must push app context to interact with db
+    ctx = app.app_context()
+    ctx.push()
+    
+    from models import db, Project
+    db.drop_all()
+    db.create_all()
+    
+    # Load from JSON once to seed in-memory db
+    import json
+    data_file = os.path.join(os.path.dirname(__file__), "..", "data", "projects.json")
+    with open(data_file, "r", encoding="utf-8") as f:
+        projects_data = json.load(f)
+        for p_data in projects_data:
+            project = Project(
+                id=p_data.get("id"),
+                title=p_data.get("title", ""),
+                level=p_data.get("level", "Beginner"),
+                interest=p_data.get("interest", ""),
+                time=p_data.get("time", "Low"),
+                description=p_data.get("description", ""),
+                skills=p_data.get("skills", []),
+                features=p_data.get("features", []),
+                tech_stack=p_data.get("tech_stack", []),
+                roadmap=p_data.get("roadmap", []),
+                resources=p_data.get("resources", []),
+                starter_code=p_data.get("starter_code")
+            )
+            db.session.add(project)
+        db.session.commit()
 
 
 # ============================================================
@@ -353,9 +390,6 @@ def test_skill_synonyms_dict_has_minimum_entries():
     assert len(SKILL_SYNONYMS) >= 10, (
         f"Expected at least 10 synonym entries, found {len(SKILL_SYNONYMS)}"
     )
-
-
-    assert len(errors) == 4
 
 # ============================================================
 # Flask Route Tests
