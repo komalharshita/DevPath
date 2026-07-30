@@ -406,38 +406,37 @@
               d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </button>
-    </form>
+      </form>
 
-    <div class="nav-right">
-      <div class="nav-links">
-        <a href="#home" class="nav-link">Home</a>
+      <div class="nav-right">
+        <div class="nav-links">
+          <a href="#home" class="nav-link">Home</a>
         <a href="#how-it-works" class="nav-link">How It Works</a>
         <a href="#features" class="nav-link">Features</a>
         <a href="#find-project" class="nav-link">Find Project</a>
         <a href="/compare" class="nav-link">Compare</a>
         <a href="/contact" class="nav-link">Contact</a>
-        <a href="https://github.com/komalharshita/DevPath" class="nav-link" target="_blank" rel="noopener noreferrer">Github</a>
+        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-link">GitHub</a>
+        {% if current_user %}
+        {% if current_user.is_admin %}
+        <a href="/admin" class="nav-link" style="font-weight: 600; color: #4f46e5; text-decoration: none;">Admin</a>
+        {% endif %}
+        <a href="/profile" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Profile</a>
+        <a href="/auth/logout" class="nav-link" style="color: var(--text-muted); text-decoration: none;">Logout</a>
+        {% else %}
+        <a href="/auth/login" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Login with GitHub</a>
+        {% endif %}
       </div>
+      <div class="nav-actions">
+          {% include 'partials/theme_toggle.html' %}
+      </div>
+      
+      <button class="nav-mobile-toggle" id="nav-mobile-toggle" type="button" aria-label="Toggle navigation"
+          aria-expanded="false" aria-controls="nav-mobile-menu">
+          <span></span><span></span><span></span><span></span>
+      </button>
     </div>
 
-      <div class="nav-right">
-            <nav class="nav-links" aria-label="site navigation">
-                <a href="#how-it-works" class="nav-link">How It Works</a>
-                <a href="#features" class="nav-link">Features</a>
-                <a href="#find-project" class="nav-link">Find Project</a>
-                <a href="/compare" class="nav-link">Compare</a>
-                <a href="/contact" class="nav-link">Contact</a>
-                <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-link">GitHub</a>
-            </nav>
-            <div class="nav-actions">
-                {% include 'partials/theme_toggle.html' %}
-            </div>
-            
-            <button class="nav-mobile-toggle" id="nav-mobile-toggle" type="button" aria-label="Toggle navigation"
-                aria-expanded="false" aria-controls="nav-mobile-menu">
-                <span></span><span></span><span></span><span></span>
-            </button>
-          </div>
 
     <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
       <form id="topic-search-form-mobile" class="navbar-search navbar-search--mobile" role="search">

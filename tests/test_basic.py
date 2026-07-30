@@ -33,8 +33,44 @@ from utils.roadmap_comparer import load_all_career_roadmaps, compare_roadmaps
 # ============================================================
 
 def setup_module():
+    """Clear the data cache before running the test suite to ensure clean state."""
+    import tempfile
+    import os
+    db_fd, db_path = tempfile.mkstemp()
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
     app.config["TESTING"] = True
     app.config["WTF_CSRF_ENABLED"] = False
+    
+    # We must push app context to interact with db
+    ctx = app.app_context()
+    ctx.push()
+    
+    from models import db, Project
+    db.drop_all()
+    db.create_all()
+    
+    # Load from JSON once to seed in-memory db
+    import json
+    data_file = os.path.join(os.path.dirname(__file__), "..", "data", "projects.json")
+    with open(data_file, "r", encoding="utf-8") as f:
+        projects_data = json.load(f)
+        for p_data in projects_data:
+            project = Project(
+                id=p_data.get("id"),
+                title=p_data.get("title", ""),
+                level=p_data.get("level", "Beginner"),
+                interest=p_data.get("interest", ""),
+                time=p_data.get("time", "Low"),
+                description=p_data.get("description", ""),
+                skills=p_data.get("skills", []),
+                features=p_data.get("features", []),
+                tech_stack=p_data.get("tech_stack", []),
+                roadmap=p_data.get("roadmap", []),
+                resources=p_data.get("resources", []),
+                starter_code=p_data.get("starter_code")
+            )
+            db.session.add(project)
+        db.session.commit()
     clear_cache()
 
 
@@ -354,9 +390,6 @@ def test_skill_synonyms_dict_has_minimum_entries():
         f"Expected at least 10 synonym entries, found {len(SKILL_SYNONYMS)}"
     )
 
-
-    assert len(errors) == 4
-
 # ============================================================
 # Flask Route Tests
 # ============================================================
@@ -629,7 +662,6 @@ def test_search_api_returns_results():
     assert isinstance(data, list)
 
 def test_search_api_empty_query():
-    """Search API should return an empty list for blank queries."""
     client = get_client()
     response = client.get("/api/search?q=")
     assert response.status_code == 200
@@ -641,7 +673,6 @@ def test_search_api_no_match():
     client = get_client()
     response = client.get("/api/search?q=nonexistentqueryxyz")
     assert response.status_code == 200
-
     data = response.get_json()
     assert isinstance(data, list)
     assert len(data) == 0
@@ -935,6 +966,95 @@ def test_admin_crud():
         
         with app.app_context():
             assert db.session.get(Project, project_id) is None
+
+
+# ============================================================
+# GitHub Export tests
+# ============================================================
+
+def test_export_github_unauthenticated():
+    """Unauthenticated users should be redirected to login when trying to export."""
+    client = get_client()
+    response = client.post("/project/1/export_github")
+    assert response.status_code == 302
+    assert "/auth/login" in response.headers["Location"]
+
+def test_export_github_missing_starter_code():
+    """Exporting a project without starter code should redirect back to the project."""
+    with app.test_client() as client:
+        with client.session_transaction() as sess:
+            sess['github_token'] = {'access_token': 'dummy_token'}
+            
+        # Assuming project 2 does not have starter code or we make a fake one
+        with app.app_context():
+            from models import db, Project
+            p = Project(id=999, title="No Code", level="Beg", interest="Web", time="Low", description="Desc")
+            db.session.add(p)
+            db.session.commit()
+            
+        response = client.post("/project/999/export_github")
+        assert response.status_code == 302
+        assert "/project/999" in response.headers["Location"]
+
+
+from unittest.mock import patch
+
+@patch("routes.main_routes.requests.get")
+@patch("routes.main_routes.requests.post")
+@patch("routes.main_routes.requests.put")
+def test_export_github_api_failures(mock_put, mock_post, mock_get):
+    """Test how the app handles different GitHub API failure status codes."""
+    # First, we need a project that actually has a starter code file to pass the file check
+    with app.app_context():
+        from models import db, Project
+        p = db.session.get(Project, 1000)
+        if not p:
+            p = Project(
+                id=1000, title="Valid Code", level="Beg", interest="Web", time="Low", 
+                description="Desc", starter_code="expense_tracker.py"
+            )
+            db.session.add(p)
+            db.session.commit()
+
+    # Test 401 Unauthorized
+    with app.test_client() as client:
+        with client.session_transaction() as sess:
+            sess['github_token'] = {'access_token': 'dummy_token'}
+            
+        mock_get.return_value.status_code = 401
+        response = client.post("/project/1000/export_github")
+        
+        assert response.status_code == 302
+        assert "/auth/login" in response.headers["Location"]
+        
+    # Test 403 Rate Limit on repo creation
+    with app.test_client() as client:
+        with client.session_transaction() as sess:
+            sess['github_token'] = {'access_token': 'dummy_token'}
+            
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {"login": "testuser"}
+        mock_post.return_value.status_code = 403
+        
+        response = client.post("/project/1000/export_github")
+        
+        assert response.status_code == 302
+        assert "/project/1000" in response.headers["Location"]
+
+    # Test 422 Conflict (repo exists) but file push succeeds
+    with app.test_client() as client:
+        with client.session_transaction() as sess:
+            sess['github_token'] = {'access_token': 'dummy_token'}
+            
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {"login": "testuser"}
+        mock_post.return_value.status_code = 422
+        mock_put.return_value.status_code = 201
+        
+        response = client.post("/project/1000/export_github")
+        
+        assert response.status_code == 302
+        assert "github.com/testuser/DevPath-Starter-valid-code" in response.headers["Location"]
 
 
 

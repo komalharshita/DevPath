@@ -71,6 +71,9 @@ with app.app_context():
     except Exception as e:
         print(f"Warning: Failed to auto-seed database: {e}")
 
+# Enable CSRF protection for all state-changing requests
+csrf = CSRFProtect(app)
+
 # Initialize OAuth
 oauth = OAuth(app)
 github = oauth.register(
@@ -82,7 +85,7 @@ github = oauth.register(
     authorize_url='https://github.com/login/oauth/authorize',
     authorize_params=None,
     api_base_url='https://api.github.com/',
-    client_kwargs={'scope': 'read:user'},
+    client_kwargs={'scope': 'read:user public_repo'},
 )
 
 # Register blueprints
@@ -91,7 +94,6 @@ from routes.admin_routes import admin_bp
 
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(admin_bp, url_prefix='/admin')
-
 # Enable CSRF protection for all state-changing requests
 csrf = CSRFProtect(app)
 

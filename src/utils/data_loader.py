@@ -13,7 +13,6 @@ logger = logging.getLogger("devpath.data_loader")
 
 _projects_cache = None
 
-
 def validate_projects(projects):
     """
     Validate project dataset integrity.
