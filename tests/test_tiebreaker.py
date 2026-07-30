@@ -1,4 +1,4 @@
-﻿# tests/test_tiebreaker.py
+# tests/test_tiebreaker.py
 # Regression tests for issue #711:
 # Equal-scored recommendations must use project id as a stable tie-breaker.
 
@@ -25,9 +25,13 @@ def test_recommendations_are_deterministic():
     assert ids1 == ids2, "Recommendation order changed between identical calls (issue #711)"
 
 
-def test_equal_score_tiebreaker_uses_id():
+def test_equal_score_tiebreaker_uses_id(monkeypatch):
     """When projects tie on score, lower id must come first."""
-    result = get_recommendations("python", "Beginner", "web", "low")
+    import utils.recommender as rec
+    monkeypatch.setattr(rec, "score_single_project", lambda *args, **kwargs: (1.0, {}))
+    monkeypatch.setattr(rec, "get_nlp_model", lambda: None)
+    monkeypatch.setattr(rec, "tfidf_similarity_score", lambda *args, **kwargs: 0.0)
+    result = rec.get_recommendations("python", "Beginner", "web", "low")
     recs = result["recommendations"]
     for i in range(len(recs) - 1):
         assert recs[i]["id"] <= recs[i + 1]["id"], (
