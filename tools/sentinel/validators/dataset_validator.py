@@ -47,21 +47,13 @@ def _validate_duplicate_ids(
     Find duplicate project IDs.
     """
 
-    ids = [
-        project.get("id")
-        for project in projects
-    ]
+    ids = [project.get("id") for project in projects]
 
     duplicates = [
-        str(project_id)
-        for project_id, count in Counter(ids).items()
-        if count > 1
+        str(project_id) for project_id, count in Counter(ids).items() if count > 1
     ]
 
-    return [
-        f"Duplicate project ID: {project_id}"
-        for project_id in sorted(duplicates)
-    ]
+    return [f"Duplicate project ID: {project_id}" for project_id in sorted(duplicates)]
 
 
 def _validate_duplicate_titles(
@@ -71,21 +63,11 @@ def _validate_duplicate_titles(
     Find duplicate project titles.
     """
 
-    titles = [
-        project.get("title", "").strip()
-        for project in projects
-    ]
+    titles = [project.get("title", "").strip() for project in projects]
 
-    duplicates = [
-        title
-        for title, count in Counter(titles).items()
-        if count > 1
-    ]
+    duplicates = [title for title, count in Counter(titles).items() if count > 1]
 
-    return [
-        f'Duplicate project title: "{title}"'
-        for title in sorted(duplicates)
-    ]
+    return [f'Duplicate project title: "{title}"' for title in sorted(duplicates)]
 
 
 def _validate_required_fields(
@@ -98,17 +80,11 @@ def _validate_required_fields(
     errors: list[str] = []
 
     for project in projects:
-
         project_id = project.get("id", "UNKNOWN")
 
-        missing_fields = [
-            field
-            for field in REQUIRED_FIELDS
-            if field not in project
-        ]
+        missing_fields = [field for field in REQUIRED_FIELDS if field not in project]
 
         if missing_fields:
-
             errors.append(
                 (
                     f"Project {project_id} "
@@ -118,6 +94,7 @@ def _validate_required_fields(
             )
 
     return errors
+
 
 def _validate_empty_fields(
     projects: list[dict[str, Any]],
@@ -129,25 +106,19 @@ def _validate_empty_fields(
     errors: list[str] = []
 
     for project in projects:
-
         project_id = project.get("id", "UNKNOWN")
 
         for field in REQUIRED_FIELDS:
-
             value = project.get(field)
 
             if value is None:
                 continue
 
             if isinstance(value, str) and not value.strip():
-                errors.append(
-                    f"Project {project_id} has an empty '{field}' field."
-                )
+                errors.append(f"Project {project_id} has an empty '{field}' field.")
 
             elif isinstance(value, list) and not value:
-                errors.append(
-                    f"Project {project_id} has an empty '{field}' field."
-                )
+                errors.append(f"Project {project_id} has an empty '{field}' field.")
 
     return errors
 
@@ -163,7 +134,6 @@ def _validate_starter_code(
     warnings: list[str] = []
 
     for project in projects:
-
         project_id = project.get("id", "UNKNOWN")
 
         starter_code = project.get("starter_code")
@@ -174,11 +144,7 @@ def _validate_starter_code(
         starter_path = repository_root / starter_code
 
         if not starter_path.is_file():
-            warnings.append(
-                (
-                    f"[{project_id}] {starter_code}"
-                )
-            )
+            warnings.append((f"[{project_id}] {starter_code}"))
 
     return warnings
 
@@ -195,7 +161,6 @@ def run(
 
     repository_root = dataset_path.parent.parent.resolve()
 
-
     result = ValidationResult(
         name="Dataset Validator",
         passed=True,
@@ -205,19 +170,13 @@ def run(
         projects = _load_projects(dataset_path)
 
     except FileNotFoundError:
-
         result.passed = False
-        result.errors.append(
-            f"Dataset not found: {dataset_path}"
-        )
+        result.errors.append(f"Dataset not found: {dataset_path}")
         return result
 
     except json.JSONDecodeError as exc:
-
         result.passed = False
-        result.errors.append(
-            f"Invalid JSON: {exc}"
-        )
+        result.errors.append(f"Invalid JSON: {exc}")
         return result
 
     duplicate_ids = _validate_duplicate_ids(projects)
@@ -230,13 +189,36 @@ def run(
     )
 
     result.details = {
-        "projects": len(projects),
+        "resource": "Projects",
+        "count": len(projects),
         "checks": {
             "duplicate_ids": duplicate_ids,
             "duplicate_titles": duplicate_titles,
             "missing_fields": missing_fields,
             "empty_fields": empty_fields,
             "missing_files": missing_files,
+        },
+        "metadata": {
+            "duplicate_ids": {
+                "label": "Duplicate IDs",
+                "severity": "error",
+            },
+            "duplicate_titles": {
+                "label": "Duplicate Titles",
+                "severity": "error",
+            },
+            "missing_fields": {
+                "label": "Required Fields",
+                "severity": "error",
+            },
+            "empty_fields": {
+                "label": "Empty Fields",
+                "severity": "error",
+            },
+            "missing_files": {
+                "label": "Starter Code",
+                "severity": "warning",
+            },
         },
     }
 

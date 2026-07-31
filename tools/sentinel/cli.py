@@ -1,10 +1,13 @@
 """
 Command-line entry point for DevPath Sentinel.
 """
+
+from __future__ import annotations
+
 import sys
 
 from .report import print_banner, print_validation_result
-from .validators.dataset_validator import run
+from .validators import dataset_validator, starter_code_validator
 
 
 def main() -> None:
@@ -12,14 +15,22 @@ def main() -> None:
 
     print_banner()
 
-    result = run()
+    validators = [
+        dataset_validator.run,
+        starter_code_validator.run,
+    ]
 
-    print_validation_result(result)
+    has_errors = False
 
-    if result.errors:
-        sys.exit(1)
+    for validator in validators:
+        result = validator()
 
-    sys.exit(0)
+        print_validation_result(result)
+
+        if result.errors:
+            has_errors = True
+
+    sys.exit(1 if has_errors else 0)
 
 
 if __name__ == "__main__":

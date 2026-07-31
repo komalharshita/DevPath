@@ -1,85 +1,104 @@
 """
-Utilities for printing formatted Sentinel reports.
+Console report utilities for DevPath Sentinel.
 """
+
+from __future__ import annotations
 
 from tools.sentinel.models import ValidationResult
 
 
-ERROR_CHECKS = {
-    "duplicate_ids",
-    "duplicate_titles",
-    "missing_fields",
-    "empty_fields",
+_STATUS = {
+    True: "PASS",
+    False: "FAIL",
 }
 
-WARNING_CHECKS = {
-    "missing_files",
+_SEVERITY_ICON = {
+    "error": "✗",
+    "warning": "!",
 }
 
 
 def print_banner() -> None:
-    """Print the Sentinel startup banner."""
+    """Print the DevPath Sentinel banner."""
 
     print("=" * 60)
     print("DevPath Sentinel")
-    print("Repository Health & Integrity Validator")
     print("=" * 60)
-    print()
 
 
 def print_validation_result(result: ValidationResult) -> None:
-    """Print a formatted validation report."""
+    """
+    Print a formatted validation report.
+    """
 
-    print(f"Running {result.name}...\n")
+    _print_header(result)
+    _print_resource_summary(result)
+    _print_checks(result)
+    _print_messages(result)
 
-    print(f"Projects scanned : {result.details.get('projects', 0)}")
-    print()
 
-    checks = result.details.get("checks", {})
+def _print_header(result: ValidationResult) -> None:
+    """
+    Print report header.
+    """
 
-    check_order = (
-        ("Duplicate IDs", "duplicate_ids"),
-        ("Duplicate Titles", "duplicate_titles"),
-        ("Required Fields", "missing_fields"),
-        ("Empty Fields", "empty_fields"),
-        ("Starter Code", "missing_files"),
-    )
+    print(f"\n=== {result.name} ===")
+    print(f"Status : {_STATUS[result.passed]}")
 
-    passed_checks = 0
 
-    for label, key in check_order:
+def _print_resource_summary(result: ValidationResult) -> None:
+    """
+    Print resource summary.
+    """
 
-        issues = checks.get(key, [])
+    details = result.details
 
-        if not issues:
-            print(f"✓ {label:.<28} PASS")
-            passed_checks += 1
-            continue
+    resource = details.get("resource")
+    count = details.get("count")
 
-        if key in WARNING_CHECKS:
-            print(f"⚠ {label:.<28} WARN ({len(issues)})")
-        else:
-            print(f"✗ {label:.<28} FAIL ({len(issues)})")
+    if resource is not None and count is not None:
+        print(f"{resource}: {count}")
 
-        for issue in issues:
-            print(f"    • {issue}")
 
-        print()
+def _print_checks(result: ValidationResult) -> None:
+    """
+    Print validation checks.
+    """
 
-    print("=" * 60)
+    details = result.details
 
-    print(f"Projects scanned : {result.details.get('projects', 0)}")
-    print(f"Checks passed    : {passed_checks}")
-    print(f"Warnings         : {len(result.warnings)}")
-    print(f"Errors           : {len(result.errors)}")
+    checks = details.get("checks", {})
+    metadata = details.get("metadata", {})
 
-    print()
+    if not checks:
+        return
+
+    print("\nChecks")
+
+    for check_name, issues in checks.items():
+        info = metadata.get(check_name, {})
+
+        label = info.get("label", check_name.replace("_", " ").title())
+        severity = info.get("severity", "error")
+
+        icon = _SEVERITY_ICON.get(severity, "-")
+
+        print(f"  {icon} {label:<24} {len(issues)} issue(s)")
+
+
+def _print_messages(result: ValidationResult) -> None:
+    """
+    Print detailed errors and warnings.
+    """
 
     if result.errors:
-        print("Status : FAILED")
-    elif result.warnings:
-        print("Status : PASSED WITH WARNINGS")
-    else:
-        print("Status : PASSED")
+        print("\nErrors")
 
-    print("=" * 60)
+        for message in result.errors:
+            print(f"  - {message}")
+
+    if result.warnings:
+        print("\nWarnings")
+
+        for message in result.warnings:
+            print(f"  - {message}")
