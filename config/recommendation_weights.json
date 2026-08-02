@@ -1,0 +1,6 @@
+{
+  "skill_match": 0.4,
+  "level_match": 0.3,
+  "interest_match": 0.2,
+  "time_available": 0.1
+}
