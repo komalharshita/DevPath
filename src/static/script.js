@@ -629,7 +629,7 @@ async function updatePortfolioAnalysis() {
     var q = normalize(query);
     if (!q) return [];
     return availableSkills.filter(function (skill) {
-      return normalize(skill).indexOf(q) !== -1 && !isSelected(skill);
+      return normalize(skill).includes(q) && !isSelected(skill);
     }).slice(0, 8);
   }
 
