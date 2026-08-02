@@ -51,6 +51,22 @@ SKILL_ALIASES = {
     "c++": "cpp",
     "web dev": "javascript",
 }
+def load_recommendation_weights():
+    config_path = os.path.join(os.path.dirname(__file__), '..', '..', 'config', 'recommendation_weights.json')
+    try:
+        with open(config_path, 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        # Default weights if config doesn't exist
+        return {
+            "skill_match": 0.4,
+            "level_match": 0.3,
+            "interest_match": 0.2,
+            "time_available": 0.1
+        }
+
+# Get weights at module load
+WEIGHTS = load_recommendation_weights()
 
 def parse_skills(skills_string):
     """
