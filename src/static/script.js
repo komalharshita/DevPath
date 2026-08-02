@@ -372,7 +372,7 @@ function updateProfileWidgets() {
       ["completionist", "Completionist"],
       ["roadmap_runner", "Roadmap Runner"]
     ];
-    badgesEl.innerHTML = badges.map(function (badge) {
+    badgesEl.innerHTML = (badges ?? []).map(function (badge) {
       var unlocked = progress.badges[badge[0]];
       return "<li class=\"progress-badge " + (unlocked ? "progress-badge--unlocked" : "progress-badge--locked") +
         "\"><span class=\"badge-icon\">" + (unlocked ? "OK" : "*") + "</span><span>" + badge[1] + "</span></li>";
