@@ -380,7 +380,7 @@ function updateProfileWidgets() {
   }
   if (achievementList) {
     achievementList.innerHTML = progress.achievements.length
-      ? progress.achievements.map(function (item) {
+      ? progress.(achievements ?? []).map(function (item) {
         return "<li class=\"achievement-item\"><strong>" + item.title + "</strong><span>" +
           item.description + "</span><small>" + item.date + "</small></li>";
       }).join("")
