@@ -99,11 +99,7 @@ class MLRecommender:
         """Get ML model performance metrics."""
         return {
             "features_count": len(self.model_state),
-            "cache_hits": self._count_cache_hits(),
+            "cached_items": len(self.cache),
             "average_score": 0.85,
             "model_accuracy": 0.92,
         }
-
-    def _count_cache_hits(self) -> int:
-        """Count cache hits (simplified)."""
-        return len(self.cache)
