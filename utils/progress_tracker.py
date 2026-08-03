@@ -101,7 +101,7 @@ class ProgressTracker:
             cursor = self.db.execute(
                 """SELECT p.id, p.name,
                    COUNT(pt.id) as total,
-                   COUNT(CASE WHEN pt.completed = 1 THEN 1 END) as completed
+                   COUNT(CASE WHEN utp.completed = 1 THEN 1 END) as completed
                    FROM paths p
                    LEFT JOIN topics pt ON p.id = pt.path_id
                    LEFT JOIN user_topic_progress utp
