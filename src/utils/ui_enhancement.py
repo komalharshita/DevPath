@@ -20,6 +20,7 @@ class UIEnhancementManager:
         self.navigation_structure: Dict = {}
         self.accessibility_features: Dict[str, bool] = {}
         self.user_preferences: Dict[str, Dict] = {}
+        self.navigation_history: List[Dict] = []
 
     def add_filter_option(self, category: str, options: List[str]):
         """Add filter options for a category."""
@@ -128,9 +129,18 @@ class UIEnhancementManager:
 
     def track_navigation_flow(self, user_id: str, from_page: str, to_page: str):
         """Track user navigation for UX improvements."""
-        return {
+        record = {
             "user_id": user_id,
             "from": from_page,
             "to": to_page,
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
+        self.navigation_history.append(record)
+        return record
+
+    def get_navigation_history(self, user_id: str) -> List[Dict]:
+        """Return navigation history for a specific user."""
+        return [
+            entry for entry in self.navigation_history
+            if entry.get("user_id") == user_id
+        ]
