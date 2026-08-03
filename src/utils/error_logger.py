@@ -63,11 +63,7 @@ def log_exception(
     correlation_id = uuid.uuid4().hex[:8]
 
     exc_type = type(exc).__name__ if exc is not None else "UnknownError"
-    tb = (
-        "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
-        if exc is not None
-        else "No traceback available"
-    )
+    tb = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__)) if exc else "No traceback available"
 
     logger.error(
         "status=%d id=%s type=%s context=%r\n%s",
