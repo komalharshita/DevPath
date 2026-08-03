@@ -1,7 +1,7 @@
 """Learning outcome assessment and certification system."""
 
 from typing import Dict, List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import hashlib
 
 
@@ -28,7 +28,7 @@ class CertificationManager:
             "skill": skill,
             "difficulty": difficulty,
             "questions": questions,
-            "created_at": datetime.utcnow().isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
             "score": None,
             "passed": False,
             "completed_at": None,
@@ -48,7 +48,7 @@ class CertificationManager:
 
         assessment["score"] = score
         assessment["passed"] = score >= 70
-        assessment["completed_at"] = datetime.utcnow().isoformat()
+        assessment["completed_at"] = datetime.now(timezone.utc).isoformat()
 
         if assessment["passed"]:
             self._issue_certificate(assessment)
@@ -77,7 +77,7 @@ class CertificationManager:
             "skill": assessment["skill"],
             "difficulty": assessment["difficulty"],
             "score": assessment["score"],
-            "issued_at": datetime.utcnow().isoformat(),
+            "issued_at": datetime.now(timezone.utc).isoformat(),
             "valid_until": None,
             "verification_code": self._generate_verification_code(cert_id),
         }
@@ -86,7 +86,7 @@ class CertificationManager:
 
     def _generate_verification_code(self, cert_id: str) -> str:
         """Generate unique verification code."""
-        data = f"{cert_id}{datetime.utcnow().isoformat()}".encode()
+        data = f"{cert_id}{datetime.now(timezone.utc).isoformat()}".encode()
         return hashlib.sha256(data).hexdigest()[:16]
 
     def issue_digital_badge(self, user_id: str, skill: str, level: str) -> Dict:
@@ -97,7 +97,7 @@ class CertificationManager:
             "user_id": user_id,
             "skill": skill,
             "level": level,
-            "issued_at": datetime.utcnow().isoformat(),
+            "issued_at": datetime.now(timezone.utc).isoformat(),
             "icon_url": f"/badges/{skill.lower()}_{level.lower()}.png",
             "description": f"{level} {skill} Badge",
         }
