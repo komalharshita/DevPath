@@ -77,11 +77,13 @@ def _partition_lists(list_a, list_b):
             if key not in seen_overlap:
                 overlapping.append(original)
                 seen_overlap.add(key)
+            # Do not add to unique_a if it already appeared as overlapping from list_b
         else:
             unique_a.append(original)
 
     unique_b = [
-        original for key, original in norm_b.items() if key not in norm_a
+        original for key, original in norm_b.items()
+        if key not in norm_a and key not in seen_overlap
     ]
 
     return overlapping, unique_a, unique_b
