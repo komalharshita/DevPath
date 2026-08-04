@@ -6,6 +6,7 @@
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response, redirect, url_for, session
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
+import math
 from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats, get_available_interests
 from utils.roadmap_comparer import load_all_career_roadmaps, compare_roadmaps
 from utils.file_server import read_starter_code, resolve_starter_file
