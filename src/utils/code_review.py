@@ -7,7 +7,7 @@ for learner project submissions.
 
 from typing import Dict, List, Optional
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 class ReviewStatus(Enum):
@@ -100,7 +100,7 @@ class CodeReviewManager:
             "code": code,
             "language": language,
             "description": description or "",
-            "submitted_at": datetime.utcnow().isoformat(),
+            "submitted_at": datetime.now(timezone.utc).isoformat(),
             "review_status": ReviewStatus.PENDING.value,
             "review_count": 0,
             "metrics": {},
@@ -128,13 +128,13 @@ class CodeReviewManager:
             raise ValueError(f"Submission {submission_id} not found")
 
         submission = self.submissions[submission_id]
-        review_id = f"review_{submission_id}_{datetime.utcnow().timestamp()}"
+        review_id = f"review_{submission_id}_{datetime.now(timezone.utc).timestamp()}"
 
         review = {
             "review_id": review_id,
             "submission_id": submission_id,
             "reviewer_id": reviewer_id,
-            "started_at": datetime.utcnow().isoformat(),
+            "started_at": datetime.now(timezone.utc).isoformat(),
             "completed_at": None,
             "status": ReviewStatus.IN_PROGRESS.value,
             "overall_score": None,
@@ -178,7 +178,7 @@ class CodeReviewManager:
             "code_snippet": code_snippet,
             "feedback": feedback,
             "severity": severity,
-            "created_at": datetime.utcnow().isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
         }
 
         self.feedback_comments[review_id].append(comment)
@@ -249,7 +249,7 @@ class CodeReviewManager:
         scores = [s["score"] for s in review["category_scores"].values()]
         overall_score = sum(scores) / len(scores) if scores else 0
 
-        review["completed_at"] = datetime.utcnow().isoformat()
+        review["completed_at"] = datetime.now(timezone.utc).isoformat()
         review["overall_score"] = round(overall_score, 2)
         review["summary"] = summary
         review["status"] = (
