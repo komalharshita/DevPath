@@ -144,7 +144,8 @@ def parse_skills(skills_string):
 
     stripped = skills_string.strip()
 
-    # --- JSON array branch ---
+    return [entry["skill"] for entry in parse_skill_entries(skills_string)]
+
 
 def parse_skill_entries(skills_string):
     """Parse skills with optional per-skill proficiency levels."""
@@ -154,18 +155,37 @@ def parse_skill_entries(skills_string):
         try:
             parsed = json.loads(stripped)
             if isinstance(parsed, list):
-                tokens = [str(s).strip().lower() for s in parsed if str(s).strip()]
-                return [SKILL_SYNONYMS.get(token, token) for token in tokens]
+                entries = []
+                for item in parsed:
+                    if isinstance(item, dict):
+                        skill = _normalize_skill(str(item.get("skill", "")))
+                        proficiency = str(item.get("proficiency", "Beginner")).strip().title()
+                    else:
+                        skill = _normalize_skill(str(item))
+                        proficiency = "Beginner"
+                    if skill:
+                        entries.append({
+                            "skill": SKILL_ALIASES.get(skill, skill),
+                            "proficiency": (
+                                proficiency
+                                if proficiency in ("Beginner", "Intermediate", "Advanced")
+                                else "Beginner"
+                            ),
+                        })
+                return entries
         except (json.JSONDecodeError, ValueError):
             pass  # fall through to comma-splitting
 
     # --- Comma-separated branch ---
-    tokens = [
-        s.strip().lower()
-        for s in skills_string.split(",")
-        if s.strip()  # skip blanks produced by trailing / consecutive commas
-    ]
-    return [SKILL_SYNONYMS.get(token, token) for token in tokens]
+    entries = []
+    for skill in skills_string.split(","):
+        skill = skill.strip()
+        if skill:
+            entries.append({
+                "skill": SKILL_ALIASES.get(_normalize_skill(skill), _normalize_skill(skill)),
+                "proficiency": "Beginner",
+            })
+    return entries
 
 
 
