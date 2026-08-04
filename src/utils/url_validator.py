@@ -71,7 +71,7 @@ def parse_resource(raw: str) -> dict:
     idx = raw.find(split_marker)
     if idx != -1:
         label = raw[:idx].strip()
-        url   = raw[idx + 2:].strip()   # skip ": " → starts at "http"
+        url   = raw[idx + len(split_marker):].strip()
         return {"label": label, "url": url}
 
     # No label prefix — treat the entire string as a URL
