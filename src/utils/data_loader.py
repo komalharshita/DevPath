@@ -4,6 +4,7 @@ import json
 import os
 import threading
 import logging
+import time
 from pathlib import Path
 
 from utils.url_validator import is_valid_url, parse_resource
@@ -12,6 +13,15 @@ from models import Project
 logger = logging.getLogger("devpath.data_loader")
 
 _projects_cache = None
+_projects_cache_time = 0.0
+_CACHE_TTL_SECONDS = 300  # 5 minutes
+
+
+def _cache_expired():
+    """Return True if the cache is missing or older than _CACHE_TTL_SECONDS."""
+    if _projects_cache is None:
+        return True
+    return (time.time() - _projects_cache_time) > _CACHE_TTL_SECONDS
 
 
 def validate_projects(projects):
@@ -77,10 +87,11 @@ def validate_projects(projects):
 
 def load_all_projects():
     """Read and return the full list of projects from the database."""
-    global _projects_cache
-    if _projects_cache is None:
+    global _projects_cache, _projects_cache_time
+    if _cache_expired():
         projects = Project.query.all()
         _projects_cache = [p.to_dict() for p in projects]
+        _projects_cache_time = time.time()
     return _projects_cache
 
 def get_available_levels():
@@ -119,5 +130,6 @@ def get_project_stats():
 
 def clear_cache():
     """Reset the in-memory project cache (used in tests)."""
-    global _projects_cache
+    global _projects_cache, _projects_cache_time
     _projects_cache = None
+    _projects_cache_time = 0.0
