@@ -316,9 +316,7 @@ class CodeReviewManager:
             "overall_score": submission["metrics"].get("overall_score"),
             "categories": {
                 cat: score.get("score", 0)
-                for cat, score in submission["metrics"]
-                .get("category_scores", {})
-                .items()
+                for cat, score in submission["metrics"].get("category_scores", {}).items()
             },
             "status": "reviewed",
         }
