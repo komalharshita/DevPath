@@ -3,6 +3,7 @@
 # Each route is kept thin: it validates input, calls a utility function,
 # and returns a response. No business logic lives here.
 
+import math
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response, redirect, url_for, session
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs
