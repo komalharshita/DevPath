@@ -105,6 +105,8 @@ SKILL_SYNONYMS = {
     "ai":            "artificial intelligence",
     "k8s":           "kubernetes",
     "tf":            "tensorflow",
+}
+
 
 # Common aliases and abbreviations for skills
 # This improves recommendation accuracy by normalizing user input
@@ -116,55 +118,28 @@ SKILL_ALIASES = {
     "c++": "cpp",
     "web dev": "javascript",
 }
+
 def _normalize_skill(s: str) -> str:
-    """Normalize a skill string: strip surrounding whitespace and lowercase."""
+    "Normalize a skill string: strip surrounding whitespace and lowercase."
     return s.strip().lower()
 
 # Keep the old name alive so score_single_project() and any external callers
 # that reference SKILL_ALIASES continue to work without modification.
 SKILL_ALIASES = SKILL_SYNONYMS
 
+
 def parse_skills(skills_string):
-    """
-    Convert a raw skills string into a normalized, synonym-resolved lowercase list.
+    return [entry['skill'] for entry in parse_skill_entries(skills_string)]
 
-    Accepts either:
-    - A JSON array  e.g. '["Python", "ReactJS"]'  -> ["python", "react"]
-    - A comma-separated string  e.g. "JS, TS, Node, "  -> ["javascript", "typescript", "node.js"]
-
-    Processing steps applied to every token:
-    1. Strip surrounding whitespace.
-    2. Convert to lowercase.
-    3. Discard empty strings (handles trailing commas / double commas).
-    4. Map through SKILL_SYNONYMS so abbreviations become canonical names.
-    """
-    if not skills_string or not skills_string.strip():
-        return []
-
-    stripped = skills_string.strip()
-
-    # --- JSON array branch ---
 
 def parse_skill_entries(skills_string):
-    """Parse skills with optional per-skill proficiency levels."""
+    "Parse skills with optional per-skill proficiency levels."
     stripped = skills_string.strip()
 
     if stripped.startswith("["):
         try:
             parsed = json.loads(stripped)
             if isinstance(parsed, list):
-                tokens = [str(s).strip().lower() for s in parsed if str(s).strip()]
-                return [SKILL_SYNONYMS.get(token, token) for token in tokens]
-        except (json.JSONDecodeError, ValueError):
-            pass  # fall through to comma-splitting
-
-    # --- Comma-separated branch ---
-    tokens = [
-        s.strip().lower()
-        for s in skills_string.split(",")
-        if s.strip()  # skip blanks produced by trailing / consecutive commas
-    ]
-    return [SKILL_SYNONYMS.get(token, token) for token in tokens]
                 entries = []
                 for item in parsed:
                     if isinstance(item, dict):
@@ -173,42 +148,30 @@ def parse_skill_entries(skills_string):
                     else:
                         skill = _normalize_skill(str(item))
                         proficiency = "Beginner"
-
                     if skill:
-                        entries.append(
-                            {
-                                "skill": SKILL_ALIASES.get(skill, skill),
-                                "proficiency": (
-                                    proficiency
-                                    if proficiency in (
-                                        "Beginner",
-                                        "Intermediate",
-                                        "Advanced",
-                                    )
-                                    else "Beginner"
-                                ),
-                            }
-                        )
+                        entries.append({
+                            'skill': SKILL_ALIASES.get(skill, skill),
+                            'proficiency': (
+                                proficiency
+                                if proficiency in ("Beginner", "Intermediate", "Advanced")
+                                else "Beginner"
+                            ),
+                        })
                 return entries
         except (json.JSONDecodeError, ValueError):
-            pass
+            pass  # fall through to comma-splitting
 
-    return [
-        {
-            "skill": SKILL_ALIASES.get(_normalize_skill(skill), _normalize_skill(skill)),
-            "proficiency": "Beginner",
-        }
-        for skill in skills_string.split(",")
-        if skill.strip()
-    ]
+    # --- Comma-separated branch ---
+    entries = []
+    for skill in skills_string.split(','):
+        skill = skill.strip()
+        if skill:
+            entries.append({
+                'skill': SKILL_ALIASES.get(_normalize_skill(skill), _normalize_skill(skill)),
+                "proficiency": "Beginner",
+            })
+    return entries
 
-
-def parse_skills(skills_string):
-    return [entry["skill"] for entry in parse_skill_entries(skills_string)]
-
-
-def parse_skills(skills_string):
-    return [entry["skill"] for entry in parse_skill_entries(skills_string)]
 
 _nlp_model = None
 _project_embeddings_cache = {}
