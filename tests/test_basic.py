@@ -354,9 +354,6 @@ def test_skill_synonyms_dict_has_minimum_entries():
         f"Expected at least 10 synonym entries, found {len(SKILL_SYNONYMS)}"
     )
 
-
-    assert len(errors) == 4
-
 # ============================================================
 # Flask Route Tests
 # ============================================================
