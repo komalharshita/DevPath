@@ -105,6 +105,7 @@ SKILL_SYNONYMS = {
     "ai":            "artificial intelligence",
     "k8s":           "kubernetes",
     "tf":            "tensorflow",
+}
 
 # Common aliases and abbreviations for skills
 # This improves recommendation accuracy by normalizing user input
@@ -153,8 +154,17 @@ def parse_skill_entries(skills_string):
         try:
             parsed = json.loads(stripped)
             if isinstance(parsed, list):
-                tokens = [str(s).strip().lower() for s in parsed if str(s).strip()]
-                return [SKILL_SYNONYMS.get(token, token) for token in tokens]
+                entries = []
+                for item in parsed:
+                    if isinstance(item, dict):
+                        skill = _normalize_skill(str(item.get("skill", "")))
+                        proficiency = str(item.get("proficiency", "Beginner")).strip().title()
+                    else:
+                        skill = _normalize_skill(str(item))
+                        proficiency = "Beginner"
+                    if skill:
+                        entries.append({"skill": SKILL_ALIASES.get(skill, skill), "proficiency": proficiency if proficiency in ("Beginner", "Intermediate", "Advanced") else "Beginner"})
+                return entries
         except (json.JSONDecodeError, ValueError):
             pass  # fall through to comma-splitting
 
@@ -164,47 +174,7 @@ def parse_skill_entries(skills_string):
         for s in skills_string.split(",")
         if s.strip()  # skip blanks produced by trailing / consecutive commas
     ]
-    return [SKILL_SYNONYMS.get(token, token) for token in tokens]
-                entries = []
-                for item in parsed:
-                    if isinstance(item, dict):
-                        skill = _normalize_skill(str(item.get("skill", "")))
-                        proficiency = str(item.get("proficiency", "Beginner")).strip().title()
-                    else:
-                        skill = _normalize_skill(str(item))
-                        proficiency = "Beginner"
-
-                    if skill:
-                        entries.append(
-                            {
-                                "skill": SKILL_ALIASES.get(skill, skill),
-                                "proficiency": (
-                                    proficiency
-                                    if proficiency in (
-                                        "Beginner",
-                                        "Intermediate",
-                                        "Advanced",
-                                    )
-                                    else "Beginner"
-                                ),
-                            }
-                        )
-                return entries
-        except (json.JSONDecodeError, ValueError):
-            pass
-
-    return [
-        {
-            "skill": SKILL_ALIASES.get(_normalize_skill(skill), _normalize_skill(skill)),
-            "proficiency": "Beginner",
-        }
-        for skill in skills_string.split(",")
-        if skill.strip()
-    ]
-
-
-def parse_skills(skills_string):
-    return [entry["skill"] for entry in parse_skill_entries(skills_string)]
+    return [{"skill": SKILL_ALIASES.get(token, token), "proficiency": "Beginner"} for token in tokens]
 
 
 def parse_skills(skills_string):
