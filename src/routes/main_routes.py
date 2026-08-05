@@ -27,6 +27,7 @@ from utils.code_review import CodeReviewManager
 from config import Config
 from utils.portfolio_analyzer import analyze_portfolio
 import os
+import math
 from models import db, ProjectProgress, UserGameProgress
 
 _skill_validator = SkillProgressionValidator()
@@ -376,12 +377,13 @@ def sitemap():
     Generate and return a sitemap.xml for search engine indexing.
     Includes the homepage and all individual project detail pages.
     """
+    from xml.sax.saxutils import escape
     base = request.host_url.rstrip("/")
     projects = load_all_projects()
 
-    urls = [f"<url><loc>{base}/</loc></url>", f"<url><loc>{base}/compare</loc></url>"]
+    urls = [f"<url><loc>{escape(base)}/</loc></url>", f"<url><loc>{escape(base)}/compare</loc></url>"]
     for p in projects:
-        urls.append(f"<url><loc>{base}/project/{p['id']}</loc></url>")
+        urls.append(f"<url><loc>{escape(base)}/project/{p['id']}</loc></url>")
 
     xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
