@@ -91,7 +91,7 @@
 
       if (!container || !weeklyData || weeklyData.length === 0) return;
 
-      var maxValue = Math.max.apply(null, weeklyData);
+      var maxValue = Math.max(...weeklyData);
       var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
       var html = '<div class="chart-container">';
