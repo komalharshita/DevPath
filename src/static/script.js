@@ -1307,7 +1307,7 @@ if (typeof RecentlyViewed !== "undefined") {
       }
     }
 
-    if (skipSave === true) return;
+    if (skipSave) return;
 
     var completedStates = roadmapCheckboxes.map(function (checkbox) {
       return checkbox.checked;
