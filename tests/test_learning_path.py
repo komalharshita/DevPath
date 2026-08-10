@@ -26,6 +26,7 @@ from utils.learning_path import (
     update_learning_path,
     path_exists,
     _clear_all,
+    cleanup_expired_paths,
     PathNotFoundError,
     PathAlreadyExistsError,
     AuthorizationError,
@@ -576,6 +577,98 @@ class TestUpdatePathRoute:
         )
 
         assert response.status_code == 400
+
+
+# ---------------------------------------------------------------------------
+# 3. Persistence tests — data survives fresh contexts / other "instances"
+# ---------------------------------------------------------------------------
+
+class TestPersistenceAcrossContexts:
+
+    def setup_method(self):
+        _clear_all()
+
+    def test_path_survives_fresh_app_context(self):
+        """A path written inside one app context must be readable from a fresh one."""
+        token = make_token()
+        with app.app_context():
+            create_learning_path("persist-1", token, {"plan": "learn flask"})
+
+        # Simulate a new request/instance: a brand-new context, no reference
+        # to anything held by the creating context.
+        with app.app_context():
+            assert get_learning_path("persist-1", token) == {"plan": "learn flask"}
+
+    def test_path_readable_from_second_instance(self):
+        """A path created by one 'instance' must be visible to a second one."""
+        token = make_token()
+        with app.app_context():
+            create_learning_path("persist-2", token, {"step": 1})
+
+        # Second "instance": fresh context, fresh client, fresh session.
+        with app.app_context():
+            client = get_client()
+            response = client.get(
+                "/api/learning-path/persist-2",
+                headers={TOKEN_HEADER: token},
+            )
+            assert response.status_code == 200
+            assert response.get_json()["data"] == {"step": 1}
+
+    def test_update_visible_after_context_switch(self):
+        """An update from a new context must be reflected in the stored row."""
+        token = make_token()
+        with app.app_context():
+            create_learning_path("persist-3", token, {"v": 1})
+        with app.app_context():
+            update_learning_path("persist-3", token, {"v": 2})
+        with app.app_context():
+            assert get_learning_path("persist-3", token) == {"v": 2}
+
+    def test_raw_token_not_stored_anywhere(self):
+        """The DB must contain a hash, never the raw token."""
+        from models import LearningPath
+
+        token = make_token()
+        with app.app_context():
+            create_learning_path("hash-1", token, {})
+            row = LearningPath.query.filter_by(path_id="hash-1").first()
+            assert row is not None
+            assert row.token_hash != token
+            assert token not in row.token_hash
+            assert "$" in row.token_hash  # "<salt>$<digest>" format
+            assert len(row.token_hash.split("$", 1)[1]) == 64  # sha256 hex
+
+
+class TestCleanupExpiredPaths:
+
+    def setup_method(self):
+        _clear_all()
+
+    def test_active_path_survives_cleanup(self):
+        """Paths that are actively used must never be purged by TTL cleanup."""
+        token = make_token()
+        with app.app_context():
+            create_learning_path("active-1", token, {})
+            assert cleanup_expired_paths() == 0
+            assert path_exists("active-1") is True
+
+    def test_expired_path_is_removed(self):
+        """A path older than the TTL cutoff must be deleted."""
+        import datetime
+        from models import LearningPath, db
+
+        token = make_token()
+        with app.app_context():
+            create_learning_path("stale-1", token, {})
+            stale = datetime.datetime.now() - datetime.timedelta(days=90)
+            LearningPath.query.filter_by(path_id="stale-1").update(
+                {"updated_at": stale}
+            )
+            db.session.commit()
+
+            assert cleanup_expired_paths() == 1
+            assert path_exists("stale-1") is False
 
 
 # ---------------------------------------------------------------------------

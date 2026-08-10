@@ -1,6 +1,13 @@
+from datetime import datetime, timezone
+
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
+
+
+def _utcnow():
+    """Return the current UTC time as a naive datetime for DB storage."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 class Project(db.Model):
     __tablename__ = 'projects'
@@ -80,3 +87,16 @@ class UserGameProgress(db.Model):
     data = db.Column(db.JSON, nullable=False, default=dict)
 
     user = db.relationship('User', backref=db.backref('game_progress', uselist=False, cascade="all, delete-orphan"))
+
+
+class LearningPath(db.Model):
+    __tablename__ = 'learning_paths'
+
+    # The client-supplied opaque path id (typically a UUID chosen in the browser).
+    path_id = db.Column(db.String(128), primary_key=True)
+    # Only a salted SHA-256 hash of the owner token is ever stored; the raw
+    # token is never persisted so a leaked DB does not expose bearer secrets.
+    token_hash = db.Column(db.String(128), nullable=False)
+    data = db.Column(db.JSON, nullable=False, default=dict)
+    created_at = db.Column(db.DateTime, nullable=False, default=_utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=_utcnow, onupdate=_utcnow)
