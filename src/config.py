@@ -6,17 +6,36 @@
 
 import os
 
+# Publicly-known SECRET_KEY values committed to the repository.  The app
+# must never sign sessions or CSRF tokens with these outside debug mode.
+KNOWN_DEFAULT_SECRET_KEYS = {
+    "dev_secret_key_change_in_production",
+    "change-this-secret-in-production",
+    "default-dev-secret-key-replace-in-production",
+}
+
+
+def secret_key_is_safe(value):
+    """Return True only when ``value`` is usable for signing data.
+
+    A safe key is non-empty and not equal to any publicly-known default.
+    """
+    return bool(value) and value not in KNOWN_DEFAULT_SECRET_KEYS
+
+
 class Config:
     """Base configuration class with sensible defaults."""
     
-    # Secret key for session signing and CSRF protection
-    SECRET_KEY = os.getenv("SECRET_KEY", "change-this-secret-in-production")
+    # Secret key for session signing and CSRF protection.
+    # Must be overridden with a secure random value in production (the
+    # application refuses to boot with this dev-only fallback unless
+    # FLASK_DEBUG is set).  Generate one with:
+    #     python -c "import secrets; print(secrets.token_hex(32))"
+    SECRET_KEY = os.getenv("SECRET_KEY", "dev_secret_key_change_in_production")
     
     # Base URL for the application - used for OG tags and canonical URLs
     # Can be overridden via environment variable for different deployments
     BASE_URL = os.getenv("BASE_URL", "https://mydevpath-github.vercel.app")
-    # Security and Session
-    SECRET_KEY = os.getenv("SECRET_KEY", "dev_secret_key_change_in_production")
     
     # GitHub OAuth Settings
     GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID", "dummy_client_id")
