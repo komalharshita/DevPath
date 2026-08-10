@@ -1,62 +1,63 @@
-import os
 import requests
-from flask import Blueprint, redirect, request, session, jsonify, url_for
+from flask import Blueprint, redirect, session, jsonify, url_for
 
 github_bp = Blueprint("github", __name__)
 
-GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
-GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
+# This blueprint previously ran a second, manual OAuth flow
+# (/api/github/login + /api/github/callback) that was incompatible with the
+# Authlib flow in routes/auth_routes.py:
+#
+#   - it stored a bare access-token *string* in session['github_token'],
+#     while the Authlib flow stores the full token dict
+#     {"access_token": ..., "token_type": ..., "expires_in": ...}, and
+#     export_github expects the dict shape -> TypeError.
+#   - it never created a User row nor set session['user_id'], so the user
+#     remained unauthenticated for /profile and progress APIs.
+#   - it read credentials from os.getenv at import time instead of Config.
+#
+# Both OAuth entry points now delegate to the single Authlib flow, so every
+# login produces one consistent session payload.  Only /api/github/repos
+# remains here (used by the frontend to list the user's repositories).
 
-# You can configure your local callback URL in GitHub, e.g., http://localhost:5000/api/github/callback
-# In production, it will be your domain.
+
+def _session_access_token():
+    """Return the GitHub access token from the session, if present.
+
+    The Authlib flow stores the full token dict.  A bare string may still
+    exist in older sessions, so both shapes are handled defensively.
+    """
+    token = session.get("github_token")
+    if isinstance(token, dict):
+        return token.get("access_token")
+    if isinstance(token, str) and token:
+        return token
+    return None
+
 
 @github_bp.route("/api/github/login")
 def login():
-    """Redirect user to GitHub OAuth login."""
-    if not GITHUB_CLIENT_ID:
-        return jsonify({"error": "GitHub OAuth is not configured on the server."}), 500
-        
-    redirect_uri = request.host_url.rstrip('/') + url_for("github.callback")
-    auth_url = (
-        f"https://github.com/login/oauth/authorize"
-        f"?client_id={GITHUB_CLIENT_ID}"
-        f"&redirect_uri={redirect_uri}"
-        f"&scope=public_repo"
-    )
-    return redirect(auth_url)
+    """Alias of the canonical Authlib login flow.
+
+    Kept so existing frontend links (and bookmarks) keep working while the
+    app consolidates on a single OAuth implementation.
+    """
+    return redirect(url_for("auth.login"))
+
 
 @github_bp.route("/api/github/callback")
 def callback():
-    """Handle GitHub OAuth callback and exchange code for access token."""
-    code = request.args.get("code")
-    if not code:
-        return redirect("/?github_auth=error")
+    """Backward-compatible alias of the canonical Authlib callback.
 
-    redirect_uri = request.host_url.rstrip('/') + url_for("github.callback")
-    
-    token_url = "https://github.com/login/oauth/access_token"
-    payload = {
-        "client_id": GITHUB_CLIENT_ID,
-        "client_secret": GITHUB_CLIENT_SECRET,
-        "code": code,
-        "redirect_uri": redirect_uri
-    }
-    headers = {"Accept": "application/json"}
+    Old GitHub OAuth app redirect URIs may still point here; forward the
+    user into the canonical flow rather than returning a 404.
+    """
+    return redirect(url_for("auth.login"))
 
-    response = requests.post(token_url, json=payload, headers=headers)
-    data = response.json()
-
-    access_token = data.get("access_token")
-    if access_token:
-        session["github_token"] = access_token
-        return redirect("/?github_auth=success")
-    else:
-        return redirect("/?github_auth=error")
 
 @github_bp.route("/api/github/repos")
 def repos():
     """Fetch user's repositories using the stored access token."""
-    access_token = session.get("github_token")
+    access_token = _session_access_token()
     if not access_token:
         return jsonify({"error": "Not authenticated with GitHub"}), 401
 
@@ -66,7 +67,7 @@ def repos():
     }
 
     response = requests.get("https://api.github.com/user/repos?sort=updated&per_page=100", headers=headers)
-    
+
     if response.status_code != 200:
         return jsonify({"error": "Failed to fetch repositories from GitHub"}), response.status_code
 

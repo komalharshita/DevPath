@@ -386,7 +386,12 @@ def download_code(project_id):
 def export_github(project_id):
     """Create a new GitHub repository for the user and push starter code."""
     token = session.get('github_token')
-    if not token or 'access_token' not in token:
+    access_token = None
+    if isinstance(token, dict):
+        access_token = token.get('access_token')
+    elif isinstance(token, str):
+        access_token = token
+    if not access_token:
         flash("You must be logged in with GitHub to export projects.", "error")
         return redirect(url_for('auth.login'))
 
@@ -416,7 +421,7 @@ def export_github(project_id):
     repo_name = f"DevPath-Starter-{safe_title}"
 
     headers = {
-        "Authorization": f"Bearer {token['access_token']}",
+        "Authorization": f"Bearer {access_token}",
         "Accept": "application/vnd.github.v3+json"
     }
 
