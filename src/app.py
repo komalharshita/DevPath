@@ -25,16 +25,39 @@ from flask import Flask, session
 from flask_wtf.csrf import CSRFProtect
 from routes.main_routes import main
 from routes.github_routes import github_bp
-from config import Config
+from config import Config, secret_key_is_safe
 from errors.handlers import register_error_handlers
 from models import db
 from authlib.integrations.flask_client import OAuth
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "default-dev-secret-key-replace-in-production")
 
 # Load config settings into Flask's internal config manager properly
 app.config.from_object(Config)
+
+
+def _is_debug_mode():
+    return os.environ.get("FLASK_DEBUG", "False").lower() in ("true", "1")
+
+
+def _validate_secret_key():
+    """Raise RuntimeError if SECRET_KEY is unusable outside debug mode.
+
+    SECRET_KEY signs session cookies and CSRF tokens.  A missing or
+    publicly-known key lets an attacker forge sessions, so refuse to boot
+    rather than silently continuing (issue #1815).
+    """
+    if not _is_debug_mode() and not secret_key_is_safe(app.config.get("SECRET_KEY")):
+        raise RuntimeError(
+            "SECRET_KEY is missing or set to a known default value. In "
+            "production you must set the SECRET_KEY environment variable to "
+            "a secure random string (see README 'Environment Variables'). "
+            "Refusing to start because a publicly-known key would allow "
+            "forging session cookies and CSRF tokens."
+        )
+
+
+_validate_secret_key()
 
 # Initialize SQLAlchemy
 db.init_app(app)

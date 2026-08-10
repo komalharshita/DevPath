@@ -173,6 +173,22 @@ pip install -r requirements.txt
 python src/app.py
 ```
 
+## Environment Variables
+
+| Variable | Required in production | Default | Description |
+| --- | --- | --- | --- |
+| `SECRET_KEY` | **Yes** | dev-only fallback | Signs session cookies and CSRF tokens. The app **refuses to start** in non-debug environments when this is missing or still a known default. Generate one with `python -c "import secrets; print(secrets.token_hex(32))"`. |
+| `GITHUB_CLIENT_ID` | Yes (for GitHub login) | `dummy_client_id` | GitHub OAuth app client id. |
+| `GITHUB_CLIENT_SECRET` | Yes (for GitHub login) | `dummy_client_secret` | GitHub OAuth app client secret. |
+| `DATABASE_URL` | No | local SQLite file | Production database URL (e.g. a managed Postgres). |
+| `BASE_URL` | No | `https://mydevpath-github.vercel.app` | Used for OG tags and canonical URLs. |
+
+Copy `.env.example` to `.env` and fill in real values before deploying:
+
+```bash
+cp .env.example .env
+```
+
 ## Verify Everything Works
 
 Run the test suite:

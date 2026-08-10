@@ -9,6 +9,12 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 import pytest
+
+# app.py refuses to boot with a missing/known-default SECRET_KEY in non-debug
+# environments (issue #1815).  Provide a distinct test key before importing
+# the app so the test suite exercises the real production code path.
+os.environ.setdefault("SECRET_KEY", "test-secret-key-not-a-production-default")
+
 from app import app
 from utils.rate_limiter import reset_rate_limits
 
