@@ -193,6 +193,13 @@ class SkillProgressionValidator:
             }
 
         skill_data = self.user_skills[user_id][skill_name]
+
+        # Preserve the higher existing difficulty: a lower re-record must not
+        # silently destroy previously earned progress.
+        existing_difficulty = skill_data.get("difficulty")
+        if existing_difficulty is not None and existing_difficulty > difficulty:
+            difficulty = existing_difficulty
+
         skill_data["difficulty"] = difficulty
         skill_data["completed_at"] = datetime.now(timezone.utc).isoformat()
         skill_data["assessment_score"] = assessment_score
