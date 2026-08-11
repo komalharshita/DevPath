@@ -69,6 +69,10 @@ class ProjectProgress(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'), nullable=False)
     completed_steps = db.Column(db.JSON, nullable=False, default=list)
 
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'project_id', name='uq_project_progress_user_project'),
+    )
+
     user = db.relationship('User', backref=db.backref('progress', lazy=True, cascade="all, delete-orphan"))
     project = db.relationship('Project')
 

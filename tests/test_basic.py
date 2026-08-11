@@ -632,6 +632,26 @@ def test_project_progress_unauthenticated_post():
     assert response.status_code == 401
     assert b"Unauthorized" in response.data
 
+def test_project_progress_upsert_single_row():
+    """Repeated progress saves must not create duplicate rows."""
+    with app.app_context():
+        from models import db, User
+        if not db.session.get(User, 1):
+            db.session.add(User(id=1, github_id="123", username="testuser"))
+            db.session.commit()
+    client = get_client()
+    with client.session_transaction() as sess:
+        sess["user_id"] = 1
+    resp = client.post("/api/project/1/progress", json={"completed_steps": [True, True]})
+    assert resp.status_code == 200
+    resp = client.post("/api/project/1/progress", json={"completed_steps": [True, True, True]})
+    assert resp.status_code == 200
+    with app.app_context():
+        from models import ProjectProgress
+        rows = ProjectProgress.query.filter_by(user_id=1, project_id=1).all()
+        assert len(rows) == 1
+        assert rows[0].completed_steps == [True, True, True]
+
 
 def test_view_code_nested_path():
     """A project with a nested starter_code path should still return 200."""
