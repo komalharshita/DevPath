@@ -331,7 +331,6 @@ def project_detail(project_id):
 def profile():
     from flask import session
     from models import db, User
-    from utils.data_loader import find_project_by_id
     
     user_id = session.get('user_id')
     if not user_id:
@@ -342,14 +341,7 @@ def profile():
         session.pop('user_id', None)
         return redirect(url_for('auth.login'))
         
-    # Hydrate bookmarked projects
-    bookmarked_projects = []
-    for pid in user.bookmarked_projects:
-        p = find_project_by_id(pid)
-        if p:
-            bookmarked_projects.append(p)
-            
-    return render_template("profile.html", user=user, bookmarked_projects=bookmarked_projects)
+    return render_template("profile.html", user=user)
 
 @main.route("/project/<int:project_id>/code")
 def view_code(project_id):
