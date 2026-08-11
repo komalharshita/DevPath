@@ -26,6 +26,11 @@ URL_RE = re.compile(
         re.IGNORECASE,
     )
 
+# Matches a labeled resource "Label: https://...".  The label is captured
+# non-greedily so colons inside the URL are not consumed, and the scheme is
+# matched case-insensitively so "HTTPS://" is recognized as a label split.
+LABEL_URL_RE = re.compile(r'^(?P<label>.+?):\s*(?P<url>https?://.*)$', re.IGNORECASE)
+
 def is_valid_url(url: str) -> bool:
     """Return True if *url* is a well-formed http/https URL.
 
@@ -49,9 +54,9 @@ def parse_resource(raw: str) -> dict:
         "Label text: https://example.com"  → label="Label text", url="https://..."
         "https://example.com"              → label="https://example.com", url="https://..."
 
-    If the string contains ": http" the part before the colon becomes the
-    label and everything from "http" onward becomes the URL.  This avoids
-    splitting on colons that appear inside URLs (e.g. "https://...").
+    A string of the form "Label: <http(s)://...>" is split on the scheme
+    token (case-insensitive), so "https://" URLs are never truncated.  Any
+    other string is treated as a bare URL.
 
     Args:
         raw: The raw resource string from projects.json.
@@ -66,13 +71,15 @@ def parse_resource(raw: str) -> dict:
 
     raw = raw.strip()
 
-    # Find the first occurrence of ": http" to split label from URL
-    split_marker = ": http"
-    idx = raw.find(split_marker)
-    if idx != -1:
-        label = raw[:idx].strip()
-        url   = raw[idx + len(split_marker):].strip()
-        return {"label": label, "url": url}
+    # Match "Label: <scheme://...>" explicitly.  The label is non-greedy and
+    # the scheme is matched case-insensitively, so both "https://" URLs and
+    # "HTTPS://" variants are parsed without corrupting the scheme.
+    match = LABEL_URL_RE.match(raw)
+    if match:
+        return {
+            "label": match.group("label").strip(),
+            "url": match.group("url").strip(),
+        }
 
     # No label prefix — treat the entire string as a URL
     return {"label": raw, "url": raw}

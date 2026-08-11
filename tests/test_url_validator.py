@@ -127,12 +127,11 @@ def test_parse_resource_with_label():
 
 
 def test_parse_resource_with_label_extra_whitespace():
-    # Leading/trailing whitespace on the whole string is stripped.
-    # Two spaces between label and ':' breaks the ': http' split marker,
-    # so this is treated as a bare URL (documented edge case).
+    # Leading/trailing whitespace on the whole string is stripped, and
+    # whitespace around the label separator is tolerated.
     result = parse_resource("  MDN Docs  :  https://developer.mozilla.org/  ")
-    assert result["label"] == "MDN Docs  :  https://developer.mozilla.org/"
-    assert result["url"] == "MDN Docs  :  https://developer.mozilla.org/"
+    assert result["label"] == "MDN Docs"
+    assert result["url"] == "https://developer.mozilla.org/"
 
 
 def test_parse_resource_label_with_colon():
@@ -164,6 +163,23 @@ def test_parse_resource_bare_url_with_path():
     assert result["url"] == "https://example.com/path/to/page"
 
 
+def test_parse_resource_regression_https_not_truncated():
+    # Regression test for the off-by-one bug: ": http" is a prefix of
+    # ": https://", so splitting on it chopped "http" off https URLs.
+    result = parse_resource("Python official docs: https://docs.python.org")
+    assert result["label"] == "Python official docs"
+    assert result["url"] == "https://docs.python.org"
+    assert result["url"] != "s://docs.python.org"
+
+
+def test_parse_resource_https_scheme_case_insensitive():
+    # The scheme is matched case-insensitively, so "HTTPS://" variants are
+    # recognized as labeled resources too.
+    result = parse_resource("Docs: HTTPS://example.com")
+    assert result["label"] == "Docs"
+    assert result["url"] == "HTTPS://example.com"
+
+
 # ---------------------------------------------------------------------------
 # parse_resource — edge cases
 # ---------------------------------------------------------------------------
@@ -184,10 +200,11 @@ def test_parse_resource_non_string():
 
 
 def test_parse_resource_colon_without_space():
-    # "Label:https://..." does not match ": http" split marker
+    # "Label:https://..." is a labeled resource even without a space after
+    # the colon.
     result = parse_resource("Label:https://example.com")
-    assert result["url"] == "Label:https://example.com"
-    assert result["label"] == "Label:https://example.com"
+    assert result["label"] == "Label"
+    assert result["url"] == "https://example.com"
 
 
 def test_parse_resource_whitespace_only():
@@ -207,9 +224,11 @@ def test_validate_resource_valid():
 
 
 def test_validate_resource_invalid_url():
+    # Without an http(s):// scheme the string is not recognized as a
+    # labeled resource, so it is treated as a bare (invalid) URL.
     result = validate_resource("Docs: not-a-valid-url")
-    assert result["label"] == "Docs"
-    assert result["url"] == "not-a-valid-url"
+    assert result["label"] == "Docs: not-a-valid-url"
+    assert result["url"] == "Docs: not-a-valid-url"
     assert result["valid"] is False
 
 
