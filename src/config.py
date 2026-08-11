@@ -38,11 +38,16 @@ class Config:
     OG_IMAGE_PATH = "/static/og-banner.png"
 
     # Contact form handler endpoint. Replace this with the project's
-    # Formspree form URL or set CONTACT_FORM_ACTION in the deployment.
+    # provider submit URL or set CONTACT_FORM_ACTION in the deployment.
     CONTACT_FORM_ACTION = os.getenv(
         "CONTACT_FORM_ACTION",
-        "https://formspree.io/f/your-form-id",
+        "https://api.web3forms.com/submit",
     )
+
+    # Web3Forms access key. Never hardcode this in templates - it must be
+    # supplied via the CONTACT_FORM_ACCESS_KEY environment variable so the
+    # secret is not shipped to every visitor in the rendered HTML.
+    CONTACT_FORM_ACCESS_KEY = os.getenv("CONTACT_FORM_ACCESS_KEY", "")
     
     @classmethod
     def get_og_image_url(cls):
