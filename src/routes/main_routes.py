@@ -75,6 +75,11 @@ def explore():
     """Render the explore page with server-side pagination, filtering, and sorting."""
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 12, type=int)
+    # Clamp per_page to a safe range so invalid values (0, negative, or
+    # oversized) can never crash pagination or load the entire catalog.
+    per_page = min(max(per_page, 1), 100)
+    if page < 1:
+        page = 1
     search_query = request.args.get("search", "").strip().lower()
     level_filter = request.args.get("level", "").strip().lower()
     interest_filter = request.args.get("interest", "").strip().lower()
