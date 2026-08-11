@@ -116,6 +116,18 @@ def test_projects_json_loads():
     assert len(projects) > 0
 
 
+def test_all_starter_code_references_exist():
+    """Every non-null starter_code reference must resolve to a real file."""
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    projects = load_all_projects()
+    missing = [
+        (p["id"], p["starter_code"])
+        for p in projects
+        if p.get("starter_code") and not os.path.exists(os.path.join(repo_root, p["starter_code"]))
+    ]
+    assert missing == []
+
+
 def test_find_project_by_id():
     project = find_project_by_id(1)
     assert project is not None

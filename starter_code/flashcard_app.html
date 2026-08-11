@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashcard Study App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+
+    #card-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    #flashcard {
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      min-height: 180px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.4rem;
+      cursor: pointer;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      transition: background 0.2s;
+    }
+
+    #flashcard:hover {
+      background: #fafafa;
+    }
+
+    button {
+      padding: 0.6rem 1.2rem;
+      margin: 0 0.25rem;
+      font-size: 1rem;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #f0f0f0;
+    }
+
+    #card-progress {
+      margin-top: 1rem;
+      color: #555;
+    }
+
+    /* TODO: Add styles for the "known / still learning" feedback */
+  </style>
+</head>
+<body>
+
+  <div id="card-container">
+
+    <h2>Flashcard Study App</h2>
+
+    <div id="flashcard" onclick="flipCard()">
+      Card front goes here...
+    </div>
+
+    <button onclick="markKnown()">I know it</button>
+    <button onclick="markUnknown()">Still learning</button>
+    <button onclick="nextCard()">Next</button>
+
+    <p id="card-progress">Card 1 of 1</p>
+
+  </div>
+
+  <script>
+    // TODO: Add your flashcards here as an array of objects
+    var flashcards = [
+      { front: "What does HTML stand for?", back: "Hyper Text Markup Language" }
+      // TODO: Add more flashcards here
+    ];
+
+    var currentIndex = 0;
+    var isFlipped = false;
+
+    // TODO: Write renderCard() to show the current card's front
+    function renderCard() {
+      // Update the flashcard text
+      // Update the card-progress text
+    }
+
+    // TODO: Write flipCard() to toggle between front and back
+    function flipCard() {
+      // Toggle isFlipped and show the other side of the card
+    }
+
+    // TODO: Write nextCard() to move to the next flashcard
+    function nextCard() {
+      // Advance currentIndex (wrap around at the end)
+      // Reset isFlipped to false and re-render
+    }
+
+    // TODO: Write markKnown() / markUnknown() to track which cards need review
+    function markKnown() {
+      // Record that this card is mastered
+    }
+
+    function markUnknown() {
+      // Record that this card needs review
+    }
+
+    // Start the app
+    renderCard();
+  </script>
+
+</body>
+</html>
