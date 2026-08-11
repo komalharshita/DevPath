@@ -598,6 +598,18 @@ def record_skill_completion():
     except KeyError:
         return jsonify({"error": f"Invalid difficulty: {difficulty}"}), 400
 
+    # Enforce the prerequisite graph before recording: a user must not claim
+    # a level without completing its required baseline skills first.
+    allowed, error_msg = _skill_validator.can_learn_skill(
+        user_id,
+        skill_name,
+        diff_enum,
+    )
+    if not allowed:
+        return jsonify({
+            "error": error_msg or "Skill prerequisites not met"
+        }), 400
+
     if assessment_score is not None:
         try:
             assessment_score = float(assessment_score)
@@ -617,12 +629,20 @@ def record_skill_completion():
         assessment_score
     )
 
+    # The difficulty is stored internally as a SkillDifficulty enum (so
+    # prerequisite comparisons stay meaningful); expose it by name so the
+    # response is JSON-serializable and reflects any preserved higher level.
+    response_skill_data = dict(skill_data)
+    stored_difficulty = skill_data.get("difficulty")
+    if isinstance(stored_difficulty, SkillDifficulty):
+        response_skill_data["difficulty"] = stored_difficulty.name
+
     return jsonify({
         "success": True,
         "user_id": user_id,
         "skill": skill_name,
         "difficulty": difficulty,
-        "skill_data": skill_data
+        "skill_data": response_skill_data
     }), 201
 
 

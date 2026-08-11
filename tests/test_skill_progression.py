@@ -120,6 +120,27 @@ class TestSkillProgressionValidator:
         assert skill_data["completed_at"] is not None
         assert len(skill_data["progression_history"]) == 1
 
+    def test_record_skill_completion_does_not_downgrade(self, validator):
+        """Re-recording at a lower difficulty must preserve the higher level."""
+        user_id = "user123"
+
+        validator.record_skill_completion(
+            user_id,
+            "Python",
+            SkillDifficulty.EXPERT,
+            assessment_score=90
+        )
+
+        skill_data = validator.record_skill_completion(
+            user_id,
+            "Python",
+            SkillDifficulty.BEGINNER,
+            assessment_score=60
+        )
+
+        assert skill_data["difficulty"] == SkillDifficulty.EXPERT
+        assert skill_data["assessment_score"] == 60
+
     def test_get_user_skills(self, validator):
         """Test retrieving user's completed skills."""
         user_id = "user123"
