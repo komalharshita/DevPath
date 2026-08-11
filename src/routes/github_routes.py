@@ -49,6 +49,7 @@ def callback():
     access_token = data.get("access_token")
     if access_token:
         session["github_token"] = access_token
+        session.permanent = True
         return redirect("/?github_auth=success")
     else:
         return redirect("/?github_auth=error")

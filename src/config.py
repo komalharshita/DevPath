@@ -5,6 +5,7 @@
 # between environments (development, production, forks).
 
 import os
+from datetime import timedelta
 
 class Config:
     """Base configuration class with sensible defaults."""
@@ -17,6 +18,16 @@ class Config:
     BASE_URL = os.getenv("BASE_URL", "https://mydevpath-github.vercel.app")
     # Security and Session
     SECRET_KEY = os.getenv("SECRET_KEY", "dev_secret_key_change_in_production")
+
+    # Session cookie hardening. The session carries the GitHub OAuth token,
+    # so the cookie must be Secure, HttpOnly and SameSite. SESSION_COOKIE_SECURE
+    # can be disabled via env for local http:// development.
+    SESSION_COOKIE_SECURE = os.getenv(
+        "SESSION_COOKIE_SECURE", "true"
+    ).lower() in ("true", "1")
+    SESSION_COOKIE_SAMESITE = "Lax"
+    SESSION_COOKIE_HTTPONLY = True
+    PERMANENT_SESSION_LIFETIME = timedelta(days=7)
     
     # GitHub OAuth Settings
     GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID", "dummy_client_id")

@@ -24,6 +24,7 @@ def authorize():
         return redirect(url_for('main.index'))
         
     session['github_token'] = token
+    session.permanent = True
     
     resp = github.get('user', token=token)
     profile = resp.json()
