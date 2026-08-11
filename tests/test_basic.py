@@ -116,6 +116,28 @@ def test_projects_json_loads():
     assert len(projects) > 0
 
 
+def test_seed_database_is_idempotent_and_preserves_users():
+    """Seeding must upsert projects without dropping user data."""
+    with app.app_context():
+        from models import db, User
+        db.session.add(User(id=99, github_id="seed-test-user", username="seeduser"))
+        db.session.commit()
+    from seed_db import seed_database
+    seed_database()
+    with app.app_context():
+        from models import db, Project, User
+        assert db.session.get(User, 99) is not None
+        data_file = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "data",
+            "projects.json",
+        )
+        with open(data_file, "r", encoding="utf-8") as f:
+            import json
+            expected_count = len(json.load(f))
+        assert Project.query.count() == expected_count
+
+
 def test_find_project_by_id():
     project = find_project_by_id(1)
     assert project is not None
