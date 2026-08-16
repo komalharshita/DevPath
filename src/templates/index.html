@@ -9,32 +9,34 @@
   <title>DevPath — Find Projects Based On Your Skills</title>
   
   <script>
-    window.addEventListener('error', function(e) {
-      var errDiv = document.createElement('div');
-      errDiv.style.position = 'fixed';
-      errDiv.style.top = '0';
-      errDiv.style.left = '0';
-      errDiv.style.width = '100%';
-      errDiv.style.background = 'red';
-      errDiv.style.color = 'white';
-      errDiv.style.zIndex = '999999';
-      errDiv.style.padding = '20px';
-      errDiv.textContent = 'JS ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno;
-      document.body.appendChild(errDiv);
-    });
-    window.addEventListener('unhandledrejection', function(e) {
-      var errDiv = document.createElement('div');
-      errDiv.style.position = 'fixed';
-      errDiv.style.top = '50px';
-      errDiv.style.left = '0';
-      errDiv.style.width = '100%';
-      errDiv.style.background = 'orange';
-      errDiv.style.color = 'white';
-      errDiv.style.zIndex = '999999';
-      errDiv.style.padding = '20px';
-      errDiv.textContent = 'PROMISE REJECTION: ' + (e.reason ? e.reason.message : e.reason);
-      document.body.appendChild(errDiv);
-    });
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+      window.addEventListener('error', function(e) {
+        var errDiv = document.createElement('div');
+        errDiv.style.position = 'fixed';
+        errDiv.style.top = '0';
+        errDiv.style.left = '0';
+        errDiv.style.width = '100%';
+        errDiv.style.background = 'red';
+        errDiv.style.color = 'white';
+        errDiv.style.zIndex = '999999';
+        errDiv.style.padding = '20px';
+        errDiv.textContent = 'JS ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno;
+        document.body.appendChild(errDiv);
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        var errDiv = document.createElement('div');
+        errDiv.style.position = 'fixed';
+        errDiv.style.top = '50px';
+        errDiv.style.left = '0';
+        errDiv.style.width = '100%';
+        errDiv.style.background = 'orange';
+        errDiv.style.color = 'white';
+        errDiv.style.zIndex = '999999';
+        errDiv.style.padding = '20px';
+        errDiv.textContent = 'PROMISE REJECTION: ' + (e.reason ? e.reason.message : e.reason);
+        document.body.appendChild(errDiv);
+      });
+    }
   </script>
 
   <!-- Open Graph meta tags for social media sharing -->
