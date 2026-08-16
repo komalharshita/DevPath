@@ -36,6 +36,10 @@ jobs:
       run: |
         flake8 . --exit-zero --max-line-length=120
 
+    - name: Check undefined names (blocking)
+      run: |
+        flake8 . --max-line-length=120 --select=F821
+
     - name: Run tests
       run: |
         PYTHONPATH=src pytest

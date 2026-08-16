@@ -10,6 +10,10 @@ from enum import Enum
 from datetime import datetime, timezone
 
 
+class ReviewAlreadyCompletedError(Exception):
+    """Raised when a code review is completed more than once."""
+
+
 class ReviewStatus(Enum):
     """Status of a code review."""
     PENDING = "pending"
@@ -105,6 +109,11 @@ class CodeReviewManager:
             "review_count": 0,
             "metrics": {},
         }
+
+        if submission_id in self.submissions:
+            raise SubmissionAlreadyExistsError(
+                f"Submission {submission_id} already exists"
+            )
 
         self.submissions[submission_id] = submission
         return submission
@@ -246,6 +255,9 @@ class CodeReviewManager:
             raise ValueError(f"Review {review_id} not found")
 
         review = self.reviews[review_id]
+        if review["completed_at"] is not None:
+            raise ReviewAlreadyCompletedError(f"Review {review_id} is already completed")
+
         scores = [s["score"] for s in review["category_scores"].values()]
         overall_score = sum(scores) / len(scores) if scores else 0
 
@@ -316,9 +328,7 @@ class CodeReviewManager:
             "overall_score": submission["metrics"].get("overall_score"),
             "categories": {
                 cat: score.get("score", 0)
-                for cat, score in submission["metrics"]
-                .get("category_scores", {})
-                .items()
+                for cat, score in submission["metrics"].get("category_scores", {}).items()
             },
             "status": "reviewed",
         }

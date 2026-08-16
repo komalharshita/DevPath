@@ -71,8 +71,20 @@ def parse_resource(raw: str) -> dict:
     idx = raw.find(split_marker)
     if idx != -1:
         label = raw[:idx].strip()
-        url   = raw[idx + len(split_marker):].strip()
+        # Skip only the separating colon and space so the URL keeps its
+        # complete ``http://`` or ``https://`` scheme.
+        url = raw[idx + 2:].strip()
         return {"label": label, "url": url}
+
+    # Preserve a useful label when the value after it is malformed.  Requiring
+    # exactly one space after the colon retains the documented whitespace edge
+    # case above and avoids splitting a bare URL at its scheme colon.
+    labeled_value = re.match(r"^([^:]+): ([^ ].*)$", raw)
+    if labeled_value:
+        return {
+            "label": labeled_value.group(1).strip(),
+            "url": labeled_value.group(2).strip(),
+        }
 
     # No label prefix — treat the entire string as a URL
     return {"label": raw, "url": raw}

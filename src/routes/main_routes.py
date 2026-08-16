@@ -3,7 +3,7 @@
 # Each route is kept thin: it validates input, calls a utility function,
 # and returns a response. No business logic lives here.
 
-from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response, redirect, url_for, session, flash, current_app
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs, diagnose_empty_state
 from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats, get_available_interests
@@ -23,25 +23,26 @@ from utils.skill_progression import (
     SkillDifficulty,
     validate_skill_progression,
 )
-from utils.code_review import CodeReviewManager
+from utils.code_review import CodeReviewManager, ReviewAlreadyCompletedError
 from config import Config
 from utils.portfolio_analyzer import analyze_portfolio
-import math
-import os
+from utils.pagination import parse_pagination
 import base64
 import requests
-import math
 from models import db, ProjectProgress, UserGameProgress
 from sqlalchemy.exc import IntegrityError
 
 _skill_validator = SkillProgressionValidator()
 _code_review_manager = CodeReviewManager()
 
+
+def _authenticated_user_id():
+    """Return the logged-in user id, or None for anonymous requests."""
+    return session.get("user_id")
+
 # Interest categories that currently have no project recommendations available
 NO_PROJECT_INTERESTS = {
     "machine learning/ai",
-    "devops",
-    "mobile",
     "artificial intelligence",
     "cloud computing",
     "mobile app development",
@@ -74,8 +75,10 @@ def index():
 @main.route("/explore")
 def explore():
     """Render the explore page with server-side pagination, filtering, and sorting."""
-    page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 12, type=int)
+    page, per_page = parse_pagination(
+        request.args.get("page", 1, type=int),
+        request.args.get("per_page", 12, type=int),
+    )
     search_query = request.args.get("search", "").strip().lower()
     level_filter = request.args.get("level", "").strip().lower()
     interest_filter = request.args.get("interest", "").strip().lower()
@@ -133,6 +136,7 @@ def explore():
 
     # Also pass filter dropdown options to UI
     available_levels = get_available_levels()
+    available_interests = get_available_interests()
     stats = get_project_stats()
     
     return render_template(
@@ -147,6 +151,7 @@ def explore():
         time=time_filter,
         sort=sort_by,
         available_levels=available_levels,
+        available_interests=available_interests,
         stats=stats,
         config=Config
     )
@@ -437,18 +442,29 @@ def export_github(project_id):
     username = user_resp.json().get('login')
 
     # 2. Create the repository
+    # Visibility defaults to private unless the user explicitly opts in to public.
+    visibility = (request.form.get("visibility") or "").strip().lower()
+    if visibility not in ("public", "private"):
+        visibility = "private"
+
     repo_payload = {
         "name": repo_name,
         "description": f"Starter code for DevPath project: {project['title']}",
-        "private": False,
+        "private": visibility != "public",
         "auto_init": False
     }
     
     create_resp = requests.post("https://api.github.com/user/repos", json=repo_payload, headers=headers)
     
     if create_resp.status_code == 422:
-        # 422 usually means the repository already exists
-        pass
+        # 422 means the repository already exists. Refuse to blind-push into an
+        # existing repository the user did not explicitly target.
+        flash(
+            f"Repository {repo_name} already exists on your GitHub account. "
+            "Rename or remove it, then try exporting again.",
+            "error",
+        )
+        return redirect(url_for('main.project_detail', project_id=project_id))
     elif create_resp.status_code == 403:
         flash("GitHub API rate limit exceeded or lack of permissions. Please try again later.", "error")
         return redirect(url_for('main.project_detail', project_id=project_id))
@@ -459,8 +475,6 @@ def export_github(project_id):
     elif create_resp.status_code != 201:
         flash(f"Failed to create repository. GitHub API responded with {create_resp.status_code}.", "error")
         return redirect(url_for('main.project_detail', project_id=project_id))
-        
-    # If 422, the repo might already exist, which is fine, we can try to push the file anyway.
 
     # 3. Create the file in the repository
     file_payload = {
@@ -494,14 +508,17 @@ def export_github(project_id):
 def sitemap():
     """
     Generate and return a sitemap.xml for search engine indexing.
-    Includes the homepage and all individual project detail pages.
+    Includes the homepage, static pages, and all individual project detail pages.
     """
+    from xml.sax.saxutils import escape
     base = request.host_url.rstrip("/")
     projects = load_all_projects()
 
-    urls = [f"<url><loc>{base}/</loc></url>", f"<url><loc>{base}/compare</loc></url>"]
+    urls = [f"<url><loc>{base}/</loc></url>"]
+    for path in ("/explore", "/contact", "/compare", "/profile"):
+        urls.append(f"<url><loc>{base}{path}</loc></url>")
     for p in projects:
-        urls.append(f"<url><loc>{base}/project/{p['id']}</loc></url>")
+        urls.append(f"<url><loc>{escape(base)}/project/{p['id']}</loc></url>")
 
     xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -552,18 +569,21 @@ def search_projects():
 @main.route("/api/skill-progression/validate", methods=["POST"])
 def validate_skill():
     """Validate if user can learn a skill at target difficulty level."""
+    user_id = _authenticated_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     payload = request.get_json(silent=True)
 
     if not payload:
         return jsonify({"error": "Request body must be valid JSON."}), 400
 
-    user_id = (payload.get("user_id") or "").strip()
     skill_name = (payload.get("skill") or "").strip()
     target_difficulty = (payload.get("difficulty") or "").strip()
 
-    if not user_id or not skill_name or not target_difficulty:
+    if not skill_name or not target_difficulty:
         return jsonify({
-            "error": "user_id, skill, and difficulty are required"
+            "error": "skill and difficulty are required"
         }), 400
 
     result = validate_skill_progression(
@@ -579,19 +599,22 @@ def validate_skill():
 @main.route("/api/skill-progression/record", methods=["POST"])
 def record_skill_completion():
     """Record user completion of a skill at given difficulty level."""
+    user_id = _authenticated_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     payload = request.get_json(silent=True)
 
     if not payload:
         return jsonify({"error": "Request body must be valid JSON."}), 400
 
-    user_id = (payload.get("user_id") or "").strip()
     skill_name = (payload.get("skill") or "").strip()
     difficulty = (payload.get("difficulty") or "").strip()
     assessment_score = payload.get("assessment_score")
 
-    if not user_id or not skill_name or not difficulty:
+    if not skill_name or not difficulty:
         return jsonify({
-            "error": "user_id, skill, and difficulty are required"
+            "error": "skill and difficulty are required"
         }), 400
 
     try:
@@ -630,10 +653,17 @@ def record_skill_completion():
 @main.route("/api/skill-progression/user/<user_id>")
 def get_user_progression(user_id):
     """Get skill progression data for a user."""
+    authenticated_user_id = _authenticated_user_id()
+    if not authenticated_user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     user_id = user_id.strip()
 
     if not user_id:
         return jsonify({"error": "user_id is required"}), 400
+
+    if str(authenticated_user_id) != user_id:
+        return jsonify({"error": "Forbidden"}), 403
 
     skills = _skill_validator.get_user_skills(user_id)
     proficiency = _skill_validator.calculate_overall_proficiency(user_id)
@@ -648,11 +678,18 @@ def get_user_progression(user_id):
 @main.route("/api/skill-progression/next/<user_id>/<skill>")
 def get_next_skill(user_id, skill):
     """Get recommended next skill level for user to pursue."""
+    authenticated_user_id = _authenticated_user_id()
+    if not authenticated_user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     user_id = user_id.strip()
     skill = skill.strip()
 
     if not user_id or not skill:
         return jsonify({"error": "user_id and skill are required"}), 400
+
+    if str(authenticated_user_id) != user_id:
+        return jsonify({"error": "Forbidden"}), 403
 
     next_skill = _skill_validator.get_recommended_next_skill(user_id, skill)
 
@@ -677,21 +714,28 @@ def get_next_skill(user_id, skill):
 @main.route("/api/code-review/submit", methods=["POST"])
 def submit_code_for_review():
     """Submit code for expert review."""
+    user_id = _authenticated_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     payload = request.get_json(silent=True)
 
     if not payload:
         return jsonify({"error": "Request body must be valid JSON."}), 400
 
+    requested_user_id = (payload.get("user_id") or "").strip()
+    if requested_user_id and str(user_id) != requested_user_id:
+        return jsonify({"error": "Forbidden"}), 403
+
     submission_id = (payload.get("submission_id") or "").strip()
-    user_id = (payload.get("user_id") or "").strip()
     project_id = payload.get("project_id")
     code = (payload.get("code") or "").strip()
     language = (payload.get("language") or "").strip()
     description = (payload.get("description") or "").strip()
 
-    if not all([submission_id, user_id, project_id, code, language]):
+    if not all([submission_id, project_id, code, language]):
         return jsonify({
-            "error": "submission_id, user_id, project_id, code, and language are required"
+            "error": "submission_id, project_id, code, and language are required"
         }), 400
 
     try:
@@ -707,13 +751,19 @@ def submit_code_for_review():
             "success": True,
             "submission": submission
         }), 201
+    except SubmissionAlreadyExistsError as e:
+        return jsonify({"error": str(e)}), 409
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        current_app.logger.exception("code review submit error: %s", e)
+        return jsonify({"error": "An internal error occurred."}), 400
 
 
 @main.route("/api/code-review/submission/<submission_id>")
 def get_submission(submission_id):
     """Get submission details."""
+    if not _authenticated_user_id():
+        return jsonify({"error": "Unauthorized"}), 401
+
     submission_id = submission_id.strip()
 
     submission = _code_review_manager.get_submission(submission_id)
@@ -729,7 +779,14 @@ def get_submission(submission_id):
 @main.route("/api/code-review/user/<user_id>/submissions")
 def get_user_code_submissions(user_id):
     """Get all code submissions from a user."""
+    authenticated_user_id = _authenticated_user_id()
+    if not authenticated_user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     user_id = user_id.strip()
+
+    if str(authenticated_user_id) != user_id:
+        return jsonify({"error": "Forbidden"}), 403
 
     submissions = _code_review_manager.get_user_submissions(user_id)
     return jsonify({
@@ -742,6 +799,9 @@ def get_user_code_submissions(user_id):
 @main.route("/api/code-review/project/<int:project_id>/submissions")
 def get_project_code_submissions(project_id):
     """Get all code submissions for a project."""
+    if not _authenticated_user_id():
+        return jsonify({"error": "Unauthorized"}), 401
+
     submissions = _code_review_manager.get_project_submissions(project_id)
     return jsonify({
         "project_id": project_id,
@@ -753,6 +813,9 @@ def get_project_code_submissions(project_id):
 @main.route("/api/code-review/start", methods=["POST"])
 def start_code_review():
     """Start a code review session."""
+    if not _authenticated_user_id():
+        return jsonify({"error": "Unauthorized"}), 401
+
     payload = request.get_json(silent=True)
 
     if not payload:
@@ -776,12 +839,16 @@ def start_code_review():
             "review": review
         }), 201
     except ValueError as e:
-        return jsonify({"error": str(e)}), 404
+        current_app.logger.exception("code review start error: %s", e)
+        return jsonify({"error": "An internal error occurred."}), 404
 
 
 @main.route("/api/code-review/<review_id>/comment", methods=["POST"])
 def add_review_comment(review_id):
     """Add feedback comment to a review."""
+    if not _authenticated_user_id():
+        return jsonify({"error": "Unauthorized"}), 401
+
     payload = request.get_json(silent=True)
 
     if not payload:
@@ -810,12 +877,16 @@ def add_review_comment(review_id):
             "comment": comment
         }), 201
     except ValueError as e:
-        return jsonify({"error": str(e)}), 404
+        current_app.logger.exception("code review comment error: %s", e)
+        return jsonify({"error": "An internal error occurred."}), 404
 
 
 @main.route("/api/code-review/<review_id>/score", methods=["POST"])
 def score_review_category(review_id):
     """Score a code quality category in a review."""
+    if not _authenticated_user_id():
+        return jsonify({"error": "Unauthorized"}), 401
+
     payload = request.get_json(silent=True)
 
     if not payload:
@@ -843,12 +914,16 @@ def score_review_category(review_id):
             "category_score": category_score
         }), 201
     except ValueError as e:
-        return jsonify({"error": str(e)}), 400
+        current_app.logger.exception("code review score error: %s", e)
+        return jsonify({"error": "An internal error occurred."}), 400
 
 
 @main.route("/api/code-review/<review_id>/complete", methods=["POST"])
 def complete_code_review(review_id):
     """Complete a code review."""
+    if not _authenticated_user_id():
+        return jsonify({"error": "Unauthorized"}), 401
+
     payload = request.get_json(silent=True)
 
     if not payload:
@@ -870,13 +945,19 @@ def complete_code_review(review_id):
             "success": True,
             "review": completed
         }), 200
+    except ReviewAlreadyCompletedError as e:
+        return jsonify({"error": str(e)}), 409
     except ValueError as e:
-        return jsonify({"error": str(e)}), 404
+        current_app.logger.exception("code review complete error: %s", e)
+        return jsonify({"error": "An internal error occurred."}), 404
 
 
 @main.route("/api/code-review/<review_id>/comments")
 def get_review_feedback(review_id):
     """Get all feedback comments for a review."""
+    if not _authenticated_user_id():
+        return jsonify({"error": "Unauthorized"}), 401
+
     review_id = review_id.strip()
 
     comments = _code_review_manager.get_review_comments(review_id)
@@ -890,6 +971,9 @@ def get_review_feedback(review_id):
 @main.route("/api/code-review/submission/<submission_id>/quality")
 def get_code_quality_score(submission_id):
     """Get code quality score for a submission."""
+    if not _authenticated_user_id():
+        return jsonify({"error": "Unauthorized"}), 401
+
     submission_id = submission_id.strip()
 
     score_data = _code_review_manager.get_code_quality_score(submission_id)
@@ -899,6 +983,9 @@ def get_code_quality_score(submission_id):
 @main.route("/api/code-review/submission/<submission_id>/recommendations")
 def get_code_recommendations(submission_id):
     """Get improvement recommendations for a submission."""
+    if not _authenticated_user_id():
+        return jsonify({"error": "Unauthorized"}), 401
+
     submission_id = submission_id.strip()
 
     recommendations = _code_review_manager.get_improvement_recommendations(
@@ -940,7 +1027,9 @@ def create_path(path_id):
 
     Request headers:
         X-Learning-Path-Token  (required) - the secret token chosen by the
-                               client (should be a random UUID or similar).
+                               client. Must be at least 16 characters
+                               (a random UUID or similar high-entropy value).
+                               Tokens shorter than 16 characters are rejected.
 
     Request body (JSON):
         Any JSON object representing the initial learning-path state.
@@ -982,10 +1071,11 @@ def read_path(path_id):
 
     Request headers:
         X-Learning-Path-Token  (required) - the token associated with this
-                               path when it was created.
+                               path when it was created. Must be at least
+                               16 characters long.
 
     Response 200:  {"path_id": "<path_id>", "data": { ... }}
-    Response 400:  token header missing or path_id format invalid.
+    Response 400:  token header missing or invalid, weak token, or path_id format invalid.
     Response 403:  token does not match the owner token.
     Response 404:  no learning path found for this path_id.
     """
@@ -1012,13 +1102,14 @@ def update_path(path_id):
 
     Request headers:
         X-Learning-Path-Token  (required) - the token associated with this
-                               path when it was created.
+                               path when it was created. Must be at least
+                               16 characters long.
 
     Request body (JSON):
         Any JSON object representing the new learning-path state.
 
     Response 200:  {"path_id": "<path_id>", "message": "Learning path updated."}
-    Response 400:  malformed request body, missing token, or invalid format.
+    Response 400:  malformed request body, missing or weak token, or invalid format.
     Response 403:  token does not match the owner token.
     Response 404:  no learning path found for this path_id.
     """
@@ -1124,6 +1215,28 @@ def save_user_game_progress():
     db.session.commit()
     return jsonify({"message": "Progress saved successfully"}), 200
 
+
+@main.route("/api/leaderboard", methods=["GET"])
+def leaderboard():
+    """Return the top users ranked by gamified progress points."""
+    if not session.get("user_id"):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    entries = []
+    for record in UserGameProgress.query.all():
+        points = record.data.get("points", 0) if isinstance(record.data, dict) else 0
+        try:
+            points = int(points)
+        except (TypeError, ValueError):
+            points = 0
+        name = record.user.username if record.user else f"user-{record.user_id}"
+        entries.append({"name": name, "points": points})
+
+    entries.sort(key=lambda e: e["points"], reverse=True)
+
+    return jsonify({"leaderboard": entries[:10]}), 200
+
+
 @main.route("/api/portfolio-analysis", methods=["POST"])
 def portfolio_analysis():
     """
@@ -1164,6 +1277,8 @@ def get_path_analytics(path_id):
     Calculate time analytics and velocity for a specific learning path.
     
     Requires X-Learning-Path-Token header for authorization.
+    The token must be at least 16 characters long (a random UUID or
+    similar high-entropy value); weak tokens are rejected.
     Expected data structure in path['progress']:
     {
         "project_id": {"completed": bool, "actual_hours": float}
@@ -1184,6 +1299,8 @@ def get_path_analytics(path_id):
 
     # Analytics Calculation
     progress = path_data.get("progress", {})
+    if not isinstance(progress, dict):
+        progress = {}
     total_est = 0
     total_act = 0
     comp_est = 0
@@ -1204,7 +1321,7 @@ def get_path_analytics(path_id):
             if stats.get("completed"):
                 comp_est += est
                 comp_act += act
-        except (ValueError, TypeError):
+        except (ValueError, TypeError, AttributeError):
             continue
 
     # Learning Velocity: ratio of Actual Time / Estimated Time

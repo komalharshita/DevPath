@@ -38,6 +38,22 @@ class SkillDifficulty(Enum):
         return self.value >= other.value
 
 
+def _to_skill_difficulty(value) -> Optional[SkillDifficulty]:
+    """Coerce a stored difficulty (name string or enum) back to an enum.
+
+    Stored difficulty values are kept as ``difficulty.name`` strings so the
+    records are JSON-serializable; comparisons still need the enum.
+    """
+    if value is None:
+        return None
+    if isinstance(value, SkillDifficulty):
+        return value
+    try:
+        return SkillDifficulty[value]
+    except (KeyError, TypeError):
+        return None
+
+
 SKILL_PREREQUISITES = {
     "JavaScript": {
         SkillDifficulty.BEGINNER: [],
@@ -147,7 +163,9 @@ class SkillProgressionValidator:
                     f"Missing prerequisite: {prereq_skill} at {prereq_difficulty.name} level",
                 )
 
-            user_level = user_skills[prereq_skill].get("difficulty")
+            user_level = _to_skill_difficulty(
+                user_skills[prereq_skill].get("difficulty")
+            )
             if user_level is None or user_level < prereq_difficulty:
                 return (
                     False,
@@ -193,7 +211,7 @@ class SkillProgressionValidator:
             }
 
         skill_data = self.user_skills[user_id][skill_name]
-        skill_data["difficulty"] = difficulty
+        skill_data["difficulty"] = difficulty.name
         skill_data["completed_at"] = datetime.now(timezone.utc).isoformat()
         skill_data["assessment_score"] = assessment_score
         skill_data["progression_history"].append(
@@ -226,7 +244,9 @@ class SkillProgressionValidator:
         if skill_name not in user_skills:
             return None
 
-        current_difficulty = user_skills[skill_name].get("difficulty")
+        current_difficulty = _to_skill_difficulty(
+            user_skills[skill_name].get("difficulty")
+        )
         if current_difficulty is None:
             return None
 
@@ -267,7 +287,7 @@ class SkillProgressionValidator:
 
         levels_distribution = {}
         for skill, data in user_skills.items():
-            difficulty = data.get("difficulty")
+            difficulty = _to_skill_difficulty(data.get("difficulty"))
             if difficulty:
                 level_name = difficulty.name
                 levels_distribution[level_name] = (

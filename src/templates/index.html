@@ -422,7 +422,10 @@
         <a href="/admin" class="nav-link" style="font-weight: 600; color: #4f46e5; text-decoration: none;">Admin</a>
         {% endif %}
         <a href="/profile" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Profile</a>
-        <a href="/auth/logout" class="nav-link" style="color: var(--text-muted); text-decoration: none;">Logout</a>
+        <form method="POST" action="/auth/logout" style="display: inline; margin: 0;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="nav-link" style="color: var(--text-muted); text-decoration: none; background: none; border: none; cursor: pointer;">Logout</button>
+        </form>
         {% else %}
         <a href="/auth/login" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Login with GitHub</a>
         {% endif %}
@@ -462,7 +465,10 @@
       <a href="/admin" class="nav-mobile-link" role="menuitem" style="color: #4f46e5;">Admin</a>
       {% endif %}
       <a href="/profile" class="nav-mobile-link" role="menuitem">Profile</a>
-      <a href="/auth/logout" class="nav-mobile-link" role="menuitem">Logout</a>
+      <form method="POST" action="/auth/logout" style="display: block; margin: 0;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="nav-mobile-link" role="menuitem" style="width: 100%; text-align: left; background: none; border: none; color: inherit; cursor: pointer;">Logout</button>
+      </form>
       {% else %}
       <a href="/auth/login" class="nav-mobile-link" role="menuitem">Login with GitHub</a>
       {% endif %}
@@ -1269,7 +1275,7 @@
           <li><a href="#how-it-works">How It Works</a></li>
           <li><a href="#features">Features</a></li>
           <li><a href="/explore">Explore All</a></li>
-          <li><a href="#the-project">Find Project</a></li>
+          <li><a href="#find-project">Find Project</a></li>
           <li><a href="/contact">Contact Us</a></li>
         </ul>
       </div>

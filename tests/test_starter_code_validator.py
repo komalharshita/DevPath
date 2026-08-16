@@ -365,3 +365,297 @@ def test_missing_starter_code_directory(tmp_path):
         in error
         for error in result.errors
     )
+
+
+def test_nested_starter_code_file(tmp_path):
+    """Nested starter code files should be discovered and validated."""
+
+    nested_dir = tmp_path / "starter_code" / "python"
+    nested_dir.mkdir(parents=True)
+
+    file_path = nested_dir / "expense_tracker.py"
+    file_path.write_text(
+        "# starter code",
+        encoding="utf-8",
+    )
+
+    dataset = write_dataset(
+        tmp_path,
+        [
+            create_project(
+                starter_code="starter_code/python/expense_tracker.py",
+            ),
+        ],
+    )
+
+    result = run(
+        dataset_path=dataset,
+        starter_code_dir=tmp_path / "starter_code",
+    )
+
+    assert result.passed is True
+    assert result.errors == []
+    assert result.warnings == []
+
+    assert result.details["checks"]["orphan_files"] == []
+
+    assert result.details["count"] == 1
+
+
+def test_nested_orphan_file(tmp_path):
+    """Nested unreferenced starter code files should be detected."""
+
+    nested_dir = tmp_path / "starter_code" / "python"
+    nested_dir.mkdir(parents=True)
+
+    (nested_dir / "expense_tracker.py").write_text(
+        "# starter code",
+        encoding="utf-8",
+    )
+
+    (nested_dir / "calculator.py").write_text(
+        "# orphan starter code",
+        encoding="utf-8",
+    )
+
+    dataset = write_dataset(
+        tmp_path,
+        [
+            create_project(
+                starter_code="starter_code/python/expense_tracker.py",
+            ),
+        ],
+    )
+
+    result = run(
+        dataset_path=dataset,
+        starter_code_dir=tmp_path / "starter_code",
+    )
+
+    assert result.passed is False
+
+    assert result.details["checks"]["orphan_files"] == [
+        "starter_code/python/calculator.py",
+    ]
+
+    assert any(
+        "Orphan Files"
+        in error
+        for error in result.errors
+    )
+
+
+def test_multiple_empty_files(tmp_path):
+    """Multiple empty starter code files should all be detected."""
+
+    create_starter_file(
+        tmp_path,
+        "expense_tracker.py",
+        content="",
+    )
+
+    create_starter_file(
+        tmp_path,
+        "calculator.py",
+        content="",
+    )
+
+    dataset = write_dataset(
+        tmp_path,
+        [
+            create_project(
+                starter_code="starter_code/expense_tracker.py",
+            ),
+            create_project(
+                id=2,
+                title="Calculator",
+                starter_code="starter_code/calculator.py",
+            ),
+        ],
+    )
+
+    result = run(
+        dataset_path=dataset,
+        starter_code_dir=tmp_path / "starter_code",
+    )
+
+    assert result.passed is False
+
+    assert result.details["checks"]["empty_files"] == [
+        "starter_code/calculator.py",
+        "starter_code/expense_tracker.py",
+    ]
+
+    assert any(
+        "Empty Files"
+        in error
+        for error in result.errors
+    )
+
+
+def test_multiple_hidden_files(tmp_path):
+    """Multiple hidden files should all produce a warning."""
+
+    create_starter_file(
+        tmp_path,
+        ".gitkeep",
+    )
+
+    create_starter_file(
+        tmp_path,
+        ".config",
+    )
+
+    dataset = write_dataset(
+        tmp_path,
+        [create_project()],
+    )
+
+    result = run(
+        dataset_path=dataset,
+        starter_code_dir=tmp_path / "starter_code",
+    )
+
+    assert result.passed is False
+
+    assert len(result.warnings) == 2
+
+    assert result.details["checks"]["hidden_files"] == [
+        "starter_code/.config",
+        "starter_code/.gitkeep",
+    ]
+
+    assert any(
+        "Hidden Files"
+        in warning
+        for warning in result.warnings
+    )
+
+
+def test_multiple_unsupported_extensions(tmp_path):
+    """Multiple unsupported file types should all produce warnings."""
+
+    create_starter_file(
+        tmp_path,
+        "expense_tracker.py",
+    )
+
+    create_starter_file(
+        tmp_path,
+        "notes.pdf",
+    )
+
+    create_starter_file(
+        tmp_path,
+        "archive.zip",
+    )
+
+    dataset = write_dataset(
+        tmp_path,
+        [create_project()],
+    )
+
+    result = run(
+        dataset_path=dataset,
+        starter_code_dir=tmp_path / "starter_code",
+    )
+
+    assert result.passed is False
+
+    assert result.details["checks"]["unsupported_extensions"] == [
+        "starter_code/archive.zip",
+        "starter_code/notes.pdf",
+    ]
+
+    assert any(
+        "Unsupported Extensions"
+        in warning
+        for warning in result.warnings
+    )
+
+
+def test_all_supported_extensions(tmp_path):
+    """All configured supported extensions should pass validation."""
+
+    supported_extensions = [
+        ".py",
+        ".js",
+        ".java",
+        ".html",
+        ".css",
+        ".yml",
+        ".yaml",
+        ".txt",
+        ".md",
+    ]
+
+    starter_dir = tmp_path / "starter_code"
+    starter_dir.mkdir()
+
+    projects = []
+
+    for index, extension in enumerate(supported_extensions, start=1):
+        filename = f"project_{index}{extension}"
+
+        (starter_dir / filename).write_text(
+            "# starter code",
+            encoding="utf-8",
+        )
+
+        projects.append(
+            create_project(
+                id=index,
+                title=f"Project {index}",
+                starter_code=f"starter_code/{filename}",
+            )
+        )
+
+    dataset = write_dataset(
+        tmp_path,
+        projects,
+    )
+
+    result = run(
+        dataset_path=dataset,
+        starter_code_dir=starter_dir,
+    )
+
+    assert result.passed is True
+    assert result.errors == []
+    assert result.warnings == []
+
+    assert result.details["checks"]["unsupported_extensions"] == []
+    assert result.details["checks"]["orphan_files"] == []
+
+    assert result.details["count"] == len(supported_extensions)
+
+
+def test_dataset_must_be_json_array(tmp_path):
+    """A JSON object instead of a project list should fail validation."""
+
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+
+    dataset = data_dir / "projects.json"
+
+    dataset.write_text(
+        json.dumps(
+            {
+                "project": create_project(),
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = run(
+        dataset_path=dataset,
+        starter_code_dir=tmp_path / "starter_code",
+    )
+
+    assert result.passed is False
+
+    assert any(
+        "Dataset must contain a JSON array of projects."
+        in error
+        for error in result.errors
+    )

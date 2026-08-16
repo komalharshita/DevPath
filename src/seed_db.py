@@ -37,7 +37,8 @@ def seed_database():
                 tech_stack=p_data.get("tech_stack", []),
                 roadmap=p_data.get("roadmap", []),
                 resources=p_data.get("resources", []),
-                starter_code=p_data.get("starter_code")
+                starter_code=p_data.get("starter_code"),
+                estimated_hours=p_data.get("estimated_hours", 0.0)
             )
             db.session.add(project)
             

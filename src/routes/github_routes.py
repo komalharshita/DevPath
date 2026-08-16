@@ -1,4 +1,5 @@
 import os
+import secrets
 import requests
 from flask import Blueprint, redirect, request, session, jsonify, url_for
 
@@ -6,6 +7,9 @@ github_bp = Blueprint("github", __name__)
 
 GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
 GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
+
+# Session key used to store the OAuth state between login and callback.
+_OAUTH_STATE_KEY = "github_oauth_state"
 
 # You can configure your local callback URL in GitHub, e.g., http://localhost:5000/api/github/callback
 # In production, it will be your domain.
@@ -15,13 +19,18 @@ def login():
     """Redirect user to GitHub OAuth login."""
     if not GITHUB_CLIENT_ID:
         return jsonify({"error": "GitHub OAuth is not configured on the server."}), 500
-        
+
+    # Generate and persist a state parameter to protect against login CSRF.
+    state = secrets.token_urlsafe(32)
+    session[_OAUTH_STATE_KEY] = state
+
     redirect_uri = request.host_url.rstrip('/') + url_for("github.callback")
     auth_url = (
         f"https://github.com/login/oauth/authorize"
         f"?client_id={GITHUB_CLIENT_ID}"
         f"&redirect_uri={redirect_uri}"
         f"&scope=public_repo"
+        f"&state={state}"
     )
     return redirect(auth_url)
 
@@ -30,6 +39,12 @@ def callback():
     """Handle GitHub OAuth callback and exchange code for access token."""
     code = request.args.get("code")
     if not code:
+        return redirect("/?github_auth=error")
+
+    # Validate the state parameter to prevent login CSRF.
+    expected_state = session.pop(_OAUTH_STATE_KEY, None)
+    returned_state = request.args.get("state")
+    if not expected_state or not returned_state or not secrets.compare_digest(expected_state, returned_state):
         return redirect("/?github_auth=error")
 
     redirect_uri = request.host_url.rstrip('/') + url_for("github.callback")
@@ -44,7 +59,12 @@ def callback():
     headers = {"Accept": "application/json"}
 
     response = requests.post(token_url, json=payload, headers=headers)
-    data = response.json()
+    if response.status_code != 200:
+        return redirect("/?github_auth=error")
+    try:
+        data = response.json()
+    except ValueError:
+        return redirect("/?github_auth=error")
 
     access_token = data.get("access_token")
     if access_token:

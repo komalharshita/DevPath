@@ -8,6 +8,7 @@ from src.utils.code_review import (
     ReviewStatus,
     CodeQualityCategory,
     FEEDBACK_TEMPLATES,
+    ReviewAlreadyCompletedError,
 )
 
 
@@ -36,6 +37,66 @@ class TestCodeReviewManager:
         assert submission["project_id"] == 1
         assert submission["review_status"] == ReviewStatus.PENDING.value
         assert submission["submitted_at"] is not None
+
+    def test_submit_code_rejects_duplicate_id(self, review_manager):
+        """Re-submitting an existing submission_id must be rejected (issue #1871)."""
+        review_manager.submit_code(
+            submission_id="sub_001",
+            user_id="user_123",
+            project_id=1,
+            code="print('hello')",
+            language="python",
+        )
+
+        with pytest.raises(SubmissionAlreadyExistsError):
+            review_manager.submit_code(
+                submission_id="sub_001",
+                user_id="user_456",
+                project_id=2,
+                code="print('overwrite')",
+                language="python",
+            )
+
+    def test_resubmission_does_not_clobber_review_progress(self, review_manager):
+        """A rejected re-submit must leave review_count and metrics intact (issue #1871)."""
+        review_manager.submit_code(
+            submission_id="sub_001",
+            user_id="user_123",
+            project_id=1,
+            code="print('hello')",
+            language="python",
+        )
+        review = review_manager.start_review(
+            submission_id="sub_001",
+            reviewer_id="reviewer_001",
+        )
+        review_manager.score_category(
+            review_id=review["review_id"],
+            category="functionality",
+            score=90,
+        )
+        review_manager.complete_review(
+            review_id=review["review_id"],
+            summary="Good work",
+        )
+
+        before = review_manager.get_submission("sub_001")
+        assert before["review_count"] == 1
+        assert before["metrics"]["overall_score"] == 90.0
+
+        with pytest.raises(SubmissionAlreadyExistsError):
+            review_manager.submit_code(
+                submission_id="sub_001",
+                user_id="user_123",
+                project_id=1,
+                code="print('overwrite')",
+                language="python",
+            )
+
+        after = review_manager.get_submission("sub_001")
+        assert after["review_count"] == before["review_count"]
+        assert after["metrics"] == before["metrics"]
+        assert after["code"] == "print('hello')"
 
     def test_get_submission(self, review_manager):
         """Test retrieving a submission."""
@@ -248,6 +309,47 @@ class TestCodeReviewManager:
 
         assert completed["overall_score"] == 77.5
         assert completed["status"] == ReviewStatus.CHANGES_REQUESTED.value
+
+    def test_complete_review_is_idempotent(self, review_manager):
+        """Completing a review twice must not inflate review_count or restamp (issue #1873)."""
+        review_manager.submit_code(
+            submission_id="sub_001",
+            user_id="user_123",
+            project_id=1,
+            code="test code",
+            language="python",
+        )
+        review = review_manager.start_review(
+            submission_id="sub_001",
+            reviewer_id="reviewer_001",
+        )
+        review_manager.score_category(
+            review_id=review["review_id"],
+            category="functionality",
+            score=90,
+        )
+
+        first = review_manager.complete_review(
+            review_id=review["review_id"],
+            summary="Good work",
+        )
+        submission = review_manager.get_submission("sub_001")
+        assert submission["review_count"] == 1
+
+        with pytest.raises(ReviewAlreadyCompletedError):
+            review_manager.complete_review(
+                review_id=review["review_id"],
+                summary="Retried completion",
+            )
+
+        second = review_manager.get_review(review["review_id"])
+        submission_after = review_manager.get_submission("sub_001")
+
+        assert second["completed_at"] == first["completed_at"]
+        assert second["overall_score"] == first["overall_score"]
+        assert second["summary"] == first["summary"]
+        assert submission_after["review_count"] == 1
+        assert submission_after["metrics"] == submission["metrics"]
 
     def test_get_review_comments(self, review_manager):
         """Test retrieving all comments for a review."""

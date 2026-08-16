@@ -36,11 +36,22 @@ app.secret_key = os.getenv("SECRET_KEY", "default-dev-secret-key-replace-in-prod
 # Load config settings into Flask's internal config manager properly
 app.config.from_object(Config)
 
+# Initialize CSRF protection before registering route exemptions below.
+csrf = CSRFProtect(app)
+
 # Initialize SQLAlchemy
 db.init_app(app)
 
 with app.app_context():
     db.create_all()
+    try:
+        from sqlalchemy import text
+        with db.engine.connect() as conn:
+            conn.execute(text("ALTER TABLE projects ADD COLUMN estimated_hours FLOAT DEFAULT 0.0"))
+            conn.commit()
+    except Exception:
+        pass
+
     # Auto-seed project database if empty (required for ephemeral/Vercel serverless runs)
     from models import Project
     try:
@@ -63,16 +74,14 @@ with app.app_context():
                         tech_stack=p_data.get("tech_stack", []),
                         roadmap=p_data.get("roadmap", []),
                         resources=p_data.get("resources", []),
-                        starter_code=p_data.get("starter_code")
+                        starter_code=p_data.get("starter_code"),
+                        estimated_hours=p_data.get("estimated_hours", 0.0)
                     )
                     db.session.add(project)
                 db.session.commit()
                 print("Database auto-seeded successfully!")
     except Exception as e:
         print(f"Warning: Failed to auto-seed database: {e}")
-
-# Enable CSRF protection for all state-changing requests
-csrf = CSRFProtect(app)
 
 # Initialize OAuth
 oauth = OAuth(app)
@@ -94,8 +103,22 @@ from routes.admin_routes import admin_bp
 
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(admin_bp, url_prefix='/admin')
-# Enable CSRF protection for all state-changing requests
-csrf = CSRFProtect(app)
+
+# JSON-only API endpoints are exempt from CSRF.  Browsers cannot send a
+# cross-origin application/json POST without a CORS preflight, and the app's
+# CSP connect-src policy is 'self', so these endpoints have no form-based
+# CSRF vector.  Exempting them keeps the app's own frontend (which posts
+# JSON without a CSRF token) working in production.
+from routes.main_routes import (
+    recommend,
+    save_user_game_progress,
+    update_project_progress,
+    portfolio_analysis,
+)
+csrf.exempt(recommend)
+csrf.exempt(save_user_game_progress)
+csrf.exempt(update_project_progress)
+csrf.exempt(portfolio_analysis)
 
 # Register all routes defined in the main Blueprint (This handles your '/' route!)
 app.register_blueprint(main)
@@ -130,7 +153,7 @@ def add_security_headers(response):
         "default-src 'self'; "
         "script-src 'self' 'unsafe-inline'; "
         "style-src 'self' 'unsafe-inline'; "
-        "img-src 'self' data:; "
+        "img-src 'self' data: https://avatars.githubusercontent.com https://*.githubusercontent.com; "
         "font-src 'self'; "
         "connect-src 'self'; "
         "form-action 'self' https://formspree.io https://api.web3forms.com; "

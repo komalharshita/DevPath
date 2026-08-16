@@ -32,6 +32,7 @@
     </div>
 
     <form method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <div class="form-group">
         <label for="title">Project Title</label>
         <input type="text" id="title" name="title" required value="{{ project.title if project else '' }}" placeholder="e.g. Build a Web Scraper">

@@ -258,3 +258,271 @@ def test_missing_dataset_file(tmp_path):
         in error
         for error in result.errors
     )
+
+
+def test_multiple_duplicate_project_ids(tmp_path):
+    """Multiple duplicate IDs should all be reported."""
+
+    create_starter_file(
+        tmp_path,
+        "expense_tracker.py",
+    )
+
+    dataset = write_dataset(
+        tmp_path,
+        [
+            create_project(
+                id=1,
+                title="Expense Tracker",
+            ),
+            create_project(
+                id=1,
+                title="Calculator",
+            ),
+            create_project(
+                id=2,
+                title="Weather App",
+            ),
+            create_project(
+                id=2,
+                title="Todo App",
+            ),
+        ],
+    )
+
+    result = run(dataset)
+
+    assert result.passed is False
+
+    assert result.errors == [
+        "Duplicate project ID: 1",
+        "Duplicate project ID: 2",
+    ]
+
+
+def test_multiple_duplicate_project_titles(tmp_path):
+    """Multiple duplicate titles should all be reported."""
+
+    create_starter_file(
+        tmp_path,
+        "expense_tracker.py",
+    )
+
+    dataset = write_dataset(
+        tmp_path,
+        [
+            create_project(
+                id=1,
+                title="Calculator",
+            ),
+            create_project(
+                id=2,
+                title="Calculator",
+            ),
+            create_project(
+                id=3,
+                title="Todo App",
+            ),
+            create_project(
+                id=4,
+                title="Todo App",
+            ),
+        ],
+    )
+
+    result = run(dataset)
+
+    assert result.passed is False
+
+    assert result.errors == [
+        'Duplicate project title: "Calculator"',
+        'Duplicate project title: "Todo App"',
+    ]
+
+
+def test_whitespace_only_required_field(tmp_path):
+    """Whitespace-only required fields should fail validation."""
+
+    create_starter_file(
+        tmp_path,
+        "expense_tracker.py",
+    )
+
+    dataset = write_dataset(
+        tmp_path,
+        [
+            create_project(
+                title="   ",
+            ),
+        ],
+    )
+
+    result = run(dataset)
+
+    assert result.passed is False
+
+    assert any(
+        "empty 'title'"
+        in error
+        for error in result.errors
+    )
+
+
+def test_empty_required_list_field(tmp_path):
+    """Empty required list fields should fail validation."""
+
+    create_starter_file(
+        tmp_path,
+        "expense_tracker.py",
+    )
+
+    dataset = write_dataset(
+        tmp_path,
+        [
+            create_project(
+                skills=[],
+            ),
+        ],
+    )
+
+    result = run(dataset)
+
+    assert result.passed is False
+
+    assert any(
+        "empty 'skills'"
+        in error
+        for error in result.errors
+    )
+
+
+def test_multiple_missing_required_fields(tmp_path):
+    """Multiple missing required fields should all be reported."""
+
+    create_starter_file(
+        tmp_path,
+        "expense_tracker.py",
+    )
+
+    project = create_project()
+
+    del project["description"]
+    del project["features"]
+    del project["resources"]
+
+    dataset = write_dataset(
+        tmp_path,
+        [project],
+    )
+
+    result = run(dataset)
+
+    assert result.passed is False
+
+    assert len(result.errors) == 1
+
+    assert (
+        "Project 1 is missing required fields: "
+        "description, features, resources"
+        in result.errors[0]
+    )
+
+
+def test_multiple_validation_failures(tmp_path):
+    """Multiple validation checks should be reported together."""
+
+    create_starter_file(
+        tmp_path,
+        "expense_tracker.py",
+    )
+
+    project_one = create_project(
+        id=1,
+        title="Calculator",
+    )
+
+    project_two = create_project(
+        id=1,
+        title="Calculator",
+        skills=[],
+    )
+
+    del project_two["description"]
+
+    dataset = write_dataset(
+        tmp_path,
+        [
+            project_one,
+            project_two,
+        ],
+    )
+
+    result = run(dataset)
+
+    assert result.passed is False
+
+    assert any(
+        "Duplicate project ID: 1"
+        in error
+        for error in result.errors
+    )
+
+    assert any(
+        'Duplicate project title: "Calculator"'
+        in error
+        for error in result.errors
+    )
+
+    assert any(
+        "missing required fields: description"
+        in error
+        for error in result.errors
+    )
+
+    assert any(
+        "empty 'skills'"
+        in error
+        for error in result.errors
+    )
+
+
+def test_duplicate_values_are_reported_in_sorted_order(tmp_path):
+    """Duplicate IDs and titles should be reported deterministically."""
+
+    create_starter_file(
+        tmp_path,
+        "expense_tracker.py",
+    )
+
+    dataset = write_dataset(
+        tmp_path,
+        [
+            create_project(
+                id=3,
+                title="Zebra App",
+            ),
+            create_project(
+                id=1,
+                title="Alpha App",
+            ),
+            create_project(
+                id=3,
+                title="Zebra App",
+            ),
+            create_project(
+                id=1,
+                title="Alpha App",
+            ),
+        ],
+    )
+
+    result = run(dataset)
+
+    assert result.passed is False
+
+    assert result.errors == [
+        "Duplicate project ID: 1",
+        "Duplicate project ID: 3",
+        'Duplicate project title: "Alpha App"',
+        'Duplicate project title: "Zebra App"',
+    ]

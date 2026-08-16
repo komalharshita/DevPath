@@ -106,6 +106,17 @@ SKILL_SYNONYMS = {
     "k8s":           "kubernetes",
     "tf":            "tensorflow",
 }
+
+# Common aliases and abbreviations for skills
+# This improves recommendation accuracy by normalizing user input
+SKILL_ALIASES = {
+    "js": "javascript",
+    "py": "python",
+    "html5": "html",
+    "css3": "css",
+    "c++": "cpp",
+    "web dev": "javascript",
+}
 def _normalize_skill(s: str) -> str:
     """Normalize a skill string: strip surrounding whitespace and lowercase."""
     return s.strip().lower()
@@ -125,46 +136,21 @@ def parse_skill_entries(skills_string):
         try:
             parsed = json.loads(stripped)
             if isinstance(parsed, list):
-                entries = []
-                for item in parsed:
-                    if isinstance(item, dict):
-                        skill = _normalize_skill(str(item.get("skill", "")))
-                        proficiency = str(item.get("proficiency", "Beginner")).strip().title()
-                    else:
-                        skill = _normalize_skill(str(item))
-                        proficiency = "Beginner"
-
-                    if skill:
-                        entries.append(
-                            {
-                                "skill": SKILL_SYNONYMS.get(skill, skill),
-                                "proficiency": (
-                                    proficiency
-                                    if proficiency in (
-                                        "Beginner",
-                                        "Intermediate",
-                                        "Advanced",
-                                    )
-                                    else "Beginner"
-                                ),
-                            }
-                        )
-                return entries
+                tokens = [str(s).strip().lower() for s in parsed if str(s).strip()]
+                return [SKILL_SYNONYMS.get(token, token) for token in tokens]
         except (json.JSONDecodeError, ValueError):
-            pass
+            pass  # fall through to comma-splitting
 
-    return [
-        {
-            "skill": SKILL_SYNONYMS.get(_normalize_skill(skill), _normalize_skill(skill)),
-            "proficiency": "Beginner",
-        }
-        for skill in skills_string.split(",")
-        if skill.strip()
+    # --- Comma-separated branch ---
+    tokens = [
+        s.strip().lower()
+        for s in skills_string.split(",")
+        if s.strip()  # skip blanks produced by trailing / consecutive commas
     ]
+    return [SKILL_SYNONYMS.get(token, token) for token in tokens]
 
 
-def parse_skills(skills_string):
-    return [entry["skill"] for entry in parse_skill_entries(skills_string)]
+
 
 
 _nlp_model = None
@@ -649,7 +635,7 @@ def get_recommendations(
     interest,
     time_availability,
     tech_stack="all",
-    max_results=None,
+    max_results=MAX_RESULTS,
 ):
     if isinstance(interest, str):
         interest = [interest]
@@ -662,6 +648,8 @@ def get_recommendations(
         for entry in skill_entries
     }
     all_projects = load_all_projects()
+    if tech_stack and tech_stack.lower() != "all":
+        all_projects = [p for p in all_projects if project_matches_tech(p, tech_stack)]
     # Load NLP model to determine if we should use semantic search
     model = get_nlp_model()
     
@@ -725,7 +713,7 @@ def get_recommendations(
     scored_projects.sort(key=lambda item: (-item["score"], int(item["project"].get("id", 0))))
     
     selected_projects = (
-      scored_projects
+      scored_projects[:MAX_RESULTS]
       if max_results is None
       else scored_projects[:max_results])
 
@@ -754,8 +742,6 @@ def get_recommendations(
       proj["match_score"] = min(max(match_score, 4.0), 10.0)
 
       match_details = item.get("match_details", {})
-
-      import random
 
       matched_skills_list = match_details.get("matched_skills", [])
       skills_str = ""

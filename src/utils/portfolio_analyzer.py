@@ -7,6 +7,7 @@
 # practiced, vs. which ones they keep skipping. Returns a diversity
 # score plus targeted project recommendations for the gaps.
 
+import re
 from collections import OrderedDict
 
 # Ordered so the dashboard always renders categories in a stable,

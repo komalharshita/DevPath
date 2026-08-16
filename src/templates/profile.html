@@ -13,9 +13,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <!-- Import Inter font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  {% include 'partials/theme_head.html' %}
 
   <!-- Link to central stylesheet -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
   
   <style>
     .profile-header {
@@ -116,7 +117,10 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
           </svg>
         </button>
-        <a href="/auth/logout" class="btn-primary" style="padding: 0.5rem 1rem;">Logout</a>
+        <form method="POST" action="/auth/logout" style="display: inline; margin: 0;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn-primary" style="padding: 0.5rem 1rem; border: none; cursor: pointer;">Logout</button>
+        </form>
       </div>
 
       <!-- Mobile hamburger toggle -->
@@ -131,7 +135,10 @@
     <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
       <a href="/" class="nav-mobile-link" role="menuitem">Home</a>
       <a href="/explore" class="nav-mobile-link" role="menuitem">Explore All</a>
-      <a href="/auth/logout" class="nav-mobile-link" role="menuitem">Logout</a>
+      <form method="POST" action="/auth/logout" style="display: block; margin: 0;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="nav-mobile-link" role="menuitem" style="width: 100%; text-align: left; background: none; border: none; color: inherit; cursor: pointer;">Logout</button>
+      </form>
       <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile" role="menuitem" style="text-align: left; width: 100%; display: flex; align-items: center; justify-content: space-between;">
         <span>Toggle Theme</span>
         <svg class="sun-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
@@ -197,7 +204,10 @@
     <div style="margin-top: 4rem; border-top: 1px solid var(--border); padding-top: 2rem;">
       <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main);">Account Management</h3>
       <p style="color: var(--text-muted); font-size: 0.95rem;">You are currently authenticated via GitHub OAuth.</p>
-      <a href="/auth/logout" class="btn-danger">Sign Out</a>
+      <form method="POST" action="/auth/logout" style="display: inline-block; margin-top: 1rem;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="btn-danger" style="border: none; cursor: pointer;">Sign Out</button>
+      </form>
     </div>
   </main>
 

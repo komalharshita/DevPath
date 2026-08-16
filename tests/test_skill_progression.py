@@ -115,10 +115,26 @@ class TestSkillProgressionValidator:
             assessment_score=88.5
         )
 
-        assert skill_data["difficulty"] == SkillDifficulty.BEGINNER
+        assert skill_data["difficulty"] == SkillDifficulty.BEGINNER.name
         assert skill_data["assessment_score"] == 88.5
         assert skill_data["completed_at"] is not None
         assert len(skill_data["progression_history"]) == 1
+
+    def test_record_skill_completion_json_serializable(self, validator):
+        """Recorded skill data must be JSON-serializable (no raw enums)."""
+        import json
+
+        user_id = "user123"
+
+        skill_data = validator.record_skill_completion(
+            user_id,
+            "Python",
+            SkillDifficulty.BEGINNER,
+            assessment_score=88.5
+        )
+
+        encoded = json.dumps(skill_data)
+        assert '"difficulty": "BEGINNER"' in encoded
 
     def test_get_user_skills(self, validator):
         """Test retrieving user's completed skills."""

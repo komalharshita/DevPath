@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, abort, session
 from models import db, Project, User
+from utils.pagination import parse_pagination
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -15,9 +16,8 @@ def check_admin():
 
 @admin_bp.route('/')
 def dashboard():
-    page = request.args.get('page', 1, type=int)
-    per_page = 20
-    pagination = Project.query.order_by(Project.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    page, _ = parse_pagination(request.args.get('page', 1, type=int), 20)
+    pagination = Project.query.order_by(Project.id.desc()).paginate(page=page, per_page=20, error_out=False)
     return render_template('admin/dashboard.html', pagination=pagination)
 
 def _get_list_from_form(field_name):

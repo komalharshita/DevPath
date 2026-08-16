@@ -304,6 +304,21 @@ def test_get_recommendations_max_three():
     assert len(results.get("recommendations", [])) <= 3, f"Expected at most 3 results, got {len(results.get('recommendations', []))}"
 
 
+def test_get_recommendations_default_cap_applies():
+    """MAX_RESULTS must be honored as the default cap when max_results is None."""
+    capped = get_recommendations("python", "Beginner", "Web", "Low")
+    assert len(capped.get("recommendations", [])) <= 3, (
+        f"Expected default cap of 3, got {len(capped.get('recommendations', []))}"
+    )
+
+    uncapped = get_recommendations(
+        "python", "Beginner", "Web", "Low", max_results=100
+    )
+    assert len(uncapped.get("recommendations", [])) > 3, (
+        "Explicit max_results should override the default cap"
+    )
+
+
 def test_get_recommendations_result_format():
     """Each returned project must be a dict with at least a title and id."""
     results = get_recommendations("Python", "Beginner", "Data", "Low")
@@ -478,6 +493,20 @@ def test_security_headers_present():
         response.headers["Permissions-Policy"]
         == "geolocation=(), microphone=(), camera=()"
     )
+
+def test_csp_allows_github_avatars():
+    """img-src must whitelist GitHub avatar hosts so profile avatars load (issue #1875)."""
+    client = get_client()
+    response = client.get("/")
+
+    csp = response.headers["Content-Security-Policy"]
+    img_src = next(
+        part.strip()
+        for part in csp.split(";")
+        if part.strip().startswith("img-src ")
+    )
+    assert "https://avatars.githubusercontent.com" in img_src
+    assert "https://*.githubusercontent.com" in img_src
 
 def test_recommend_api_single_interest():
     client = get_client()
@@ -910,11 +939,23 @@ def test_login_redirect():
     assert "github.com/login/oauth/authorize" in response.headers["Location"]
 
 def test_logout_redirect():
-    """Logout route should redirect to homepage."""
+    """Logout route should redirect to homepage and clear the session."""
     client = get_client()
-    response = client.get("/auth/logout")
+    with client.session_transaction() as sess:
+        sess["user_id"] = 1
+        sess["github_token"] = "test-token"
+    response = client.post("/auth/logout")
     assert response.status_code == 302
     assert response.headers["Location"] == "/"
+    with client.session_transaction() as sess:
+        assert "user_id" not in sess
+        assert "github_token" not in sess
+
+def test_logout_rejects_get():
+    """Logout must not be triggerable via a plain GET (logout CSRF)."""
+    client = get_client()
+    response = client.get("/auth/logout")
+    assert response.status_code == 405
 
 def test_profile_unauthenticated_redirects_to_login():
     """Profile route should redirect to login if unauthenticated."""
@@ -1093,7 +1134,7 @@ def test_export_github_api_failures(mock_put, mock_post, mock_get):
         assert response.status_code == 302
         assert "/project/1000" in response.headers["Location"]
 
-    # Test 422 Conflict (repo exists) but file push succeeds
+    # Test 422 Conflict (repo exists) must NOT blind-push into the existing repo
     with app.test_client() as client:
         with client.session_transaction() as sess:
             sess['github_token'] = {'access_token': 'dummy_token'}
@@ -1101,13 +1142,81 @@ def test_export_github_api_failures(mock_put, mock_post, mock_get):
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = {"login": "testuser"}
         mock_post.return_value.status_code = 422
-        mock_put.return_value.status_code = 201
         
         response = client.post("/project/1000/export_github")
         
         assert response.status_code == 302
-        assert "github.com/testuser/DevPath-Starter-valid-code" in response.headers["Location"]
+        assert "/project/1000" in response.headers["Location"]
+        mock_put.assert_not_called()
 
+
+from unittest.mock import patch
+
+@patch("routes.main_routes.requests.get")
+@patch("routes.main_routes.requests.post")
+@patch("routes.main_routes.requests.put")
+def test_export_github_defaults_to_private_repo(mock_put, mock_post, mock_get):
+    """Exporting without a visibility choice must create a private repo (issue #1872)."""
+    with app.app_context():
+        from models import db, Project
+        p = db.session.get(Project, 1000)
+        if not p:
+            p = Project(
+                id=1000, title="Valid Code", level="Beg", interest="Web", time="Low",
+                description="Desc", starter_code="expense_tracker.py"
+            )
+            db.session.add(p)
+            db.session.commit()
+
+    with app.test_client() as client:
+        with client.session_transaction() as sess:
+            sess['github_token'] = {'access_token': 'dummy_token'}
+
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {"login": "testuser"}
+        mock_post.return_value.status_code = 201
+        mock_put.return_value.status_code = 201
+
+        response = client.post("/project/1000/export_github")
+
+        assert response.status_code == 302
+        repo_payload = mock_post.call_args.kwargs["json"]
+        assert repo_payload["private"] is True
+
+
+@patch("routes.main_routes.requests.get")
+@patch("routes.main_routes.requests.post")
+@patch("routes.main_routes.requests.put")
+def test_export_github_public_visibility_opt_in(mock_put, mock_post, mock_get):
+    """A repo can only be public when the user explicitly selects public (issue #1872)."""
+    with app.app_context():
+        from models import db, Project
+        p = db.session.get(Project, 1000)
+        if not p:
+            p = Project(
+                id=1000, title="Valid Code", level="Beg", interest="Web", time="Low",
+                description="Desc", starter_code="expense_tracker.py"
+            )
+            db.session.add(p)
+            db.session.commit()
+
+    with app.test_client() as client:
+        with client.session_transaction() as sess:
+            sess['github_token'] = {'access_token': 'dummy_token'}
+
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {"login": "testuser"}
+        mock_post.return_value.status_code = 201
+        mock_put.return_value.status_code = 201
+
+        response = client.post(
+            "/project/1000/export_github",
+            data={"visibility": "public"},
+        )
+
+        assert response.status_code == 302
+        repo_payload = mock_post.call_args.kwargs["json"]
+        assert repo_payload["private"] is False
 
 
 def test_sitemap_includes_compare():
@@ -1116,6 +1225,17 @@ def test_sitemap_includes_compare():
     response = client.get("/sitemap.xml")
     assert response.status_code == 200
     assert b"/compare" in response.data
+
+
+def test_sitemap_includes_static_pages():
+    """Sitemap should include /explore, /contact, and /profile pages."""
+    client = get_client()
+    response = client.get("/sitemap.xml")
+    assert response.status_code == 200
+    for path in ("/explore", "/contact", "/compare", "/profile"):
+        assert path.encode() in response.data, (
+            f"Sitemap missing public page {path}"
+        )
 
 
 

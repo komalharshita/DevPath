@@ -38,6 +38,10 @@ _store: dict = {}
 # Maximum byte length accepted for a path_id to prevent abuse
 _MAX_PATH_ID_LEN = 128
 
+# Minimum length required for the client-chosen ownership token so that
+# trivially guessable secrets (e.g. "test", "1234") are rejected.
+_MIN_TOKEN_LENGTH = 16
+
 # Regex that path_id values must satisfy (alphanumeric + hyphens/underscores)
 _PATH_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,128}$")
 
@@ -76,9 +80,20 @@ def _validate_path_id(path_id: str) -> None:
 
 
 def _validate_token(token: str) -> None:
-    """Raise ValueError if token is not a non-empty string."""
+    """Raise ValueError if token is not a sufficiently strong secret.
+
+    Tokens are client-chosen but act as the only authorization secret for a
+    learning path, so a minimum length is enforced to reject trivially
+    guessable values. Clients should supply a random UUID or equivalent
+    high-entropy string.
+    """
     if not isinstance(token, str) or not token.strip():
         raise ValueError("token must be a non-empty string.")
+    if len(token) < _MIN_TOKEN_LENGTH:
+        raise ValueError(
+            f"token must be at least {_MIN_TOKEN_LENGTH} characters long; "
+            "use a random UUID or similar high-entropy value."
+        )
 
 
 def _validate_data(data: dict) -> None:

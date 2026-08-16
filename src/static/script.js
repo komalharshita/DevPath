@@ -174,23 +174,6 @@
   });
 })();
 
-var POINTS_PER_SEARCH     = 5;
-var POINTS_PER_VIEW       = 10;
-var POINTS_PER_CODE_OPEN  = 15;
-var POINTS_PER_COMPLETION = 30;
-
-var PROGRESS_TARGET_SEARCHES     = 10;
-var PROGRESS_TARGET_VIEWS        = 10;
-var PROGRESS_TARGET_CODE_OPENS   = 10;
-var PROGRESS_TARGET_COMPLETIONS  = 5;
-
-var PROGRESS_MAX_POINTS = (
-  PROGRESS_TARGET_SEARCHES * POINTS_PER_SEARCH +
-  PROGRESS_TARGET_VIEWS * POINTS_PER_VIEW +
-  PROGRESS_TARGET_CODE_OPENS * POINTS_PER_CODE_OPEN +
-  PROGRESS_TARGET_COMPLETIONS * POINTS_PER_COMPLETION
-);
-
 var STORAGE_KEY = "devpathUserProgress";
 var progress = {
   searches: 0,
@@ -339,6 +322,16 @@ function projectIsCompleted(projectId) {
   });
 }
 
+function renderLeaderboardList(listEl, entries) {
+  if (!entries.length) {
+    listEl.innerHTML = '<li class="leaderboard-empty">Complete projects to see rankings</li>';
+    return;
+  }
+  listEl.innerHTML = entries.map(function (entry, index) {
+    return "<li><span>" + (index + 1) + ". " + entry.name + "</span><strong>" + entry.points + " pts</strong></li>";
+  }).join("");
+}
+
 function updateProfileWidgets() {
   var pointsEl = document.getElementById("progress-points");
   var statsEl = document.getElementById("progress-stats");
@@ -387,15 +380,17 @@ function updateProfileWidgets() {
       : "<li class=\"achievement-empty\">No achievements yet. Use DevPath and unlock the first badge.</li>";
   }
   if (leaderboardList) {
-    var entries = [
-      { name: "Ava", points: 245 },
-      { name: "Kai", points: 192 },
-      { name: "Sam", points: 176 },
-      { name: "You", points: progress.points }
-    ].sort(function (a, b) { return b.points - a.points; });
-    leaderboardList.innerHTML = entries.map(function (entry, index) {
-      return "<li><span>" + (index + 1) + ". " + entry.name + "</span><strong>" + entry.points + " pts</strong></li>";
-    }).join("");
+    fetch("/api/leaderboard")
+      .then(function (r) {
+        if (!r.ok) throw new Error("Leaderboard unavailable");
+        return r.json();
+      })
+      .then(function (data) {
+        renderLeaderboardList(leaderboardList, data.leaderboard || []);
+      })
+      .catch(function () {
+        renderLeaderboardList(leaderboardList, [{ name: "You", points: progress.points }]);
+      });
   }
   if (historyList) {
     historyList.innerHTML = progress.completedProjects.length
@@ -809,6 +804,17 @@ async function updatePortfolioAnalysis() {
     var footer = document.createElement("div");
     footer.className = "project-card-footer";
 
+    var link = document.createElement("a");
+    link.className = "btn-details";
+    link.textContent = "View Full Project";
+    link.href = "/project/" + project.id;
+
+    link.addEventListener("click", function() {
+      if (typeof RecentlyViewed !== "undefined") {
+        RecentlyViewed.trackView(project);
+      }
+    });
+
     if (typeof DevPathBookmarks !== "undefined") {
       var saveBtn = document.createElement("button");
       saveBtn.type = "button";
@@ -834,19 +840,8 @@ async function updatePortfolioAnalysis() {
 
       // Also keep recently-viewed tracking code
       footer.appendChild(saveBtn);
-      footer.appendChild(link);
     }
 
-    var link = document.createElement("a");
-    link.className = "btn-details";
-    link.textContent = "View Full Project";
-    link.href = "/project/" + project.id;
-    
-    link.addEventListener("click", function() {
-      if (typeof RecentlyViewed !== "undefined") {
-        RecentlyViewed.trackView(project);
-      }
-    });
     footer.appendChild(link);
 
     card.appendChild(title);

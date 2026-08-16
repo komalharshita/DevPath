@@ -1,6 +1,22 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
+import sqlite3
 
 db = SQLAlchemy()
+
+
+@event.listens_for(Engine, "connect")
+def _set_sqlite_foreign_keys(dbapi_connection, connection_record):
+    """Enable SQLite foreign-key enforcement so deletes cascade correctly.
+
+    SQLite does not enforce foreign keys by default. Without this PRAGMA,
+    deleting a Project would leave orphaned ProjectProgress rows behind.
+    """
+    if isinstance(dbapi_connection, sqlite3.Connection):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
 class Project(db.Model):
     __tablename__ = 'projects'
@@ -19,6 +35,9 @@ class Project(db.Model):
     roadmap = db.Column(db.JSON, nullable=False, default=list)
     resources = db.Column(db.JSON, nullable=True, default=list)
     starter_code = db.Column(db.String(500), nullable=True)
+    estimated_hours = db.Column(db.Float, nullable=True, default=0.0)
+
+    progress = db.relationship('ProjectProgress', cascade="all, delete-orphan", back_populates='project')
 
     def to_dict(self):
         """Convert the model to a dictionary matching projects.json format."""
@@ -28,6 +47,7 @@ class Project(db.Model):
             "level": self.level,
             "interest": self.interest,
             "time": self.time,
+            "estimated_hours": self.estimated_hours if self.estimated_hours is not None else 0.0,
             "description": self.description,
             "skills": self.skills if self.skills else [],
             "features": self.features if self.features else [],
@@ -74,7 +94,7 @@ class ProjectProgress(db.Model):
     )
 
     user = db.relationship('User', backref=db.backref('progress', lazy=True, cascade="all, delete-orphan"))
-    project = db.relationship('Project')
+    project = db.relationship('Project', back_populates='progress')
 
 class UserGameProgress(db.Model):
     __tablename__ = 'user_game_progress'
