@@ -6125,3 +6125,45 @@ body.dark-theme .theme-toggle:hover {
 .btn-surprise:hover {
   background-color: #581c87;
 }
+
+/* Share Toast Notification Styling */
+.share-toast {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(16, 185, 129, 0.95);
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: var(--r-md, 8px);
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  z-index: 10000;
+  backdrop-filter: blur(8px);
+  transform: translateY(20px);
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.share-toast.show {
+  display: flex !important;
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.share-toast svg {
+  flex-shrink: 0;
+}
+
+.btn-share-project.copied {
+  background-color: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #10b981 !important;
+  transition: all 0.2s ease;
+}
+
