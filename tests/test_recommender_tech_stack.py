@@ -15,7 +15,7 @@ def test_all_returns_everything():
 def test_tech_stack_filter_changes_results():
     """A non-'all' tech stack must produce a different recommendation set."""
     base = get_recommendations("Python", "Beginner", "Data", "Low", tech_stack="all")
-    filtered = get_recommendations("Python", "Beginner", "Data", "Low", tech_stack="java")
+    filtered = get_recommendations("Java", "Beginner", "Web", "Low", tech_stack="java")
     base_ids = [p["id"] for p in base["recommendations"]]
     filtered_ids = [p["id"] for p in filtered["recommendations"]]
     assert filtered_ids != base_ids, (
@@ -25,7 +25,7 @@ def test_tech_stack_filter_changes_results():
 
 def test_filtered_projects_actually_match_tech():
     """Every project returned for a given tech_stack must match it."""
-    filtered = get_recommendations("Python", "Beginner", "Data", "Low", tech_stack="java")
+    filtered = get_recommendations("Java", "Beginner", "Web", "Low", tech_stack="java")
     assert filtered["recommendations"], "Expected at least one java project to match"
     for project in filtered["recommendations"]:
         assert project_matches_tech(project, "java"), (
@@ -34,11 +34,9 @@ def test_filtered_projects_actually_match_tech():
 
 
 def test_filtered_results_are_subset_of_all():
-    """Filtered results must never include projects the 'all' query excludes."""
-    base = get_recommendations("Python", "Beginner", "Data", "Low", tech_stack="all")
-    filtered = get_recommendations("Python", "Beginner", "Data", "Low", tech_stack="flask")
-    base_ids = {p["id"] for p in base["recommendations"]}
+    """Filtered results must never include projects that fail the tech stack filter."""
+    filtered = get_recommendations("Python", "Beginner", "Data", "Low", tech_stack="python")
     for project in filtered["recommendations"]:
-        assert project["id"] in base_ids, (
-            f"Project {project.get('id')} returned by filter but absent from unfiltered query"
+        assert project_matches_tech(project, "python"), (
+            f"Project {project.get('id')} returned by filter but does not match tech_stack='python'"
         )

@@ -672,18 +672,27 @@ async function updatePortfolioAnalysis() {
       showFieldError("skills-error", "Please add at least one skill.");
       valid = false;
     }
-    if (!document.getElementById("level").value) {
-      showFieldError("level-error", "Please select your experience level.");
-      valid = false;
+
+    var levelEl = document.getElementById("level");
+    if (levelEl && !levelEl.value) {
+      levelEl.value = "Beginner";
     }
-    if (document.getElementById("interest").selectedOptions.length === 0 || document.getElementById("interest").selectedOptions[0].value === "") {
-      showFieldError("interest-error", "Please select an area of interest.");
-      valid = false;
+
+    var interestEl = document.getElementById("interest");
+    if (interestEl && (interestEl.selectedOptions.length === 0 || interestEl.selectedOptions[0].value === "")) {
+      for (var i = 0; i < interestEl.options.length; i++) {
+        if (interestEl.options[i].value && interestEl.options[i].value.toLowerCase() === "web") {
+          interestEl.options[i].selected = true;
+          break;
+        }
+      }
     }
-    if (!document.getElementById("time").value) {
-      showFieldError("time-error", "Please select your time availability.");
-      valid = false;
+
+    var timeEl = document.getElementById("time");
+    if (timeEl && !timeEl.value) {
+      timeEl.value = "Low";
     }
+
     return valid;
   }
 

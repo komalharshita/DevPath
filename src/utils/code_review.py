@@ -14,6 +14,10 @@ class ReviewAlreadyCompletedError(Exception):
     """Raised when a code review is completed more than once."""
 
 
+class SubmissionAlreadyExistsError(Exception):
+    """Raised when a submission ID already exists."""
+
+
 class ReviewStatus(Enum):
     """Status of a code review."""
     PENDING = "pending"

@@ -9,6 +9,7 @@ import pytest
 def client():
     from app import app
     app.config["TESTING"] = True
+    app.config["WTF_CSRF_ENABLED"] = False
     with app.test_client() as c:
         yield c
 

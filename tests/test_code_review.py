@@ -9,6 +9,7 @@ from src.utils.code_review import (
     CodeQualityCategory,
     FEEDBACK_TEMPLATES,
     ReviewAlreadyCompletedError,
+    SubmissionAlreadyExistsError,
 )
 
 

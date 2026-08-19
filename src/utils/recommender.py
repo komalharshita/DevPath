@@ -150,6 +150,9 @@ def parse_skill_entries(skills_string):
     return [SKILL_SYNONYMS.get(token, token) for token in tokens]
 
 
+parse_skills = parse_skill_entries
+
+
 
 
 
@@ -641,10 +644,10 @@ def get_recommendations(
         interest = [interest]
     skill_entries = parse_skill_entries(skills_string)
 
-    user_skills = [entry["skill"] for entry in skill_entries]
+    user_skills = [entry["skill"] if isinstance(entry, dict) else entry for entry in skill_entries]
 
     skill_proficiencies = {
-        entry["skill"]: entry["proficiency"]
+        (entry["skill"] if isinstance(entry, dict) else entry): (entry.get("proficiency", "beginner") if isinstance(entry, dict) else "beginner")
         for entry in skill_entries
     }
     all_projects = load_all_projects()

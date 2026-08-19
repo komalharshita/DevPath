@@ -24,6 +24,9 @@ def login():
     # Build the callback URL from the configured base URL instead of the
     # incoming Host header so an attacker cannot poison the redirect target
     # (host-header poisoning) and steal the authorization code.
+    state = secrets.token_urlsafe(16)
+    session[_OAUTH_STATE_KEY] = state
+
     redirect_uri = Config.BASE_URL.rstrip('/') + url_for("github.callback")
     auth_url = (
         f"https://github.com/login/oauth/authorize"
