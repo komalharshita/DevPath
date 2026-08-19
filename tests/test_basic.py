@@ -969,6 +969,30 @@ def test_logout_rejects_get():
     response = client.get("/auth/logout")
     assert response.status_code == 405
 
+def test_session_cookie_security_config_defaults():
+    """Session cookie hardening flags should be configured by default."""
+    from config import Config
+    assert Config.SESSION_COOKIE_SECURE is True
+    assert Config.SESSION_COOKIE_SAMESITE == "Lax"
+    assert Config.SESSION_COOKIE_HTTPONLY is True
+    assert Config.PERMANENT_SESSION_LIFETIME.days == 7
+
+def test_session_cookie_security_flags():
+    """Session cookie should be marked Secure, HttpOnly and SameSite=Lax."""
+    previous = app.config.get("SESSION_COOKIE_SECURE")
+    app.config["SESSION_COOKIE_SECURE"] = True
+    try:
+        client = get_client()
+        with client.session_transaction() as sess:
+            sess["user_id"] = 1
+        response = client.get("/auth/logout", base_url="https://localhost")
+        set_cookie = response.headers.get("Set-Cookie", "")
+        assert "Secure" in set_cookie
+        assert "HttpOnly" in set_cookie
+        assert "SameSite=Lax" in set_cookie
+    finally:
+        app.config["SESSION_COOKIE_SECURE"] = previous
+
 def test_profile_unauthenticated_redirects_to_login():
     """Profile route should redirect to login if unauthenticated."""
     client = get_client()

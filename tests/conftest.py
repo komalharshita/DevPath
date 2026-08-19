@@ -15,6 +15,8 @@ from utils.rate_limiter import reset_rate_limits
 # Disable CSRF globally for testing
 app.config['WTF_CSRF_ENABLED'] = False
 app.config['TESTING'] = True
+# Tests run over plain HTTP; the app's production default is a Secure cookie.
+app.config['SESSION_COOKIE_SECURE'] = False
 
 @pytest.fixture(autouse=True)
 def app_context():
