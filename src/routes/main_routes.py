@@ -33,6 +33,7 @@ from utils.pagination import parse_pagination
 import base64
 import requests
 from models import db, ProjectProgress, UserGameProgress
+from sqlalchemy.exc import IntegrityError
 
 _skill_validator = SkillProgressionValidator()
 _code_review_manager = CodeReviewManager()
@@ -1176,18 +1177,27 @@ def update_project_progress(project_id):
 
     completed_steps = payload["completed_steps"]
 
-    progress = ProjectProgress.query.filter_by(user_id=user_id, project_id=project_id).first()
-    if progress:
-        progress.completed_steps = completed_steps
-    else:
-        progress = ProjectProgress(
-            user_id=user_id,
-            project_id=project_id,
-            completed_steps=completed_steps
-        )
-        db.session.add(progress)
+    try:
+        progress = ProjectProgress.query.filter_by(user_id=user_id, project_id=project_id).first()
+        if progress:
+            progress.completed_steps = completed_steps
+        else:
+            progress = ProjectProgress(
+                user_id=user_id,
+                project_id=project_id,
+                completed_steps=completed_steps
+            )
+            db.session.add(progress)
 
-    db.session.commit()
+        db.session.commit()
+    except IntegrityError:
+        # A concurrent request inserted the same (user_id, project_id) row
+        # between our lookup and insert. Re-select and update instead.
+        db.session.rollback()
+        progress = ProjectProgress.query.filter_by(user_id=user_id, project_id=project_id).first()
+        progress.completed_steps = completed_steps
+        db.session.commit()
+
     return jsonify({"message": "Progress saved successfully"}), 200
 @main.route("/api/user-progress", methods=["GET"])
 def get_user_game_progress():
