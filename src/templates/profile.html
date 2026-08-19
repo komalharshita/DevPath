@@ -168,39 +168,6 @@
        Main Content
   ============================================================= -->
   <main class="profile-content container">
-    <h2 class="section-title">Saved Skills</h2>
-    {% if user.saved_skills %}
-    <div class="skills-list">
-      {% for skill in user.saved_skills %}
-      <span class="project-tag project-tag--skill">{{ skill }}</span>
-      {% endfor %}
-    </div>
-    {% else %}
-    <p style="color: var(--text-muted); margin-bottom: 3rem;">You haven't saved any skills yet. Your search history will automatically populate this section over time.</p>
-    {% endif %}
-
-    <h2 class="section-title">Bookmarked Projects</h2>
-    {% if bookmarked_projects %}
-    <div class="results-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
-      {% for project in bookmarked_projects %}
-      <div class="project-card">
-        <h3 class="project-card-title">{{ project.title }}</h3>
-        <p class="project-card-desc"><span class="project-card-desc-text">{{ project.description | truncate(120) }}</span></p>
-        <div class="project-card-tags">
-          <span class="project-tag project-tag--{{ project.level | lower | replace(' ', '-') }}">{{ project.level }}</span>
-          <span class="project-tag project-tag--time">Time: {{ project.time }}</span>
-        </div>
-        <div class="project-card-footer">
-          <a href="/project/{{ project.id }}" class="btn-view-project" style="flex: 1; text-align: center;">View Project &rarr;</a>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-    {% else %}
-    <p style="color: var(--text-muted);">You haven't bookmarked any projects yet. Go explore the catalog to find your next challenge!</p>
-    <a href="/explore" class="btn-primary" style="display: inline-block; margin-top: 1rem;">Explore Projects</a>
-    {% endif %}
-
     <div style="margin-top: 4rem; border-top: 1px solid var(--border); padding-top: 2rem;">
       <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main);">Account Management</h3>
       <p style="color: var(--text-muted); font-size: 0.95rem;">You are currently authenticated via GitHub OAuth.</p>
