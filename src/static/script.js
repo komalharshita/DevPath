@@ -527,6 +527,13 @@ async function updatePortfolioAnalysis() {
   var visibleSuggestions = [];
   var hasSearched = false;
   var techStackSelect = document.getElementById("tech_stack");
+  var surpriseBtn = document.getElementById("surprise-btn");
+
+  if (surpriseBtn) {
+    surpriseBtn.addEventListener("click", function () {
+      window.location.href = "/random-project";
+    });
+  }
 
   function normalize(value) {
     return String(value || "").trim().toLowerCase();

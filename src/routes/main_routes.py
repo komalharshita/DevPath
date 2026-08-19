@@ -5,6 +5,7 @@
 
 import os
 import math
+import random
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response, redirect, url_for, session, flash
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs, diagnose_empty_state
@@ -333,6 +334,16 @@ def project_detail(project_id):
         abort(404)
         
     return render_template("project.html", project=project, config=Config, og_url=Config.get_base_url() + "/project/" + str(project_id))
+
+@main.route("/random-project")
+@main.route("/random")
+def random_project():
+    """Redirect to a randomly chosen project detail page."""
+    all_projects = load_all_projects()
+    if not all_projects:
+        return redirect(url_for("main.explore"))
+    chosen = random.choice(all_projects)
+    return redirect(url_for("main.project_detail", project_id=chosen.get("id", 1)))
 
 @main.route("/profile")
 def profile():
