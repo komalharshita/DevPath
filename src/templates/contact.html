@@ -117,9 +117,10 @@
 
                 <!-- Contact Form -->
                 <div class="glass-panel">
-                    <form class="contact-form" action="https://api.web3forms.com/submit" method="POST">
-                        <!-- Replace with your actual Web3Forms access key -->
-                        <input type="hidden" name="access_key" value="5886c0b3-7787-464c-a6a2-ed73a1926f60">
+                    <form class="contact-form" action="{{ config.CONTACT_FORM_ACTION }}" method="POST">
+                        {% if config.CONTACT_FORM_ACCESS_KEY %}
+                        <input type="hidden" name="access_key" value="{{ config.CONTACT_FORM_ACCESS_KEY }}">
+                        {% endif %}
                         
                         <div class="form-group">
                             <label for="name" class="form-label">Name</label>
