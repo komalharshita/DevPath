@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typing Speed Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+
+    #app {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    #sample-text {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 1rem;
+      min-height: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    #input-area {
+      width: 100%;
+      min-height: 4rem;
+      font-size: 1.1rem;
+      padding: 0.5rem;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      margin-bottom: 1rem;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 0.6rem 1.4rem;
+      font-size: 1rem;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+
+    button:hover {
+      background: #f0f0f0;
+    }
+
+    /* TODO: Add styles for correct/incorrect character highlighting */
+  </style>
+</head>
+<body>
+
+  <div id="app">
+
+    <h2>Typing Speed Test</h2>
+
+    <p id="sample-text">
+      The quick brown fox jumps over the lazy dog.
+    </p>
+
+    <textarea id="input-area" placeholder="Start typing here..."></textarea>
+
+    <div class="stats">
+      <span>Time: <span id="timer">0</span>s</span>
+      <span>WPM: <span id="wpm">0</span></span>
+      <span>Accuracy: <span id="accuracy">100</span>%</span>
+    </div>
+
+    <button id="restart-btn">Restart</button>
+
+  </div>
+
+  <script>
+    var sampleText = document.getElementById("sample-text").textContent;
+    var timerRunning = false;
+    var startTime = null;
+
+    // TODO: Write startTimer() to begin timing on the first keystroke
+    function startTimer() {
+      // Record startTime and mark timerRunning as true
+    }
+
+    // TODO: Write updateStats() to compute elapsed time, WPM and accuracy
+    function updateStats() {
+      // elapsed = now - startTime
+      // WPM = (correct words / minutes)
+      // accuracy = (correct chars / total chars) * 100
+    }
+
+    // TODO: Write checkInput() to highlight errors while typing
+    function checkInput() {
+      // Compare typed text to sampleText
+      // Apply correct/incorrect styling
+      // Stop the timer when the user finishes
+    }
+
+    // TODO: Write restart() to reset the test
+    function restart() {
+      // Clear input, reset stats, stop the timer
+    }
+
+    document.getElementById("input-area").addEventListener("input", function () {
+      if (!timerRunning) {
+        startTimer();
+      }
+      checkInput();
+      updateStats();
+    });
+
+    document.getElementById("restart-btn").addEventListener("click", restart);
+  </script>
+
+</body>
+</html>
