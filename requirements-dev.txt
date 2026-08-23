@@ -1,4 +1,4 @@
 -r requirements.txt
-sentence-transformers==5.7.0
+sentence-transformers==6.0.0
 pytest==9.1.1
 flake8==7.3.0
