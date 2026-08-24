@@ -1,239 +1,212 @@
-# Architecture — DevPath
+# System Architecture — DevPath
 
-This document explains how DevPath is structured, how data flows through the
-system, and why each module exists.
-
----
-
-## High-Level Architecture
-
-```
-Browser
-  |
-  |  HTTP request (GET / or POST /api/recommend)
-  v
-Flask Application (app.py)
-  |
-  |-- Blueprint registration
-  v
-routes/main_routes.py        <-- receives requests, validates, delegates
-  |
-  |-- calls utils/recommender.py    (scoring + filtering logic)
-  |-- calls utils/data_loader.py    (reads projects.json)
-  |-- calls utils/file_server.py    (resolves + serves starter code)
-  |
-  v
-templates/ + static/         <-- rendered HTML + JS + CSS served to browser
-```
+This document provides a comprehensive, production-grade overview of DevPath's architecture, directory structure, data layer, security mechanisms, and request lifecycle.
 
 ---
 
-## Module Responsibilities
+## 1. System Architecture Overview
 
-### app.py
+DevPath is built on a modular **Flask application factory and Blueprint architecture** with a hybrid persistence layer (SQLAlchemy ORM + JSON dataset seeding), Authlib OAuth2 authentication, Flask-WTF CSRF protection, and strict HTTP security headers.
 
-The entry point. Its only jobs are:
+```mermaid
+flowchart TD
+    subgraph Client["Client Tier"]
+        Browser["Modern Web Browser"]
+    end
 
-- Create the Flask app instance
-- Register the `main` Blueprint from `routes/`
-- Register the 404 and 500 error handlers
-- Start the dev server when run directly
+    subgraph Security["Security & Middleware"]
+        CSP["Security Headers & CSP"]
+        CSRF["CSRF Protection (Flask-WTF)"]
+        Auth["OAuth2 & Session Guard"]
+    end
 
-No business logic, no data access, no file handling.
+    subgraph App["Flask Application (src/app.py)"]
+        MainBP["Main Blueprint (routes/main_routes.py)"]
+        AuthBP["Auth Blueprint (routes/auth_routes.py)"]
+        AdminBP["Admin Blueprint (routes/admin_routes.py)"]
+        GithubBP["GitHub Blueprint (routes/github_routes.py)"]
+        Errors["Error Boundary (errors/handlers.py)"]
+    end
 
----
+    subgraph Services["Core Engine & Utilities (src/utils/)"]
+        Recommender["Recommendation Engine (recommender.py)"]
+        DataLoader["Data Loader & Cache (data_loader.py)"]
+        FileServer["Secure Starter Code Server (file_server.py)"]
+        Analyzer["Portfolio Analyzer (portfolio_analyzer.py)"]
+        Roadmaps["Roadmap Comparator (roadmap_comparator.py)"]
+    end
 
-### routes/main_routes.py
+    subgraph Persistence["Persistence Tier"]
+        SQLite[(SQLite Database - SQLAlchemy ORM)]
+        ProjectsJSON[("data/projects.json - Seed & Fallback")]
+        StarterFiles[("starter_code/ - Code Templates")]
+    end
 
-Contains all URL route handlers, registered as a Flask Blueprint named `main`.
+    Browser -->|HTTP Requests| CSP
+    CSP --> CSRF
+    CSRF --> Auth
+    Auth --> App
 
-Each route handler follows the same pattern:
+    MainBP --> Recommender
+    MainBP --> DataLoader
+    MainBP --> FileServer
+    MainBP --> Analyzer
+    MainBP --> Roadmaps
+    AuthBP --> SQLite
+    AdminBP --> SQLite
+    GithubBP --> FileServer
 
-1. Read and strip input from the request
-2. Call one or more utility functions
-3. Return a rendered template or a JSON response
-
-Routes defined:
-
-| Method | Path                          | Description                       |
-|--------|-------------------------------|-----------------------------------|
-| GET    | `/`                           | Render homepage                   |
-| POST   | `/api/recommend`              | Return matching project JSON      |
-| GET    | `/project/<id>`               | Render project detail page        |
-| GET    | `/project/<id>/code`          | Return starter code content JSON  |
-| GET    | `/project/<id>/download`      | Serve starter code as download    |
-
----
-
-### utils/data_loader.py
-
-Handles all reading and lookup of project data.
-
-Functions:
-
-- `load_all_projects()` — reads and returns the full JSON array
-- `find_project_by_id(project_id)` — returns a single project dict or None
-
-The data file path is resolved relative to the module file itself, so the app
-works correctly regardless of the working directory it is started from.
-
----
-
-### utils/recommender.py
-
-Contains all recommendation logic. Nothing in this module knows about HTTP,
-Flask, or file paths.
-
-Functions:
-
-- `parse_skills(skills_string)` — converts `"Python, HTML"` to `["python", "html"]`
-- `score_single_project(project, user_skills, level, interest, time)` — returns an integer score
-- `get_recommendations(skills, level, interest, time)` — returns the top N projects
-- `validate_recommendation_inputs(...)` — returns a list of error strings
-
-Scoring weights are named module-level constants:
-
-```python
-WEIGHT_SKILL    = 3   # Points per matching skill (scaled by coverage ratio)
-WEIGHT_LEVEL    = 2   # Points for matching experience level
-WEIGHT_INTEREST = 2   # Points for matching interest area
-WEIGHT_TIME     = 1   # Points for matching time availability
-```
-
-Changing a weight number changes the relative influence of each criterion
-across all recommendations.
-
----
-
-### utils/file_server.py
-
-Handles safe resolution and serving of starter code files.
-
-Functions:
-
-- `resolve_starter_file(project)` — returns the absolute path to the file, or None
-- `read_starter_code(project)` — returns `{"filename": ..., "code": ...}` or None
-- `get_starter_code_dir()` — returns the directory path for `send_from_directory`
-
-The `os.path.basename()` call in `resolve_starter_file` ensures that a
-malicious `starter_code` value in the JSON (such as `../../etc/passwd`) cannot
-cause a path traversal vulnerability.
-
----
-
-## Data Flow: Recommendation Request
-
-```
-1. User submits form
-   |
-2. script.js sends POST /api/recommend
-   {skills: "Python", level: "Beginner", interest: "Data", time: "Low"}
-   |
-3. main_routes.recommend() reads and strips each field
-   |
-4. validate_recommendation_inputs() checks for empty fields
-   - Returns 400 JSON error if any field missing
-   |
-5. get_recommendations() is called
-   |
-   5a. parse_skills("Python") -> ["python"]
-   |
-   5b. load_all_projects() reads data/projects.json (7 projects)
-   |
-   5c. For each project, score_single_project() computes:
-       - Skill coverage score: matched * 3 * (matched / total_project_skills)
-         A user covering 1 of 2 required skills scores less than one covering both.
-       - Level match     +2 points
-       - Interest match  +2 points
-       - Time match      +1 point
-   |
-   5d. Projects with score > 0 are collected
-   |
-   5e. Sorted descending by score
-   |
-   5f. Top 3 returned
-   |
-6. main_routes.recommend() returns 200 JSON {projects: [...]}
-   |
-7. script.js receives response and calls renderResults()
-   |
-8. buildProjectCard() creates DOM elements for each project
-   |
-9. Cards inserted into #results-grid and section scrolled into view
+    DataLoader --> ProjectsJSON
+    DataLoader --> SQLite
+    FileServer --> StarterFiles
 ```
 
 ---
 
-## Data Flow: Project Detail Page
+## 2. Directory Structure
 
+```text
+devpath/
+├── data/                       # Data datasets and persistent storage
+│   ├── projects.json           # Canonical project catalog and metadata
+│   ├── roadmaps.json           # Career roadmap paths
+│   └── devpath.db              # SQLite development database (auto-seeded)
+├── docs/                       # Comprehensive documentation
+│   ├── README.md               # Documentation portal & index
+│   ├── architecture.md         # System design and data flow (this file)
+│   ├── api_reference.md        # Complete REST API reference
+│   ├── contribution_guide.md   # Step-by-step developer contribution guide
+│   ├── project_overview.md     # Purpose and core value proposition
+│   ├── security.md             # Security policy and disclosure
+│   └── faq.md                  # Frequently asked questions
+├── src/                        # Primary application source code
+│   ├── app.py                  # Application entry point, config, and startup
+│   ├── config.py               # Centralized configuration class
+│   ├── models.py               # SQLAlchemy ORM models
+│   ├── errors/                 # Global error handling and logging
+│   │   ├── handlers.py         # HTTP and unhandled exception error boundaries
+│   │   └── error_logger.py     # Structured error formatting & correlation IDs
+│   ├── routes/                 # Modular Flask Blueprints
+│   │   ├── main_routes.py      # Core views, recommend, search, explore, compare
+│   │   ├── auth_routes.py      # User authentication and session management
+│   │   ├── admin_routes.py     # Protected admin management CRUD routes
+│   │   └── github_routes.py    # GitHub OAuth and repository export workflows
+│   ├── static/                 # Stylesheets, client scripts, assets, icons
+│   │   ├── css/ & style.css    # Responsive theme styling & CSS variables
+│   │   └── js/ & script.js     # Interactivity, recommendation UI, theme toggles
+│   ├── templates/              # Jinja2 HTML templates
+│   │   ├── partials/           # Reusable UI partials (navbar, footer, modals, buttons)
+│   │   ├── admin/              # Admin dashboard and form templates
+│   │   └── errors/             # Custom error pages (400, 403, 404, 429, 500)
+│   └── utils/                  # Core algorithms and business logic services
+│       ├── recommender.py      # Rule-based recommendation engine
+│       ├── data_loader.py      # Dataset loading and caching
+│       ├── file_server.py      # Path-traversal-safe starter code reader
+│       ├── portfolio_analyzer.py # Portfolio diversity scoring engine
+│       └── roadmap_comparator.py # Career roadmap diff and overlap utility
+├── starter_code/               # Downloadable starter project templates
+├── tests/                      # Automated test suite (660+ pytest tests)
+├── tools/                      # Repository integrity and validation utilities
+│   └── sentinel/               # DevPath Sentinel dataset & code validator
+├── .env.example                # Template environment variables
+├── Dockerfile                  # Container definition
+├── Makefile                    # Developer shortcut commands
+└── requirements.txt            # Production Python dependencies
 ```
-1. User clicks "View Full Project" link -> GET /project/1
-   |
-2. main_routes.project_detail(1) calls find_project_by_id(1)
-   |
-3. project dict passed to render_template("project.html", project=project)
-   |
-4. Jinja2 renders the template, iterating roadmap steps with loop.index
-   |
-5. Browser receives complete HTML
-   |
-6. User clicks "View Code" button
-   |
-7. script.js calls GET /project/1/code
-   |
-8. main_routes.view_code(1):
-   - find_project_by_id(1) -> project dict
-   - read_starter_code(project) -> {filename, code}
-   - Returns 200 JSON
-   |
-9. script.js injects filename + code into the slide-up code panel
+
+---
+
+## 3. Core Modules & Responsibilities
+
+### `src/app.py`
+The primary application bootstrapper:
+- Initializes Flask and loads settings from `Config`.
+- Configures CSRF protection (`CSRFProtect`) with exemptions for stateless JSON API routes.
+- Initializes SQLAlchemy ORM (`db.init_app`) and auto-seeds initial project data from `data/projects.json` if the database is empty.
+- Configures GitHub OAuth provider integration via Authlib.
+- Registers Blueprints (`main`, `auth_bp`, `admin_bp`, `github_bp`).
+- Attaches the global error boundary via `register_error_handlers`.
+- Adds strict security headers on every response (`X-Frame-Options`, `Content-Security-Policy`, `X-Content-Type-Options`, `Referrer-Policy`).
+
+### `src/models.py`
+Defines SQLAlchemy models:
+- **`User`**: Account identity (GitHub OAuth ID, username, avatar, admin role).
+- **`Project`**: Catalog project details, skills, required experience level, roadmap steps, estimated hours, and starter code pointers.
+- **`UserProgress`**: Per-user project completion status, active steps, and notes.
+- **`UserGameProgress`**: Quiz / coding challenge scores and badges.
+
+### `src/utils/recommender.py`
+Houses the recommendation engine without any HTTP or database dependencies:
+- **`parse_skills(skills_input)`**: Normalizes skill strings or JSON arrays into a standardized lowercased skill set, resolving synonyms via `SKILL_SYNONYMS`.
+- **`score_single_project(...)`**: Computes weighted scores:
+  - Skill Coverage: Matched skills weighted by $( \text{matched} / \text{total\_skills} )$.
+  - Experience Level Match (+2 pts).
+  - Domain / Interest Match (+2 pts).
+  - Time Commitment Match (+1 pt).
+- **`get_recommendations(...)`**: Filters and sorts candidates deterministically, returning the top matches.
+
+### `src/utils/file_server.py`
+Safely exposes starter code templates:
+- Uses strict basename resolution and canonical path validation to prevent **Path Traversal Attacks** (`../`).
+- Returns raw source code for the in-browser modal and streams files as attachments for downloads.
+
+---
+
+## 4. Request Lifecycle & Recommendation Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Flask as Flask Router (src/app.py)
+    participant MainBP as Main Blueprint
+    participant Engine as Recommender Engine
+    participant DB as SQLite / projects.json
+
+    User->>Browser: Selects skills, level, interest, time & submits
+    Browser->>Flask: POST /api/recommend (JSON payload)
+    Flask->>Flask: Validate Security & CSRF Exemption
+    Flask->>MainBP: Route to recommend() handler
+    MainBP->>MainBP: validate_recommendation_inputs()
+    alt Inputs Invalid
+        MainBP-->>Browser: 400 Bad Request {error: "..."}
+    else Inputs Valid
+        MainBP->>Engine: get_recommendations(skills, level, interest, time)
+        Engine->>DB: Fetch active projects
+        Engine->>Engine: Parse skills, apply synonyms & compute weighted scores
+        Engine-->>MainBP: Top 3 sorted project matches
+        MainBP-->>Browser: 200 OK {projects: [...]}
+        Browser->>Browser: Render project cards dynamically
+    end
 ```
 
 ---
 
-## Template Rendering
+## 5. Security & Protection Model
 
-DevPath uses Flask's built-in Jinja2 templating. Templates receive data through
-`render_template()` keyword arguments. The project detail template uses
-`{{ project.title }}`, `{% for step in project.roadmap %}`, and similar
-expressions to render dynamic content server-side.
-
-No client-side template engine is used. The frontend JavaScript only handles
-interactivity (form submission, chip management, code panel) and rendering of
-the recommendation cards (which come back from the API as JSON).
-
----
-
-## Static Files
-
-CSS and JavaScript are served from the `static/` directory by Flask's built-in
-static file handler. In production, these would ideally be served directly by
-a web server like Nginx rather than through Flask.
+1. **Content Security Policy (CSP)**:
+   - Restricts script and stylesheet execution.
+   - Permits trusted GitHub avatar domains for user profiles (`https://avatars.githubusercontent.com`).
+   - Disallows framing (`frame-ancestors 'none'`) to eliminate Clickjacking.
+2. **CSRF Protection**:
+   - Web forms require valid CSRF tokens via Flask-WTF.
+   - JSON-only API routes are explicitly exempt since cross-origin JSON requests require CORS preflight and `Content-Type: application/json`.
+3. **Session Hardening**:
+   - Session cookies utilize `HttpOnly=True`, `SameSite='Lax'`, and `Secure=True` in production.
+4. **Path Traversal Guards**:
+   - Starter code file requests are sanitized using `os.path.basename()` and verified against `STARTER_CODE_DIR`.
 
 ---
 
-## Testing Strategy
+## 6. Testing & Quality Assurance
 
-Tests live in `tests/test_basic.py` and are grouped into four categories:
+The test suite covers over **660+ automated tests** using `pytest`:
+- **Unit Tests**: Skill parsing, synonym resolution, scoring math, tiebreakers, portfolio diversity metrics.
+- **Integration Tests**: Blueprint routes, OAuth callbacks, CSRF enforcement, error boundaries.
+- **Dataset & Starter Code Sentinel**: `tools/sentinel/cli.py` validates that all JSON entries contain required fields and resolve to valid starter files.
 
-1. **Data loader tests** — verify the JSON file loads and has correct structure
-2. **Recommender unit tests** — test scoring, parsing, and validation in isolation
-3. **HTTP route tests** — use Flask's test client to verify status codes and response shapes
-4. **Edge case tests** — empty inputs, missing IDs, no-match scenarios
-
-Run with: `python tests/test_basic.py` or `pytest tests/`
-
----
-
-## Extending the Project
-
-The most common extension points are:
-
-| What to change          | Where to change it                          |
-|-------------------------|---------------------------------------------|
-| Add a new project       | `data/projects.json`                        |
-| Change scoring weights  | `utils/recommender.py` (top constants)      |
-| Add a new route         | `routes/main_routes.py`                     |
-| Change recommendation count | `utils/recommender.py` (MAX_RESULTS)   |
-| Add a new interest area | `data/projects.json` + `templates/index.html` dropdown |
-| Change UI styling       | `static/style.css` CSS variables block      |
+To execute the test suite:
+```bash
+pytest tests/
+```
