@@ -49,18 +49,18 @@ Closes #
 
 1. Clone this branch: `git checkout your-branch-name`
 2. Install dependencies: `pip install -r requirements.txt`
-3. Run the app: `python app.py`
-4. Open http://127.0.0.1:5000 and...
-5. Run the tests: `python tests/test_basic.py`
+3. Run the app: `PORT=5001 python src/app.py`
+4. Open http://localhost:5001 and verify functionality
+5. Run the tests: `pytest tests/`
 
 Expected test output:
 ```
-27 passed, 0 failed out of 27 tests
+660+ passed in tests/
 ```
 
 ## Test Results [required]
 
-<!-- Paste the full output of python tests/test_basic.py -->
+<!-- Paste the full output of pytest tests/ -->
 
 ```
 paste output here
@@ -82,7 +82,7 @@ paste output here
 
 - [ ] I have read [CONTRIBUTING.md](../CONTRIBUTING.md) and followed all guidelines
 - [ ] My branch name follows the convention: `feat/`, `fix/`, `docs/`, `data/`, `style/`, `test/`
-- [ ] I have run `python tests/test_basic.py` and all 27 tests pass
+- [ ] I have run `pytest tests/` and all test suites pass
 - [ ] I have run `flake8 .` locally and there are no errors
 - [ ] I have not introduced any `print()` or `console.log()` debug statements
 - [ ] Every new function I wrote has a docstring

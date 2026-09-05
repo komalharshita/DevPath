@@ -15,7 +15,7 @@
 [![Python](https://img.shields.io/badge/Python-3.8%2B-2335c2?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.0-0f172a?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![MIT License](https://img.shields.io/badge/License-MIT-fbbf24?style=for-the-badge)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-27_Passing-22c55e?style=for-the-badge&logo=checkmarx&logoColor=white)](#quick-start)
+[![Tests](https://img.shields.io/badge/Tests-660%2B_Passing-22c55e?style=for-the-badge&logo=checkmarx&logoColor=white)](#quick-start)
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-7c3aed?style=for-the-badge&logo=git&logoColor=white)](CONTRIBUTING.md)
 [![GSSoC](https://img.shields.io/badge/GSSoC-2026-fbbf24?style=for-the-badge&logo=opensourceinitiative&logoColor=0f1560)](https://gssoc.girlscript.tech/)
 
@@ -178,13 +178,13 @@ python src/app.py
 Run the test suite:
 
 ```bash
-python tests/test_basic.py
+pytest tests/
 ```
 
 Expected output:
 
 ```bash
-All tests passed
+================= 660+ passed in tests/ =================
 ```
 
 ---
