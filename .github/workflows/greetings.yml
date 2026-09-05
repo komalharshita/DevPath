@@ -22,19 +22,20 @@ jobs:
         uses: actions/first-interaction@v3
 
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
 
-          issue-message: |
+          issue_message: |
             Thank you for opening your first issue in DevPath.
 
             Please make sure to:
             - Read CONTRIBUTING.md
             - Wait for assignment before starting work
             - Follow repository guidelines carefully
+            - Keep discussions constructive and on-topic
 
             Happy contributing.
 
-          pr-message: |
+          pr_message: |
             Thank you for submitting your first pull request to DevPath.
 
             Before review:
