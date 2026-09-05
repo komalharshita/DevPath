@@ -1,74 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description"
-    content="DevPath recommends real coding projects based on your skills, level, and interests — with full roadmaps and starter code." />
-  <title>DevPath — Find Projects Based On Your Skills</title>
-  
-  <script>
-    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-      window.addEventListener('error', function(e) {
-        var errDiv = document.createElement('div');
-        errDiv.style.position = 'fixed';
-        errDiv.style.top = '0';
-        errDiv.style.left = '0';
-        errDiv.style.width = '100%';
-        errDiv.style.background = 'red';
-        errDiv.style.color = 'white';
-        errDiv.style.zIndex = '999999';
-        errDiv.style.padding = '20px';
-        errDiv.textContent = 'JS ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno;
-        document.body.appendChild(errDiv);
-      });
-      window.addEventListener('unhandledrejection', function(e) {
-        var errDiv = document.createElement('div');
-        errDiv.style.position = 'fixed';
-        errDiv.style.top = '50px';
-        errDiv.style.left = '0';
-        errDiv.style.width = '100%';
-        errDiv.style.background = 'orange';
-        errDiv.style.color = 'white';
-        errDiv.style.zIndex = '999999';
-        errDiv.style.padding = '20px';
-        errDiv.textContent = 'PROMISE REJECTION: ' + (e.reason ? e.reason.message : e.reason);
-        document.body.appendChild(errDiv);
-      });
-    }
-  </script>
+{% block title %}DevPath — Find Projects Based On Your Skills{% endblock %}
 
-  <!-- Open Graph meta tags for social media sharing -->
-  <meta property="og:title" content="DevPath — Find Projects Based On Your Skills" />
-  <meta property="og:description" content="{{ config.SITE_DESCRIPTION }}" />
-  <meta property="og:image" content="{{ config.get_og_image_url() }}" />
-  <meta property="og:url" content="{{ config.get_base_url() }}/" />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="{{ config.SITE_NAME }}" />
-  
-  <!-- Twitter Card meta tags -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="DevPath — Find Projects Based On Your Skills" />
-  <meta name="twitter:description" content="{{ config.SITE_DESCRIPTION }}" />
-  <meta name="twitter:image" content="{{ config.get_og_image_url() }}" />
-  
-  <script>
-    document.documentElement.setAttribute("data-entry-anim", "true");
-  </script>
-  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
-  {% include 'partials/theme_head.html' %}
-  <link rel="stylesheet" href="/static/style.css" />
-  <link rel="stylesheet" href="/static/bookmarks.css" />
+{% block extra_css %}
+<style>
 
-  <link rel="stylesheet" href="/static/animations.css" />
-
-  <link rel="stylesheet" href="/static/recently-viewed.css" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
-    rel="stylesheet" />
-  
-  <style>
     /* ============================================
        REDESIGNED PROFILE SECTION STYLES
        Only these styles are new - rest remain original
@@ -382,137 +318,35 @@
     [data-theme="dark"] .badge-mini {
       background: #374151;
     }
-  </style>
-</head>
+  
 
-<body>
-  <!-- ============================================================
-       Navigation
-       ============================================================ -->
-  <nav class="navbar" id="navbar" aria-label="Main navigation">
-    <div class="nav-inner">
-      <a href="/" class="nav-logo">Dev<span class="nav-logo-accent">Path</span></a>
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      align-items: center;
+    }
 
-    <form id="topic-search-form" class="navbar-search" role="search">
-        <input
-          type="search"
-          id="topic-search"
-          autocomplete="off"
-          aria-label="Search projects"
-          placeholder="Search projects…"
-        />
-        <button class="navbar-search-btn" type="submit" aria-label="Search">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </button>
-      </form>
+    .btn-clear {
+      background-color: #f3f4f6;
+      color: #1f2937;
+      border: 1px solid #d1d5db;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
 
-      <div class="nav-right">
-        <div class="nav-links">
-          <a href="#home" class="nav-link">Home</a>
-        <a href="#how-it-works" class="nav-link">How It Works</a>
-        <a href="#features" class="nav-link">Features</a>
-        <a href="#find-project" class="nav-link">Find Project</a>
-        <a href="/compare" class="nav-link">Compare</a>
-        <a href="/contact" class="nav-link">Contact</a>
-        <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="nav-link">GitHub</a>
-        {% if current_user %}
-        {% if current_user.is_admin %}
-        <a href="/admin" class="nav-link" style="font-weight: 600; color: #4f46e5; text-decoration: none;">Admin</a>
-        {% endif %}
-        <a href="/profile" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Profile</a>
-        <form method="POST" action="/auth/logout" style="display: inline; margin: 0;">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-          <button type="submit" class="nav-link" style="color: var(--text-muted); text-decoration: none; background: none; border: none; cursor: pointer;">Logout</button>
-        </form>
-        {% else %}
-        <a href="/auth/login" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">Login with GitHub</a>
-        {% endif %}
-      </div>
-      <div class="nav-actions">
-          {% include 'partials/theme_toggle.html' %}
-      </div>
-      
-      <button class="nav-mobile-toggle" id="nav-mobile-toggle" type="button" aria-label="Toggle navigation"
-          aria-expanded="false" aria-controls="nav-mobile-menu">
-          <span></span><span></span><span></span><span></span>
-      </button>
-    </div>
+    .btn-clear:hover {
+      background-color: #e5e7eb;
+    }
+  
+</style>
+{% endblock %}
 
-
-    <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
-      <form id="topic-search-form-mobile" class="navbar-search navbar-search--mobile" role="search">
-        <button class="navbar-search-btn" type="submit" aria-label="Search">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-            stroke-width="2" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </button>
-        <input type="search" id="topic-search-mobile" autocomplete="off" aria-label="Search projects"
-          placeholder="Search projects…" />
-      </form>
-      <a href="#home" class="nav-mobile-link {% if request.path == '/' %}active{% endif %}" role="menuitem">Home</a>
-      <a href="#how-it-works" class="nav-mobile-link" role="menuitem">How It Works</a>
-      <a href="#features" class="nav-mobile-link" role="menuitem">Features</a>
-      <a href="#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
-      <a href="/explore" class="nav-mobile-link {% if request.path == '/explore' %}active{% endif %}" role="menuitem">Explore All</a>
-      <a href="/compare" class="nav-mobile-link {% if request.path == '/compare' %}active{% endif %}" role="menuitem">Compare</a>
-      <a href="/contact" class="nav-mobile-link {% if request.path == '/contact' %}active{% endif %}" role="menuitem">Contact</a>
-      {% if current_user %}
-      {% if current_user.is_admin %}
-      <a href="/admin" class="nav-mobile-link" role="menuitem" style="color: #4f46e5;">Admin</a>
-      {% endif %}
-      <a href="/profile" class="nav-mobile-link" role="menuitem">Profile</a>
-      <form method="POST" action="/auth/logout" style="display: block; margin: 0;">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        <button type="submit" class="nav-mobile-link" role="menuitem" style="width: 100%; text-align: left; background: none; border: none; color: inherit; cursor: pointer;">Logout</button>
-      </form>
-      {% else %}
-      <a href="/auth/login" class="nav-mobile-link" role="menuitem">Login with GitHub</a>
-      {% endif %}
-      <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
-        class="nav-mobile-link" role="menuitem">GitHub</a>
-      <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile"
-        aria-pressed="false" aria-label="Switch to dark mode" role="menuitem">
-        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-        </svg>
-        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="5" />
-          <line x1="12" y1="1" x2="12" y2="3" />
-          <line x1="12" y1="21" x2="12" y2="23" />
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-          <line x1="1" y1="12" x2="3" y2="12" />
-          <line x1="21" y1="12" x2="23" y2="12" />
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-        </svg>
-        <span class="theme-toggle-label">Dark Mode</span>
-      </button>
-    </div>
-  </nav>
-
-  <!-- ============================================================
-       No-Script Fallback
-       ============================================================ -->
-  <noscript>
-    <div class="noscript-warning">
-      <p>JavaScript is required to use DevPath. Please enable JavaScript in your browser settings and reload the page.
-      </p>
-    </div>
-  </noscript>
-
-  <!-- ============================================================
-       Hero Section
-       ============================================================ -->
-  <section class="hero" id="home">
+{% block content %}
+<section class="hero" id="home">
     <div class="hero-inner">
       <div class="hero-copy">
         <div class="hero-badge">
@@ -1262,73 +1096,8 @@
   <!-- ============================================================
        Footer
        ============================================================ -->
-  <footer class="footer">
-    <div class="footer-inner">
-      <div class="footer-col footer-col--brand">
-        <span class="footer-logo">Dev<span class="footer-logo-accent">Path</span></span>
-        <p class="footer-tagline">Open source. Built for learners, by learners.</p>
-        <p class="footer-tagline">Helping developers find meaningful projects to build their skills.</p>
-      </div>
-
-      <div class="footer-col">
-        <h4 class="footer-col-title">Quick Links</h4>
-        <ul class="footer-links-list">
-          <li><a href="#home">Home</a></li>
-          <li><a href="#how-it-works">How It Works</a></li>
-          <li><a href="#features">Features</a></li>
-          <li><a href="/explore">Explore All</a></li>
-          <li><a href="#find-project">Find Project</a></li>
-          <li><a href="/contact">Contact Us</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h4 class="footer-col-title">Resources</h4>
-        <ul class="footer-links-list">
-          <li><a href="/project/1">Sample Project</a></li>
-          <li><a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-          <li><a href="https://github.com/komalharshita/DevPath/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing Guide</a></li>
-          <li><a href="https://github.com/komalharshita/DevPath/issues" target="_blank" rel="noopener noreferrer">Report an Issue</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h4 class="footer-col-title">About Us</h4>
-        <ul class="footer-links-list">
-          <li><a href="#our-story">Our Story</a></li>
-          <li><a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">Open Source</a></li>
-          <li><a href="https://github.com/komalharshita/DevPath/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">License</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="footer-bottom">
-  <p>DevPath is open source. Licensed under the MIT License.</p>
-  <div class="footer-bottom-links">
-    <a href="#our-story">About Us</a>
-    <a href="https://github.com/komalharshita/DevPath/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Project License</a>
-  </div>
-  <div class="footer-social-icons">
-    <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-      </svg>
-    </a>
-    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-      </svg>
-    </a>
-    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 14-7.496 14-13.986 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-      </svg>
-    </a>
-  </div>
-</div>
-  </footer>
-
-  <!-- GitHub Modal Overlay -->
+  
+<!-- GitHub Modal Overlay -->
   <div class="code-panel-overlay" id="github-modal-overlay" style="align-items: center; justify-content: center; opacity: 1;">
     <div class="sidebar-card" style="width: 100%; max-width: 400px; margin: 20px; z-index: 400; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
       <div class="sidebar-card-title">
@@ -1344,47 +1113,11 @@
       <div class="form-group" style="margin-bottom: 20px;">
         <div class="form-error-msg" id="github-modal-error"></div>
       </div>
+{% endblock %}
 
-      <div style="display: flex; gap: 12px;">
-        <a href="/api/github/login" id="btn-fetch-github" class="btn-primary" style="flex: 2; padding: 10px; font-size: 0.85rem; text-align: center; text-decoration: none;">Authenticate</a>
-        <button type="button" id="btn-close-github" class="btn-view-code-sm" style="flex: 1; border-color: var(--border); color: var(--text-body);">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <style>
-    .form-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
-      align-items: center;
-    }
-
-    .btn-clear {
-      background-color: #f3f4f6;
-      color: #1f2937;
-      border: 1px solid #d1d5db;
-      padding: 12px 24px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.2s ease;
-    }
-
-    .btn-clear:hover {
-      background-color: #e5e7eb;
-    }
-  </style>
-
-  <script src="/static/data/skills.js"></script>
-
-  {% include 'partials/scroll_top_btn.html' %}
-
-  <script src="/static/script.js"></script>
-  <script src="/static/bookmarks.js"></script>
-  <script src="/static/recently-viewed.js"></script>
-  
-  <script>
+{% block extra_scripts %}
+<script src="/static/data/skills.js"></script>
+<script>
     // Tab switching for leaderboard/achievements (adds to your existing JS)
     document.addEventListener('DOMContentLoaded', function() {
       const tabs = document.querySelectorAll('.la-tab');
@@ -1408,9 +1141,4 @@
       });
     });
   </script>
-      <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
-
-  <script src="/static/animations.js"></script>
-</body>
-
-</html>
+{% endblock %}
