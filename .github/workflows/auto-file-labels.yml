@@ -19,6 +19,6 @@ jobs:
     steps:
       - name: Label PRs automatically
         uses: actions/labeler@v7
-
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          sync-labels: false

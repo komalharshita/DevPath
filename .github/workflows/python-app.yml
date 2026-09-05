@@ -24,6 +24,7 @@ jobs:
       uses: actions/setup-python@v7
       with:
         python-version: "3.11"
+        cache: "pip"
 
     - name: Install dependencies
       run: |
@@ -32,14 +33,18 @@ jobs:
         if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
         pip install flake8 pytest
 
-    - name: Lint code (non-blocking)
+    - name: Check syntax and fatal errors (blocking)
       run: |
-        flake8 . --exit-zero --max-line-length=120
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 
     - name: Check undefined names (blocking)
       run: |
-        flake8 . --max-line-length=120 --select=F821
+        flake8 . --count --max-line-length=120 --select=F821
+
+    - name: Lint code style (advisory)
+      run: |
+        flake8 . --exit-zero --max-line-length=120
 
     - name: Run tests
       run: |
-        PYTHONPATH=src pytest
+        PYTHONPATH=src pytest -v

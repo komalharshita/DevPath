@@ -19,6 +19,7 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: '3.11'
+          cache: 'pip'
 
       # Install dependencies
       - name: Install dependencies
