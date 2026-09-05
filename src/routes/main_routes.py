@@ -6,7 +6,7 @@
 import os
 import math
 import random
-from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response, redirect, url_for, session, flash, current_app
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs, diagnose_empty_state
 from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats, get_available_interests
@@ -26,7 +26,7 @@ from utils.skill_progression import (
     SkillDifficulty,
     validate_skill_progression,
 )
-from utils.code_review import CodeReviewManager, ReviewAlreadyCompletedError
+from utils.code_review import CodeReviewManager, ReviewAlreadyCompletedError, SubmissionAlreadyExistsError
 from config import Config
 from utils.portfolio_analyzer import analyze_portfolio
 from utils.pagination import parse_pagination

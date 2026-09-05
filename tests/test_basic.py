@@ -985,7 +985,7 @@ def test_session_cookie_security_flags():
         client = get_client()
         with client.session_transaction() as sess:
             sess["user_id"] = 1
-        response = client.get("/auth/logout", base_url="https://localhost")
+        response = client.post("/auth/logout", base_url="https://localhost")
         set_cookie = response.headers.get("Set-Cookie", "")
         assert "Secure" in set_cookie
         assert "HttpOnly" in set_cookie
