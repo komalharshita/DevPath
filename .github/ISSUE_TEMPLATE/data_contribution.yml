@@ -110,7 +110,7 @@ body:
   - type: textarea
     id: resources
     attributes:
-      label: Learning resources (one per line, format "Label: https://url")
+      label: 'Learning resources (one per line, format "Label: https://url")'
       placeholder: |
         Python json module: https://docs.python.org/3/library/json.html
         Python file I/O: https://docs.python.org/3/tutorial/inputoutput.html

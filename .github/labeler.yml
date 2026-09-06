@@ -1,8 +1,20 @@
+backend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/**"
+          - "routes/**"
+          - "utils/**"
+          - "app.py"
+          - "wsgi.py"
+          - "config.py"
+
 ui:
   - changed-files:
       - any-glob-to-any-file:
           - "templates/**"
           - "static/**"
+          - "src/templates/**"
+          - "src/static/**"
 
 documentation:
   - changed-files:
@@ -10,30 +22,35 @@ documentation:
           - "README.md"
           - "CONTRIBUTING.md"
           - "CODE_OF_CONDUCT.md"
+          - "SECURITY.md"
+          - "CHANGELOG.md"
           - "docs/**"
+          - "**/*.md"
 
 data:
   - changed-files:
       - any-glob-to-any-file:
           - "data/**"
 
+database:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "migrations/**"
+          - "src/models.py"
+          - "src/database/**"
+
 type:testing:
   - changed-files:
       - any-glob-to-any-file:
           - "tests/**"
+          - "test_*.py"
 
-type:accessibility:
+ci/cd:
   - changed-files:
       - any-glob-to-any-file:
-          - "templates/**"
-          - "static/**"
-
-type:performance:
-  - changed-files:
-      - any-glob-to-any-file:
-          - "utils/**"
-
-type:security:
-  - changed-files:
-      - any-glob-to-any-file:
-          - "utils/**"
+          - ".github/**"
+          - "Dockerfile"
+          - "docker-compose.yml"
+          - "requirements*.txt"
+          - "Makefile"
+          - "vercel.json"

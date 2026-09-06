@@ -22,55 +22,46 @@ jobs:
         with:
           script: |
             const pr = context.payload.pull_request;
-            const branch = pr.head.ref;
+            const branch = (pr.head && pr.head.ref) ? pr.head.ref.toLowerCase() : "";
+            const title = (pr.title || "").toLowerCase();
 
-            let labels = ['gssoc-2026'];
+            const labels = new Set(['gssoc-2026']);
 
-            // Difficulty labels
-            if (branch.startsWith('level1/')) {
-              labels.push('level:beginner');
+            // Difficulty labels (branch prefix)
+            if (branch.startsWith('level1/')) labels.add('level:beginner');
+            if (branch.startsWith('level2/')) labels.add('level:intermediate');
+            if (branch.startsWith('level3/')) labels.add('level:advanced');
+            if (branch.startsWith('level4/')) labels.add('level:critical');
+
+            // Type labels (from branch ref or conventional commit title)
+            if (branch.includes('feat/') || title.startsWith('feat') || title.includes('(feat)')) {
+              labels.add('type:feature');
             }
-
-            if (branch.startsWith('level2/')) {
-              labels.push('level:intermediate');
+            if (branch.includes('fix/') || title.startsWith('fix') || title.includes('(fix)')) {
+              labels.add('type:bug');
             }
-
-            if (branch.startsWith('level3/')) {
-              labels.push('level:advanced');
+            if (branch.includes('docs/') || title.startsWith('docs') || title.includes('(docs)')) {
+              labels.add('type:docs');
             }
-
-            if (branch.startsWith('level4/')) {
-              labels.push('level:critical');
+            if (branch.includes('refactor/') || title.startsWith('refactor') || title.includes('(refactor)')) {
+              labels.add('type:refactor');
             }
-
-            // Type labels
-            if (branch.includes('feat/')) {
-              labels.push('type:feature');
+            if (branch.includes('test/') || title.startsWith('test') || title.includes('(test)')) {
+              labels.add('type:testing');
             }
-
-            if (branch.includes('fix/')) {
-              labels.push('type:bug');
+            if (branch.includes('style/') || title.startsWith('style') || title.includes('(style)')) {
+              labels.add('type:design');
             }
-
-            if (branch.includes('docs/')) {
-              labels.push('type:docs');
+            if (branch.includes('perf/') || title.startsWith('perf') || title.includes('(perf)')) {
+              labels.add('type:performance');
             }
-
-            if (branch.includes('refactor/')) {
-              labels.push('type:refactor');
-            }
-
-            if (branch.includes('test/')) {
-              labels.push('type:testing');
-            }
-
-            if (branch.includes('style/')) {
-              labels.push('type:design');
+            if (branch.includes('chore/') || title.startsWith('chore') || title.includes('(chore)')) {
+              labels.add('type:chore');
             }
 
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: pr.number,
-              labels
+              labels: Array.from(labels)
             });
