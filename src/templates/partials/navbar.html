@@ -1,0 +1,39 @@
+<nav class="navbar" style="background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100;">
+  <div class="container flex justify-between items-center" style="padding-top: var(--space-4); padding-bottom: var(--space-4);">
+    <a href="/" class="nav-logo" style="font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; color: var(--text-main);">
+      Dev<span style="color: var(--color-primary);">Path</span>
+    </a>
+
+    <div class="nav-links flex gap-4 items-center">
+      <a href="/explore" class="text-muted" style="font-weight: 500;">Explore</a>
+      <a href="/compare" class="text-muted" style="font-weight: 500;">Compare</a>
+      
+      {% if current_user %}
+        <a href="/profile" class="text-muted" style="font-weight: 500;">Profile</a>
+        <form method="POST" action="/auth/logout" style="margin: 0;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn btn--ghost text-muted">Logout</button>
+        </form>
+      {% else %}
+        <a href="/auth/login" class="btn btn--primary">Login with GitHub</a>
+      {% endif %}
+      
+      <button id="theme-toggle" class="btn btn--ghost" aria-label="Toggle dark mode">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<script>
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    const root = document.documentElement;
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    const newTheme = isDark ? 'light' : 'dark';
+    root.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+  });
+</script>

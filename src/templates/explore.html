@@ -1,695 +1,135 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description"
-    content="DevPath recommends real coding projects based on your skills, level, and interests — with full roadmaps and starter code." />
-  <title>DevPath — Find Projects Based On Your Skills</title>
+{% block title %}Explore Projects - DevPath{% endblock %}
+{% block og_title %}Explore Projects - DevPath{% endblock %}
+{% block twitter_title %}Explore Projects - DevPath{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/explore.css">
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: var(--space-24); padding-bottom: var(--space-16); min-height: 80vh;">
+  <h1 class="mb-4">Explore All Projects</h1>
+  <p class="text-muted mb-8">Browse our entire catalog of projects, filter by difficulty or interest, and find your next coding challenge.</p>
   
-  <script>
-    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-      window.addEventListener('error', function(e) {
-        var errDiv = document.createElement('div');
-        errDiv.style.position = 'fixed';
-        errDiv.style.top = '0';
-        errDiv.style.left = '0';
-        errDiv.style.width = '100%';
-        errDiv.style.background = 'red';
-        errDiv.style.color = 'white';
-        errDiv.style.zIndex = '999999';
-        errDiv.style.padding = '20px';
-        errDiv.textContent = 'JS ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno;
-        document.body.appendChild(errDiv);
-      });
-      window.addEventListener('unhandledrejection', function(e) {
-        var errDiv = document.createElement('div');
-        errDiv.style.position = 'fixed';
-        errDiv.style.top = '50px';
-        errDiv.style.left = '0';
-        errDiv.style.width = '100%';
-        errDiv.style.background = 'orange';
-        errDiv.style.color = 'white';
-        errDiv.style.zIndex = '999999';
-        errDiv.style.padding = '20px';
-        errDiv.textContent = 'PROMISE REJECTION: ' + (e.reason ? e.reason.message : e.reason);
-        document.body.appendChild(errDiv);
-      });
-    }
-  </script>
-
-  <!-- Open Graph meta tags for social media sharing -->
-  <meta property="og:title" content="DevPath — Find Projects Based On Your Skills" />
-  <meta property="og:description" content="{{ config.SITE_DESCRIPTION }}" />
-  <meta property="og:image" content="{{ config.get_og_image_url() }}" />
-  <meta property="og:url" content="{{ config.get_base_url() }}/" />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="{{ config.SITE_NAME }}" />
-  
-  <!-- Twitter Card meta tags -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="DevPath — Find Projects Based On Your Skills" />
-  <meta name="twitter:description" content="{{ config.SITE_DESCRIPTION }}" />
-  <meta name="twitter:image" content="{{ config.get_og_image_url() }}" />
-  
-  <script>
-    document.documentElement.setAttribute("data-entry-anim", "true");
-  </script>
-  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
-  {% include 'partials/theme_head.html' %}
-  <link rel="stylesheet" href="/static/style.css" />
-  <link rel="stylesheet" href="/static/bookmarks.css" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
-    rel="stylesheet" />
-  
-  <style>
-    /* ============================================
-       REDESIGNED PROFILE SECTION STYLES
-       Only these styles are new - rest remain original
-       ============================================ */
-    
-    /* Stats Dashboard Grid */
-    .stats-dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .stat-dashboard-card {
-      background: var(--card-bg, #ffffff);
-      border-radius: 1.25rem;
-      padding: 1.25rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      border: 1px solid var(--border, #e5e7eb);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .stat-dashboard-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 24px -12px rgba(0,0,0,0.15);
-    }
-
-    .stat-dashboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    .stat-dashboard-title {
-      font-size: 0.85rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted, #6b7280);
-    }
-
-    .stat-dashboard-value {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 0.75rem;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .stat-dashboard-progress {
-      margin: 0.75rem 0;
-    }
-
-    .progress-meter {
-      background: var(--gray-200, #e5e7eb);
-      border-radius: 100px;
-      height: 8px;
-      overflow: hidden;
-    }
-
-    .progress-meter-fill {
-      background: linear-gradient(90deg, #6366f1, #8b5cf6);
-      height: 100%;
-      border-radius: 100px;
-      display: block;
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-
-    .stat-dashboard-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.7rem;
-      color: var(--text-muted, #6b7280);
-      margin-top: 0.75rem;
-    }
-
-    .reset-btn-mini {
-      background: none;
-      border: none;
-      color: var(--text-muted, #6b7280);
-      font-size: 0.7rem;
-      cursor: pointer;
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.5rem;
-      transition: all 0.2s;
-    }
-
-    .reset-btn-mini:hover {
-      background: var(--gray-100, #f3f4f6);
-      color: #ef4444;
-    }
-
-    /* Badges Grid Mini */
-    .badges-grid-mini {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin: 0.75rem 0;
-      min-height: 60px;
-    }
-
-    .badge-mini {
-      background: var(--gray-100, #f3f4f6);
-      padding: 0.4rem 0.75rem;
-      border-radius: 2rem;
-      font-size: 0.7rem;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-
-    .badge-mini.earned {
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
-      color: white;
-    }
-
-    /* Activity Stats */
-    .activity-stats-row {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-      margin-top: 0.5rem;
-    }
-
-    .activity-stat-item {
-      text-align: center;
-      padding: 0.75rem;
-      background: var(--gray-50, #f9fafb);
-      border-radius: 1rem;
-    }
-
-    .activity-stat-value {
-      display: block;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #6366f1;
-    }
-
-    .activity-stat-label {
-      font-size: 0.7rem;
-      color: var(--text-muted, #6b7280);
-    }
-
-    /* Bottom Grid */
-    .profile-bottom-grid {
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 1.5rem;
-    }
-
-    .completed-card,
-    .leaderboard-achievement-card {
-      background: var(--card-bg, #ffffff);
-      border-radius: 1.25rem;
-      padding: 1.25rem;
-      border: 1px solid var(--border, #e5e7eb);
-    }
-
-    .completed-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid var(--border, #e5e7eb);
-    }
-
-    .completed-header h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      margin: 0;
-    }
-
-    .empty-completed {
-      text-align: center;
-      padding: 2rem;
-      color: var(--text-muted, #6b7280);
-    }
-
-    .empty-completed svg {
-      margin-bottom: 0.75rem;
-      opacity: 0.5;
-    }
-
-    .empty-completed p {
-      margin: 0;
-      font-weight: 500;
-    }
-
-    .empty-completed span {
-      font-size: 0.75rem;
-    }
-
-    /* Tabs */
-    .la-tabs {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-      border-bottom: 1px solid var(--border, #e5e7eb);
-      padding-bottom: 0.5rem;
-    }
-
-    .la-tab {
-      background: none;
-      border: none;
-      padding: 0.5rem 1rem;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      border-radius: 0.5rem;
-      color: var(--text-muted, #6b7280);
-      transition: all 0.2s;
-    }
-
-    .la-tab.active {
-      background: #6366f1;
-      color: white;
-    }
-
-    .la-content {
-      display: none;
-    }
-
-    .la-content.active {
-      display: block;
-    }
-
-    .leaderboard-list-compact,
-    .achievement-list-compact {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-
-    .leaderboard-list-compact li,
-    .achievement-list-compact li {
-      padding: 0.5rem 0;
-      border-bottom: 1px solid var(--border, #e5e7eb);
-      font-size: 0.85rem;
-    }
-
-    .leaderboard-empty,
-    .achievement-empty {
-      text-align: center;
-      color: var(--text-muted, #6b7280);
-      padding: 1.5rem !important;
-    }
-
-    .la-footer {
-      margin-top: 0.75rem;
-      padding-top: 0.75rem;
-      border-top: 1px solid var(--border, #e5e7eb);
-      font-size: 0.7rem;
-      color: var(--text-muted, #6b7280);
-      text-align: center;
-    }
-
-    /* Responsive */
-    @media (max-width: 1024px) {
-      .stats-dashboard-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
-      
-      .profile-bottom-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
-      
-      .activity-stats-row {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    @media (max-width: 640px) {
-      .activity-stats-row {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    /* Dark mode support */
-    [data-theme="dark"] .stat-dashboard-card,
-    [data-theme="dark"] .completed-card,
-    [data-theme="dark"] .leaderboard-achievement-card {
-      background: #1f2937;
-    }
-
-    [data-theme="dark"] .activity-stat-item {
-      background: #374151;
-    }
-
-    [data-theme="dark"] .badge-mini {
-      background: #374151;
-    }
-  </style>
-</head>
-
-<body>
-  <!-- ============================================================
-       Navigation
-       ============================================================ -->
-  <nav class="navbar" id="navbar" aria-label="Main navigation">
-    <div class="nav-inner">
-      <a href="/" class="nav-logo">Dev<span class="nav-logo-accent">Path</span></a>
-
-      <form id="topic-search-form" class="navbar-search" role="search">
-        <input
-          type="search"
-          id="topic-search"
-          autocomplete="off"
-          aria-label="Search projects"
-          placeholder="Search projects…"
-        />
-        <button class="navbar-search-btn" type="submit" aria-label="Search">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </button>
-      </div>
-
-      <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation"
-        aria-expanded="false" aria-controls="nav-mobile-menu">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-
-    <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
-      <form id="topic-search-form-mobile" class="navbar-search navbar-search--mobile" role="search">
-        <button class="navbar-search-btn" type="submit" aria-label="Search">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-            stroke-width="2" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </button>
-        <input type="search" id="topic-search-mobile" autocomplete="off" aria-label="Search projects"
-          placeholder="Search projects…" />
-      </form>
-      <a href="/#home" class="nav-mobile-link" role="menuitem">Home</a>
-      <a href="/#how-it-works" class="nav-mobile-link" role="menuitem">How It Works</a>
-      <a href="/#features" class="nav-mobile-link" role="menuitem">Features</a>
-      <a href="/#find-project" class="nav-mobile-link" role="menuitem">Find Project</a>
-      <a href="/explore" class="nav-mobile-link" role="menuitem">Explore All</a>
-      <a href="/compare" class="nav-mobile-link" role="menuitem">Compare</a>
-      <a href="/contact" class="nav-mobile-link" role="menuitem">Contact</a>
-      <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer"
-        class="nav-mobile-link" role="menuitem">GitHub</a>
-      <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile"
-        aria-pressed="false" aria-label="Switch to dark mode" role="menuitem">
-        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-        </svg>
-        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="5" />
-          <line x1="12" y1="1" x2="12" y2="3" />
-          <line x1="12" y1="21" x2="12" y2="23" />
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-          <line x1="1" y1="12" x2="3" y2="12" />
-          <line x1="21" y1="12" x2="23" y2="12" />
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-        </svg>
-        <span class="theme-toggle-label">Dark Mode</span>
-      </button>
-    </div>
-  </nav>
-
-  <!-- ============================================================
-       No-Script Fallback
-       ============================================================ -->
-  <noscript>
-    <div class="noscript-warning">
-      <p>JavaScript is required to use DevPath. Please enable JavaScript in your browser settings and reload the page.
-      </p>
-    </div>
-  </noscript>
-
-  <!-- ============================================================
-       Hero Section
-       ============================================================ -->
-  
-  <main class="container" style="padding-top: 120px; padding-bottom: 60px; min-height: 80vh;">
-    <h1 style="margin-bottom: 1rem;">Explore All Projects</h1>
-    <p style="color: var(--text-muted); margin-bottom: 2rem;">Browse our entire catalog of projects, filter by difficulty or interest, and find your next coding challenge.</p>
-    
-    <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
-      <!-- Sidebar Filters -->
-      <aside style="flex: 1; min-width: 250px; max-width: 300px;">
-        <div class="sidebar-card">
-          <h3 class="sidebar-card-title">Filters</h3>
+  <div class="grid explore-layout">
+    <!-- Sidebar Filters -->
+    <aside class="explore-sidebar">
+      <div class="card">
+        <div class="card__header">
+          <h3>Filters</h3>
+        </div>
+        <div class="card__body">
           <form method="GET" action="/explore" id="explore-filter-form">
-            <div class="form-group" style="margin-bottom: 1rem;">
-              <label for="search" style="font-size: 0.85rem; font-weight: 600; color: var(--text-body);">Search</label>
-              <input type="text" id="search" name="search" value="{{ search }}" placeholder="Search projects..." style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem; background: var(--input-bg); color: var(--text-main);">
+            <div class="form-group">
+              <label for="search" class="form-label">Search</label>
+              <input type="text" id="search" name="search" value="{{ search }}" class="form-input" placeholder="Search projects...">
             </div>
             
-            <div class="form-group" style="margin-bottom: 1rem;">
-              <label for="level" style="font-size: 0.85rem; font-weight: 600; color: var(--text-body);">Level</label>
-              <div class="select-wrap" style="width: 100%;">
-                <select id="level" name="level">
-                  <option value="">Any Level</option>
-                  {% for l in available_levels %}
-                  <option value="{{ l | lower }}" {% if level == l | lower %}selected{% endif %}>{{ l }}</option>
-                  {% endfor %}
-                  <!-- wait, loop end is wrong in python string, let's fix below -->
-                </select>
-              </div>
+            <div class="form-group">
+              <label for="level" class="form-label">Level</label>
+              <select id="level" name="level" class="form-select">
+                <option value="">Any Level</option>
+                {% for l in available_levels %}
+                <option value="{{ l | lower }}" {% if level == l | lower %}selected{% endif %}>{{ l }}</option>
+                {% endfor %}
+              </select>
             </div>
 
-            <div class="form-group" style="margin-bottom: 1rem;">
-              <label for="interest" style="font-size: 0.85rem; font-weight: 600; color: var(--text-body);">Interest</label>
-              <div class="select-wrap" style="width: 100%;">
-                <select id="interest" name="interest">
-                  <option value="">Any Interest</option>
-                  {% for i in available_interests %}
-                  <option value="{{ i | lower }}" {% if interest == i | lower %}selected{% endif %}>{{ i }}</option>
-                  {% endfor %}
-                </select>
-              </div>
+            <div class="form-group">
+              <label for="interest" class="form-label">Interest</label>
+              <select id="interest" name="interest" class="form-select">
+                <option value="">Any Interest</option>
+                {% for i in available_interests %}
+                <option value="{{ i | lower }}" {% if interest == i | lower %}selected{% endif %}>{{ i }}</option>
+                {% endfor %}
+              </select>
             </div>
 
-            <div class="form-group" style="margin-bottom: 1rem;">
-              <label for="time" style="font-size: 0.85rem; font-weight: 600; color: var(--text-body);">Time Availability</label>
-              <div class="select-wrap" style="width: 100%;">
-                <select id="time" name="time">
-                  <option value="">Any Time</option>
-                  <option value="low" {% if time == "low" %}selected{% endif %}>Low (Few hours/week)</option>
-                  <option value="medium" {% if time == "medium" %}selected{% endif %}>Medium (Weekends)</option>
-                  <option value="high" {% if time == "high" %}selected{% endif %}>High (Daily)</option>
-                </select>
-              </div>
+            <div class="form-group">
+              <label for="time" class="form-label">Time Availability</label>
+              <select id="time" name="time" class="form-select">
+                <option value="">Any Time</option>
+                <option value="low" {% if time == "low" %}selected{% endif %}>Low (Few hours/week)</option>
+                <option value="medium" {% if time == "medium" %}selected{% endif %}>Medium (Weekends)</option>
+                <option value="high" {% if time == "high" %}selected{% endif %}>High (Daily)</option>
+              </select>
             </div>
 
-            <div class="form-group" style="margin-bottom: 1.5rem;">
-              <label for="sort" style="font-size: 0.85rem; font-weight: 600; color: var(--text-body);">Sort By</label>
-              <div class="select-wrap" style="width: 100%;">
-                <select id="sort" name="sort">
-                  <option value="id_asc" {% if sort == "id_asc" %}selected{% endif %}>Default</option>
-                  <option value="title_asc" {% if sort == "title_asc" %}selected{% endif %}>Title (A-Z)</option>
-                  <option value="title_desc" {% if sort == "title_desc" %}selected{% endif %}>Title (Z-A)</option>
-                  <option value="id_desc" {% if sort == "id_desc" %}selected{% endif %}>Newest First</option>
-                </select>
-              </div>
+            <div class="form-group mb-8">
+              <label for="sort" class="form-label">Sort By</label>
+              <select id="sort" name="sort" class="form-select">
+                <option value="id_asc" {% if sort == "id_asc" %}selected{% endif %}>Default</option>
+                <option value="title_asc" {% if sort == "title_asc" %}selected{% endif %}>Title (A-Z)</option>
+                <option value="title_desc" {% if sort == "title_desc" %}selected{% endif %}>Title (Z-A)</option>
+                <option value="id_desc" {% if sort == "id_desc" %}selected{% endif %}>Newest First</option>
+              </select>
             </div>
 
-            <button type="submit" class="btn-primary" style="width: 100%;">Apply Filters</button>
-            <a href="/explore" class="btn-clear" style="display: block; text-align: center; margin-top: 10px; width: 100%; box-sizing: border-box; text-decoration: none;">Clear Filters</a>
+            <button type="submit" class="btn btn--primary" style="width: 100%;">Apply Filters</button>
+            <div class="text-center mt-4">
+              <a href="/explore" class="btn btn--ghost" style="width: 100%;">Clear Filters</a>
+            </div>
           </form>
         </div>
-      </aside>
+      </div>
+    </aside>
 
-      <!-- Main Results -->
-      <section style="flex: 3; min-width: 300px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-          <h2 style="font-size: 1.25rem;">Showing {{ projects|length }} of {{ total_items }} projects</h2>
-        </div>
+    <!-- Main Results -->
+    <section class="explore-results">
+      <div class="flex justify-between items-center mb-8">
+        <h2 style="font-size: 1.25rem;">Showing {{ projects|length }} of {{ total_items }} projects</h2>
+      </div>
 
-        {% if projects %}
-        <div class="results-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
-          {% for project in projects %}
-          <div class="project-card">
-            <h3 class="project-card-title">{{ project.title }}</h3>
-            <p class="project-card-desc"><span class="project-card-desc-text">{{ project.description | truncate(120) }}</span></p>
-            <div class="project-card-tags">
+      {% if projects %}
+      <div class="grid grid-cols-1 grid-cols-md-2 grid-cols-lg-3">
+        {% for project in projects %}
+        <div class="card project-card flex flex-col">
+          <div class="card__body flex flex-col" style="flex: 1;">
+            <h3 class="mb-2" style="font-size: 1.1rem;">{{ project.title }}</h3>
+            <p class="text-muted mb-4" style="font-size: 0.9rem; flex: 1;">{{ project.description | truncate(120) }}</p>
+            <div class="flex" style="flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-4);">
               {% for skill in project.skills %}
-              <span class="project-tag project-tag--skill">{{ skill }}</span>
+              <span class="badge">{{ skill }}</span>
               {% endfor %}
-              <span class="project-tag project-tag--{{ project.level | lower | replace(' ', '-') }}">{{ project.level }}</span>
-              <span class="project-tag project-tag--time">Time: {{ project.time }}</span>
-            </div>
-            <div class="project-card-footer">
-              <a href="/project/{{ project.id }}" class="btn-view-project" style="flex: 1; text-align: center;">View Project &rarr;</a>
+              <span class="badge badge--primary">{{ project.level }}</span>
+              <span class="badge badge--success">Time: {{ project.time }}</span>
             </div>
           </div>
-          {% endfor %}
+          <div class="card__footer">
+            <a href="/project/{{ project.id }}" class="btn btn--secondary" style="width: 100%;">View Project &rarr;</a>
+          </div>
         </div>
+        {% endfor %}
+      </div>
 
-        <!-- Pagination Controls -->
-        <div class="pagination" style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 3rem;">
-          {% if page > 1 %}
-          <a href="/explore?page={{ page - 1 }}&per_page=12&search={{ search }}&level={{ level }}&interest={{ interest }}&time={{ time }}&sort={{ sort }}" class="btn-view-code-sm" style="text-decoration: none;">&larr; Previous</a>
-          {% else %}
-          <span class="btn-view-code-sm" style="opacity: 0.5; cursor: not-allowed;">&larr; Previous</span>
-          {% endif %}
-          
-          <span style="font-weight: 600; color: var(--text-body);">Page {{ page }} of {{ total_pages }}</span>
-          
-          {% if page < total_pages %}
-          <a href="/explore?page={{ page + 1 }}&per_page=12&search={{ search }}&level={{ level }}&interest={{ interest }}&time={{ time }}&sort={{ sort }}" class="btn-view-code-sm" style="text-decoration: none;">Next &rarr;</a>
-          {% else %}
-          <span class="btn-view-code-sm" style="opacity: 0.5; cursor: not-allowed;">Next &rarr;</span>
-          {% endif %}
-        </div>
+      <!-- Pagination Controls -->
+      <div class="flex justify-center items-center gap-4 mt-8">
+        {% if page > 1 %}
+        <a href="/explore?page={{ page - 1 }}&per_page=12&search={{ search }}&level={{ level }}&interest={{ interest }}&time={{ time }}&sort={{ sort }}" class="btn btn--secondary">&larr; Previous</a>
         {% else %}
-        <div class="empty-state">
-          <h3>No Projects Found</h3>
-          <p>Try adjusting your filters or search term.</p>
-          <a href="/explore" class="btn-try-again">Clear Filters</a>
-        </div>
+        <span class="btn btn--secondary" style="opacity: 0.5; cursor: not-allowed;">&larr; Previous</span>
         {% endif %}
-      </section>
-    </div>
-  </main>
-<!-- ============================================================
-       Footer
-       ============================================================ -->
-  <footer class="footer">
-    <div class="footer-inner">
-      <div class="footer-col footer-col--brand">
-        <span class="footer-logo">Dev<span class="footer-logo-accent">Path</span></span>
-        <p class="footer-tagline">Open source. Built for learners, by learners.</p>
-        <p class="footer-tagline">Helping developers find meaningful projects to build their skills.</p>
+        
+        <span style="font-weight: 600; color: var(--text-main);">Page {{ page }} of {{ total_pages }}</span>
+        
+        {% if page < total_pages %}
+        <a href="/explore?page={{ page + 1 }}&per_page=12&search={{ search }}&level={{ level }}&interest={{ interest }}&time={{ time }}&sort={{ sort }}" class="btn btn--secondary">Next &rarr;</a>
+        {% else %}
+        <span class="btn btn--secondary" style="opacity: 0.5; cursor: not-allowed;">Next &rarr;</span>
+        {% endif %}
       </div>
-
-      <div class="footer-col">
-        <h4 class="footer-col-title">Quick Links</h4>
-        <ul class="footer-links-list">
-          <li><a href="/#home">Home</a></li>
-          <li><a href="/#how-it-works">How It Works</a></li>
-          <li><a href="/#features">Features</a></li>
-          <li><a href="/explore">Explore All</a></li>
-          <li><a href="/#find-project">Find Project</a></li>
-          <li><a href="/contact">Contact Us</a></li>
-        </ul>
+      {% else %}
+      <div class="card flex flex-col items-center justify-center text-center" style="padding: var(--space-12) var(--space-4);">
+        <div class="card__body">
+            <h3 class="mb-4">No Projects Found</h3>
+            <p class="text-muted mb-8">Try adjusting your filters or search term.</p>
+            <a href="/explore" class="btn btn--primary">Clear Filters</a>
+        </div>
       </div>
-
-      <div class="footer-col">
-        <h4 class="footer-col-title">Resources</h4>
-        <ul class="footer-links-list">
-          <li><a href="/project/1">Sample Project</a></li>
-          <li><a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-          <li><a href="https://github.com/komalharshita/DevPath/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing Guide</a></li>
-          <li><a href="https://github.com/komalharshita/DevPath/issues" target="_blank" rel="noopener noreferrer">Report an Issue</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h4 class="footer-col-title">About Us</h4>
-        <ul class="footer-links-list">
-          <li><a href="/#our-story">Our Story</a></li>
-          <li><a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer">Open Source</a></li>
-          <li><a href="https://github.com/komalharshita/DevPath/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">License</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="footer-bottom">
-      <p>DevPath is open source. Licensed under the MIT License.</p>
-      <div class="footer-bottom-links">
-        <a href="/#our-story">About Us</a>
-        <a href="https://github.com/komalharshita/DevPath/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Project License</a>
-      </div>
-    </div>
-  </footer>
-
-  <style>
-    .form-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
-      align-items: center;
-    }
-
-    .btn-clear {
-      background-color: #f3f4f6;
-      color: #1f2937;
-      border: 1px solid #d1d5db;
-      padding: 12px 24px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.2s ease;
-    }
-
-    .btn-clear:hover {
-      background-color: #e5e7eb;
-    }
-  </style>
-
-  <script src="/static/data/skills.js"></script>
-
-  {% include 'partials/scroll_top_btn.html' %}
-
-  <script src="/static/script.js"></script>
-  <script src="/static/bookmarks.js"></script>
-  
-  <script>
-    // Tab switching for leaderboard/achievements (adds to your existing JS)
-    document.addEventListener('DOMContentLoaded', function() {
-      const tabs = document.querySelectorAll('.la-tab');
-      tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-          const parent = this.closest('.leaderboard-achievement-card');
-          if (parent) {
-            parent.querySelectorAll('.la-tab').forEach(t => t.classList.remove('active'));
-            parent.querySelectorAll('.la-content').forEach(c => c.classList.remove('active'));
-            this.classList.add('active');
-            const tabId = this.getAttribute('data-tab');
-            if (tabId === 'leaderboard') {
-              const leaderboardContent = parent.querySelector('#leaderboard-content');
-              if (leaderboardContent) leaderboardContent.classList.add('active');
-            } else {
-              const achievementsContent = parent.querySelector('#achievements-content');
-              if (achievementsContent) achievementsContent.classList.add('active');
-            }
-          }
-        });
-      });
-    });
-  </script>
-    
-  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
-</body>
-
-</html>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}
