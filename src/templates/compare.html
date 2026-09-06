@@ -5,133 +5,162 @@
 {% block og_title %}Compare Roadmaps — DevPath{% endblock %}
 {% block twitter_title %}Compare Roadmaps — DevPath{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="/static/compare.css" />
+{% endblock %}
+
 {% block content %}
-<header class="compare-hero">
-  <div class="compare-hero-inner">
-    <span class="compare-badge">Career Decision Tool</span>
-    <h1 class="compare-title">Compare Learning Roadmaps</h1>
-    <p class="compare-subtitle">
+<header class="compare-hero text-center">
+  <div class="container">
+    <span class="badge badge--primary mb-2">Career Decision Tool</span>
+    <h1 class="mb-2">Compare Learning Roadmaps</h1>
+    <p class="text-muted">
       Select two career paths to compare topics, duration, difficulty, overlapping skills, and job opportunities —
       side by side.
     </p>
   </div>
 </header>
 
-<main class="compare-main">
+<main class="container my-4">
   <!-- Roadmap selectors -->
-  <section class="compare-selectors" aria-label="Select roadmaps to compare">
-    <div class="compare-select-card">
-      <label for="roadmap-select-a" class="compare-select-label">Roadmap A</label>
-      <select id="roadmap-select-a" class="compare-select">
-        <option value="">Choose a roadmap…</option>
-        {% for roadmap in roadmaps %}
-        <option value="{{ roadmap.id }}">{{ roadmap.title }}</option>
-        {% endfor %}
-      </select>
+  <section class="card mb-4" aria-label="Select roadmaps to compare">
+    <div class="card__body">
+      <div class="grid grid-cols-md-2 gap-4 align-items-end">
+        <div class="form-group mb-0">
+          <label for="roadmap-select-a" class="form-label">Roadmap A</label>
+          <select id="roadmap-select-a" class="form-select">
+            <option value="">Choose a roadmap…</option>
+            {% for roadmap in roadmaps %}
+            <option value="{{ roadmap.id }}">{{ roadmap.title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="compare-vs-badge d-md-none" aria-hidden="true">VS</div>
+
+        <div class="form-group mb-0">
+          <label for="roadmap-select-b" class="form-label">Roadmap B</label>
+          <select id="roadmap-select-b" class="form-select">
+            <option value="">Choose a roadmap…</option>
+            {% for roadmap in roadmaps %}
+            <option value="{{ roadmap.id }}">{{ roadmap.title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="text-center mt-4">
+        <button type="button" id="compare-btn" class="btn btn--primary">Compare Roadmaps</button>
+      </div>
     </div>
-
-    <div class="compare-vs-badge" aria-hidden="true">VS</div>
-
-    <div class="compare-select-card">
-      <label for="roadmap-select-b" class="compare-select-label">Roadmap B</label>
-      <select id="roadmap-select-b" class="compare-select">
-        <option value="">Choose a roadmap…</option>
-        {% for roadmap in roadmaps %}
-        <option value="{{ roadmap.id }}">{{ roadmap.title }}</option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <button type="button" id="compare-btn" class="btn-primary compare-btn">Compare Roadmaps</button>
   </section>
 
-  <div id="compare-error" class="compare-error" role="alert" hidden></div>
+  <div id="compare-error" class="alert alert-danger hidden" role="alert"></div>
 
   <!-- Empty state -->
-  <section id="compare-empty" class="compare-empty">
+  <section id="compare-empty" class="text-center py-5">
     <div class="compare-empty-icon" aria-hidden="true">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
       </svg>
     </div>
     <h2>Pick two roadmaps to get started</h2>
-    <p>Try comparing <strong>Frontend vs Full Stack</strong>, <strong>React vs Angular</strong>, or
+    <p class="text-muted">Try comparing <strong>Frontend vs Full Stack</strong>, <strong>React vs Angular</strong>, or
       <strong>DevOps vs Cloud Engineering</strong>.
     </p>
     <div class="compare-quick-picks">
-      <button type="button" class="compare-quick-btn" data-a="frontend" data-b="fullstack">Frontend vs Full Stack</button>
-      <button type="button" class="compare-quick-btn" data-a="react" data-b="angular">React vs Angular</button>
-      <button type="button" class="compare-quick-btn" data-a="devops" data-b="cloud">DevOps vs Cloud</button>
+      <button type="button" class="btn btn--secondary btn--sm compare-quick-btn" data-a="frontend" data-b="fullstack">Frontend vs Full Stack</button>
+      <button type="button" class="btn btn--secondary btn--sm compare-quick-btn" data-a="react" data-b="angular">React vs Angular</button>
+      <button type="button" class="btn btn--secondary btn--sm compare-quick-btn" data-a="devops" data-b="cloud">DevOps vs Cloud</button>
     </div>
   </section>
 
   <!-- Results -->
-  <section id="compare-results" class="compare-results" hidden>
+  <section id="compare-results" class="hidden">
 
     <!-- Summary cards -->
-    <div class="compare-summary-grid">
-      <div class="compare-summary-card compare-summary-card--a">
-        <span class="compare-summary-label">Roadmap A</span>
-        <h2 id="summary-title-a"></h2>
-        <p id="summary-desc-a"></p>
-      </div>
-      <div class="compare-summary-card compare-summary-card--shared">
-        <span class="compare-summary-label">Overlap</span>
-        <div class="compare-shared-stat">
-          <span id="shared-skills-count" class="compare-stat-num">0</span>
-          <span class="compare-stat-text">shared skills</span>
+    <div class="grid grid-cols-lg-3 gap-4 mb-4">
+      <div class="card">
+        <div class="card__header">
+          <span class="badge badge--primary">Roadmap A</span>
         </div>
-        <div class="compare-shared-stat">
-          <span id="shared-topics-count" class="compare-stat-num">0</span>
-          <span class="compare-stat-text">shared topics</span>
+        <div class="card__body">
+          <h2 id="summary-title-a" class="h4"></h2>
+          <p id="summary-desc-a" class="text-muted"></p>
         </div>
       </div>
-      <div class="compare-summary-card compare-summary-card--b">
-        <span class="compare-summary-label">Roadmap B</span>
-        <h2 id="summary-title-b"></h2>
-        <p id="summary-desc-b"></p>
+
+      <div class="card text-center">
+        <div class="card__header">
+          <span class="badge badge--success">Overlap</span>
+        </div>
+        <div class="card__body d-flex flex-column justify-content-center align-items-center">
+          <div class="compare-shared-stat">
+            <span id="shared-skills-count" class="compare-stat-num">0</span>
+            <span class="compare-stat-text">shared skills</span>
+          </div>
+          <div class="compare-shared-stat">
+            <span id="shared-topics-count" class="compare-stat-num">0</span>
+            <span class="compare-stat-text">shared topics</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__header">
+          <span class="badge badge--primary">Roadmap B</span>
+        </div>
+        <div class="card__body">
+          <h2 id="summary-title-b" class="h4"></h2>
+          <p id="summary-desc-b" class="text-muted"></p>
+        </div>
       </div>
     </div>
 
     <!-- Visual charts -->
-    <section class="compare-charts" aria-label="Comparison charts">
-      <div class="compare-chart-card">
-        <h3 class="compare-chart-title">Difficulty vs Duration</h3>
+    <section class="card compare-chart-card mb-4" aria-label="Comparison charts">
+      <div class="card__header">
+        <h3 class="h5 mb-0">Difficulty vs Duration</h3>
+      </div>
+      <div class="card__body">
         <canvas id="difficulty-chart" aria-label="Bar chart comparing roadmap difficulty and duration" role="img"></canvas>
       </div>
     </section>
 
     <!-- Side by side lists -->
-    <div class="compare-details-grid">
+    <div class="grid grid-cols-md-2 gap-4">
       <!-- Roadmap A Details -->
-      <div class="compare-details-col">
-        <div class="compare-section">
-          <h3>Target Roles</h3>
-          <ul id="roles-a" class="compare-list"></ul>
-        </div>
-        <div class="compare-section">
-          <h3>Core Topics</h3>
-          <ul id="topics-a" class="compare-list"></ul>
-        </div>
-        <div class="compare-section">
-          <h3>Key Skills</h3>
-          <ul id="skills-a" class="compare-list"></ul>
+      <div class="card">
+        <div class="card__body">
+          <div class="mb-4">
+            <h3 class="h5">Target Roles</h3>
+            <ul id="roles-a" class="compare-list"></ul>
+          </div>
+          <div class="mb-4">
+            <h3 class="h5">Core Topics</h3>
+            <ul id="topics-a" class="compare-list"></ul>
+          </div>
+          <div>
+            <h3 class="h5">Key Skills</h3>
+            <ul id="skills-a" class="compare-list"></ul>
+          </div>
         </div>
       </div>
 
       <!-- Roadmap B Details -->
-      <div class="compare-details-col">
-        <div class="compare-section">
-          <h3>Target Roles</h3>
-          <ul id="roles-b" class="compare-list"></ul>
-        </div>
-        <div class="compare-section">
-          <h3>Core Topics</h3>
-          <ul id="topics-b" class="compare-list"></ul>
-        </div>
-        <div class="compare-section">
-          <h3>Key Skills</h3>
-          <ul id="skills-b" class="compare-list"></ul>
+      <div class="card">
+        <div class="card__body">
+          <div class="mb-4">
+            <h3 class="h5">Target Roles</h3>
+            <ul id="roles-b" class="compare-list"></ul>
+          </div>
+          <div class="mb-4">
+            <h3 class="h5">Core Topics</h3>
+            <ul id="topics-b" class="compare-list"></ul>
+          </div>
+          <div>
+            <h3 class="h5">Key Skills</h3>
+            <ul id="skills-b" class="compare-list"></ul>
+          </div>
         </div>
       </div>
     </div>

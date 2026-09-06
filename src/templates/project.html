@@ -9,52 +9,49 @@
 
 {% block extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="/static/project.css" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
-<div class="detail-page" data-project-interest="{{ project.interest }}" style="padding-top: 60px;">
-  <div class="detail-hero">
+<div class="project-page" data-project-interest="{{ project.interest }}" style="padding-top: 60px;">
+  <!-- Project Summary -->
+  <div class="project-hero">
     <div class="container">
-      <nav class="breadcrumb" aria-label="breadcrumb">
-        <a href="/">Home</a>
-        <span class="breadcrumb-sep">&#8250;</span>
-        <a href="/explore">Projects</a>
-        <span class="breadcrumb-sep">&#8250;</span>
+      <nav class="breadcrumb flex items-center gap-2 mb-4" style="color: var(--color-text-muted, #6c757d); font-size: 0.875rem;" aria-label="breadcrumb">
+        <a href="/" style="text-decoration: none; color: inherit;">Home</a>
+        <span>&#8250;</span>
+        <a href="/explore" style="text-decoration: none; color: inherit;">Projects</a>
+        <span>&#8250;</span>
         <span>{{ project.title }}</span>
       </nav>
 
-      <div class="detail-hero-content">
-        <div class="detail-hero-left">
-          <h1 class="detail-title">{{ project.title }}</h1>
-          <div class="badge-group">
-            <span class="badge badge--{{ project.level | lower }}">{{ project.level }}</span>
-            <span class="badge badge--{{ project.interest | lower }}">{{ project.interest }}</span>
-            <span class="badge badge--effort" data-time="{{ project.time }}">{{ project.time }}</span>
-          </div>
-          <p class="detail-description">{{ project.description }}</p>
+      <div class="flex flex-col gap-4">
+        <h1 class="project-title m-0">{{ project.title }}</h1>
+        <div class="badge-group">
+          <span class="badge badge--{{ project.level | lower }}">{{ project.level }}</span>
+          <span class="badge badge--{{ project.interest | lower }}">{{ project.interest }}</span>
+          <span class="badge badge--secondary" data-time="{{ project.time }}">{{ project.time }}</span>
         </div>
+        <p class="project-description">{{ project.description }}</p>
 
-        <!-- Quick-action buttons in the hero -->
-        <div class="detail-hero-actions" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-          <a href="/project/{{ project.id }}/download" class="btn-download" aria-label="Download starter code file">
-            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <div class="project-actions">
+          <a href="/project/{{ project.id }}/download" class="btn btn--primary flex items-center gap-2" aria-label="Download starter code file">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
             Download Starter Code
           </a>
-          
-          <form method="POST" action="/project/{{ project.id }}/export_github" style="margin: 0; display: flex; gap: 0.5rem; align-items: center;">
+
+          <form method="POST" action="/project/{{ project.id }}/export_github" class="flex items-center gap-2 m-0">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <label for="repo-visibility" style="font-size: 0.85rem; color: #555;">Repo:</label>
-            <select id="repo-visibility" name="visibility" aria-label="Repository visibility"
-              style="font-size: 0.85rem; padding: 0.35rem 0.5rem; border: 1px solid #ddd; border-radius: 6px; background: #fff; color: #333;">
+            <label for="repo-visibility" class="form-label m-0" style="font-size: 0.85rem;">Repo:</label>
+            <select id="repo-visibility" name="visibility" class="form-select" style="width: auto; padding: 0.35rem 0.5rem; font-size: 0.85rem;">
               <option value="private" selected>Private</option>
               <option value="public">Public</option>
             </select>
-            <button type="submit" class="btn-download" style="background: #24292e; color: white; border: none; cursor: pointer;" aria-label="Start on GitHub">
+            <button type="submit" class="btn flex items-center gap-2" style="background: #24292e; color: white; border-color: #24292e;" aria-label="Start on GitHub">
               <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
               </svg>
@@ -62,22 +59,22 @@
             </button>
           </form>
 
-          <button class="btn-view-code" id="btn-view-code" aria-label="Open inline code viewer">
+          <button class="btn btn--secondary flex items-center gap-2" id="btn-view-code" aria-label="Open inline code viewer">
             <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="16 18 22 12 16 6" />
               <polyline points="8 6 2 12 8 18" />
             </svg>
             View Code
           </button>
-          
-          <button class="btn-view-code" id="btn-save-project-detail" data-save-project-id="{{ project.id }}" aria-label="Save project">
+
+          <button class="btn btn--secondary flex items-center gap-2" id="btn-save-project-detail" data-save-project-id="{{ project.id }}" aria-label="Save project">
             <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
             </svg>
             Save Project
           </button>
 
-          <button class="btn-view-code btn-share-project" id="btn-share-project" data-project-title="{{ project.title }}" aria-label="Copy direct project link" onclick="copyProjectLink(this)">
+          <button class="btn btn--secondary flex items-center gap-2 btn-share-project" id="btn-share-project" data-project-title="{{ project.title }}" aria-label="Copy direct project link" onclick="copyProjectLink(this)">
             <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
@@ -89,51 +86,51 @@
     </div>
   </div>
 
-  <div class="detail-body">
-    <div class="container">
-      <div class="detail-grid">
-        <div class="detail-main">
-          
-          <section class="detail-section">
-            <div class="detail-section-header">
-              <div class="detail-section-icon">
-                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="9 11 12 14 22 4" />
-                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-                </svg>
-              </div>
-              <h2>Features</h2>
-            </div>
-            <ul class="feature-list">
+  <div class="container mb-5" style="margin-bottom: 3rem;">
+    <div class="grid grid-cols-lg-3 gap-6">
+      
+      <!-- Main Content Area -->
+      <div class="flex flex-col gap-6" style="grid-column: span 2;">
+        
+        <!-- Features -->
+        <section class="card">
+          <div class="card__header flex items-center gap-2">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 11 12 14 22 4" />
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+            </svg>
+            <h2 class="m-0">Features</h2>
+          </div>
+          <div class="card__body">
+            <ul class="feature-list m-0">
               {% for feature in project.features %}
-              <li class="feature-list-item">
-                <span class="feature-check">
-                  <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                </span>
-                {{ feature }}
+              <li class="mb-2 flex items-start gap-2">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-1 flex-shrink-0" style="color: var(--color-success, #198754);">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span>{{ feature }}</span>
               </li>
               {% endfor %}
             </ul>
-          </section>
+          </div>
+        </section>
 
-          <section class="detail-section">
-            <div class="detail-section-header">
-                <div class="detail-section-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-                    </svg>
-                </div>
-                <h2>Project Roadmap</h2>
-            </div>
-            <p class="detail-section-sub">Follow these steps in order. Each one builds on the previous.</p>
+        <!-- Step-by-step roadmap -->
+        <section class="card">
+          <div class="card__header flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            <h2 class="m-0">Project Roadmap</h2>
+          </div>
+          <div class="card__body">
+            <p class="mb-4 text-sm" style="color: var(--color-text-muted, #6c757d);">Follow these steps in order. Each one builds on the previous.</p>
 
             <div class="roadmap-progress-wrap">
                 <div class="roadmap-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Roadmap completion progress">
                     <div id="roadmap-progress-fill"></div>
                 </div>
-                <span id="roadmap-progress-text" aria-live="polite">0% completed</span>
+                <span id="roadmap-progress-text" aria-live="polite" style="font-size: 0.875rem; color: var(--color-text-muted, #6c757d);">0% completed</span>
             </div>
 
             <ol class="roadmap-timeline" id="roadmap-list">
@@ -156,9 +153,9 @@
                 {% endfor %}
             </ol>
 
-            <div class="completion-container" id="completion-container" style="display: none; margin-top: 2rem;">
-              <button class="btn-complete-project" id="btn-complete-project" onclick="completeProject({{ project.id }})">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="completion-container mt-4" id="completion-container" style="display: none;">
+              <button class="btn btn--primary flex items-center gap-2" id="btn-complete-project" onclick="completeProject({{ project.id }})">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                   <polyline points="22 4 12 14.01 9 11.01"/>
                 </svg>
@@ -166,88 +163,97 @@
               </button>
             </div>
             
-            <div id="completion-message" style="display: none; margin-top: 1.5rem; padding: 1.5rem; background: var(--success-bg, #dcfce7); border-radius: 0.75rem; border: 1px solid var(--success-border, #bbf7d0); text-align: center;">
-              <h3 style="color: var(--success-text, #166534); margin-bottom: 0.5rem;">🎉 Project Completed!</h3>
-              <p style="color: var(--success-text, #166534); font-size: 0.95rem; margin-bottom: 1rem;">Great job! Your progress has been saved.</p>
-              <a href="/profile" class="btn-primary" style="text-decoration: none; display: inline-block;">View Profile</a>
+            <div id="completion-message" style="display: none; background: #dcfce7; border: 1px solid #bbf7d0; text-align: center; border-radius: 0.5rem;" class="mt-4 p-4">
+              <h3 style="color: #166534; margin-top: 0; margin-bottom: 0.5rem;">🎉 Project Completed!</h3>
+              <p style="color: #166534; font-size: 0.95rem; margin-bottom: 1rem;">Great job! Your progress has been saved.</p>
+              <a href="/profile" class="btn btn--primary">View Profile</a>
             </div>
-          </section>
+          </div>
+        </section>
 
-          <section class="detail-section">
-            <div class="detail-section-header">
-                <div class="detail-section-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10" />
-                        <line x1="12" y1="16" x2="12" y2="12" />
-                        <line x1="12" y1="8" x2="12.01" y2="8" />
-                    </svg>
-                </div>
-                <h2>Helpful Resources</h2>
-            </div>
-            <ul class="resources-list" id="resources-list">
+        <!-- Learning resources -->
+        <section class="card">
+          <div class="card__header flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            <h2 class="m-0">Helpful Resources</h2>
+          </div>
+          <div class="card__body">
+            <ul class="resources-list m-0" id="resources-list">
               {% for resource in project.resources %}
               {% set parts = resource.split(": ") %}
-              <li class="resources-list-item">
+              <li class="mb-2">
                 {% if parts|length == 2 %}
-                <a href="{{ parts[1] }}" target="_blank" rel="noopener noreferrer" class="resource-link">
+                <a href="{{ parts[1] }}" target="_blank" rel="noopener noreferrer" class="resource-link flex items-center gap-1">
                   {{ parts[0] }}
-                  <svg class="resource-arrow" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="5" y1="12" x2="19" y2="12" />
                     <polyline points="12 5 19 12 12 19" />
                   </svg>
                 </a>
                 {% else %}
-                <span class="resource-text">{{ resource }}</span>
+                <span>{{ resource }}</span>
                 {% endif %}
               </li>
               {% endfor %}
             </ul>
-          </section>
-        </div>
+          </div>
+        </section>
 
-        <aside class="detail-sidebar">
-          <div class="sidebar-card">
-            <h3 class="sidebar-card-title">
-              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="16 18 22 12 16 6" />
-                <polyline points="8 6 2 12 8 18" />
-              </svg>
-              Tech Stack
-            </h3>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="flex flex-col gap-6">
+        <div class="card">
+          <div class="card__header flex items-center gap-2">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6" />
+              <polyline points="8 6 2 12 8 18" />
+            </svg>
+            <h3 class="m-0">Tech Stack</h3>
+          </div>
+          <div class="card__body">
             <div class="sidebar-tags">
               {% for tech in project.tech_stack %}
-              <span class="project-tag project-tag--tech">{{ tech }}</span>
+              <span class="badge badge--secondary">{{ tech }}</span>
               {% endfor %}
             </div>
           </div>
+        </div>
 
-          <div class="sidebar-card">
-            <h3 class="sidebar-card-title">
-              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-              </svg>
-              Skills Practiced
-            </h3>
+        <div class="card">
+          <div class="card__header flex items-center gap-2">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+            </svg>
+            <h3 class="m-0">Skills Practiced</h3>
+          </div>
+          <div class="card__body">
             <div class="sidebar-tags">
               {% for skill in project.skills %}
-              <span class="project-tag project-tag--skill">{{ skill }}</span>
+              <span class="badge badge--secondary">{{ skill }}</span>
               {% endfor %}
             </div>
           </div>
-        </aside>
-      </div>
+        </div>
+      </aside>
+
     </div>
   </div>
 </div>
 
+<!-- Starter Code Modal -->
 <div class="code-panel-overlay" id="code-overlay">
   <div class="code-panel-container">
     <div class="code-panel-header">
-      <div class="cph-left">
+      <div class="flex flex-col">
         <h3 class="cph-title">Starter Code</h3>
-        <span class="cph-filename" id="cph-filename"></span>
+        <span class="cph-filename" id="cph-filename" style="font-size: 0.875rem; color: var(--color-text-muted, #6c757d);"></span>
       </div>
-      <button class="cph-close" id="btn-close-code" aria-label="Close code panel">
+      <button class="cph-close btn btn--secondary" id="btn-close-code" aria-label="Close code panel" style="padding: 0.25rem;">
         <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18" />
           <line x1="6" y1="6" x2="18" y2="18" />
@@ -255,25 +261,43 @@
       </button>
     </div>
     <div class="code-panel-body" id="code-panel-body">
-      <div class="code-loading" id="code-loading">
-        <div class="spinner"></div>
+      <div class="code-loading flex flex-col items-center justify-center h-full" id="code-loading">
+        <div class="spinner mb-2" style="width: 2rem; height: 2rem; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite;"></div>
         <span>Loading starter code...</span>
       </div>
-      <div class="code-error" id="code-error" hidden>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <div class="code-error flex flex-col items-center justify-center h-full" id="code-error" hidden style="color: #f87171;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2">
           <circle cx="12" cy="12" r="10" />
           <line x1="12" y1="8" x2="12" y2="12" />
           <line x1="12" y1="16" x2="12.01" y2="16" />
         </svg>
         <span>Failed to load code. Please download it directly instead.</span>
       </div>
-      <pre class="code-content-block" id="code-content-block" hidden><code id="code-content" aria-label="Starter code"></code></pre>
+      <pre class="code-content-block m-0 h-full overflow-auto" id="code-content-block" hidden><code id="code-content" aria-label="Starter code" style="font-family: 'JetBrains Mono', monospace; font-size: 0.875rem;"></code></pre>
     </div>
   </div>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
+<style>
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .gap-1 { gap: 0.25rem; }
+  .gap-2 { gap: 0.5rem; }
+  .gap-4 { gap: 1rem; }
+  .gap-6 { gap: 1.5rem; }
+  .m-0 { margin: 0; }
+  .mb-2 { margin-bottom: 0.5rem; }
+  .mb-4 { margin-bottom: 1rem; }
+  .mb-5 { margin-bottom: 2rem; }
+  .mt-1 { margin-top: 0.25rem; }
+  .mt-2 { margin-top: 0.5rem; }
+  .mt-4 { margin-top: 1rem; }
+  .w-auto { width: auto; }
+  .h-full { height: 100%; }
+  .flex-shrink-0 { flex-shrink: 0; }
+  .overflow-auto { overflow: auto; }
+</style>
 <script>
   window.PROJECT_ID = {{ project.id }};
   
@@ -283,8 +307,8 @@
       const textSpan = btn.querySelector('.btn-share-text');
       const originalText = textSpan.innerText;
       textSpan.innerText = 'Copied!';
-      btn.style.backgroundColor = 'var(--success-bg, #dcfce7)';
-      btn.style.color = 'var(--success-text, #166534)';
+      btn.style.backgroundColor = 'var(--color-success-bg, #dcfce7)';
+      btn.style.color = 'var(--color-success-text, #166534)';
       setTimeout(() => {
         textSpan.innerText = originalText;
         btn.style.backgroundColor = '';

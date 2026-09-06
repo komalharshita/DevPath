@@ -1,150 +1,32 @@
 {% extends "base.html" %}
 
-{% block title %}Contact Us - DevPath{% endblock %}
-
-{% block extra_css %}
-<style>
-  .glass-panel {
-      background: var(--card-bg, rgba(255,255,255,0.06));
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-      border: 1px solid var(--border, rgba(255,255,255,0.1));
-      padding: 2rem;
-      border-radius: 16px;
-      backdrop-filter: blur(10px);
-  }
-  .contact-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-      max-width: 800px;
-      margin: 2rem auto 0;
-      text-align: left;
-  }
-  @media (min-width: 768px) {
-      .contact-grid {
-          grid-template-columns: 1fr 1.5fr;
-      }
-  }
-  .form-group {
-      margin-bottom: 1.5rem;
-  }
-  .form-label {
-      display: block;
-      color: var(--text-body);
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
-      font-weight: 500;
-  }
-  .form-input, .form-textarea {
-      width: 100%;
-      background: var(--input-bg, rgba(0, 0, 0, 0.05));
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.75rem 1rem;
-      color: var(--text-main);
-      font-family: inherit;
-      transition: all 0.3s ease;
-      box-sizing: border-box;
-  }
-  .form-input:focus, .form-textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
-  }
-  .contact-info-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-  }
-  .contact-info-list li {
-      color: var(--text-body);
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-  }
-</style>
-{% endblock %}
+{% block title %}Contact — DevPath{% endblock %}
 
 {% block content %}
-<section style="min-height: calc(100vh - 200px); display:flex; align-items:center; justify-content:center; text-align:center; padding: 120px 20px 60px;">
-    <div style="max-width: 800px; width:100%;">
-        <div class="hero-badge" style="margin: 0 auto 1.5rem;">
-            Contact DevPath
-        </div>
-
-        <h1 style="color: var(--text-main); margin-bottom: 1rem;">
-            Get In Touch
-        </h1>
-        <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 600px; margin-inline: auto;">
-            Have questions, feedback, or suggestions?
-            We'd love to hear from you and improve DevPath together.
-        </p>
-
-        <div class="contact-grid">
-            <!-- Contact Information -->
-            <div class="glass-panel" style="display: flex; flex-direction: column; justify-content: center;">
-                <h3 style="color: var(--text-main); margin-bottom: 1.5rem; font-size: 1.5rem;">
-                    Contact Information
-                </h3>
-                <ul class="contact-info-list">
-                    <li>
-                        <span style="font-size: 1.2rem;">📧</span> support@devpath.dev
-                    </li>
-                    <li>
-                        <span style="font-size: 1.2rem;">🌐</span> GitHub Community Support
-                    </li>
-                    <li>
-                        <span style="font-size: 1.2rem;">💡</span> Open to feedback, suggestions, and contributions
-                    </li>
-                </ul>
+<section class="py-16">
+    <div class="container max-w-3xl mx-auto">
+        <div class="card">
+            <div class="card__header text-center">
+                <h1 class="text-3xl font-display font-bold">Contact Us</h1>
+                <p class="text-muted">Have a question or feedback? We'd love to hear from you.</p>
             </div>
-
-            <!-- Contact Form -->
-            <div class="glass-panel">
-                <form class="contact-form" action="{{ config.CONTACT_FORM_ACTION }}" method="POST">
-                    {% if config.CONTACT_FORM_ACCESS_KEY %}
-                    <input type="hidden" name="access_key" value="{{ config.CONTACT_FORM_ACCESS_KEY }}">
-                    {% endif %}
-                    
+            <div class="card__body">
+                <form action="https://api.web3forms.com/submit" method="POST" id="contact-form" class="contact-form">
                     <div class="form-group">
                         <label for="name" class="form-label">Name</label>
-                        <input type="text" id="name" name="name" class="form-input" placeholder="Your Name" required>
+                        <input type="text" id="name" name="name" class="form-input" required>
                     </div>
-                    
                     <div class="form-group">
-                        <label for="email" class="form-label">Email Address</label>
-                        <input type="email" id="email" name="email" class="form-input" placeholder="you@example.com" required>
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" id="email" name="email" class="form-input" required>
                     </div>
-                    
                     <div class="form-group">
                         <label for="message" class="form-label">Message</label>
-                        <textarea id="message" name="message" class="form-textarea" rows="4" placeholder="How can we help you?" required></textarea>
+                        <textarea id="message" name="message" class="form-input" rows="5" required></textarea>
                     </div>
-                    
-                    <button type="submit" class="btn-primary" style="width: 100%; border: none; cursor: pointer; justify-content: center;">
-                        Send Message
-                    </button>
+                    <button type="submit" class="btn btn--primary btn--lg" style="width: 100%;">Send Message</button>
                 </form>
             </div>
-        </div>
-
-        <div style="margin-top: 3rem; display:flex; justify-content:center; align-items:center; gap:1.5rem; flex-wrap:wrap;">
-            <a href="https://github.com/komalharshita/DevPath"
-               target="_blank"
-               class="btn-primary">
-                Visit GitHub Repository
-            </a>
-            <a href="/"
-                class="btn-clear"
-                style="
-                text-decoration:none;
-                min-width: 220px;
-                display: flex;
-                justify-content: center;
-                ">
-                    Back to Home
-            </a>
         </div>
     </div>
 </section>

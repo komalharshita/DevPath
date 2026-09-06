@@ -1,93 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description"
-    content="{% block meta_description %}{{ config.SITE_DESCRIPTION | default('DevPath recommends real coding projects based on your skills, level, and interests — with full roadmaps and starter code.') }}{% endblock %}" />
+  <meta name="description" content="{% block meta_description %}{{ config.SITE_DESCRIPTION | default('DevPath recommends real coding projects based on your skills.') }}{% endblock %}" />
   <title>{% block title %}DevPath — Find Projects Based On Your Skills{% endblock %}</title>
 
-  <script>
-    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-      window.addEventListener('error', function(e) {
-        var errDiv = document.createElement('div');
-        errDiv.style.position = 'fixed';
-        errDiv.style.top = '0';
-        errDiv.style.left = '0';
-        errDiv.style.width = '100%';
-        errDiv.style.background = 'red';
-        errDiv.style.color = 'white';
-        errDiv.style.zIndex = '999999';
-        errDiv.style.padding = '20px';
-        errDiv.textContent = 'JS ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno;
-        document.body.appendChild(errDiv);
-      });
-      window.addEventListener('unhandledrejection', function(e) {
-        var errDiv = document.createElement('div');
-        errDiv.style.position = 'fixed';
-        errDiv.style.top = '50px';
-        errDiv.style.left = '0';
-        errDiv.style.width = '100%';
-        errDiv.style.background = 'orange';
-        errDiv.style.color = 'white';
-        errDiv.style.zIndex = '999999';
-        errDiv.style.padding = '20px';
-        errDiv.textContent = 'PROMISE REJECTION: ' + (e.reason ? e.reason.message : e.reason);
-        document.body.appendChild(errDiv);
-      });
-    }
-  </script>
-
-  <!-- Open Graph meta tags for social media sharing -->
-  <meta property="og:title" content="{% block og_title %}DevPath — Find Projects Based On Your Skills{% endblock %}" />
-  <meta property="og:description" content="{% block og_description %}{{ config.SITE_DESCRIPTION | default('') }}{% endblock %}" />
-  <meta property="og:image" content="{% block og_image %}{% if config %}{{ config.get_og_image_url() }}{% endif %}{% endblock %}" />
-  <meta property="og:url" content="{% block og_url %}{% if config %}{{ config.get_base_url() }}{% endif %}/{% endblock %}" />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="{% if config %}{{ config.SITE_NAME }}{% else %}DevPath{% endif %}" />
-
-  <!-- Twitter Card meta tags -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="{% block twitter_title %}DevPath — Find Projects Based On Your Skills{% endblock %}" />
-  <meta name="twitter:description" content="{% block twitter_description %}{{ config.SITE_DESCRIPTION | default('') }}{% endblock %}" />
-  <meta name="twitter:image" content="{% block twitter_image %}{% if config %}{{ config.get_og_image_url() }}{% endif %}{% endblock %}" />
-
-  <script>
-    document.documentElement.setAttribute("data-entry-anim", "true");
-  </script>
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
-  {% include 'partials/theme_head.html' ignore missing %}
   
-  <link rel="stylesheet" href="/static/style.css" />
-  <link rel="stylesheet" href="/static/bookmarks.css" />
-  <link rel="stylesheet" href="/static/animations.css" />
-  <link rel="stylesheet" href="/static/recently-viewed.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/design-system.css" />
+  <link rel="stylesheet" href="/static/components.css" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet" />
 
   {% block extra_css %}{% endblock %}
 </head>
 <body>
   {% include 'partials/navbar.html' ignore missing %}
 
-  <noscript>
-    <div class="noscript-warning">
-      <p>JavaScript is required to use DevPath. Please enable JavaScript in your browser settings and reload the page.</p>
-    </div>
-  </noscript>
-
   <main>
     {% block content %}{% endblock %}
   </main>
 
   {% include 'partials/footer.html' ignore missing %}
-  {% include 'partials/scroll_top_btn.html' ignore missing %}
-
-  <script src="/static/script.js"></script>
-  <script src="/static/bookmarks.js"></script>
-  <script src="/static/recently-viewed.js"></script>
-  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
-  <script src="/static/animations.js"></script>
-
+  
+  <!-- Add any base scripts here -->
+  <script>
+    // Simple theme toggle logic
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    });
+  </script>
   {% block extra_scripts %}{% endblock %}
 </body>
 </html>
