@@ -16,13 +16,21 @@
   {% block extra_css %}{% endblock %}
 </head>
 <body>
-  {% include 'partials/navbar.html' ignore missing %}
+  {% if request.endpoint == 'main.index' or request.path == '/' %}
+    {% include 'partials/landing_navbar.html' ignore missing %}
+  {% else %}
+    {% include 'partials/navbar.html' ignore missing %}
+  {% endif %}
 
   <main>
     {% block content %}{% endblock %}
   </main>
 
-  {% include 'partials/footer.html' ignore missing %}
+  {% if request.endpoint == 'main.index' or request.path == '/' %}
+    {% include 'partials/landing_footer.html' ignore missing %}
+  {% else %}
+    {% include 'partials/footer.html' ignore missing %}
+  {% endif %}
   
   <!-- Add any base scripts here -->
   <script>

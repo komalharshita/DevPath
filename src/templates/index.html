@@ -2,109 +2,178 @@
 
 {% block title %}DevPath — Find Projects Based On Your Skills{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="/static/landing.css">
+{% endblock %}
+
 {% block content %}
-<section class="hero py-12" id="home">
-    <div class="container text-center">
-        <div class="badge badge--primary mb-4">Open Source Developer Tool</div>
-        <h1 class="text-4xl font-display font-bold mb-4">Build Projects That Actually Matter</h1>
-        <p class="text-muted mb-8 max-w-2xl mx-auto">Tell DevPath what you know, what interests you, and how much time you have. Get matched to real coding projects with step-by-step roadmaps and ready-to-run starter code.</p>
-        <div class="flex justify-center gap-4">
-            <a href="#find-project" class="btn btn--primary btn--lg">Start Finding Projects</a>
-            <a href="#how-it-works" class="btn btn--secondary btn--lg">See How It Works</a>
-        </div>
-    </div>
-</section>
+<script>
+    // Apply body class for landing page styling scoping
+    document.body.classList.add('landing-page');
+</script>
 
-<section class="stats-section py-12 bg-surface" id="stats">
-    <div class="container grid grid-cols-md-3 gap-6 text-center">
-        <div class="card p-6">
-            <h3 class="text-3xl font-display font-bold text-primary mb-2">{{ stats.total_projects }}</h3>
-            <p class="text-muted">Real Projects</p>
-        </div>
-        <div class="card p-6">
-            <h3 class="text-3xl font-display font-bold text-warning mb-2">{{ stats.unique_skills }}</h3>
-            <p class="text-muted">Unique Skills</p>
-        </div>
-        <div class="card p-6">
-            <h3 class="text-3xl font-display font-bold text-success mb-2">{{ stats.beginner_friendly }}</h3>
-            <p class="text-muted">Beginner Friendly</p>
-        </div>
-    </div>
-</section>
-
-<!-- Include hidden form IDs needed by script.js -->
-<section class="form-section py-16" id="find-project">
-    <div class="container max-w-3xl mx-auto">
-        <div class="card">
-            <div class="card__header text-center">
-                <h2 class="text-2xl font-display font-bold">Find The Project</h2>
-                <p class="text-muted">Fill in your details below and DevPath will match you.</p>
+<section class="landing-hero" id="home">
+    <div class="landing-container landing-hero-grid">
+        <!-- LEFT: CONTENT -->
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="dot"></span> OPEN SOURCE DEVELOPER TOOL
             </div>
-            <div class="card__body">
-                <form id="recommend-form" novalidate>
-                    <input type="hidden" id="skills" name="skills" value="[]">
-                    
-                    <div class="form-group" id="skill-input-wrap">
-                        <label class="form-label" for="skills-input">Your Skills</label>
-                        <div class="flex flex-wrap gap-2 mb-2" id="skill-chips-selected"></div>
-                        <input type="text" id="skills-input" class="form-input" placeholder="Search or add a skill, e.g. Python, React" autocomplete="off">
-                        <div id="skills-suggestions" class="hidden"></div>
-                    </div>
+            <h1 class="hero-headline">
+                Build Projects
+                <span class="yellow">That Actually</span>
+                <span class="yellow">Matter</span>
+            </h1>
+            <p class="hero-desc">Tell DevPath what you know, what interests you, and how much time you have. Get matched to real coding projects with step-by-step roadmaps and ready-to-run starter code.</p>
+            <div class="hero-ctas">
+                <a href="#find-project" class="btn-yellow">Start Finding Projects</a>
+                <a href="#how-it-works" class="btn-ghost">See How It Works</a>
+            </div>
+        </div>
 
-                    <div class="grid grid-cols-md-3 gap-4 mb-6">
-                        <div class="form-group">
-                            <label class="form-label" for="level">Experience Level</label>
-                            <select id="level" name="level" class="form-select">
-                                {% for level in available_levels %}
-                                <option value="{{ level }}">{{ level }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="interest">Area of Interest</label>
-                            <select id="interest" name="interest" class="form-select">
-                                <option value="">Any Interest</option>
-                                {% for interest in available_interests %}
-                                <option value="{{ interest }}">{{ interest }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="time">Time Available</label>
-                            <select id="time" name="time" class="form-select">
-                                <option value="Low">Low (1-3 days)</option>
-                                <option value="Medium" selected>Medium (1-2 weeks)</option>
-                                <option value="High">High (3+ weeks)</option>
-                            </select>
-                        </div>
-                    </div>
+        <!-- RIGHT: PRODUCT VISUAL -->
+        <div class="hero-visual">
+            <div class="float-card top">
+                <div class="float-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                </div>
+                <div class="float-text">
+                    <h4>Starter Code Ready</h4>
+                    <p>Download and start immediately</p>
+                </div>
+            </div>
 
-                    <div class="flex justify-between items-center mt-6">
-                        <button type="reset" id="clear-filters-btn" class="btn btn--ghost">Reset</button>
-                        <button type="submit" id="submit-btn" class="btn btn--primary btn--lg">
-                            <span id="btn-label">Generate My Projects</span>
-                            <span id="btn-loading" class="hidden">Loading...</span>
-                        </button>
+            <div class="code-panel">
+                <div class="code-header">
+                    <div class="code-dots">
+                        <div class="code-dot red"></div>
+                        <div class="code-dot yellow"></div>
+                        <div class="code-dot green"></div>
                     </div>
-                </form>
+                    <div class="code-filename">expense_tracker.py</div>
+                </div>
+                <div class="code-content">
+<span class="code-keyword">def</span> <span class="code-func">add_expense</span>(category, amount):
+    <span class="code-comment"># Save entry to CSV</span>
+    date = datetime.now()
+    <span class="code-keyword">with</span> open(DATA_FILE) <span class="code-keyword">as</span> f:
+        writer.writerow([date, ...])
+
+<span class="code-keyword">def</span> <span class="code-func">monthly_summary</span>():
+    <span class="code-comment"># TODO: implement</span>
+    <span class="code-keyword">pass</span>
+                </div>
+            </div>
+
+            <div class="float-card bottom">
+                <div class="float-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                <div class="float-text">
+                    <h4>7-Step Roadmap</h4>
+                    <p>Clear path from start to finish</p>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Results Section -->
-<section class="results-section py-16 hidden" id="results-section">
-    <div class="container">
-        <h2 class="text-2xl font-display font-bold mb-8 text-center">Your Recommendations</h2>
+<!-- HOW IT WORKS -->
+<section class="landing-section" id="how-it-works">
+    <div class="landing-container">
+        <h2>How DevPath Works</h2>
+        <p>Three simple steps. No account required. No fluff.</p>
+        
+        <div class="grid-3">
+            <div class="feature-box">
+                <h3 style="font-size: 2rem; opacity: 0.5;">01</h3>
+                <h3>Enter Your Skills</h3>
+                <p>Type your programming skills or click quick-select chips. Add as many as you like.</p>
+            </div>
+            <div class="feature-box">
+                <h3 style="font-size: 2rem; opacity: 0.5;">02</h3>
+                <h3>Set Preferences</h3>
+                <p>Select your experience level, area of interest, and how much time you can commit.</p>
+            </div>
+            <div class="feature-box">
+                <h3 style="font-size: 2rem; opacity: 0.5;">03</h3>
+                <h3>Get Matched</h3>
+                <p>DevPath returns your top matched projects with roadmaps and starter code.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FORM SECTION -->
+<section class="landing-section" id="find-project">
+    <div class="landing-container max-w-3xl mx-auto">
+        <h2>Find The Project</h2>
+        <p>Fill in your details below and DevPath will match you.</p>
+
+        <div class="landing-form-card">
+            <form id="recommend-form" novalidate>
+                <input type="hidden" id="skills" name="skills" value="[]">
+                
+                <div class="form-group" id="skill-input-wrap">
+                    <label class="form-label" for="skills-input">Your Skills</label>
+                    <div class="flex flex-wrap gap-2 mb-2" id="skill-chips-selected"></div>
+                    <input type="text" id="skills-input" class="form-input" placeholder="Search or add a skill, e.g. Python, React" autocomplete="off">
+                    <div id="skills-suggestions" class="hidden"></div>
+                </div>
+
+                <div class="grid grid-cols-md-3 gap-4 mb-6">
+                    <div class="form-group">
+                        <label class="form-label" for="level">Experience Level</label>
+                        <select id="level" name="level" class="form-select">
+                            {% for level in available_levels %}
+                            <option value="{{ level }}">{{ level }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="interest">Area of Interest</label>
+                        <select id="interest" name="interest" class="form-select">
+                            <option value="">Any Interest</option>
+                            {% for interest in available_interests %}
+                            <option value="{{ interest }}">{{ interest }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="time">Time Available</label>
+                        <select id="time" name="time" class="form-select">
+                            <option value="Low">Low (1-3 days)</option>
+                            <option value="Medium" selected>Medium (1-2 weeks)</option>
+                            <option value="High">High (3+ weeks)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mt-6">
+                    <button type="reset" id="clear-filters-btn" class="btn btn--ghost" style="color: #666; border: none;">Reset</button>
+                    <button type="submit" id="submit-btn" class="btn-yellow" style="border: none; cursor: pointer;">
+                        <span id="btn-label">Generate My Projects</span>
+                        <span id="btn-loading" class="hidden">Loading...</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- RESULTS SECTION -->
+<section class="landing-section hidden" id="results-section">
+    <div class="landing-container">
+        <h2>Your Recommendations</h2>
         
         <div id="results-loading" class="text-center py-12 hidden">
             <div class="spinner"></div>
-            <p class="mt-4 text-muted">Finding the best projects for you...</p>
+            <p class="mt-4">Finding the best projects for you...</p>
         </div>
 
         <div id="results-empty" class="text-center py-12 hidden">
             <h3 class="text-xl font-bold mb-2">No exact matches found</h3>
-            <p id="empty-message" class="text-muted">Try adjusting your filters.</p>
+            <p id="empty-message">Try adjusting your filters.</p>
         </div>
 
         <div id="results-grid" class="grid grid-cols-md-2 grid-cols-lg-3 gap-6">
@@ -112,7 +181,7 @@
         </div>
 
         <div class="text-center mt-8">
-            <button id="show-more-btn" class="btn btn--secondary hidden">Show More</button>
+            <button id="show-more-btn" class="btn-ghost hidden">Show More</button>
         </div>
     </div>
 </section>
