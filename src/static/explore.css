@@ -1,0 +1,16 @@
+/* explore.css */
+.explore-layout {
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .explore-layout {
+    grid-template-columns: 280px 1fr;
+  }
+}
+
+.explore-sidebar {
+  position: sticky;
+  top: var(--space-24);
+}
