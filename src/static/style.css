@@ -4140,12 +4140,12 @@ body.dark-theme .btn-clear:hover {
   display: flex;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   #scroll-top-btn {
-    bottom: 1.25rem;
+    bottom: 4.5rem;
     right: 1.25rem;
-    width: 2.4rem;
-    height: 2.4rem;
+    width: 2.75rem;
+    height: 2.75rem;
   }
 }
 
