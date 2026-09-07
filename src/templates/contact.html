@@ -55,6 +55,19 @@
             background: rgba(0, 0, 0, 0.3);
             box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
         }
+        .char-counter {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #9ca3af;
+            text-align: right;
+        }
+        .char-counter.warn {
+            color: #facc15;
+        }
+        .char-counter.danger {
+            color: #f87171;
+            font-weight: 600;
+        }
         .contact-info-list {
             list-style: none;
             padding: 0;
@@ -124,17 +137,18 @@
                         
                         <div class="form-group">
                             <label for="name" class="form-label">Name</label>
-                            <input type="text" id="name" name="name" class="form-input" placeholder="Your Name" required>
+                            <input type="text" id="name" name="name" class="form-input" placeholder="Your Name" maxlength="100" required>
                         </div>
                         
                         <div class="form-group">
                             <label for="email" class="form-label">Email Address</label>
-                            <input type="email" id="email" name="email" class="form-input" placeholder="you@example.com" required>
+                            <input type="email" id="email" name="email" class="form-input" placeholder="you@example.com" maxlength="254" required>
                         </div>
                         
                         <div class="form-group">
                             <label for="message" class="form-label">Message</label>
-                            <textarea id="message" name="message" class="form-textarea" rows="4" placeholder="How can we help you?" required></textarea>
+                            <textarea id="message" name="message" class="form-textarea" rows="4" placeholder="How can we help you?" maxlength="1000" required></textarea>
+                            <div class="char-counter" id="message-counter">1000 characters remaining</div>
                         </div>
                         
                         <button type="submit" class="btn-primary" style="width: 100%; border: none; cursor: pointer; justify-content: center;">
@@ -179,6 +193,21 @@
   </footer>
 
   <script src="/static/script.js"></script>
+  <script>
+    (function () {
+      var message = document.getElementById("message");
+      var counter = document.getElementById("message-counter");
+      if (!message || !counter) return;
+      var max = parseInt(message.getAttribute("maxlength"), 10) || 1000;
+      var warnAt = Math.floor(max * 0.8);
+      message.addEventListener("input", function () {
+        var left = max - message.value.length;
+        counter.textContent = left + " characters remaining";
+        counter.classList.toggle("danger", left <= 0);
+        counter.classList.toggle("warn", left > 0 && left <= max - warnAt);
+      });
+    })();
+  </script>
 </body>
 
 </html>
