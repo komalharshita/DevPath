@@ -42,15 +42,18 @@ def test_admin_create_rejected_without_csrf_when_enabled(client):
     """With CSRF enabled, a POST without a token must be rejected."""
     from app import app
     app.config["WTF_CSRF_ENABLED"] = True
-    _login_admin(client)
-    response = client.post("/admin/projects/new", data={
-        "title": "Test Project",
-        "level": "Beginner",
-        "interest": "Web",
-        "time": "Low",
-        "description": "desc",
-    })
-    assert response.status_code == 400
+    try:
+        _login_admin(client)
+        response = client.post("/admin/projects/new", data={
+            "title": "Test Project",
+            "level": "Beginner",
+            "interest": "Web",
+            "time": "Low",
+            "description": "desc",
+        })
+        assert response.status_code == 400
+    finally:
+        app.config["WTF_CSRF_ENABLED"] = False
 
 
 def test_admin_create_succeeds_with_csrf_when_enabled(client):
@@ -58,20 +61,23 @@ def test_admin_create_succeeds_with_csrf_when_enabled(client):
     import re
     from app import app
     app.config["WTF_CSRF_ENABLED"] = True
-    _login_admin(client)
+    try:
+        _login_admin(client)
 
-    # Fetch the create form to obtain a valid CSRF token from the session.
-    form = client.get("/admin/projects/new")
-    match = re.search(rb'name="csrf_token" value="([^"]+)"', form.data)
-    assert match is not None
-    token = match.group(1).decode()
+        # Fetch the create form to obtain a valid CSRF token from the session.
+        form = client.get("/admin/projects/new")
+        match = re.search(rb'name="csrf_token" value="([^"]+)"', form.data)
+        assert match is not None
+        token = match.group(1).decode()
 
-    response = client.post("/admin/projects/new", data={
-        "title": "Test Project",
-        "level": "Beginner",
-        "interest": "Web",
-        "time": "Low",
-        "description": "desc",
-        "csrf_token": token,
-    })
-    assert response.status_code == 302
+        response = client.post("/admin/projects/new", data={
+            "title": "Test Project",
+            "level": "Beginner",
+            "interest": "Web",
+            "time": "Low",
+            "description": "desc",
+            "csrf_token": token,
+        })
+        assert response.status_code == 302
+    finally:
+        app.config["WTF_CSRF_ENABLED"] = False
