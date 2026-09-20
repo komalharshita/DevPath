@@ -124,7 +124,6 @@ def _normalize_skill(s: str) -> str:
 # Keep the old name alive so score_single_project() and any external callers
 # that reference SKILL_ALIASES continue to work without modification.
 SKILL_ALIASES = SKILL_SYNONYMS
-
 def parse_skill_entries(skills_string):
     """Parse skills with optional per-skill proficiency levels."""
     if not skills_string or not skills_string.strip():
@@ -137,7 +136,8 @@ def parse_skill_entries(skills_string):
             parsed = json.loads(stripped)
             if isinstance(parsed, list):
                 tokens = [str(s).strip().lower() for s in parsed if str(s).strip()]
-                return [SKILL_SYNONYMS.get(token, token) for token in tokens]
+                canonical_tokens = [SKILL_SYNONYMS.get(token, token) for token in tokens]
+                return list(dict.fromkeys(canonical_tokens))
         except (json.JSONDecodeError, ValueError):
             pass  # fall through to comma-splitting
 
@@ -147,9 +147,16 @@ def parse_skill_entries(skills_string):
         for s in skills_string.split(",")
         if s.strip()  # skip blanks produced by trailing / consecutive commas
     ]
-    return [SKILL_SYNONYMS.get(token, token) for token in tokens]
+    canonical_tokens = [SKILL_SYNONYMS.get(token, token) for token in tokens]
+    return list(dict.fromkeys(canonical_tokens))
 
+def test_parse_skill_entries_deduplicates_synonyms():
+    """Verify that parse_skill_entries removes duplicate canonical tokens after alias resolution."""
+    from utils.recommender import parse_skill_entries
 
+    raw_input = "python, py, Python"
+    result = parse_skill_entries(raw_input)
+    assert result == ["python"]
 parse_skills = parse_skill_entries
 
 

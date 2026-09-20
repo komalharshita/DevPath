@@ -1,0 +1,73 @@
+/* compare.css */
+
+.compare-hero {
+    padding: 3rem 1rem;
+    background-color: var(--color-surface, #f8f9fa);
+    border-bottom: 1px solid var(--color-border, #dee2e6);
+}
+
+.compare-vs-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.25rem;
+    color: var(--color-text-muted, #6c757d);
+    padding: 1rem;
+}
+
+.compare-empty-icon {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    color: var(--color-text-muted, #6c757d);
+}
+
+.compare-quick-picks {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.compare-shared-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem;
+}
+
+.compare-stat-num {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-primary, #0d6efd);
+}
+
+.compare-stat-text {
+    font-size: 0.875rem;
+    color: var(--color-text-muted, #6c757d);
+}
+
+.compare-chart-card {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.compare-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.compare-list li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--color-border, #dee2e6);
+}
+
+.compare-list li:last-child {
+    border-bottom: none;
+}
+
+.hidden {
+    display: none !important;
+}

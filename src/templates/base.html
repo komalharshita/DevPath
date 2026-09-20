@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="{% block meta_description %}{{ config.SITE_DESCRIPTION | default('DevPath recommends real coding projects based on your skills.') }}{% endblock %}" />
+  <title>{% block title %}DevPath — Find Projects Based On Your Skills{% endblock %}</title>
+
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+  
+  <link rel="stylesheet" href="/static/design-system.css" />
+  <link rel="stylesheet" href="/static/components.css" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet" />
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  {% if request.endpoint == 'main.index' or request.path == '/' %}
+    {% include 'partials/landing_navbar.html' ignore missing %}
+  {% else %}
+    {% include 'partials/navbar.html' ignore missing %}
+  {% endif %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  {% if request.endpoint == 'main.index' or request.path == '/' %}
+    {% include 'partials/landing_footer.html' ignore missing %}
+  {% else %}
+    {% include 'partials/footer.html' ignore missing %}
+  {% endif %}
+  
+  <!-- Add any base scripts here -->
+  <script>
+    // Simple theme toggle logic
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    });
+  </script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>
