@@ -3,6 +3,21 @@
 {% block title %}Contact — DevPath{% endblock %}
 
 {% block content %}
+<style>
+    .char-counter {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        text-align: right;
+        margin-top: 0.25rem;
+    }
+    .char-counter.warn {
+        color: #facc15;
+    }
+    .char-counter.danger {
+        color: #f87171;
+        font-weight: 600;
+    }
+</style>
 <section class="py-16">
     <div class="container max-w-3xl mx-auto">
         <div class="card">
@@ -14,15 +29,16 @@
                 <form action="https://api.web3forms.com/submit" method="POST" id="contact-form" class="contact-form">
                     <div class="form-group">
                         <label for="name" class="form-label">Name</label>
-                        <input type="text" id="name" name="name" class="form-input" required>
+                        <input type="text" id="name" name="name" class="form-input" maxlength="100" required>
                     </div>
                     <div class="form-group">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" id="email" name="email" class="form-input" required>
+                        <input type="email" id="email" name="email" class="form-input" maxlength="254" required>
                     </div>
                     <div class="form-group">
                         <label for="message" class="form-label">Message</label>
-                        <textarea id="message" name="message" class="form-input" rows="5" required></textarea>
+                        <textarea id="message" name="message" class="form-input" rows="5" maxlength="1000" required></textarea>
+                        <div class="char-counter" id="message-counter">1000 characters remaining</div>
                     </div>
                     <button type="submit" class="btn btn--primary btn--lg" style="width: 100%;">Send Message</button>
                 </form>
@@ -30,4 +46,20 @@
         </div>
     </div>
 </section>
+
+<script>
+    (function () {
+        var message = document.getElementById("message");
+        var counter = document.getElementById("message-counter");
+        if (!message || !counter) return;
+        var max = parseInt(message.getAttribute("maxlength"), 10) || 1000;
+        var warnAt = Math.floor(max * 0.8);
+        message.addEventListener("input", function () {
+            var left = max - message.value.length;
+            counter.textContent = left + " characters remaining";
+            counter.classList.toggle("danger", left <= 0);
+            counter.classList.toggle("warn", left > 0 && left <= max - warnAt);
+        });
+    })();
+</script>
 {% endblock %}
