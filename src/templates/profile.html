@@ -1,183 +1,116 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Developer Profile - DevPath</title>
-  
-  <meta name="description" content="Manage your personalized DevPath developer profile." />
-  <meta name="theme-color" content="#ffffff" id="theme-color-meta" />
+{% extends "base.html" %}
 
-  <!-- Preconnect to Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <!-- Import Inter font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  {% include 'partials/theme_head.html' %}
+{% block title %}Developer Profile - DevPath{% endblock %}
+{% block meta_description %}Manage your personalized DevPath developer profile.{% endblock %}
 
-  <!-- Link to central stylesheet -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-  
-  <style>
-    .profile-header {
-      padding: 120px 0 60px 0;
-      text-align: center;
-      background: var(--bg-card);
-      border-bottom: 1px solid var(--border);
-    }
-    
-    .profile-avatar {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 1.5rem;
-      border: 4px solid var(--primary-light);
-    }
-    
-    .profile-name {
-      font-size: 2.5rem;
-      font-weight: 800;
-      color: var(--text-main);
-      margin-bottom: 0.5rem;
-    }
-    
-    .profile-meta {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-    }
-    
-    .profile-content {
-      padding: 60px 0;
-      min-height: 50vh;
-    }
-    
-    .section-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    
-    .skills-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      margin-bottom: 3rem;
-    }
-    
-    .btn-danger {
-      background-color: transparent;
-      color: #ef4444;
-      border: 1px solid #ef4444;
-      padding: 0.5rem 1rem;
-      border-radius: 0.5rem;
-      font-weight: 600;
-      text-decoration: none;
-      display: inline-block;
-      margin-top: 1rem;
-      transition: all 0.2s ease;
-    }
-    
-    .btn-danger:hover {
-      background-color: #ef4444;
-      color: white;
-    }
-  </style>
-</head>
-<body>
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='profile.css') }}">
+{% endblock %}
 
-  <!-- ============================================================
-       Desktop & Mobile Navigation
-  ============================================================= -->
-  <nav class="navbar" aria-label="Main navigation">
-    <div class="nav-inner">
-      <a href="/" class="nav-logo">DevPath</a>
+{% block content %}
+<header class="profile-header">
+  <div class="container text-center">
+    {% if user.avatar_url %}
+    <img src="{{ user.avatar_url }}" alt="Profile Picture" class="profile-avatar">
+    {% else %}
+    <div class="profile-avatar profile-avatar--placeholder">
+      {{ user.username[0] | upper }}
+    </div>
+    {% endif %}
+    <h1>{{ user.username }}</h1>
+    <div class="flex items-center justify-center gap-2 mt-2 text-muted">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+      </svg>
+      <span>GitHub Account Connected</span>
+    </div>
+    
+    <div class="mt-4 mb-4">
+      <a href="/explore" class="btn btn--primary">Explore Projects</a>
+    </div>
+  </div>
+</header>
 
-      <!-- Desktop center: search form -->
-      <form id="topic-search-form" class="navbar-search" role="search">
-        <input type="text" id="topic-search-input" class="navbar-search-input" placeholder="Search projects by topic, skill, or title..." aria-label="Search projects">
-        <button type="submit" class="navbar-search-btn" aria-label="Submit search">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+<section class="container mt-8 mb-8">
+  <div class="grid grid-cols-1 grid-cols-lg-3">
+    
+    <!-- User Stats Card -->
+    <div class="card">
+      <div class="card__header">
+        <h2 class="flex items-center gap-2">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 12h4l3-9 5 18 3-9h5"/>
           </svg>
-        </button>
-      </form>
-
-      <!-- Desktop right side -->
-      <div class="nav-actions">
-        <button class="theme-toggle" id="theme-toggle-desktop" aria-label="Toggle dark mode">
-          <svg class="sun-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-          </svg>
-          <svg class="moon-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display: none;">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-          </svg>
-        </button>
-        <form method="POST" action="/auth/logout" style="display: inline; margin: 0;">
+          User Stats
+        </h2>
+      </div>
+      <div class="card__body flex flex-col gap-4">
+        <div>
+          <span class="stat-label">Account Created</span>
+          <span class="text-muted">{{ user.created_at.strftime('%B %d, %Y') if user.created_at else 'Unknown' }}</span>
+        </div>
+        <div>
+          <span class="stat-label">Total Saved Skills</span>
+          <span class="text-muted">{{ user.saved_skills|length if user.saved_skills else 0 }}</span>
+        </div>
+        <div>
+          <span class="stat-label">Bookmarked Projects</span>
+          <span class="text-muted">{{ user.bookmarked_projects|length if user.bookmarked_projects else 0 }}</span>
+        </div>
+        <div>
+          <span class="stat-label">Projects In Progress</span>
+          <span class="text-muted">{{ user.progress|length if user.progress else 0 }}</span>
+        </div>
+      </div>
+      <div class="card__footer flex justify-center">
+        <form method="POST" action="/auth/logout">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-          <button type="submit" class="btn-primary" style="padding: 0.5rem 1rem; border: none; cursor: pointer;">Logout</button>
+          <button type="submit" class="btn btn-danger">Disconnect Account</button>
         </form>
       </div>
-
-      <!-- Mobile hamburger toggle -->
-      <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-mobile-menu">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-      </button>
     </div>
-
-    <!-- Mobile Navigation Menu -->
-    <div class="nav-mobile-menu" id="nav-mobile-menu" role="menu">
-      <a href="/" class="nav-mobile-link" role="menuitem">Home</a>
-      <a href="/explore" class="nav-mobile-link" role="menuitem">Explore All</a>
-      <form method="POST" action="/auth/logout" style="display: block; margin: 0;">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        <button type="submit" class="nav-mobile-link" role="menuitem" style="width: 100%; text-align: left; background: none; border: none; color: inherit; cursor: pointer;">Logout</button>
-      </form>
-      <button class="nav-mobile-link theme-toggle" id="theme-toggle-mobile" role="menuitem" style="text-align: left; width: 100%; display: flex; align-items: center; justify-content: space-between;">
-        <span>Toggle Theme</span>
-        <svg class="sun-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-        <svg class="moon-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display: none;"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-      </button>
-    </div>
-  </nav>
-
-  <!-- ============================================================
-       Profile Header
-  ============================================================= -->
-  <header class="profile-header">
-    <div class="container">
-      {% if user.avatar_url %}
-      <img src="{{ user.avatar_url }}" alt="{{ user.username }}'s avatar" class="profile-avatar">
-      {% else %}
-      <div class="profile-avatar" style="background: var(--primary); display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 3rem; font-weight: 700;">
-        {{ user.username[0] | upper }}
+    
+    <!-- Bookmarked Projects Card -->
+    <div class="card">
+      <div class="card__header">
+        <h2>Bookmarked Projects</h2>
       </div>
-      {% endif %}
-      <h1 class="profile-name">{{ user.username }}</h1>
-      <p class="profile-meta">GitHub Developer Profile</p>
+      <div class="card__body">
+        {% if user.bookmarked_projects %}
+        <ul class="profile-list">
+          {% for project_id in user.bookmarked_projects %}
+          <li>
+            <a href="/project/{{ project_id }}" class="profile-link">Project #{{ project_id }}</a>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted">No bookmarked projects yet.</p>
+        {% endif %}
+      </div>
     </div>
-  </header>
-
-  <!-- ============================================================
-       Main Content
-  ============================================================= -->
-  <main class="profile-content container">
-    <div style="margin-top: 4rem; border-top: 1px solid var(--border); padding-top: 2rem;">
-      <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main);">Account Management</h3>
-      <p style="color: var(--text-muted); font-size: 0.95rem;">You are currently authenticated via GitHub OAuth.</p>
-      <form method="POST" action="/auth/logout" style="display: inline-block; margin-top: 1rem;">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        <button type="submit" class="btn-danger" style="border: none; cursor: pointer;">Sign Out</button>
-      </form>
+    
+    <!-- Progress Tracking Card -->
+    <div class="card">
+      <div class="card__header">
+        <h2>Progress Tracking</h2>
+      </div>
+      <div class="card__body">
+        {% if user.progress %}
+        <ul class="profile-list">
+          {% for p in user.progress %}
+          <li class="flex items-center justify-between">
+            <a href="/project/{{ p.project.id }}" class="profile-link">{{ p.project.title }}</a>
+            <span class="badge badge--success">In Progress</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted">No projects in progress.</p>
+        {% endif %}
+      </div>
     </div>
-  </main>
-
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
-</html>
+    
+  </div>
+</section>
+{% endblock %}

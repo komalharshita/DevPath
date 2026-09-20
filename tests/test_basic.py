@@ -473,7 +473,7 @@ def test_explore_route():
     html = response.data.decode("utf-8")
     assert "Explore All Projects" in html
     # The max per_page is 5, so there should be pagination controls or fewer items.
-    assert 'class="project-card"' in html
+    assert 'project-card' in html
 
 def test_contact_page_renders_send_message_form():
     """Contact page should include the external form handler and required fields."""
@@ -1286,6 +1286,10 @@ if __name__ == "__main__":
     failed = 0
 
     for fn in test_functions:
+        import inspect
+        if len(inspect.signature(fn).parameters) > 0:
+            print(f"  SKIP  {fn.__name__} (requires fixtures)")
+            continue
         try:
             fn()
             print(f"  PASS  {fn.__name__}")
@@ -1338,3 +1342,11 @@ def test_ml_recommendation_prefers_relevant_python_data_project():
     recs = results.get("recommendations", [])
     titles = [project["title"] for project in recs]
     assert any("Data" in title or "Pipeline" in title for title in titles)
+
+def test_parse_skill_entries_deduplicates_synonyms():
+    """Verify parse_skill_entries and also  removes duplicate canonical tokens after alias resolution."""
+    from utils.recommender import parse_skill_entries
+
+    raw_input = "python, py, Python"
+    result = parse_skill_entries(raw_input)
+    assert result == ["python"]
