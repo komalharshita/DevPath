@@ -82,6 +82,13 @@
             <span class="btn-share-text">Copy Direct Link</span>
           </button>
         </div>
+
+        <div class="share-toast" id="share-toast" role="alert" aria-live="assertive">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <span id="share-toast-msg">Link copied to clipboard!</span>
+        </div>
       </div>
     </div>
   </div>
@@ -309,6 +316,16 @@
       textSpan.innerText = 'Copied!';
       btn.style.backgroundColor = 'var(--color-success-bg, #dcfce7)';
       btn.style.color = 'var(--color-success-text, #166534)';
+
+      const toast = document.getElementById('share-toast');
+      if (toast) {
+        toast.classList.add('show');
+        clearTimeout(toast._hideTimer);
+        toast._hideTimer = setTimeout(() => {
+          toast.classList.remove('show');
+        }, 2000);
+      }
+
       setTimeout(() => {
         textSpan.innerText = originalText;
         btn.style.backgroundColor = '';

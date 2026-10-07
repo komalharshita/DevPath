@@ -6,6 +6,18 @@
   <meta name="description" content="{% block meta_description %}{{ config.SITE_DESCRIPTION | default('DevPath recommends real coding projects based on your skills.') }}{% endblock %}" />
   <title>{% block title %}DevPath — Find Projects Based On Your Skills{% endblock %}</title>
 
+  <meta property="og:title" content="{% block og_title %}DevPath — Find Projects Based On Your Skills{% endblock %}" />
+  <meta property="og:description" content="{% block og_description %}{{ config.SITE_DESCRIPTION }}{% endblock %}" />
+  <meta property="og:image" content="{{ config.get_og_image_url() }}" />
+  <meta property="og:url" content="{% block og_url %}{{ config.get_base_url() }}{{ request.path }}{% endblock %}" />
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
+  <meta property="og:site_name" content="{{ config.SITE_NAME }}" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{% block twitter_title %}DevPath — Find Projects Based On Your Skills{% endblock %}" />
+  <meta name="twitter:description" content="{% block twitter_description %}{{ config.SITE_DESCRIPTION }}{% endblock %}" />
+  <meta name="twitter:image" content="{{ config.get_og_image_url() }}" />
+
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
   
   <link rel="stylesheet" href="/static/design-system.css" />

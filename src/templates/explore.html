@@ -85,7 +85,8 @@
       {% if projects %}
       <div class="grid grid-cols-1 grid-cols-md-2 grid-cols-lg-3">
         {% for project in projects %}
-        <div class="card project-card flex flex-col">
+        <div class="project-card">
+          <div class="card flex flex-col" style="height: 100%;">
           <div class="card__body flex flex-col" style="flex: 1;">
             <h3 class="mb-2" style="font-size: 1.1rem;">{{ project.title }}</h3>
             <p class="text-muted mb-4" style="font-size: 0.9rem; flex: 1;">{{ project.description | truncate(120) }}</p>
@@ -99,6 +100,7 @@
           </div>
           <div class="card__footer">
             <a href="/project/{{ project.id }}" class="btn btn--secondary" style="width: 100%;">View Project &rarr;</a>
+          </div>
           </div>
         </div>
         {% endfor %}
