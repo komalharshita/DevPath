@@ -175,9 +175,10 @@ python src/app.py
 
 ## Verify Everything Works
 
-Run the test suite:
+Install the test dependencies, then run the test suite:
 
 ```bash
+pip install -r requirements-dev.txt
 pytest tests/
 ```
 
