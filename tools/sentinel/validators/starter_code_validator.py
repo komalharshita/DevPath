@@ -153,7 +153,7 @@ def _validate_orphan_files(
         A sorted list of orphan starter code file paths.
     """
     orphan_files = [
-        str(file_path)
+        file_path.as_posix()
         for file_path in repository_files
         if file_path not in referenced_files
     ]
@@ -181,7 +181,7 @@ def _validate_empty_files(
         absolute_path = starter_code_dir / file_path.relative_to("starter_code")
 
         if absolute_path.stat().st_size == 0:
-            empty_files.append(str(file_path))
+            empty_files.append(file_path.as_posix())
 
     return sorted(empty_files)
 
@@ -200,7 +200,7 @@ def _validate_hidden_files(
         A sorted list of hidden starter code file paths.
     """
     hidden_files = [
-        str(file_path)
+        file_path.as_posix()
         for file_path in repository_files
         if file_path.name.startswith(".")
     ]
@@ -223,7 +223,7 @@ def _validate_supported_extensions(
         file extensions.
     """
     unsupported_files = [
-        str(file_path)
+        file_path.as_posix()
         for file_path in repository_files
         if file_path.suffix.lower() not in ALLOWED_STARTER_CODE_EXTENSIONS
     ]

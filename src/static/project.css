@@ -199,3 +199,25 @@
   flex-wrap: wrap;
   gap: 0.5rem;
 }
+
+/* Share toast notification */
+.share-toast {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  display: none;
+  align-items: center;
+  gap: 10px;
+  background: rgba(16, 185, 129, 0.95);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  z-index: 10000;
+}
+
+.share-toast.show {
+  display: flex;
+}

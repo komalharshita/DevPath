@@ -360,7 +360,7 @@ def profile():
         session.pop('user_id', None)
         return redirect(url_for('auth.login'))
         
-    return render_template("profile.html", user=user)
+    return render_template("profile.html", user=user, config=Config)
 
 @main.route("/project/<int:project_id>/code")
 def view_code(project_id):

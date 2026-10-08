@@ -4,6 +4,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="/static/landing.css">
+<link rel="stylesheet" href="/static/bookmarks.css">
 {% endblock %}
 
 {% block content %}
@@ -162,9 +163,20 @@
 </section>
 
 <!-- RESULTS SECTION -->
-<section class="landing-section hidden" id="results-section">
+<section class="landing-section" id="results-section" style="display:none;" aria-live="polite" aria-atomic="false">
     <div class="landing-container">
-        <h2>Your Recommendations</h2>
+        <div class="flex justify-between items-center flex-wrap gap-4">
+            <h2>Your Recommendations</h2>
+            <div class="progress-meter-widget" style="min-width: 220px;">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-muted" style="font-size: 0.85rem;">Your Progress</span>
+                    <span id="progress-meter-label" style="font-size: 0.85rem; font-weight: 600;">0%</span>
+                </div>
+                <div class="progress-meter" style="height: 8px; background: rgba(128,128,128,0.25); border-radius: 999px; overflow: hidden;">
+                    <span class="progress-meter-fill" id="progress-meter-fill" style="display: block; width: 0%; height: 100%; background: var(--color-primary, #facc15); border-radius: 999px; transition: width 0.3s ease;" role="progressbar" aria-label="Points progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></span>
+                </div>
+            </div>
+        </div>
         
         <div id="results-loading" class="text-center py-12 hidden">
             <div class="spinner"></div>
@@ -183,7 +195,22 @@
         <div class="text-center mt-8">
             <button id="show-more-btn" class="btn-ghost hidden">Show More</button>
         </div>
+
+        <div class="saved-projects-panel" id="saved-projects-panel">
+            <div class="saved-projects-header">
+                <div>
+                    <h3>Saved Projects</h3>
+                    <p>Shortlist ideas you want to revisit later.</p>
+                </div>
+                <span class="saved-projects-count" id="saved-projects-count">0 saved</span>
+            </div>
+            <div class="saved-projects-list" id="saved-projects-list"></div>
+        </div>
     </div>
 </section>
 
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/bookmarks.js"></script>
 {% endblock %}

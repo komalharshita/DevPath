@@ -50,43 +50,26 @@
           <span class="text-muted">{{ user.created_at.strftime('%B %d, %Y') if user.created_at else 'Unknown' }}</span>
         </div>
         <div>
-          <span class="stat-label">Total Saved Skills</span>
-          <span class="text-muted">{{ user.saved_skills|length if user.saved_skills else 0 }}</span>
-        </div>
-        <div>
-          <span class="stat-label">Bookmarked Projects</span>
-          <span class="text-muted">{{ user.bookmarked_projects|length if user.bookmarked_projects else 0 }}</span>
-        </div>
-        <div>
           <span class="stat-label">Projects In Progress</span>
           <span class="text-muted">{{ user.progress|length if user.progress else 0 }}</span>
         </div>
+      </div>
+    </div>
+    
+    <!-- Account Management Card -->
+    <div class="card">
+      <div class="card__header">
+        <h2>Account Management</h2>
+      </div>
+      <div class="card__body">
+        <p class="text-muted">You are currently authenticated via GitHub OAuth.</p>
+        <p class="text-muted">Sign out to disconnect your GitHub account from DevPath.</p>
       </div>
       <div class="card__footer flex justify-center">
         <form method="POST" action="/auth/logout">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <button type="submit" class="btn btn-danger">Disconnect Account</button>
         </form>
-      </div>
-    </div>
-    
-    <!-- Bookmarked Projects Card -->
-    <div class="card">
-      <div class="card__header">
-        <h2>Bookmarked Projects</h2>
-      </div>
-      <div class="card__body">
-        {% if user.bookmarked_projects %}
-        <ul class="profile-list">
-          {% for project_id in user.bookmarked_projects %}
-          <li>
-            <a href="/project/{{ project_id }}" class="profile-link">Project #{{ project_id }}</a>
-          </li>
-          {% endfor %}
-        </ul>
-        {% else %}
-        <p class="text-muted">No bookmarked projects yet.</p>
-        {% endif %}
       </div>
     </div>
     
