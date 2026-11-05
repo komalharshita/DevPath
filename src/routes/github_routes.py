@@ -44,6 +44,12 @@ def callback():
     if not code:
         return redirect("/?github_auth=error")
 
+    # Validate the state parameter to prevent login CSRF.
+    expected_state = session.pop(_OAUTH_STATE_KEY, None)
+    returned_state = request.args.get("state")
+    if not expected_state or not returned_state or not secrets.compare_digest(expected_state, returned_state):
+        return redirect("/?github_auth=error")
+
     redirect_uri = Config.BASE_URL.rstrip('/') + url_for("github.callback")
     
     token_url = "https://github.com/login/oauth/access_token"
