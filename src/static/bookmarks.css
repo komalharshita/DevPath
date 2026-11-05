@@ -61,6 +61,36 @@
   margin: 0.25rem 0 0 0;
 }
 
+.saved-projects-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-export-markdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--accent, #6366f1);
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--accent, #6366f1);
+  padding: 0.375rem 0.75rem;
+  border-radius: 2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-export-markdown:hover {
+  background: var(--accent, #6366f1);
+  color: #ffffff;
+}
+
+.btn-export-markdown svg {
+  flex-shrink: 0;
+}
+
 .saved-projects-count {
   font-size: 0.8rem;
   font-weight: 600;

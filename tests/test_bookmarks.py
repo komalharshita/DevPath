@@ -68,6 +68,12 @@ def test_saved_projects_count_present(client):
     assert b'id="saved-projects-count"' in response.data
 
 
+def test_export_bookmarks_btn_present(client):
+    """export-bookmarks-markdown-btn element must be present in the homepage HTML."""
+    response = client.get("/")
+    assert b'id="export-bookmarks-markdown-btn"' in response.data
+
+
 def test_results_grid_present(client):
     """results-grid must be present — save buttons are injected here by JS."""
     response = client.get("/")
