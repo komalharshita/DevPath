@@ -30,3 +30,16 @@ def test_explore_dropdown_omits_interests_without_projects(client):
     assert response.status_code == 200
     assert b"Business Logic" not in response.data
     assert b"Machine Learning/AI" not in response.data
+
+
+def test_explore_dropdown_includes_skills_and_filters_by_skill(client):
+    """The dropdown must include skills and filter projects by selected skill."""
+    response = client.get("/explore")
+    assert response.status_code == 200
+    assert b"Tech Stack / Skill" in response.data
+    assert b"Python" in response.data or b"python" in response.data
+
+    # Filter by a known skill, e.g. python
+    filtered_response = client.get("/explore?skill=python")
+    assert filtered_response.status_code == 200
+    assert b"Showing" in filtered_response.data

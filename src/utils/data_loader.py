@@ -100,6 +100,16 @@ def get_available_interests():
     """Return all unique project interests."""
     projects = load_all_projects()
     return sorted({p["interest"] for p in projects if "interest" in p})
+
+def get_available_skills():
+    """Return all unique project skills, sorted alphabetically."""
+    projects = load_all_projects()
+    skills = set()
+    for p in projects:
+        for s in p.get("skills", []):
+            if s and s.strip():
+                skills.add(s.strip())
+    return sorted(skills, key=lambda s: s.lower())
 def find_project_by_id(project_id):
     """Return the project whose 'id' matches project_id, or None."""
     from models import db
