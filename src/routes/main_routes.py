@@ -9,7 +9,7 @@ import random
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort, make_response, redirect, url_for, session, flash, current_app
 
 from utils.recommender import get_recommendations, validate_recommendation_inputs, diagnose_empty_state
-from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats, get_available_interests
+from utils.data_loader import find_project_by_id, load_all_projects, get_available_levels, get_project_stats, get_available_interests, get_available_skills
 from utils.roadmap_comparer import load_all_career_roadmaps, compare_roadmaps
 from utils.file_server import read_starter_code, resolve_starter_file
 from utils.rate_limiter import rate_limit
@@ -85,6 +85,7 @@ def explore():
     search_query = request.args.get("search", "").strip().lower()
     level_filter = request.args.get("level", "").strip().lower()
     interest_filter = request.args.get("interest", "").strip().lower()
+    skill_filter = request.args.get("skill", "").strip().lower()
     time_filter = request.args.get("time", "").strip().lower()
     sort_by = request.args.get("sort", "id_asc")
 
@@ -106,6 +107,9 @@ def explore():
             continue
             
         if interest_filter and p.get("interest", "").lower() != interest_filter:
+            continue
+
+        if skill_filter and not any(s.strip().lower() == skill_filter for s in p.get("skills", [])):
             continue
             
         if time_filter and p.get("time", "").lower() != time_filter:
@@ -140,6 +144,11 @@ def explore():
     # Also pass filter dropdown options to UI
     available_levels = get_available_levels()
     available_interests = get_available_interests()
+    available_skills = get_available_skills()
+    popular_skills = [
+        s for s in ["Python", "JavaScript", "HTML", "CSS", "Flask", "Docker", "Machine Learning", "TypeScript", "Java", "Node.js", "C++"]
+        if any(s.lower() == avail.lower() for avail in available_skills)
+    ]
     stats = get_project_stats()
     
     return render_template(
@@ -151,10 +160,13 @@ def explore():
         search=search_query,
         level=level_filter,
         interest=interest_filter,
+        skill=skill_filter,
         time=time_filter,
         sort=sort_by,
         available_levels=available_levels,
         available_interests=available_interests,
+        available_skills=available_skills,
+        popular_skills=popular_skills,
         stats=stats,
         config=Config
     )
