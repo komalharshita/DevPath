@@ -48,6 +48,16 @@
             </div>
 
             <div class="form-group">
+              <label for="skill" class="form-label">Tech Stack / Skill</label>
+              <select id="skill" name="skill" class="form-select">
+                <option value="">Any Skill</option>
+                {% for s in available_skills %}
+                <option value="{{ s | lower }}" {% if skill == s | lower %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group">
               <label for="time" class="form-label">Time Availability</label>
               <select id="time" name="time" class="form-select">
                 <option value="">Any Time</option>
@@ -109,7 +119,7 @@
       <!-- Pagination Controls -->
       <div class="flex justify-center items-center gap-4 mt-8">
         {% if page > 1 %}
-        <a href="/explore?page={{ page - 1 }}&per_page=12&search={{ search }}&level={{ level }}&interest={{ interest }}&time={{ time }}&sort={{ sort }}" class="btn btn--secondary">&larr; Previous</a>
+        <a href="/explore?page={{ page - 1 }}&per_page=12&search={{ search }}&level={{ level }}&interest={{ interest }}&skill={{ skill }}&time={{ time }}&sort={{ sort }}" class="btn btn--secondary">&larr; Previous</a>
         {% else %}
         <span class="btn btn--secondary" style="opacity: 0.5; cursor: not-allowed;">&larr; Previous</span>
         {% endif %}
@@ -117,7 +127,7 @@
         <span style="font-weight: 600; color: var(--text-main);">Page {{ page }} of {{ total_pages }}</span>
         
         {% if page < total_pages %}
-        <a href="/explore?page={{ page + 1 }}&per_page=12&search={{ search }}&level={{ level }}&interest={{ interest }}&time={{ time }}&sort={{ sort }}" class="btn btn--secondary">Next &rarr;</a>
+        <a href="/explore?page={{ page + 1 }}&per_page=12&search={{ search }}&level={{ level }}&interest={{ interest }}&skill={{ skill }}&time={{ time }}&sort={{ sort }}" class="btn btn--secondary">Next &rarr;</a>
         {% else %}
         <span class="btn btn--secondary" style="opacity: 0.5; cursor: not-allowed;">Next &rarr;</span>
         {% endif %}
