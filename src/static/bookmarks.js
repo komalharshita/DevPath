@@ -145,6 +145,11 @@ var DevPathBookmarks = (function () {
 
     list.textContent = "";
 
+    var exportBtn = document.getElementById("export-bookmarks-markdown-btn");
+    if (exportBtn) {
+      exportBtn.style.display = saved.length ? "inline-flex" : "none";
+    }
+
     if (!saved.length) {
       var empty = document.createElement("p");
       empty.className = "saved-projects-empty";
@@ -178,6 +183,59 @@ var DevPathBookmarks = (function () {
       item.appendChild(removeBtn);
       list.appendChild(item);
     });
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Export Bookmarks as Markdown Checklist                             */
+  /* ------------------------------------------------------------------ */
+  function exportMarkdown() {
+    var saved = getSaved();
+    if (!saved || !saved.length) {
+      alert("No saved projects to export.");
+      return;
+    }
+
+    var lines = [
+      "# My DevPath Bookmarked Projects",
+      "",
+      "> Exported from DevPath",
+      "",
+      "Total Projects: " + saved.length,
+      "",
+      "---",
+      ""
+    ];
+
+    saved.forEach(function (project, index) {
+      var title = project.title || ("Project " + project.id);
+      var origin = (typeof window !== "undefined" && window.location && window.location.origin) ? window.location.origin : "";
+      var link = origin ? (origin + "/project/" + project.id) : ("/project/" + project.id);
+      var level = project.level || "Not specified";
+      var time = project.time || "Not specified";
+      var skills = (Array.isArray(project.skills) && project.skills.length)
+        ? project.skills.join(", ")
+        : "None listed";
+
+      lines.push("### " + (index + 1) + ". [" + title + "](" + link + ")");
+      lines.push("- **Level:** " + level);
+      lines.push("- **Time Availability:** " + time);
+      lines.push("- **Skills / Tech Stack:** " + skills);
+      lines.push("- [ ] Planned / Completed");
+      lines.push("");
+    });
+
+    var markdownContent = lines.join("\n");
+    if (typeof Blob !== "undefined" && typeof document !== "undefined") {
+      var blob = new Blob([markdownContent], { type: "text/markdown;charset=utf-8" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "devpath-bookmarks.md";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
   }
 
   /* ------------------------------------------------------------------ */
@@ -314,6 +372,12 @@ var DevPathBookmarks = (function () {
         toggle(projectObj, detailSaveBtn);
       });
     }
+
+    // Wire up export bookmarks as markdown button
+    var exportBtn = document.getElementById("export-bookmarks-markdown-btn");
+    if (exportBtn) {
+      exportBtn.addEventListener("click", exportMarkdown);
+    }
   });
 
   /* ------------------------------------------------------------------ */
@@ -325,6 +389,7 @@ var DevPathBookmarks = (function () {
     save:           save,
     remove:         remove,
     toggle:         toggle,
+    exportMarkdown: exportMarkdown,
     renderPanel:    renderPanel,
     saveSession:    saveSession,
     restoreSession: restoreSession,
