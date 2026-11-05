@@ -173,7 +173,6 @@
     try {
       project = JSON.parse(dataScript.textContent);
     } catch (err) {
-      console.error("Failed to parse project data", err);
       return;
     }
 
@@ -208,7 +207,7 @@
 
     // Populate Skills
     if (skillsContainer) {
-      skillsContainer.innerHTML = "";
+      skillsContainer.textContent = "";
       (project.skills || []).forEach(function (skill) {
         var badge = document.createElement("span");
         badge.className = "badge";
@@ -219,7 +218,7 @@
 
     // Populate Features
     if (featuresList) {
-      featuresList.innerHTML = "";
+      featuresList.textContent = "";
       var features = project.features || [];
       if (features.length) {
         features.forEach(function (feat) {
@@ -235,7 +234,7 @@
 
     // Populate Roadmap Preview (First 4 steps)
     if (roadmapList) {
-      roadmapList.innerHTML = "";
+      roadmapList.textContent = "";
       var roadmap = project.roadmap || [];
       if (roadmap.length) {
         roadmap.slice(0, 4).forEach(function (step) {
@@ -256,8 +255,8 @@
     }
 
     // Full Details Link
-    if (fullLink) {
-      fullLink.href = "/project/" + project.id;
+    if (fullLink && project.id) {
+      fullLink.href = "/project/" + encodeURIComponent(project.id);
     }
 
     // Sync Modal Bookmark Button
