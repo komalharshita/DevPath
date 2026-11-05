@@ -5,26 +5,45 @@
 {% block twitter_title %}Explore Projects - DevPath{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="/static/bookmarks.css">
 <link rel="stylesheet" href="/static/explore.css">
 {% endblock %}
 
 {% block content %}
 <div class="container" style="padding-top: var(--space-24); padding-bottom: var(--space-16); min-height: 80vh;">
-  <h1 class="mb-4">Explore All Projects</h1>
-  <p class="text-muted mb-8">Browse our entire catalog of projects, filter by difficulty or interest, and find your next coding challenge.</p>
+  <h1 class="mb-2">Explore All Projects</h1>
+  <p class="text-muted mb-6">Browse our catalog of coding projects with step-by-step roadmaps, starter code, and skill matching.</p>
   
+  <!-- Popular Tech Stacks Quick Filters -->
+  <div class="tech-chips-bar-wrapper">
+    <div class="tech-chips-header">
+      <span class="text-muted" style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Popular Tech Stacks</span>
+      <span class="text-muted" style="font-size: 0.75rem;">Click any pill to filter</span>
+    </div>
+    <div class="tech-chips-scroll">
+      <button type="button" class="tech-chip {% if not skill %}tech-chip--active{% endif %}" data-skill-chip="">
+        ⚡ All Stacks
+      </button>
+      {% for s in popular_skills %}
+      <button type="button" class="tech-chip {% if skill == s | lower %}tech-chip--active{% endif %}" data-skill-chip="{{ s | lower }}">
+        {{ s }}
+      </button>
+      {% endfor %}
+    </div>
+  </div>
+
   <div class="grid explore-layout">
     <!-- Sidebar Filters -->
     <aside class="explore-sidebar">
       <div class="card">
         <div class="card__header">
-          <h3>Filters</h3>
+          <h3 style="font-size: 1.1rem; margin: 0;">Filters</h3>
         </div>
         <div class="card__body">
           <form method="GET" action="/explore" id="explore-filter-form">
             <div class="form-group">
               <label for="search" class="form-label">Search</label>
-              <input type="text" id="search" name="search" value="{{ search }}" class="form-input" placeholder="Search projects...">
+              <input type="text" id="search" name="search" value="{{ search }}" class="form-input" placeholder="Search keywords...">
             </div>
             
             <div class="form-group">
@@ -48,6 +67,16 @@
             </div>
 
             <div class="form-group">
+              <label for="skill" class="form-label">Tech Stack / Skill</label>
+              <select id="skill" name="skill" class="form-select">
+                <option value="">Any Skill</option>
+                {% for s in available_skills %}
+                <option value="{{ s | lower }}" {% if skill == s | lower %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group">
               <label for="time" class="form-label">Time Availability</label>
               <select id="time" name="time" class="form-select">
                 <option value="">Any Time</option>
@@ -57,7 +86,7 @@
               </select>
             </div>
 
-            <div class="form-group mb-8">
+            <div class="form-group mb-6">
               <label for="sort" class="form-label">Sort By</label>
               <select id="sort" name="sort" class="form-select">
                 <option value="id_asc" {% if sort == "id_asc" %}selected{% endif %}>Default</option>
@@ -68,8 +97,8 @@
             </div>
 
             <button type="submit" class="btn btn--primary" style="width: 100%;">Apply Filters</button>
-            <div class="text-center mt-4">
-              <a href="/explore" class="btn btn--ghost" style="width: 100%;">Clear Filters</a>
+            <div class="text-center mt-3">
+              <a href="/explore" class="btn btn--ghost" style="width: 100%; font-size: 0.9rem;">Clear Filters</a>
             </div>
           </form>
         </div>
@@ -78,29 +107,88 @@
 
     <!-- Main Results -->
     <section class="explore-results">
-      <div class="flex justify-between items-center mb-8">
-        <h2 style="font-size: 1.25rem;">Showing {{ projects|length }} of {{ total_items }} projects</h2>
+      <!-- Active Filters Ribbon -->
+      {% set has_active_filters = search or level or interest or skill or time %}
+      {% if has_active_filters %}
+      <div class="active-filters-bar">
+        <span class="active-filters-label">Active:</span>
+        {% if search %}
+        <span class="active-filter-pill">
+          Search: "{{ search }}"
+          <button type="button" class="remove-filter-btn" data-filter-key="search" aria-label="Remove search filter">&times;</button>
+        </span>
+        {% endif %}
+        {% if level %}
+        <span class="active-filter-pill">
+          Level: {{ level | capitalize }}
+          <button type="button" class="remove-filter-btn" data-filter-key="level" aria-label="Remove level filter">&times;</button>
+        </span>
+        {% endif %}
+        {% if interest %}
+        <span class="active-filter-pill">
+          Interest: {{ interest | capitalize }}
+          <button type="button" class="remove-filter-btn" data-filter-key="interest" aria-label="Remove interest filter">&times;</button>
+        </span>
+        {% endif %}
+        {% if skill %}
+        <span class="active-filter-pill">
+          Tech: {{ skill | capitalize }}
+          <button type="button" class="remove-filter-btn" data-filter-key="skill" aria-label="Remove skill filter">&times;</button>
+        </span>
+        {% endif %}
+        {% if time %}
+        <span class="active-filter-pill">
+          Time: {{ time | capitalize }}
+          <button type="button" class="remove-filter-btn" data-filter-key="time" aria-label="Remove time filter">&times;</button>
+        </span>
+        {% endif %}
+        <a href="/explore" class="clear-all-filters-btn">Clear All</a>
+      </div>
+      {% endif %}
+
+      <div class="flex justify-between items-center mb-6">
+        <h2 style="font-size: 1.2rem; margin: 0; font-weight: 600;">Showing {{ projects|length }} of {{ total_items }} projects</h2>
       </div>
 
       {% if projects %}
       <div class="grid grid-cols-1 grid-cols-md-2 grid-cols-lg-3">
         {% for project in projects %}
-        <div class="project-card">
+        <div class="project-card" data-project-card="{{ project.id }}">
           <div class="card flex flex-col" style="height: 100%;">
-          <div class="card__body flex flex-col" style="flex: 1;">
-            <h3 class="mb-2" style="font-size: 1.1rem;">{{ project.title }}</h3>
-            <p class="text-muted mb-4" style="font-size: 0.9rem; flex: 1;">{{ project.description | truncate(120) }}</p>
-            <div class="flex" style="flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-4);">
-              {% for skill in project.skills %}
-              <span class="badge">{{ skill }}</span>
-              {% endfor %}
-              <span class="badge badge--primary">{{ project.level }}</span>
-              <span class="badge badge--success">Time: {{ project.time }}</span>
+            <div class="card__header flex items-start justify-between gap-2" style="padding-bottom: var(--space-2);">
+              <h3 style="font-size: 1.05rem; line-height: 1.35; margin: 0; flex: 1;">{{ project.title }}</h3>
+              <button type="button" class="btn-card-bookmark" data-bookmark-project="{{ project.id }}" aria-label="Save project to bookmarks" title="Save to bookmarks">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                </svg>
+              </button>
             </div>
-          </div>
-          <div class="card__footer">
-            <a href="/project/{{ project.id }}" class="btn btn--secondary" style="width: 100%;">View Project &rarr;</a>
-          </div>
+            <div class="card__body flex flex-col" style="flex: 1; padding-top: var(--space-2);">
+              <p class="text-muted mb-4" style="font-size: 0.875rem; flex: 1; line-height: 1.5;">{{ project.description | truncate(110) }}</p>
+              
+              <!-- Clickable Skill Badges -->
+              <div class="flex" style="flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-4);">
+                {% for s in project.skills %}
+                <button type="button" class="badge skill-badge clickable" data-filter-skill="{{ s | lower }}" title="Filter by {{ s }}">
+                  {{ s }}
+                </button>
+                {% endfor %}
+                <span class="badge badge--primary">{{ project.level }}</span>
+                <span class="badge badge--success">Time: {{ project.time }}</span>
+              </div>
+            </div>
+            <div class="card__footer flex items-center justify-between gap-2">
+              <button type="button" class="btn btn--secondary btn--sm btn-quick-view" data-quick-view="{{ project.id }}" aria-label="Quick preview {{ project.title }}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                Quick View
+              </button>
+              <a href="/project/{{ project.id }}" class="btn btn--primary btn--sm">View Details &rarr;</a>
+            </div>
+            <!-- Embedded project data for 0ms quick-view modal -->
+            <script type="application/json" data-project-json="{{ project.id }}">{{ project | tojson }}</script>
           </div>
         </div>
         {% endfor %}
@@ -109,7 +197,7 @@
       <!-- Pagination Controls -->
       <div class="flex justify-center items-center gap-4 mt-8">
         {% if page > 1 %}
-        <a href="/explore?page={{ page - 1 }}&per_page=12&search={{ search }}&level={{ level }}&interest={{ interest }}&time={{ time }}&sort={{ sort }}" class="btn btn--secondary">&larr; Previous</a>
+        <a href="/explore?page={{ page - 1 }}&per_page=12&search={{ search }}&level={{ level }}&interest={{ interest }}&skill={{ skill }}&time={{ time }}&sort={{ sort }}" class="btn btn--secondary">&larr; Previous</a>
         {% else %}
         <span class="btn btn--secondary" style="opacity: 0.5; cursor: not-allowed;">&larr; Previous</span>
         {% endif %}
@@ -117,7 +205,7 @@
         <span style="font-weight: 600; color: var(--text-main);">Page {{ page }} of {{ total_pages }}</span>
         
         {% if page < total_pages %}
-        <a href="/explore?page={{ page + 1 }}&per_page=12&search={{ search }}&level={{ level }}&interest={{ interest }}&time={{ time }}&sort={{ sort }}" class="btn btn--secondary">Next &rarr;</a>
+        <a href="/explore?page={{ page + 1 }}&per_page=12&search={{ search }}&level={{ level }}&interest={{ interest }}&skill={{ skill }}&time={{ time }}&sort={{ sort }}" class="btn btn--secondary">Next &rarr;</a>
         {% else %}
         <span class="btn btn--secondary" style="opacity: 0.5; cursor: not-allowed;">Next &rarr;</span>
         {% endif %}
@@ -134,4 +222,60 @@
     </section>
   </div>
 </div>
+
+<!-- Quick View Modal Dialog -->
+<div id="project-quick-view-modal" class="quick-view-modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-project-title">
+  <div class="quick-view-backdrop" data-close-modal></div>
+  <div class="quick-view-dialog">
+    <div class="quick-view-header">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span id="modal-project-level" class="badge badge--primary">Beginner</span>
+        <span id="modal-project-time" class="badge badge--success">Time: Low</span>
+        <span id="modal-project-hours" class="badge">~6 hrs</span>
+      </div>
+      <button type="button" class="quick-view-close" data-close-modal aria-label="Close modal">&times;</button>
+    </div>
+    <div class="quick-view-body">
+      <h2 id="modal-project-title" class="mb-3" style="font-size: 1.4rem;">Project Title</h2>
+      <p id="modal-project-description" class="text-muted mb-4" style="line-height: 1.6;"></p>
+
+      <div class="mb-4">
+        <h4 class="mb-2" style="font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Technologies & Skills</h4>
+        <div id="modal-project-skills" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <div class="mb-4" id="modal-features-container">
+        <h4 class="mb-2" style="font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Key Features You'll Build</h4>
+        <ul id="modal-project-features" class="quick-view-list"></ul>
+      </div>
+
+      <div class="mb-4" id="modal-roadmap-container">
+        <h4 class="mb-2" style="font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Roadmap Preview</h4>
+        <ol id="modal-project-roadmap" class="quick-view-roadmap"></ol>
+      </div>
+    </div>
+    <div class="quick-view-footer flex items-center justify-between gap-3">
+      <button type="button" id="modal-bookmark-btn" class="btn btn--secondary btn--sm">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+        </svg>
+        <span id="modal-bookmark-label">Save Project</span>
+      </button>
+      <a id="modal-full-details-link" href="#" class="btn btn--primary btn--sm">
+        Go to Full Project Page &rarr;
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Floating Toast Notification -->
+<div id="explore-toast" class="explore-toast hidden" role="status" aria-live="polite">
+  <span class="toast-icon">✓</span>
+  <span id="toast-message">Saved to bookmarks!</span>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/bookmarks.js"></script>
+<script src="/static/explore.js"></script>
 {% endblock %}
