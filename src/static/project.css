@@ -1,16 +1,24 @@
 /* Custom styles for project detail page */
 
 .project-hero {
-  padding: 3rem 0;
-  background-color: var(--color-bg-secondary, #f8f9fa);
-  border-bottom: 1px solid var(--color-border, #e9ecef);
+  color: var(--text-on-brand);
+  padding: clamp(2.5rem, 6vw, 4rem) 0;
+  background: var(--hero-gradient);
+  border-bottom: 1px solid var(--border-brand);
   margin-bottom: 2rem;
 }
 
+.project-hero .breadcrumb,
+.project-hero .breadcrumb a { color: var(--text-on-brand-muted); }
+.project-hero .breadcrumb a:hover { color: var(--dp-yellow-400); }
 .project-title {
   margin-bottom: 1rem;
-  font-size: 2.5rem;
+  color: var(--text-on-brand);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.1;
 }
+.project-hero .project-description,
+.project-hero .form-label { color: var(--text-on-brand-muted); }
 
 .badge-group {
   display: flex;
@@ -47,7 +55,7 @@
 
 #roadmap-progress-fill {
   height: 100%;
-  background-color: var(--color-primary, #0d6efd);
+  background-color: var(--dp-yellow-400);
   width: 0%;
   transition: width 0.3s ease;
 }
@@ -74,7 +82,7 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background-color: var(--color-primary, #0d6efd);
+  background-color: var(--dp-yellow-400);
   margin-top: 0.25rem;
 }
 
@@ -148,11 +156,11 @@
 }
 
 .code-panel-container {
-  background-color: var(--color-bg, #fff);
-  width: 90%;
-  max-width: 1000px;
-  height: 90vh;
-  border-radius: 8px;
+  background: var(--bg-surface);
+  width: min(90vw, 1000px);
+  height: min(90vh, 900px);
+  min-height: 0;
+  border-radius: 20px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -179,11 +187,12 @@
 }
 
 .code-panel-body {
-  flex-grow: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: auto;
   padding: 1rem;
-  background-color: #1e1e1e;
-  color: #d4d4d4;
+  background-color: var(--code-bg);
+  color: #e6edf3;
 }
 
 .code-content-block {
@@ -220,4 +229,46 @@
 
 .share-toast.show {
   display: flex;
+}
+
+.project-page > .container { padding-bottom: 1rem; }
+.project-actions .btn { min-height: 44px; }
+.roadmap-progress-bar { background: var(--bg-section); }
+.roadmap-line { background: var(--border-default); }
+.roadmap-step-num { color: var(--dp-purple-700); font-family: var(--font-display); }
+.roadmap-step-text { line-height: 1.65; }
+.roadmap-step.completed .roadmap-dot { background: var(--dp-green-500); }
+.completion-message { background: rgb(25 185 129 / 12%); border: 1px solid var(--status-success); border-radius: 16px; text-align: center; }
+.completion-message h3 { margin: 0 0 8px; color: var(--text-primary); font-size: 1.25rem; }
+.completion-message p { margin: 0 0 16px; color: var(--text-secondary); }
+#btn-complete-project:disabled { opacity: 0.65; cursor: not-allowed; box-shadow: none; transform: none; }
+.roadmap-checkbox { accent-color: var(--dp-purple-700); }
+.roadmap-step:has(.roadmap-checkbox:checked) .roadmap-step-text { color: var(--text-secondary); }
+.resource-link { color: var(--dp-indigo-800); font-weight: 600; }
+.resource-link:hover { color: var(--dp-purple-700); }
+.code-panel-container { border: 1px solid var(--border-default); border-radius: 20px; box-shadow: var(--shadow-lg); }
+.code-panel-header { background: var(--dp-charcoal-900); color: #fff; }
+.code-panel-header .cph-title { color: #fff; }
+.code-panel-actions { display: flex; align-items: center; gap: 8px; }
+.code-panel-actions .btn--secondary { min-height: 44px; color: #fff; background: transparent; border-color: rgb(255 255 255 / 22%); }
+.code-panel-actions .btn--secondary:hover { background: rgb(255 255 255 / 10%); }
+.cph-close { color: inherit; min-width: 44px; min-height: 44px; border-radius: 10px; }
+.cph-close:hover { background: rgb(255 255 255 / 10%); }
+.copy-toast { display: none; position: fixed; right: 20px; bottom: 20px; z-index: 1200; padding: 12px 16px; color: #fff; background: var(--dp-indigo-950); border: 1px solid var(--border-brand); border-radius: 12px; box-shadow: var(--shadow-lg); }
+.copy-toast.show { display: block; }
+
+@media (max-width: 767px) {
+  .project-hero { padding: 2.5rem 0; }
+  .project-actions { gap: 0.65rem; }
+  .project-actions > * { max-width: 100%; }
+  .project-actions .btn { flex: 1 1 180px; }
+  .roadmap-step { gap: 4px; }
+  .roadmap-marker { margin-right: 0.5rem; }
+  .share-toast { left: 16px; right: 16px; bottom: 16px; justify-content: center; }
+  .code-panel-overlay { padding: 12px; box-sizing: border-box; }
+  .code-panel-container { width: 100%; height: min(82vh, 760px); border-radius: 16px; }
+  .code-panel-header { flex-wrap: wrap; align-items: flex-start; gap: 12px; padding: 14px; }
+  .code-panel-actions { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
+  .code-panel-actions .btn--secondary { flex: 1 1 140px; }
+  .code-panel-actions #code-panel-close { flex: 0 0 44px; }
 }

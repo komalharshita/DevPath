@@ -1,4 +1,8 @@
-User-agent: * 
-Allow: / 
- 
-Sitemap: /sitemap.xml 
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /auth/
+Disallow: /profile
+
+Sitemap: https://mydevpath-github.vercel.app/sitemap.xml

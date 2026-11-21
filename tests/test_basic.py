@@ -1263,15 +1263,16 @@ def test_sitemap_includes_compare():
     assert b"/compare" in response.data
 
 
-def test_sitemap_includes_static_pages():
-    """Sitemap should include /explore, /contact, and /profile pages."""
+def test_sitemap_includes_indexable_static_pages():
+    """Sitemap includes public pages but excludes the private profile route."""
     client = get_client()
     response = client.get("/sitemap.xml")
     assert response.status_code == 200
-    for path in ("/explore", "/contact", "/compare", "/profile"):
+    for path in ("/explore", "/contact", "/compare"):
         assert path.encode() in response.data, (
             f"Sitemap missing public page {path}"
         )
+    assert b"/profile" not in response.data
 
 
 

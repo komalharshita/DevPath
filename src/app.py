@@ -21,7 +21,7 @@ load_dotenv(os.path.join(root_dir, '.env'))
 # Ensure the 'src' directory is in the python path for Vercel and root-level execution
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from flask import Flask, session
+from flask import Flask, request, session
 from flask_wtf.csrf import CSRFProtect
 from routes.main_routes import main
 from routes.github_routes import github_bp
@@ -129,6 +129,69 @@ app.register_blueprint(github_bp)
 # so Blueprint-level error handlers take precedence where defined.
 register_error_handlers(app)
 
+SEO_PAGE_METADATA = {
+    "main.index": (
+        "Home — DevPath",
+        "Find coding projects tailored to your skills, interests, experience, and schedule. Explore practical ideas with guided roadmaps, learning resources, and starter code.",
+    ),
+    "main.explore": (
+        "Explore Projects — DevPath",
+        "Browse coding projects by skill, difficulty, interest, and time commitment. Find practical ideas, explore detailed roadmaps, and start building with DevPath.",
+    ),
+    "main.compare_page": (
+        "Compare Roadmaps — DevPath",
+        "Compare career roadmaps by skills, topics, duration, difficulty, and opportunities. Choose a learning path that fits your development goals on DevPath.",
+    ),
+    "main.contact": (
+        "Contact — DevPath",
+        "Contact the DevPath team with questions, feedback, bug reports, or partnership ideas. Share suggestions to improve coding project discovery and learning.",
+    ),
+    "main.profile": (
+        "Developer Profile — DevPath",
+        "Manage your DevPath developer profile, review saved coding projects, track learning progress, and keep your skills and project goals up to date.",
+    ),
+}
+
+
+def fit_meta_description(value):
+    description = " ".join(str(value or "").split())
+    if len(description) < 150:
+        description = f"{description} Discover more project ideas and learning resources with DevPath."
+    if len(description) > 160:
+        description = f"{description[:157].rsplit(' ', 1)[0].rstrip('.,;:-')}..."
+    return description
+
+
+@app.context_processor
+def inject_seo_metadata():
+    endpoint = request.endpoint or ""
+    title, description = SEO_PAGE_METADATA.get(
+        endpoint,
+        ("DevPath — Coding Project Discovery", SEO_PAGE_METADATA["main.index"][1]),
+    )
+
+    if endpoint == "main.project_detail":
+        from routes.main_routes import find_project_by_id
+
+        project = find_project_by_id((request.view_args or {}).get("project_id"))
+        if project:
+            project_name = str(project.get("title", "Project"))
+            if len(project_name) > 48:
+                project_name = f"{project_name[:47].rstrip()}…"
+            title = f"{project_name} — DevPath"
+            description = (
+                f"Explore {project.get('title', 'this project')}, a {project.get('level', 'practical')} "
+                f"{project.get('interest', 'coding')} project. Review its skills, time estimate, roadmap, "
+                "learning resources, and starter code on DevPath."
+            )
+
+    return {
+        "seo_title": title,
+        "seo_description": fit_meta_description(description),
+        "fit_meta_description": fit_meta_description,
+    }
+
+
 @app.context_processor
 def inject_user():
     """Make current_user available to all templates."""
@@ -146,6 +209,9 @@ def add_security_headers(response):
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    forwarded_proto = request.headers.get("X-Forwarded-Proto", "").split(",", 1)[0].strip()
+    if request.is_secure or forwarded_proto == "https":
+        response.headers["Strict-Transport-Security"] = "max-age=63072000"
     response.headers["Permissions-Policy"] = (
         "geolocation=(), microphone=(), camera=()"
     )

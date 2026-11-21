@@ -50,13 +50,18 @@
   }
 
   function setupRevealTargets() {
+    markForReveal("main > section, main > header, main > .container, main > .project-page, main section, .admin-motion-surface, .error-page-inner");
     markForReveal(".section-eyebrow, .section-title, .section-sub");
-    markForReveal(".hero-copy > *", "reveal-left");
+    markForReveal(".hero-content > *", "reveal-left");
     markForReveal(".hero-visual > *", "reveal-right");
-    markForReveal(".stat-card, .step-card, .feature-card, .profile-card, .badge-card, .achievement-card, .history-card, .leaderboard-card", "reveal-scale");
-    markForReveal(".skill-strip-inner, .form-card-outer, .cta-inner, .footer-col");
+    markForReveal(".stat-card, .step-card, .feature-card, .feature-box, .project-card, .card, .saved-projects-panel, .profile-card, .badge-card, .achievement-card, .history-card, .leaderboard-card", "reveal-scale");
+    markForReveal(".skill-strip-inner, .form-card-outer, .cta-inner, .footer-col, .app-footer__grid > *, .landing-footer .grid-cols-md-3 > *");
     markForReveal(".form-card form > .form-group, .form-card form > .skill-chips-row, .form-card form > .form-row, .form-actions");
     observeRevealNodes(document);
+    document.addEventListener("focusin", function (event) {
+      var revealTarget = event.target.closest && event.target.closest(".reveal-on-scroll");
+      if (revealTarget) revealNode(revealTarget);
+    });
   }
 
   function setupDynamicResultReveal() {

@@ -920,6 +920,7 @@ async function updatePortfolioAnalysis() {
     window.setTimeout(hideSuggestions, 150);
   });
   skillsInput.addEventListener("keydown", function (event) {
+    if (event.key === "Enter" && (event.isComposing || event.keyCode === 229)) return;
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       if (!visibleSuggestions.length) showSuggestions(filteredSkills(skillsInput.value));
       if (!visibleSuggestions.length) return;
@@ -1043,12 +1044,7 @@ async function updatePortfolioAnalysis() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        skills: JSON.stringify(selectedSkills.map(function (skill) {
-          return {
-            skill: skill,
-            proficiency: skillProficiencies[skill] || "Beginner"
-          };
-        })),
+        skills: selectedSkills.join(", "),
         level: document.getElementById("level").value,
         interest: Array.from(document.getElementById("interest").selectedOptions).map(opt => opt.value),
         time: document.getElementById("time").value,
@@ -1167,6 +1163,7 @@ async function updatePortfolioAnalysis() {
 
 (function initDetailPage() {
   if (typeof PROJECT_ID === "undefined") return;
+  var form = document.getElementById("recommend-form");
   recordProjectView();
   
 if (typeof RecentlyViewed !== "undefined") {
@@ -1184,15 +1181,20 @@ if (typeof RecentlyViewed !== "undefined") {
   var codePanelOverlay = document.getElementById("code-panel-overlay");
   var codeContentEl = document.getElementById("code-content");
   var codePanelFilename = document.getElementById("code-panel-filename");
+  var codeLoading = document.getElementById("code-loading");
+  var codeError = document.getElementById("code-error");
+  var codeContentBlock = document.getElementById("code-content-block");
   var btnViewCode = document.getElementById("btn-view-code");
   var btnViewCodeSm = document.getElementById("btn-view-code-sm");
   var btnClosePanel = document.getElementById("code-panel-close");
   var btnCopyCode = document.getElementById("btn-copy-code");
   var copyToast = document.getElementById("copy-toast");
-  var completionBtn = document.getElementById("btn-mark-complete");
+  var completionBtn = document.getElementById("btn-complete-project");
+  var previousPanelFocus = null;
   var codeFetched = false;
 
   function renderCode(code) {
+    if (!codeContentEl) return;
     codeContentEl.textContent = "";
     String(code || "").split("\n").forEach(function (line, index) {
       var row = document.createElement("div");
@@ -1211,7 +1213,10 @@ if (typeof RecentlyViewed !== "undefined") {
   }
 
   function fetchStarterCode() {
-    codeContentEl.textContent = "Loading starter code...";
+    if (codeLoading) codeLoading.hidden = false;
+    if (codeError) codeError.hidden = true;
+    if (codeContentBlock) codeContentBlock.hidden = true;
+    if (codeContentEl) codeContentEl.textContent = "Loading starter code...";
     fetch("/project/" + PROJECT_ID + "/code")
       .then(function (response) {
         return response.json().then(function (data) {
@@ -1220,37 +1225,67 @@ if (typeof RecentlyViewed !== "undefined") {
         });
       })
       .then(function (data) {
-        codePanelFilename.textContent = data.filename;
+        if (codePanelFilename) codePanelFilename.textContent = data.filename || "starter-code";
         renderCode(data.code);
+        if (codeLoading) codeLoading.hidden = true;
+        if (codeError) codeError.hidden = true;
+        if (codeContentBlock) codeContentBlock.hidden = false;
         codeFetched = true;
       })
       .catch(function (err) {
-        codeContentEl.textContent = err.message || "Could not load starter code. Try downloading it instead.";
+        if (codeLoading) codeLoading.hidden = true;
+        if (codeError) {
+          codeError.hidden = false;
+          codeError.querySelector("span").textContent = err.message || "Could not load code. Try downloading it instead.";
+        }
       });
   }
 
   function openCodePanel() {
-    if (!codePanel) return;
+    if (!codePanel || !codePanelOverlay) return;
+    previousPanelFocus = document.activeElement;
     codePanel.classList.add("active");
-    if (codePanelOverlay) codePanelOverlay.classList.add("active");
+    codePanelOverlay.classList.add("is-active");
+    codePanelOverlay.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
+    if (btnClosePanel) btnClosePanel.focus();
     recordCodeOpen();
     if (!codeFetched) fetchStarterCode();
   }
 
   function closeCodePanel() {
-    if (!codePanel) return;
+    if (!codePanel || !codePanelOverlay) return;
     codePanel.classList.remove("active");
-    if (codePanelOverlay) codePanelOverlay.classList.remove("active");
+    codePanelOverlay.classList.remove("is-active");
+    codePanelOverlay.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
+    if (previousPanelFocus && typeof previousPanelFocus.focus === "function") previousPanelFocus.focus();
   }
 
   if (btnViewCode) btnViewCode.addEventListener("click", openCodePanel);
   if (btnViewCodeSm) btnViewCodeSm.addEventListener("click", openCodePanel);
   if (btnClosePanel) btnClosePanel.addEventListener("click", closeCodePanel);
-  if (codePanelOverlay) codePanelOverlay.addEventListener("click", closeCodePanel);
+  if (codePanelOverlay) codePanelOverlay.addEventListener("click", function (event) {
+    if (event.target === codePanelOverlay) closeCodePanel();
+  });
   document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape") closeCodePanel();
+    if (!codePanelOverlay || !codePanelOverlay.classList.contains("is-active")) return;
+    if (event.key === "Escape") {
+      closeCodePanel();
+      return;
+    }
+    if (event.key !== "Tab") return;
+    var focusable = Array.prototype.slice.call(codePanel.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'));
+    if (!focusable.length) return;
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   });
 
   if (btnCopyCode) {
@@ -1261,6 +1296,7 @@ if (typeof RecentlyViewed !== "undefined") {
       if (!code) return;
       var done = function () {
         if (copyToast) {
+          copyToast.textContent = "Code copied to clipboard.";
           copyToast.classList.add("show");
           window.setTimeout(function () { copyToast.classList.remove("show"); }, 2500);
         }
@@ -1278,87 +1314,6 @@ if (typeof RecentlyViewed !== "undefined") {
         document.body.removeChild(textarea);
         done();
       }
-    });
-  }
-
-  var roadmapCheckboxes = Array.prototype.slice.call(document.querySelectorAll(".roadmap-checkbox"));
-  var progressFill = document.getElementById("roadmap-progress-fill");
-  var progressText = document.getElementById("roadmap-progress-text");
-  var progressBar = document.querySelector(".roadmap-progress-bar");
-  var roadmapStorageKey = "devpath-roadmap-progress-" + (typeof PROJECT_ID !== 'undefined' ? PROJECT_ID : "");
-
-  function updateRoadmapProgress(skipSave) {
-    if (!roadmapCheckboxes.length) return;
-    var completedCount = roadmapCheckboxes.filter(function (checkbox) { return checkbox.checked; }).length;
-    var percent = Math.round((completedCount / roadmapCheckboxes.length) * 100);
-    roadmapCheckboxes.forEach(function (checkbox) {
-      var step = checkbox.closest(".roadmap-step");
-      if (step) step.classList.toggle("completed", checkbox.checked);
-    });
-    
-    if (progressFill) progressFill.style.width = percent + "%";
-    if (progressText) progressText.textContent = percent + "% completed";
-    if (progressBar) progressBar.setAttribute("aria-valuenow", String(percent));
-    // Disable completion button unless all steps are completed
-    var completionBtn = document.getElementById("btn-mark-complete");
-    if (completionBtn && typeof PROJECT_ID !== "undefined") {
-      var isAlreadyCompleted = projectIsCompleted(PROJECT_ID);
-      if (isAlreadyCompleted) {
-        completionBtn.textContent = "Project Completed";
-        completionBtn.disabled = true;
-      } else {
-        var allChecked = completedCount === roadmapCheckboxes.length;
-        if (allChecked) {
-          completionBtn.textContent = "Mark Project Complete";
-          completionBtn.disabled = false;
-        } else {
-          completionBtn.textContent = "Complete All Steps First";
-          completionBtn.disabled = true;
-        }
-      }
-    }
-
-    if (skipSave === true) return;
-
-    var completedStates = roadmapCheckboxes.map(function (checkbox) {
-      return checkbox.checked;
-    });
-
-    if (typeof USER_LOGGED_IN !== 'undefined' && USER_LOGGED_IN) {
-      fetch("/api/project/" + PROJECT_ID + "/progress", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ completed_steps: completedStates })
-      }).catch(console.error);
-    } else {
-      try {
-        localStorage.setItem(roadmapStorageKey, JSON.stringify(completedStates));
-      } catch (err) {}
-    }
-  }
-
-  function renderRoadmapFromState(saved) {
-    roadmapCheckboxes.forEach(function (checkbox, index) {
-      checkbox.checked = !!saved[index];
-    });
-    updateRoadmapProgress(true);
-  }
-
-  if (roadmapCheckboxes.length > 0) {
-    if (typeof USER_LOGGED_IN !== 'undefined' && USER_LOGGED_IN) {
-      fetch("/api/project/" + PROJECT_ID + "/progress")
-        .then(function(res) { return res.json(); })
-        .then(function(data) { renderRoadmapFromState(data.completed_steps || []); })
-        .catch(console.error);
-    } else {
-      try {
-        var saved = JSON.parse(localStorage.getItem(roadmapStorageKey) || "[]");
-        renderRoadmapFromState(saved);
-      } catch (err) {}
-    }
-
-    roadmapCheckboxes.forEach(function (checkbox) {
-      checkbox.addEventListener("change", function() { updateRoadmapProgress(false); });
     });
   }
 

@@ -46,7 +46,7 @@ class Config:
     SITE_DESCRIPTION = "Get personalized coding project recommendations with step-by-step roadmaps and starter code."
     
     # OG image path (relative to static folder)
-    OG_IMAGE_PATH = "/static/og-banner.png"
+    OG_IMAGE_PATH = "/static/og-image.webp"
 
     # Contact form handler endpoint. Replace this with the project's
     # provider submit URL or set CONTACT_FORM_ACTION in the deployment.

@@ -4,21 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Too Many Requests — DevPath</title>
-  <meta name="robots" content="noindex" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="description" content="{{ fit_meta_description('DevPath received too many requests in a short time. Wait briefly, then continue exploring coding projects, guided roadmaps, and practical learning resources.') }}" />
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
   <meta property="og:title" content="Too Many Requests — DevPath" />
-  <meta property="og:description" content="You have made too many requests. Please wait a moment before trying again." />
+  <meta property="og:description" content="{{ fit_meta_description('DevPath received too many requests in a short time. Wait briefly, then continue exploring coding projects, guided roadmaps, and practical learning resources.') }}" />
   <meta property="og:image" content="{{ config.get_og_image_url() }}" />
   <meta property="og:url" content="{{ config.get_base_url() }}/" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="/static/animations.css" />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
 </head>
 <body>
   <nav class="navbar">
     <div class="nav-inner">
-      <a href="/" class="nav-logo">DevPath</a>
+      <a href="/" class="nav-logo"><span>Dev</span><span class="nav-logo-accent">Path</span></a>
       {% include 'partials/theme_toggle.html' %}
     </div>
   </nav>
@@ -34,5 +36,6 @@
     </div>
   </div>
   <script src="/static/script.js"></script>
+  <script src="/static/animations.js"></script>
 </body>
 </html>

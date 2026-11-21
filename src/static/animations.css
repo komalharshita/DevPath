@@ -153,7 +153,22 @@
 
 .skill-input-wrap:focus-within,
 .select-wrap:focus-within {
-  box-shadow: 0 0 0 4px rgba(79, 110, 247, 0.12);
+  box-shadow: 0 0 0 4px rgb(255 198 41 / 18%);
+}
+
+html.motion-enhanced body.landing-page .hero-headline {
+  animation: heroHeadingDropFadeIn 680ms var(--motion-ease) both;
+}
+
+@keyframes heroHeadingDropFadeIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -24px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 .btn-submit {

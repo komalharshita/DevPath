@@ -1,38 +1,51 @@
-<nav class="navbar" style="background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100;">
-  <div class="container flex justify-between items-center" style="padding-top: var(--space-4); padding-bottom: var(--space-4);">
-    <a href="/" class="nav-logo" style="font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; color: var(--text-main);">
-      Dev<span style="color: var(--color-primary);">Path</span>
-    </a>
+<header class="app-header">
+  <nav class="app-navbar" aria-label="Primary navigation">
+    <div class="container app-navbar__inner">
+      <a href="/" class="app-brand" aria-label="DevPath home">
+        <span>Dev</span><span class="app-brand__accent">Path</span>
+      </a>
 
-    <div class="nav-links flex gap-4 items-center">
-      <a href="/explore" class="text-muted" style="font-weight: 500;">Explore</a>
-      <a href="/compare" class="text-muted" style="font-weight: 500;">Compare</a>
-      
-      {% if current_user %}
-        <a href="/profile" class="text-muted" style="font-weight: 500;">Profile</a>
-        <form method="POST" action="/auth/logout" style="margin: 0;">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-          <button type="submit" class="btn btn--ghost text-muted">Logout</button>
-        </form>
-      {% else %}
-        <a href="/auth/login" class="btn btn--primary">Login with GitHub</a>
-      {% endif %}
-      
-      <button id="theme-toggle" class="btn btn--ghost" aria-label="Toggle dark mode">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="5"></circle>
-          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
-        </svg>
+      <button class="app-menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open navigation menu">
+        <span></span><span></span><span></span>
       </button>
+
+      <div class="app-nav-links" id="primary-navigation">
+        <a href="/explore" {% if request.path == '/explore' %}aria-current="page"{% endif %}>Explore</a>
+        <a href="/compare" {% if request.path == '/compare' %}aria-current="page"{% endif %}>Compare</a>
+        <a href="/contact" {% if request.path == '/contact' %}aria-current="page"{% endif %}>Contact</a>
+        {% if current_user %}
+          <a href="/profile" {% if request.path == '/profile' %}aria-current="page"{% endif %}>Profile</a>
+          <form method="POST" action="/auth/logout">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button type="submit" class="btn btn--ghost">Logout</button>
+          </form>
+        {% else %}
+          <a href="/auth/login" class="btn btn--primary">Login with GitHub</a>
+        {% endif %}
+        <button id="theme-toggle" class="btn btn--ghost app-theme-toggle" type="button" aria-label="Toggle color theme">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+          </svg>
+        </button>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
+</header>
 
 <script>
-  document.getElementById('theme-toggle').addEventListener('click', () => {
+  const appMenuToggle = document.querySelector('.app-menu-toggle');
+  const appNavigation = document.getElementById('primary-navigation');
+  appMenuToggle?.addEventListener('click', () => {
+    const isExpanded = appMenuToggle.getAttribute('aria-expanded') === 'true';
+    appMenuToggle.setAttribute('aria-expanded', String(!isExpanded));
+    appMenuToggle.setAttribute('aria-label', isExpanded ? 'Open navigation menu' : 'Close navigation menu');
+    appNavigation?.classList.toggle('is-open', !isExpanded);
+  });
+
+  document.getElementById('theme-toggle')?.addEventListener('click', () => {
     const root = document.documentElement;
-    const isDark = root.getAttribute('data-theme') === 'dark';
-    const newTheme = isDark ? 'light' : 'dark';
+    const newTheme = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     root.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
   });

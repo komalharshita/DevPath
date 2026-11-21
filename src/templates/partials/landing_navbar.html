@@ -1,14 +1,29 @@
-<nav class="landing-navbar">
-  <div class="landing-container flex justify-between items-center">
-    <a href="/" class="landing-logo">
+<nav class="landing-navbar" aria-label="Primary navigation">
+  <div class="landing-container landing-navbar__inner">
+    <a href="/" class="landing-logo" aria-label="DevPath home">
       Dev<span>Path</span>
     </a>
 
-    <div class="landing-nav-links flex gap-4 items-center">
+    <button class="landing-menu-toggle" type="button" aria-expanded="false" aria-controls="landing-navigation" aria-label="Open navigation menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <div class="landing-nav-links" id="landing-navigation">
       <a href="/#how-it-works">How It Works</a>
       <a href="/#features">Features</a>
       <a href="/#find-project">Find Project</a>
-      <a href="https://github.com/komalharshita/DevPath" target="_blank" class="landing-btn-outline">GitHub</a>
+      <a href="https://github.com/komalharshita/DevPath" target="_blank" rel="noopener noreferrer" class="landing-btn-outline">GitHub</a>
     </div>
   </div>
 </nav>
+
+<script>
+  const landingMenuToggle = document.querySelector('.landing-menu-toggle');
+  const landingNavigation = document.getElementById('landing-navigation');
+  landingMenuToggle?.addEventListener('click', () => {
+    const isExpanded = landingMenuToggle.getAttribute('aria-expanded') === 'true';
+    landingMenuToggle.setAttribute('aria-expanded', String(!isExpanded));
+    landingMenuToggle.setAttribute('aria-label', isExpanded ? 'Open navigation menu' : 'Close navigation menu');
+    landingNavigation?.classList.toggle('is-open', !isExpanded);
+  });
+</script>

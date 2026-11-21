@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}{{ project.title }} — {{ project.level }}{% if project.skills %} {{ project.skills[0] }}{% endif %} Project | DevPath{% endblock %}
-{% block og_title %}{{ project.title }} — DevPath{% endblock %}
-{% block og_description %}{{ project.description|truncate(155, False, '...') }}{% endblock %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block meta_description %}{{ seo_description }}{% endblock %}
+{% block og_title %}{{ seo_title }}{% endblock %}
+{% block og_description %}{{ seo_description }}{% endblock %}
 {% block og_url %}{{ config.get_base_url() }}/project/{{ project.id }}{% endblock %}
-{% block twitter_title %}{{ project.title }} — DevPath{% endblock %}
-{% block twitter_description %}{{ project.description|truncate(155, False, '...') }}{% endblock %}
+{% block twitter_title %}{{ seo_title }}{% endblock %}
+{% block twitter_description %}{{ seo_description }}{% endblock %}
 
 {% block extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -13,11 +14,11 @@
 {% endblock %}
 
 {% block content %}
-<div class="project-page" data-project-interest="{{ project.interest }}" style="padding-top: 60px;">
+<div class="project-page" data-project-interest="{{ project.interest }}">
   <!-- Project Summary -->
   <div class="project-hero">
     <div class="container">
-      <nav class="breadcrumb flex items-center gap-2 mb-4" style="color: var(--color-text-muted, #6c757d); font-size: 0.875rem;" aria-label="breadcrumb">
+      <nav class="breadcrumb flex items-center gap-2 mb-4" aria-label="Breadcrumb">
         <a href="/" style="text-decoration: none; color: inherit;">Home</a>
         <span>&#8250;</span>
         <a href="/explore" style="text-decoration: none; color: inherit;">Projects</a>
@@ -160,8 +161,8 @@
                 {% endfor %}
             </ol>
 
-            <div class="completion-container mt-4" id="completion-container" style="display: none;">
-              <button class="btn btn--primary flex items-center gap-2" id="btn-complete-project" onclick="completeProject({{ project.id }})">
+            <div class="completion-container mt-4" id="completion-container" hidden>
+              <button type="button" class="btn btn--primary flex items-center gap-2" id="btn-complete-project" disabled>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                   <polyline points="22 4 12 14.01 9 11.01"/>
@@ -170,9 +171,9 @@
               </button>
             </div>
             
-            <div id="completion-message" style="display: none; background: #dcfce7; border: 1px solid #bbf7d0; text-align: center; border-radius: 0.5rem;" class="mt-4 p-4">
-              <h3 style="color: #166534; margin-top: 0; margin-bottom: 0.5rem;">🎉 Project Completed!</h3>
-              <p style="color: #166534; font-size: 0.95rem; margin-bottom: 1rem;">Great job! Your progress has been saved.</p>
+            <div id="completion-message" class="completion-message mt-4 p-4" hidden aria-live="polite">
+              <h3>Project Completed!</h3>
+              <p>Great job! Your progress has been saved.</p>
               <a href="/profile" class="btn btn--primary">View Profile</a>
             </div>
           </div>
@@ -253,19 +254,22 @@
 </div>
 
 <!-- Starter Code Modal -->
-<div class="code-panel-overlay" id="code-overlay">
-  <div class="code-panel-container">
+<div class="code-panel-overlay" id="code-panel-overlay" aria-hidden="true">
+  <div class="code-panel-container" id="code-panel" role="dialog" aria-modal="true" aria-labelledby="code-panel-title">
     <div class="code-panel-header">
       <div class="flex flex-col">
-        <h3 class="cph-title">Starter Code</h3>
-        <span class="cph-filename" id="cph-filename" style="font-size: 0.875rem; color: var(--color-text-muted, #6c757d);"></span>
+        <h3 class="cph-title" id="code-panel-title">Starter Code</h3>
+        <span class="cph-filename" id="code-panel-filename"></span>
       </div>
-      <button class="cph-close btn btn--secondary" id="btn-close-code" aria-label="Close code panel" style="padding: 0.25rem;">
+      <div class="code-panel-actions">
+        <button type="button" class="btn btn--secondary" id="btn-copy-code">Copy code</button>
+        <button type="button" class="cph-close btn btn--secondary" id="code-panel-close" aria-label="Close code panel">
         <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18" />
           <line x1="6" y1="6" x2="18" y2="18" />
         </svg>
-      </button>
+        </button>
+      </div>
     </div>
     <div class="code-panel-body" id="code-panel-body">
       <div class="code-loading flex flex-col items-center justify-center h-full" id="code-loading">
@@ -282,6 +286,7 @@
       </div>
       <pre class="code-content-block m-0 h-full overflow-auto" id="code-content-block" hidden><code id="code-content" aria-label="Starter code" style="font-family: 'JetBrains Mono', monospace; font-size: 0.875rem;"></code></pre>
     </div>
+    <div class="copy-toast" id="copy-toast" role="status" aria-live="polite"></div>
   </div>
 </div>
 {% endblock %}
@@ -307,6 +312,7 @@
 </style>
 <script>
   window.PROJECT_ID = {{ project.id }};
+  window.USER_LOGGED_IN = {{ 'true' if current_user else 'false' }};
   
   function copyProjectLink(btn) {
     const url = window.location.href;
@@ -336,5 +342,7 @@
     });
   }
 </script>
-<script src="/static/progress-dashboard.js"></script>
+<script src="/static/bookmarks.js"></script>
+<script src="/static/script.js"></script>
+<script src="/static/roadmap-progress.js"></script>
 {% endblock %}

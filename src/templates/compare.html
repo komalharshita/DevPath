@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Compare Roadmaps — DevPath{% endblock %}
-{% block meta_description %}Compare career roadmaps side by side — topics, duration, difficulty, skills overlap, and career opportunities on DevPath.{% endblock %}
-{% block og_title %}Compare Roadmaps — DevPath{% endblock %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block meta_description %}{{ seo_description }}{% endblock %}
+{% block og_title %}{{ seo_title }}{% endblock %}
+{% block og_description %}{{ seo_description }}{% endblock %}
 {% block twitter_title %}Compare Roadmaps — DevPath{% endblock %}
 
 {% block extra_css %}
@@ -21,11 +22,11 @@
   </div>
 </header>
 
-<main class="container my-4">
+<section class="container my-4" aria-label="Roadmap comparison">
   <!-- Roadmap selectors -->
   <section class="card mb-4" aria-label="Select roadmaps to compare">
     <div class="card__body">
-      <div class="grid grid-cols-md-2 gap-4 align-items-end">
+      <div class="compare-selectors">
         <div class="form-group mb-0">
           <label for="roadmap-select-a" class="form-label">Roadmap A</label>
           <select id="roadmap-select-a" class="form-select">
@@ -36,7 +37,7 @@
           </select>
         </div>
 
-        <div class="compare-vs-badge d-md-none" aria-hidden="true">VS</div>
+        <div class="compare-vs-badge" aria-hidden="true">VS</div>
 
         <div class="form-group mb-0">
           <label for="roadmap-select-b" class="form-label">Roadmap B</label>
@@ -54,7 +55,7 @@
     </div>
   </section>
 
-  <div id="compare-error" class="alert alert-danger hidden" role="alert"></div>
+  <div id="compare-error" class="alert alert-danger hidden" role="alert" aria-live="assertive"></div>
 
   <!-- Empty state -->
   <section id="compare-empty" class="text-center py-5">
@@ -75,7 +76,7 @@
   </section>
 
   <!-- Results -->
-  <section id="compare-results" class="hidden">
+  <section id="compare-results" class="hidden" aria-live="polite">
 
     <!-- Summary cards -->
     <div class="grid grid-cols-lg-3 gap-4 mb-4">
@@ -116,59 +117,51 @@
       </div>
     </div>
 
-    <!-- Visual charts -->
-    <section class="card compare-chart-card mb-4" aria-label="Comparison charts">
+    <section class="card compare-chart-card mb-4" aria-label="Roadmap metrics comparison">
       <div class="card__header">
-        <h3 class="h5 mb-0">Difficulty vs Duration</h3>
+        <h3 class="h5 mb-0">Roadmap Metrics</h3>
       </div>
       <div class="card__body">
-        <canvas id="difficulty-chart" aria-label="Bar chart comparing roadmap difficulty and duration" role="img"></canvas>
+        <div class="compare-chart-grid">
+          <div class="compare-chart-item"><h4>Duration</h4><div id="chart-duration"></div></div>
+          <div class="compare-chart-item"><h4>Difficulty</h4><div id="chart-difficulty"></div></div>
+          <div class="compare-chart-item"><h4>Topics</h4><div id="chart-topics"></div></div>
+          <div class="compare-chart-item"><h4>Skills</h4><div id="chart-skills"></div></div>
+        </div>
       </div>
     </section>
 
-    <!-- Side by side lists -->
     <div class="grid grid-cols-md-2 gap-4">
-      <!-- Roadmap A Details -->
-      <div class="card">
+      <article class="card">
+        <div class="card__header"><h3 id="detail-title-a" class="h5 mb-0">Roadmap A</h3></div>
         <div class="card__body">
-          <div class="mb-4">
-            <h3 class="h5">Target Roles</h3>
-            <ul id="roles-a" class="compare-list"></ul>
+          <div class="compare-roadmap-meta">
+            <p>Duration <strong id="meta-duration-a"></strong></p>
+            <p>Difficulty <strong id="meta-difficulty-a"></strong></p>
           </div>
-          <div class="mb-4">
-            <h3 class="h5">Core Topics</h3>
-            <ul id="topics-a" class="compare-list"></ul>
-          </div>
-          <div>
-            <h3 class="h5">Key Skills</h3>
-            <ul id="skills-a" class="compare-list"></ul>
-          </div>
+          <div class="mb-4"><h4>Target Roles</h4><ul id="roles-a" class="compare-list"></ul></div>
+          <div class="mb-4"><h4>Core Topics</h4><ul id="topics-a" class="compare-list"></ul></div>
+          <div><h4>Key Skills</h4><ul id="skills-a" class="compare-list"></ul></div>
         </div>
-      </div>
+      </article>
 
-      <!-- Roadmap B Details -->
-      <div class="card">
+      <article class="card">
+        <div class="card__header"><h3 id="detail-title-b" class="h5 mb-0">Roadmap B</h3></div>
         <div class="card__body">
-          <div class="mb-4">
-            <h3 class="h5">Target Roles</h3>
-            <ul id="roles-b" class="compare-list"></ul>
+          <div class="compare-roadmap-meta">
+            <p>Duration <strong id="meta-duration-b"></strong></p>
+            <p>Difficulty <strong id="meta-difficulty-b"></strong></p>
           </div>
-          <div class="mb-4">
-            <h3 class="h5">Core Topics</h3>
-            <ul id="topics-b" class="compare-list"></ul>
-          </div>
-          <div>
-            <h3 class="h5">Key Skills</h3>
-            <ul id="skills-b" class="compare-list"></ul>
-          </div>
+          <div class="mb-4"><h4>Target Roles</h4><ul id="roles-b" class="compare-list"></ul></div>
+          <div class="mb-4"><h4>Core Topics</h4><ul id="topics-b" class="compare-list"></ul></div>
+          <div><h4>Key Skills</h4><ul id="skills-b" class="compare-list"></ul></div>
         </div>
-      </div>
+      </article>
     </div>
   </section>
-</main>
+</section>
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="/static/compare.js"></script>
 {% endblock %}

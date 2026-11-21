@@ -12,30 +12,31 @@
    ============================================================= */
 :root {
   /* ---- Core palette ---- */
-  --indigo-900: #0f1560;
-  --indigo-800: #1a2280;
-  --indigo-700: #2335c2;
-  --indigo-600: #3347e0;
-  --indigo-500: #4f6ef7;
+  --indigo-900: #10145f;
+  --indigo-800: #171d70;
+  --indigo-700: #202b88;
+  --indigo-600: #4526a0;
+  --indigo-500: #4863f5;
   --indigo-100: #eef1ff;
   --indigo-50:  #f5f7ff;
 
-  --purple-700: #5b21b6;
-  --purple-600: #7c3aed;
+  --purple-700: #4526a0;
+  --purple-600: #5525b5;
+  --hero-gradient: linear-gradient(112deg, #151b70 0%, #252184 53%, #5525b5 100%);
   --purple-100: #f3f0ff;
 
-  --yellow-400: #fbbf24;
-  --yellow-300: #fcd34d;
-  --yellow-100: #fef9e7;
+  --yellow-400: #ffc629;
+  --yellow-300: #f5b814;
+  --yellow-100: #fff4cc;
 
   --pink-100:   #fce7f3;
   --pink-500:   #ec4899;
 
-  --green-500:  #10b981;
+  --green-500:  #19b981;
   --green-100:  #d1fae5;
 
   --orange-500: #f59e0b;
-  --red-500:    #ef4444;
+  --red-500:    #ef5b5b;
 
   /* ---- Neutrals ---- */
   --white:    #ffffff;
@@ -108,8 +109,8 @@
   --focus-ring-width:  2px;
 
   /* Accent shortcuts (components reference these) */
-  --accent:       var(--indigo-600);
-  --accent-hover: var(--indigo-700);
+  --accent:       var(--yellow-400);
+  --accent-hover: var(--yellow-300);
   --tag-beginner-text: #065f46;
   --tag-intermediate-text: #78350f;
   --tag-advanced-bg: #fee2e2;
@@ -3695,7 +3696,7 @@ body.dark-theme .btn-clear:hover {
   min-width: 40px;
   width: 0;
   height: 100%;
-  background: linear-gradient(120deg, #6366f1, #22c55e);
+  background: linear-gradient(90deg, var(--purple-700), var(--yellow-400));
   color: var(--white);
   font-size: 0.8rem;
   font-weight: 700;
@@ -3885,53 +3886,90 @@ body.dark-theme .btn-clear:hover {
  */
 .error-page {
   min-height: 100vh;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 40px 24px;
+  padding: 104px 20px 40px;
+  background: var(--hero-gradient);
 }
 
 .error-page-inner {
-  max-width: 440px;
+  width: min(100%, 540px);
+  padding: clamp(28px, 6vw, 48px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: var(--shadow-lg);
 }
 
 .error-code {
+  display: inline-flex;
+  align-items: center;
+  min-height: 100px;
+  padding: 0 20px;
   font-family: var(--font-display);
-  font-size: 7rem;
+  font-size: clamp(4rem, 14vw, 6rem);
   font-weight: 800;
-  color: var(--gray-200);
+  color: var(--indigo-900);
+  background: var(--yellow-400);
+  border-radius: 20px;
   line-height: 1;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .error-page-inner h1 {
   font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: clamp(1.75rem, 5vw, 2.25rem);
+  font-weight: 800;
   color: var(--text-heading);
   margin-bottom: 12px;
 }
 
 .error-page-inner p {
   color: var(--text-body);
-  margin-bottom: 32px;
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: 12px;
+  z-index: 500;
+  transform: translateY(-160%);
+  padding: 12px 16px;
+  color: var(--indigo-900);
+  background: var(--yellow-400);
+  border-radius: 12px;
+  font-weight: 700;
+}
+.skip-link:focus { transform: translateY(0); }
+
+@media (max-width: 420px) {
+  .error-page { padding: 88px 16px 24px; }
+  .error-page-inner { padding: 28px 20px; }
+  .error-page-inner .btn-primary { width: 100%; padding-inline: 18px; }
 }
 
 /* Primary button (error pages) */
 .btn-primary {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
   padding: 13px 32px;
-  background: linear-gradient(90deg, var(--indigo-700), var(--purple-600));
-  color: var(--white);
+  background: var(--yellow-400);
+  color: var(--indigo-900);
   font-family: var(--font-display);
   font-size: 0.95rem;
   font-weight: 700;
   border: none;
-  border-radius: var(--r-xs);
+  border-radius: var(--r-full);
   cursor: pointer;
-  box-shadow: 0 4px 18px rgba(35, 53, 194, 0.3);
-  transition: opacity var(--t), transform var(--t);
+  box-shadow: 0 8px 24px rgba(255, 198, 41, 0.24);
+  transition: opacity var(--t), transform var(--t), box-shadow var(--t);
 }
 
 .btn-primary:hover {
@@ -4420,7 +4458,7 @@ html[data-theme="dark"] .skill-input-wrap input[type="text"] {
   max-width: 260px;
   width: min(260px, 90vw);
 
-  background: #6366f1;
+  background: var(--purple-700);
   color: var(--white);
 
   padding: 8px 10px;
@@ -4556,7 +4594,7 @@ body.dark-theme .nav-logo {
 }
 
 body.dark-theme .nav-logo-accent {
-  color: #facc15;
+  color: var(--yellow-400);
 }
 
 /* hamburger */

@@ -15,6 +15,7 @@
     if (!errorEl) return;
     errorEl.textContent = message;
     errorEl.hidden = !message;
+    errorEl.classList.toggle("hidden", !message);
   }
 
   function setLoading(isLoading) {
@@ -46,6 +47,7 @@
       track.setAttribute("aria-valuemin", "0");
       track.setAttribute("aria-valuemax", String(maxValue));
       track.setAttribute("aria-valuenow", String(row.value));
+      track.setAttribute("aria-label", row.label + " metric: " + row.value + (unit || ""));
 
       var fill = document.createElement("div");
       fill.className = "compare-bar-fill " + row.cls;
@@ -70,29 +72,9 @@
       var li = document.createElement("li");
       li.textContent = item;
       var norm = item.toLowerCase();
-      if (sharedSet && sharedSet.has(norm)) {
-        li.className = "compare-tag compare-tag--shared";
-      } else {
-        li.className = "compare-tag compare-tag--" + side;
-      }
-      el.appendChild(li);
-    });
-  }
-
-  function renderSkillChips(el, items, chipClass) {
-    if (!el) return;
-    el.innerHTML = "";
-    if (!items.length) {
-      var empty = document.createElement("li");
-      empty.className = "compare-skill-empty";
-      empty.textContent = "None";
-      el.appendChild(empty);
-      return;
-    }
-    items.forEach(function (skill) {
-      var li = document.createElement("li");
-      li.className = "compare-skill-chip " + (chipClass || "");
-      li.textContent = skill;
+      var isShared = sharedSet && sharedSet.has(norm);
+      li.className = isShared ? "compare-tag compare-tag--shared" : "compare-tag compare-tag--" + side;
+      li.textContent = isShared ? item + " (shared)" : item;
       el.appendChild(li);
     });
   }
@@ -121,15 +103,12 @@
       data.overlapping_topics.map(function (t) { return t.toLowerCase(); })
     );
 
-    renderTagList(document.getElementById("topics-list-a"), a.topics, sharedTopicSet, "a");
-    renderTagList(document.getElementById("topics-list-b"), b.topics, sharedTopicSet, "b");
-
-    renderTagList(document.getElementById("careers-list-a"), a.career_opportunities, null, "a");
-    renderTagList(document.getElementById("careers-list-b"), b.career_opportunities, null, "b");
-
-    renderSkillChips(document.getElementById("unique-skills-a"), data.unique_skills_a, "compare-skill-chip--a");
-    renderSkillChips(document.getElementById("shared-skills"), data.overlapping_skills, "compare-skill-chip--shared");
-    renderSkillChips(document.getElementById("unique-skills-b"), data.unique_skills_b, "compare-skill-chip--b");
+    renderTagList(document.getElementById("topics-a"), a.topics, sharedTopicSet, "a");
+    renderTagList(document.getElementById("topics-b"), b.topics, sharedTopicSet, "b");
+    renderTagList(document.getElementById("roles-a"), a.career_opportunities, null, "a");
+    renderTagList(document.getElementById("roles-b"), b.career_opportunities, null, "b");
+    renderTagList(document.getElementById("skills-a"), a.skills, new Set(data.overlapping_skills.map(function (skill) { return skill.toLowerCase(); })), "a");
+    renderTagList(document.getElementById("skills-b"), b.skills, new Set(data.overlapping_skills.map(function (skill) { return skill.toLowerCase(); })), "b");
 
     var maxTopics = Math.max(metrics.topics_count.a, metrics.topics_count.b, 1);
     var maxSkills = Math.max(metrics.skills_count.a, metrics.skills_count.b, 1);
@@ -160,7 +139,9 @@
     );
 
     emptyEl.hidden = true;
+    emptyEl.classList.add("hidden");
     resultsEl.hidden = false;
+    resultsEl.classList.remove("hidden");
     resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 

@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/devpath_banner.png" alt="DevPath Banner" width="100%" />
+<img src="assets/devpath_banner.webp" alt="DevPath Banner" width="100%" />
 
 <br/>
 
@@ -45,8 +45,8 @@
 
 <div align="center">
 
-<img src="assets/homepage-preview.png" width="48%" alt="Homepage Preview" />
-<img src="assets/recommendation-preview.png" width="48%" alt="Recommendation Preview" />
+<img src="assets/homepage-preview.png" width="48%" alt="DevPath homepage for discovering coding projects" />
+<img src="assets/recommendation-preview.png" width="48%" alt="DevPath project recommendations with learning roadmaps" />
 
 </div>
 
@@ -451,7 +451,7 @@ Thanks to all the amazing people who contribute to DevPath.
 <div align="center">
 
 <a href="https://github.com/komalharshita/devpath/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=komalharshita/devpath" />
+  <img src="https://contrib.rocks/image?repo=komalharshita/devpath" alt="DevPath contributors" loading="lazy" />
 </a>
 
 </div>

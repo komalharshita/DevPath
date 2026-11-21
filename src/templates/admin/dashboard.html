@@ -3,31 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard | DevPath</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <title>Project Admin — DevPath</title>
+  <meta name="description" content="{{ fit_meta_description('Review and manage the DevPath project catalog. Search project entries, inspect learning details, and update the collection that powers recommendations for developers.') }}">
+  <meta name="robots" content="noindex, nofollow">
+  <meta property="og:title" content="Project Admin — DevPath">
+  <meta property="og:description" content="{{ fit_meta_description('Review and manage the DevPath project catalog. Search project entries, inspect learning details, and update the collection that powers recommendations for developers.') }}">
+  <meta property="og:image" content="https://mydevpath-github.vercel.app/static/og-image.webp">
+  <link rel="stylesheet" href="/static/design-system.css">
+  <link rel="stylesheet" href="/static/components.css">
+  <link rel="stylesheet" href="/static/animations.css">
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f9fafb; margin: 0; padding: 2rem; color: #111827; }
-    .container { max-width: 1200px; margin: 0 auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-    h1 { margin: 0; font-size: 1.5rem; }
-    .btn { display: inline-block; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 500; text-decoration: none; cursor: pointer; border: none; font-size: 0.875rem; }
-    .btn-primary { background-color: #2563eb; color: white; }
-    .btn-primary:hover { background-color: #1d4ed8; }
-    .btn-danger { background-color: #dc2626; color: white; }
-    .btn-danger:hover { background-color: #b91c1c; }
-    .btn-secondary { background-color: #f3f4f6; color: #374151; }
-    .btn-secondary:hover { background-color: #e5e7eb; }
+    body { min-height: 100vh; padding: clamp(16px, 4vw, 48px); background: var(--hero-gradient); font-family: var(--font-sans); color: var(--text-primary); }
+    .container { width: 100%; max-width: 1240px; margin: 0 auto; padding: clamp(20px, 4vw, 40px); background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 24px; box-shadow: var(--shadow-lg); }
+    .header { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 2rem; }
+    h1 { margin: 0; font-size: clamp(1.7rem, 3vw, 2.25rem); }
+    .btn { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 0.7rem 1rem; border-radius: 12px; font-family: var(--font-sans); font-weight: 650; text-decoration: none; cursor: pointer; border: 1px solid transparent; font-size: 0.9rem; }
+    .btn-primary { background: var(--dp-yellow-400); color: var(--dp-indigo-950); }
+    .btn-primary:hover { background: var(--dp-yellow-500); color: var(--dp-indigo-950); }
+    .btn-danger { background: #fff1f2; color: #9f1239; border-color: #fecdd3; }
+    .btn-danger:hover { background: #9f1239; color: #fff; }
+    .btn-secondary { background: var(--bg-surface); color: var(--text-primary); border-color: var(--border-default); }
+    .btn-secondary:hover { background: var(--bg-section); }
     table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-    th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
-    th { font-weight: 600; color: #6b7280; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; }
-    td { font-size: 0.875rem; }
-    .actions { display: flex; gap: 0.5rem; }
+    th, td { padding: 0.9rem 1rem; text-align: left; border-bottom: 1px solid var(--border-default); }
+    th { font-weight: 700; color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    td { font-size: 0.9rem; }
+    tbody tr:hover { background: var(--bg-section); }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
     form { display: inline; }
-    .badge { padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; background-color: #e0e7ff; color: #4338ca; }
-    .pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; }
+    .badge { padding: 0.3rem 0.65rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 650; background: var(--dp-yellow-100); color: var(--dp-indigo-950); }
+    .pagination { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 2rem; }
+    @media (max-width: 700px) { body { padding: 12px; } .header, .pagination { align-items: stretch; flex-direction: column; } table { display: block; overflow-x: auto; white-space: nowrap; } }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container admin-motion-surface">
     <div class="header">
       <div>
         <h1>Projects Dashboard</h1>
@@ -90,5 +101,6 @@
       </div>
     </div>
   </div>
+  <script src="/static/animations.js"></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Developer Profile - DevPath{% endblock %}
-{% block meta_description %}Manage your personalized DevPath developer profile.{% endblock %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block meta_description %}{{ seo_description }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='profile.css') }}">
@@ -11,7 +11,7 @@
 <header class="profile-header">
   <div class="container text-center">
     {% if user.avatar_url %}
-    <img src="{{ user.avatar_url }}" alt="Profile Picture" class="profile-avatar">
+    <img src="{{ user.avatar_url }}" alt="{{ user.username }}’s GitHub profile photo" class="profile-avatar">
     {% else %}
     <div class="profile-avatar profile-avatar--placeholder">
       {{ user.username[0] | upper }}

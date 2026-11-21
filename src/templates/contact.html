@@ -1,9 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}Contact — DevPath{% endblock %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block meta_description %}{{ seo_description }}{% endblock %}
+{% block og_title %}{{ seo_title }}{% endblock %}
+{% block og_description %}{{ seo_description }}{% endblock %}
 
 {% block content %}
 <style>
+    .contact-page { padding: clamp(2.5rem, 6vw, 5rem) 0; }
+    .contact-page .container { max-width: 800px; }
+    .contact-page .card { border-radius: 20px; }
+    .contact-page .card__header { padding: 2rem 1.5rem 1.25rem; }
+    .contact-page .card__body { padding: clamp(1.25rem, 4vw, 2rem); }
+    .contact-page .card__header h1 { margin-bottom: 0.4rem; }
     .char-counter {
         font-size: 0.8rem;
         color: #94a3b8;
@@ -18,7 +27,7 @@
         font-weight: 600;
     }
 </style>
-<section class="py-16">
+<section class="py-16 contact-page">
     <div class="container max-w-3xl mx-auto">
         <div class="card">
             <div class="card__header text-center">
