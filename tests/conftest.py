@@ -30,31 +30,9 @@ def app_context():
         db.drop_all()
         db.create_all()
         
-        # Seed projects
-        from models import Project
-        if True:
-            import json
-            data_file = os.path.join(basedir, "data", "projects.json")
-            with open(data_file, "r", encoding="utf-8") as f:
-                projects_data = json.load(f)
-            for p_data in projects_data:
-                project = Project(
-                    id=p_data.get("id"),
-                    title=p_data.get("title", ""),
-                    level=p_data.get("level", "Beginner"),
-                    interest=p_data.get("interest", ""),
-                    time=p_data.get("time", "Low"),
-                    description=p_data.get("description", ""),
-                    skills=p_data.get("skills", []),
-                    features=p_data.get("features", []),
-                    tech_stack=p_data.get("tech_stack", []),
-                    roadmap=p_data.get("roadmap", []),
-                    resources=p_data.get("resources", []),
-                    starter_code=p_data.get("starter_code"),
-                    estimated_hours=p_data.get("estimated_hours", 0.0)
-                )
-                db.session.add(project)
-            db.session.commit()
+        # Seed projects using shared seeding helper
+        from seed_db import seed_database
+        seed_database()
             
         yield
 
