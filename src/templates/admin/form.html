@@ -3,26 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% if project %}Edit Project{% else %}New Project{% endif %} | DevPath Admin</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <title>{% if project %}Edit {{ project.title|truncate(40, True, '…') }}{% else %}New Project{% endif %} — DevPath</title>
+  <meta name="description" content="{% if project %}{{ fit_meta_description('Update ' ~ project.title ~ ', a DevPath coding project. Refine its skills, roadmap, resources, and starter code to keep this challenge accurate and useful for learners.') }}{% else %}{{ fit_meta_description('Create a new DevPath coding project with clear skills, a practical roadmap, helpful resources, and starter code so developers can build with guided steps.') }}{% endif %}">
+  <meta name="robots" content="noindex, nofollow">
+  <meta property="og:title" content="{% if project %}Edit {{ project.title|truncate(40, True, '…') }}{% else %}New Project{% endif %} — DevPath">
+  <meta property="og:description" content="{% if project %}{{ fit_meta_description('Update ' ~ project.title ~ ', a DevPath coding project. Refine its skills, roadmap, resources, and starter code to keep this challenge accurate and useful for learners.') }}{% else %}{{ fit_meta_description('Create a new DevPath coding project with clear skills, a practical roadmap, helpful resources, and starter code so developers can build with guided steps.') }}{% endif %}">
+  <meta property="og:image" content="https://mydevpath-github.vercel.app/static/og-image.webp">
+  <link rel="stylesheet" href="/static/design-system.css">
+  <link rel="stylesheet" href="/static/components.css">
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f9fafb; margin: 0; padding: 2rem; color: #111827; }
-    .container { max-width: 800px; margin: 0 auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .header { margin-bottom: 2rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 1rem; }
-    h1 { margin: 0; font-size: 1.5rem; }
+    body { min-height: 100vh; padding: clamp(16px, 4vw, 48px); background: var(--hero-gradient); font-family: var(--font-sans); color: var(--text-primary); }
+    .container { width: 100%; max-width: 860px; margin: 0 auto; padding: clamp(20px, 4vw, 40px); background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 24px; box-shadow: var(--shadow-lg); }
+    .header { margin-bottom: 2rem; border-bottom: 1px solid var(--border-default); padding-bottom: 1rem; }
+    h1 { margin: 0; font-size: clamp(1.7rem, 3vw, 2.25rem); }
     .form-group { margin-bottom: 1.5rem; }
-    label { display: block; font-weight: 500; margin-bottom: 0.5rem; font-size: 0.875rem; color: #374151; }
-    input[type="text"], input[type="url"], select, textarea { width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; font-family: inherit; font-size: 0.875rem; }
-    input[type="text"]:focus, select:focus, textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 1px #2563eb; }
-    textarea { min-height: 100px; resize: vertical; }
-    .help-text { display: block; margin-top: 0.25rem; font-size: 0.75rem; color: #6b7280; }
-    .btn { display: inline-block; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 500; text-decoration: none; cursor: pointer; border: none; font-size: 0.875rem; }
-    .btn-primary { background-color: #2563eb; color: white; }
-    .btn-primary:hover { background-color: #1d4ed8; }
-    .btn-secondary { background-color: #f3f4f6; color: #374151; }
-    .btn-secondary:hover { background-color: #e5e7eb; }
-    .form-actions { display: flex; gap: 1rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; }
+    label { display: block; font-weight: 650; margin-bottom: 0.5rem; font-size: 0.92rem; color: var(--text-primary); }
+    input[type="text"], input[type="url"], select, textarea { width: 100%; min-height: 46px; padding: 0.7rem 0.9rem; border: 1px solid var(--border-default); border-radius: 12px; box-sizing: border-box; font-family: inherit; font-size: 1rem; background: var(--bg-surface); color: var(--text-primary); }
+    input[type="text"]:focus, input[type="url"]:focus, select:focus, textarea:focus { outline: 2px solid var(--focus-ring); outline-offset: 2px; border-color: var(--brand-secondary); }
+    textarea { min-height: 120px; resize: vertical; }
+    .help-text { display: block; margin-top: 0.4rem; font-size: 0.82rem; color: var(--text-secondary); }
+    .btn { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 0.7rem 1rem; border-radius: 12px; font-weight: 650; text-decoration: none; cursor: pointer; border: 1px solid transparent; font-size: 0.9rem; }
+    .btn-primary { background: var(--dp-yellow-400); color: var(--dp-indigo-950); }
+    .btn-primary:hover { background: var(--dp-yellow-500); color: var(--dp-indigo-950); }
+    .btn-secondary { background: var(--bg-surface); color: var(--text-primary); border-color: var(--border-default); }
+    .btn-secondary:hover { background: var(--bg-section); }
+    .form-actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-default); }
     .row { display: flex; gap: 1rem; }
-    .col { flex: 1; }
+    .col { flex: 1; min-width: 0; }
+    @media (max-width: 680px) { body { padding: 12px; } .row { flex-direction: column; gap: 0; } }
   </style>
 </head>
 <body>

@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}DevPath — Find Projects Based On Your Skills{% endblock %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block meta_description %}{{ seo_description }}{% endblock %}
+{% block og_title %}{{ seo_title }}{% endblock %}
+{% block og_description %}{{ seo_description }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="/static/landing.css">
@@ -85,7 +88,7 @@
         <h2>How DevPath Works</h2>
         <p>Three simple steps. No account required. No fluff.</p>
         
-        <div class="grid-3">
+        <div class="grid-3" id="features">
             <div class="feature-box">
                 <h3 style="font-size: 2rem; opacity: 0.5;">01</h3>
                 <h3>Enter Your Skills</h3>
@@ -173,7 +176,7 @@
                     <span id="progress-meter-label" style="font-size: 0.85rem; font-weight: 600;">0%</span>
                 </div>
                 <div class="progress-meter" style="height: 8px; background: rgba(128,128,128,0.25); border-radius: 999px; overflow: hidden;">
-                    <span class="progress-meter-fill" id="progress-meter-fill" style="display: block; width: 0%; height: 100%; background: var(--color-primary, #facc15); border-radius: 999px; transition: width 0.3s ease;" role="progressbar" aria-label="Points progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></span>
+                    <span class="progress-meter-fill" id="progress-meter-fill" style="display: block; width: 0%; height: 100%; background: var(--dp-yellow-400); border-radius: 999px; transition: width 0.3s ease;" role="progressbar" aria-label="Points progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></span>
                 </div>
             </div>
         </div>
@@ -219,4 +222,5 @@
 
 {% block extra_scripts %}
 <script src="/static/bookmarks.js"></script>
+<script src="/static/script.js"></script>
 {% endblock %}

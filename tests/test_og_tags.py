@@ -36,7 +36,7 @@ def test_index_og_image():
     """Homepage must include og:image pointing to the OG banner."""
     html = get_client().get("/").data.decode()
     assert 'property="og:image"' in html
-    assert "og-banner.png" in html
+    assert "og-image.webp" in html
 
 def test_index_og_url():
     """Homepage must include og:url."""
@@ -88,7 +88,7 @@ def test_project_og_image():
     """Project page must include og:image."""
     html = get_client().get("/project/1").data.decode()
     assert 'property="og:image"' in html
-    assert "og-banner.png" in html
+    assert "og-image.webp" in html
 
 def test_project_og_url_dynamic():
     """Project page og:url must contain the project ID."""
@@ -143,16 +143,16 @@ def test_config_base_url_used():
 # OG Banner Image Tests
 # ============================================================
 
-def test_og_banner_exists():
-    """The og-banner.png file must exist in static folder."""
+def test_og_image_exists():
+    """The current Open Graph image must exist in the static folder."""
     import os
-    assert os.path.exists("src/static/og-banner.png"), "og-banner.png missing from static folder"
+    assert os.path.exists("src/static/og-image.webp"), "og-image.webp missing from static folder"
 
-def test_og_banner_dimensions():
-    """The og-banner.png must be 1200x630 pixels."""
+def test_og_image_dimensions():
+    """The Open Graph WebP image must be 1200x630 pixels."""
     pytest.importorskip("PIL")
     from PIL import Image
-    img = Image.open("src/static/og-banner.png")
+    img = Image.open("src/static/og-image.webp")
     assert img.size == (1200, 630), f"Expected 1200x630, got {img.size}"
 
 if __name__ == "__main__":

@@ -4,10 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bad Request — DevPath</title>
-  <meta name="robots" content="noindex" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="description" content="{{ fit_meta_description('DevPath could not understand that request. Check the submitted information, return to the homepage, and explore project ideas, roadmaps, and starter code.') }}" />
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
   <meta property="og:title" content="Bad Request — DevPath" />
-  <meta property="og:description" content="The request could not be understood by the server." />
+  <meta property="og:description" content="{{ fit_meta_description('DevPath could not understand that request. Check the submitted information, return to the homepage, and explore project ideas, roadmaps, and starter code.') }}" />
   <meta property="og:image" content="{{ config.get_og_image_url() }}" />
   <meta property="og:url" content="{{ config.get_base_url() }}/" />
   <meta property="og:type" content="website" />
@@ -18,7 +19,7 @@
 <body>
   <nav class="navbar" aria-label="Main navigation">
     <div class="nav-inner">
-      <a href="/" class="nav-logo">DevPath</a>
+      <a href="/" class="nav-logo"><span>Dev</span><span class="nav-logo-accent">Path</span></a>
       {% include 'partials/theme_toggle.html' %}
     </div>
   </nav>

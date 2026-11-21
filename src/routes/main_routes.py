@@ -523,14 +523,14 @@ def sitemap():
     Includes the homepage, static pages, and all individual project detail pages.
     """
     from xml.sax.saxutils import escape
-    base = request.host_url.rstrip("/")
+    base = Config.get_base_url()
     projects = load_all_projects()
 
-    urls = [f"<url><loc>{base}/</loc></url>"]
-    for path in ("/explore", "/contact", "/compare", "/profile"):
-        urls.append(f"<url><loc>{base}{path}</loc></url>")
+    urls = [f"<url><loc>{escape(base)}/</loc></url>"]
+    for path in ("/explore", "/contact", "/compare"):
+        urls.append(f"<url><loc>{escape(base + path)}</loc></url>")
     for p in projects:
-        urls.append(f"<url><loc>{escape(base)}/project/{p['id']}</loc></url>")
+        urls.append(f"<url><loc>{escape(base)}/project/{escape(str(p['id']))}</loc></url>")
 
     xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

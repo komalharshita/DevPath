@@ -1,22 +1,21 @@
 
 /* LANDING PAGE SPECIFIC CSS */
 :root {
-  --landing-bg: #171d70;
-  --landing-bg-grad: linear-gradient(112deg, #171d70 0%, #202b88 48%, #5525b5 100%);
-  --landing-yellow: #ffc629;
-  --landing-yellow-hover: #f5b814;
-  --landing-white: #ffffff;
-  --landing-lavender: #b9b8d7;
-  --landing-code-bg: #0d1117;
-  
-  --landing-font-primary: 'Sora', sans-serif;
-  --landing-font-secondary: 'Inter', sans-serif;
-  --landing-font-mono: 'JetBrains Mono', monospace;
+  --landing-bg: var(--dp-indigo-900);
+  --landing-bg-grad: var(--hero-gradient);
+  --landing-yellow: var(--dp-yellow-400);
+  --landing-yellow-hover: var(--dp-yellow-500);
+  --landing-white: var(--dp-white);
+  --landing-lavender: var(--dp-lavender-300);
+  --landing-code-bg: var(--dp-charcoal-950);
+  --landing-font-primary: var(--font-display);
+  --landing-font-secondary: var(--font-sans);
+  --landing-font-mono: var(--font-mono);
 }
 
 body.landing-page {
-  background: #171d70;
-  color: var(--landing-white);
+  background: var(--bg-page);
+  color: var(--text-primary);
   font-family: var(--landing-font-secondary);
   margin: 0;
   padding: 0;
@@ -49,6 +48,11 @@ body.landing-page {
 .landing-logo span {
   color: var(--landing-yellow);
 }
+.landing-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
 .landing-nav-links a {
   color: var(--landing-lavender);
   text-decoration: none;
@@ -71,6 +75,7 @@ body.landing-page {
 
 /* HERO SECTION */
 .landing-hero {
+  color: var(--text-on-brand);
   min-height: calc(100vh - 80px);
   padding: 32px 0 42px;
   position: relative;
@@ -302,20 +307,23 @@ body.landing-page {
 
 /* SECTIONS */
 .landing-section {
-  padding: 5rem 0;
+  padding: clamp(3rem, 7vw, 5rem) 0;
+  background: var(--bg-page);
+  color: var(--text-primary);
 }
 .landing-section h2 {
   font-family: var(--landing-font-primary);
-  font-size: 2.5rem;
+  font-size: clamp(1.9rem, 4vw, 2.5rem);
   margin-bottom: 1rem;
   text-align: center;
+  color: var(--text-primary);
 }
 .landing-section > p {
   text-align: center;
-  color: var(--landing-lavender);
+  color: var(--text-secondary);
   max-width: 600px;
-  margin: 0 auto 4rem;
-  font-size: 1.1rem;
+  margin: 0 auto 3.5rem;
+  font-size: 1.05rem;
 }
 
 /* HOW IT WORKS / FEATURES */
@@ -325,21 +333,22 @@ body.landing-page {
   gap: 2rem;
 }
 .feature-box {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 2rem;
-  border-radius: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
 }
 .feature-box h3 {
   font-family: var(--landing-font-primary);
-  color: var(--landing-yellow);
+  color: var(--dp-indigo-900);
   margin-top: 1rem;
   margin-bottom: 0.5rem;
 }
 .feature-box p {
-  color: var(--landing-lavender);
+  color: var(--text-secondary);
   font-size: 0.95rem;
-  line-height: 1.5;
+  line-height: 1.65;
 }
 
 /* FORM OVERRIDES FOR LANDING */
@@ -372,9 +381,9 @@ body.landing-page {
 }
 
 /* RESULTS SECTION (Re-using some existing styling but adapting text) */
-#results-section h2 { color: var(--landing-white); }
-#empty-message { color: var(--landing-lavender); }
-#results-loading { color: var(--landing-lavender); }
+#results-section h2 { color: var(--text-primary); }
+#empty-message { color: var(--text-secondary); }
+#results-loading { color: var(--text-secondary); }
 
 /* FOOTER */
 .landing-footer {

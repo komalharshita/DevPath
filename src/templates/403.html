@@ -4,10 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Forbidden — DevPath</title>
-  <meta name="robots" content="noindex" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="description" content="{{ fit_meta_description('This DevPath page is restricted because your account does not have permission. Return to explore coding projects, learning resources, guided roadmaps, and starter code.') }}" />
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
   <meta property="og:title" content="Forbidden — DevPath" />
-  <meta property="og:description" content="You do not have permission to access this page." />
+  <meta property="og:description" content="{{ fit_meta_description('This DevPath page is restricted because your account does not have permission. Return to explore coding projects, learning resources, guided roadmaps, and starter code.') }}" />
   <meta property="og:image" content="{{ config.get_og_image_url() }}" />
   <meta property="og:url" content="{{ config.get_base_url() }}/" />
   <meta property="og:type" content="website" />
@@ -19,7 +20,7 @@
 <body>
   <nav class="navbar" aria-label="Main navigation">
     <div class="nav-inner">
-      <a href="/" class="nav-logo">DevPath</a>
+      <a href="/" class="nav-logo"><span>Dev</span><span class="nav-logo-accent">Path</span></a>
       {% include 'partials/theme_toggle.html' %}
     </div>
   </nav>
