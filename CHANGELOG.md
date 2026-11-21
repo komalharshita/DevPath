@@ -26,3 +26,4 @@
 - Fixed missed skill matches when users enter common abbreviations (e.g. "JS" instead of "JavaScript"),
   which previously caused skill coverage score to drop to 0 and returned poor recommendations (#1116)
 - Correct skills suggestions dropdown overlapping with available skill chips and resolve white background conflict in dark theme
+- Fixed the README "Verify Everything Works" section to install `requirements-dev.txt` before running `pytest`, so the test command works on a fresh setup (#1943)
