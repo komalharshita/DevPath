@@ -1355,5 +1355,47 @@
             "GitHub Actions documentation: https://docs.github.com/en/actions"
         ],
         "starter_code": "starter_code/devops_pipeline.yml"
+    },
+    {
+        "id": 35,
+        "title": "Inventory Management API",
+        "skills": [
+            "Python",
+            "FastAPI",
+            "SQLite"
+        ],
+        "level": "Intermediate",
+        "interest": "Backend",
+        "time": "Medium",
+        "estimated_hours": 15,
+        "description": "A REST API built with FastAPI and SQLite to manage products and stock levels. Teaches request validation with Pydantic, database access, low-stock queries and automated API testing.",
+        "features": [
+            "CRUD endpoints for products with Pydantic validation",
+            "Add and remove stock without allowing negative quantities",
+            "List products that are running low on stock",
+            "Automatic interactive API docs with Swagger UI"
+        ],
+        "tech_stack": [
+            "Python",
+            "FastAPI",
+            "SQLite",
+            "pytest"
+        ],
+        "roadmap": [
+            "Step 1: Create a virtual environment and install FastAPI, uvicorn and pytest",
+            "Step 2: Define the Product model with Pydantic (name, quantity, price)",
+            "Step 3: Create the SQLite database and a products table",
+            "Step 4: Write the CRUD endpoints for products",
+            "Step 5: Add an endpoint to adjust stock and reject negative quantities",
+            "Step 6: Add a low-stock endpoint that accepts a quantity threshold",
+            "Step 7: Write tests with pytest and FastAPI's TestClient"
+        ],
+        "resources": [
+            "FastAPI tutorial: https://fastapi.tiangolo.com/tutorial/first-steps/",
+            "FastAPI SQL databases: https://fastapi.tiangolo.com/tutorial/sql-databases/",
+            "FastAPI testing: https://fastapi.tiangolo.com/tutorial/testing/",
+            "Python sqlite3 module: https://docs.python.org/3/library/sqlite3.html"
+        ],
+        "starter_code": null
     }
 ]
